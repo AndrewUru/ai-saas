@@ -11,9 +11,9 @@ const PLAN_MAP: Record<string, { plan: "basic" | "pro"; months: number }> = {
 
 export async function POST(req: Request) {
   try {
-    const { subscriptionID, plan } = (await req.json()) as {
+    const { subscriptionID, plan: requestedPlan } = (await req.json()) as {
       subscriptionID: string;
-      plan: string;
+      plan?: string;
     };
     if (!subscriptionID) {
       return NextResponse.json(
@@ -44,6 +44,15 @@ export async function POST(req: Request) {
     if (!mapped) {
       return NextResponse.json(
         { ok: false, error: "Plan PayPal no reconocido" },
+        { status: 400 }
+      );
+    }
+    if (requestedPlan && requestedPlan !== mapped.plan) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: `Plan solicitado (${requestedPlan}) no coincide con PayPal`,
+        },
         { status: 400 }
       );
     }
