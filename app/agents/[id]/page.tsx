@@ -82,13 +82,17 @@ async function updateIntegrationAndDomains(formData: FormData) {
   redirect(`/agents/${agentId}?saved=1`);
 }
 
+type AgentDetailPageProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
 export default async function AgentDetailPage({
   params,
   searchParams,
-}: {
-  params: { id: string };
-  searchParams: Record<string, string | string[] | undefined>;
-}) {
+}: AgentDetailPageProps) {
+  const { id } = await params;
+  const resolvedSearchParams = await searchParams;
   const supabase = await createServer();
 
   // Usuario
@@ -103,7 +107,7 @@ export default async function AgentDetailPage({
     .select(
       "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at"
     )
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_id", user.id)
     .single();
 
@@ -116,9 +120,10 @@ export default async function AgentDetailPage({
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  const saved = searchParams?.saved === "1";
+  const saved = resolvedSearchParams.saved === "1";
+  const errorParam = resolvedSearchParams.error;
   const err =
-    typeof searchParams?.error === "string" ? searchParams?.error : null;
+    typeof errorParam === "string" ? errorParam : null;
 
   return (
     <section className="max-w-2xl space-y-4">
