@@ -1,5 +1,6 @@
 // app/api/paypal/webhook/route.ts
 import { NextResponse } from "next/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
 import { verifyWebhookSignature } from "@/lib/paypal-verify"; // tu helper de verificación real
 import { z } from "zod";
@@ -27,11 +28,22 @@ const PayPalWebhookSchema = z.object({
 });
 
 // ---- Cliente Supabase (service role)
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
-);
+function getSupabaseAdminClient(): SupabaseClient | null {
+  const supabaseUrl =
+    process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    console.error(
+      "Supabase admin credentials missing. Ensure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set."
+    );
+    return null;
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false },
+  });
+}
 
 export async function POST(req: Request) {
   try {
@@ -61,6 +73,14 @@ export async function POST(req: Request) {
     const event = evt.event_type;
     const subId = evt.resource?.id ?? null;
     const status = evt.resource?.status?.toLowerCase();
+
+    const supabase = getSupabaseAdminClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { ok: false, error: "Supabase no configurado" },
+        { status: 500 }
+      );
+    }
 
     if (
       event === "BILLING.SUBSCRIPTION.ACTIVATED" ||
