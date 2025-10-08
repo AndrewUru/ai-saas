@@ -1,81 +1,78 @@
+import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
 
-// ---- Utilidades de servidor (no usan window)
+// --- Utilities -------------------------------------------------------------
 function toHostname(raw: string): string | null {
-  const s = raw.trim().toLowerCase();
-  if (!s) return null;
-  // Añadimos esquema si hace falta para que URL lo parsee
+  const value = raw.trim().toLowerCase();
+  if (!value) return null;
+
   try {
-    const hasScheme = /^https?:\/\//i.test(s);
-    const u = new URL(hasScheme ? s : `https://${s}`);
-    return u.hostname.replace(/^www\./, "");
+    const hasScheme = /^https?:\/\//i.test(value);
+    const url = new URL(hasScheme ? value : `https://${value}`);
+    return url.hostname.replace(/^www\./, "");
   } catch {
-    // fallback: cadena sin espacios y sin comas
-    if (/^[a-z0-9.-]+$/i.test(s)) return s.replace(/^www\./, "");
+    if (/^[a-z0-9.-]+$/i.test(value)) {
+      return value.replace(/^www\./, "");
+    }
     return null;
   }
 }
 
 function normalizeDomainList(input: string): string[] {
-  const uniq = new Set<string>();
+  const unique = new Set<string>();
   for (const part of input.split(",")) {
     const host = toHostname(part || "");
-    if (host) uniq.add(host);
+    if (host) unique.add(host);
   }
-  return Array.from(uniq).slice(0, 50); // límite defensivo
+  return Array.from(unique).slice(0, 50);
 }
 
-// ---- Server Action: actualizar integración y dominios
+// --- Server action ---------------------------------------------------------
 async function updateIntegrationAndDomains(formData: FormData) {
   "use server";
-  const supabase = await createServer();
 
-  // Usuario
+  const supabase = await createServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   if (!user) redirect("/login");
 
-  // Campos del form
-  const agentId = String(formData.get("agent_id") || "");
-  const integrationId = String(formData.get("integration_id") || "");
-  const domainsRaw = String(formData.get("allowed_domains") || "");
+  const agentId = String(formData.get("agent_id") ?? "");
+  const integrationId = String(formData.get("integration_id") ?? "");
+  const domainsRaw = String(formData.get("allowed_domains") ?? "");
 
-  // Normalizar valores
-  const allowed_domains = normalizeDomainList(domainsRaw);
-  const woo_integration_id =
+  const allowedDomains = normalizeDomainList(domainsRaw);
+  const wooIntegrationId =
     integrationId && integrationId !== "none" ? integrationId : null;
 
-  // (Opcional) Validación extra: que la integración pertenezca al usuario
-  if (woo_integration_id) {
-    const { data: integ, error: integErr } = await supabase
+  if (wooIntegrationId) {
+    const { data: integration, error } = await supabase
       .from("integrations_woocommerce")
       .select("id, user_id, is_active")
-      .eq("id", woo_integration_id)
+      .eq("id", wooIntegrationId)
       .single();
 
-    if (integErr || !integ || integ.user_id !== user.id) {
-      // integración inválida para este usuario
+    if (error || !integration || integration.user_id !== user.id) {
       redirect(`/agents/${agentId}?error=integration`);
     }
-    if (integ && integ.is_active === false) {
+    if (integration && integration.is_active === false) {
       redirect(`/agents/${agentId}?error=integration_inactive`);
     }
   }
 
-  // Actualizar agente (RLS: user_id debe coincidir)
-  const { error: upErr } = await supabase
+  const { error: updateError } = await supabase
     .from("agents")
     .update({
-      woo_integration_id,
-      allowed_domains: allowed_domains.length ? allowed_domains : null, // null si vacío
+      woo_integration_id: wooIntegrationId,
+      allowed_domains: allowedDomains.length ? allowedDomains : null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", agentId)
     .eq("user_id", user.id);
 
-  if (upErr) {
+  if (updateError) {
     redirect(`/agents/${agentId}?error=save`);
   }
 
@@ -93,27 +90,24 @@ export default async function AgentDetailPage({
 }: AgentDetailPageProps) {
   const { id } = await params;
   const resolvedSearchParams = await searchParams;
-  const supabase = await createServer();
 
-  // Usuario
+  const supabase = await createServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Agente
-  const { data: agent, error: agentErr } = await supabase
+  const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at"
+      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at",
     )
     .eq("id", id)
     .eq("user_id", user.id)
     .single();
 
-  if (agentErr || !agent) return notFound();
+  if (agentError || !agent) return notFound();
 
-  // Integraciones Woo del usuario
   const { data: integrations } = await supabase
     .from("integrations_woocommerce")
     .select("id, site_url, is_active, created_at")
@@ -122,114 +116,232 @@ export default async function AgentDetailPage({
 
   const saved = resolvedSearchParams.saved === "1";
   const errorParam = resolvedSearchParams.error;
-  const err =
-    typeof errorParam === "string" ? errorParam : null;
+  const errorKey = typeof errorParam === "string" ? errorParam : null;
+
+  const errorMessages: Record<string, string> = {
+    integration: "La integracion seleccionada no pertenece a tu cuenta.",
+    integration_inactive: "La integracion seleccionada esta inactiva.",
+    save: "No pudimos guardar los cambios. Intenta nuevamente.",
+  };
+
+  const statusLabel = agent.is_active ? "Activo" : "Pausado";
+  const statusColor = agent.is_active
+    ? "bg-emerald-400"
+    : "bg-slate-500";
+
+  const createdAt = agent.created_at
+    ? new Intl.DateTimeFormat("es-ES", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      }).format(new Date(agent.created_at))
+    : "Fecha desconocida";
+
+  const allowedDomains = agent.allowed_domains ?? [];
 
   return (
-    <section className="max-w-2xl space-y-4">
-      <div className="rounded-2xl bg-white p-4 shadow">
-        <h1 className="text-xl font-semibold mb-1">{agent.name}</h1>
-        <p className="text-sm text-gray-600 break-all">
-          <b>API Key:</b> {agent.api_key}
-        </p>
-      </div>
-
-      {saved && (
-        <div className="rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-900 p-3 text-sm">
-          ✅ Cambios guardados correctamente.
-        </div>
-      )}
-      {err && (
-        <div className="rounded-lg border border-rose-300 bg-rose-50 text-rose-900 p-3 text-sm">
-          {err === "integration" &&
-            "La integración seleccionada no pertenece a tu cuenta."}
-          {err === "integration_inactive" &&
-            "La integración seleccionada está inactiva."}
-          {err === "save" && "No se pudo guardar. Intenta nuevamente."}
-        </div>
-      )}
-
-      <div className="rounded-2xl bg-white p-4 shadow">
-        <h2 className="font-semibold mb-3">Integración y dominios</h2>
-
-        <form action={updateIntegrationAndDomains} className="space-y-4">
-          {/* Agente actual */}
-          <input type="hidden" name="agent_id" value={agent.id} />
-
-          {/* Selector de integración Woo */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Integración de WooCommerce
-            </label>
-            <select
-              name="integration_id"
-              defaultValue={agent.woo_integration_id || "none"}
-              className="w-full rounded border px-3 py-2"
+    <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_60%)]" />
+      <section className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col gap-8 px-6 py-16 md:px-10 lg:px-16">
+        <header className="space-y-4 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div className="space-y-3">
+              <p className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">
+                Ficha del agente
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
+                  {agent.name}
+                </h1>
+                <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-300">
+                  <span className={`h-2.5 w-2.5 rounded-full ${statusColor}`} />
+                  {statusLabel}
+                </span>
+              </div>
+              <p className="max-w-2xl text-sm text-slate-300 sm:text-base">
+                Usa esta vista para vincular WooCommerce, controlar desde que dominios
+                se puede cargar el widget y copiar la API key del agente.
+              </p>
+            </div>
+            <Link
+              href="/agents"
+              className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
             >
-              <option value="none">— Ninguna —</option>
-              {(integrations || []).map((i) => (
-                <option key={i.id} value={i.id}>
-                  {i.site_url} {i.is_active ? "" : "(inactiva)"}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 mt-1">
-              Las credenciales se usarán solo para este agente. Puedes
-              gestionarlas en{" "}
-              <a href="/integrations/woo" className="underline">
-                Integraciones
-              </a>
-              .
+              Volver a agentes
+            </Link>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300">
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+                API Key
+              </p>
+              <p className="mt-2 break-all font-mono text-emerald-200">
+                {agent.api_key}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300">
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+                Limite de mensajes
+              </p>
+              <p className="mt-2 text-lg font-semibold text-white">
+                {agent.messages_limit?.toLocaleString("es-ES") ?? "Sin definir"}
+              </p>
+              <p className="text-xs text-slate-500">Ajusta este valor desde la base de datos o proximamente desde el plan.</p>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300">
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+                Creado el
+              </p>
+              <p className="mt-2 text-lg font-semibold text-white">{createdAt}</p>
+              <p className="text-xs text-slate-500">
+                Mantiene registro completo de actividad y dominios permitidos.
+              </p>
+            </div>
+          </div>
+        </header>
+
+        {saved && (
+          <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/20">
+            Cambios guardados correctamente.
+          </div>
+        )}
+        {errorKey && (
+          <div className="rounded-3xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-100 shadow-lg shadow-rose-500/20">
+            {errorMessages[errorKey] ?? "Ocurrio un error inesperado."}
+          </div>
+        )}
+
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_minmax(320px,1fr)]">
+          <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">
+            <h2 className="text-xl font-semibold text-white">
+              Integracion y dominios permitidos
+            </h2>
+            <p className="mt-1 text-sm text-slate-300">
+              Selecciona la integracion WooCommerce que debe usar este agente y define
+              que dominios pueden embeber el widget.
             </p>
-          </div>
 
-          {/* Dominios permitidos */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Dominios permitidos (opcional)
-            </label>
-            <input
-              name="allowed_domains"
-              placeholder="midominio.com, tienda.com"
-              defaultValue={(agent.allowed_domains || []).join(", ")}
-              className="w-full rounded border px-3 py-2"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Separa por comas. Ej.: <code>midominio.com, tienda.com</code>. Si
-              lo dejas vacío, no se restringe por dominio.
-            </p>
-          </div>
+            <form action={updateIntegrationAndDomains} className="mt-6 space-y-6">
+              <input type="hidden" name="agent_id" value={agent.id} />
 
-          <div className="flex gap-2">
-            <button className="rounded bg-black text-white px-3 py-2 text-sm">
-              Guardar
-            </button>
-            <a
-              href={`/agents/${agent.id}`}
-              className="rounded border px-3 py-2 text-sm"
-            >
-              Cancelar
-            </a>
-          </div>
-        </form>
-      </div>
+              <div className="space-y-2">
+                <label
+                  htmlFor="integration"
+                  className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                >
+                  Integracion WooCommerce
+                </label>
+                <select
+                  id="integration"
+                  name="integration_id"
+                  defaultValue={agent.woo_integration_id || "none"}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                >
+                  <option value="none">Sin integracion</option>
+                  {(integrations ?? []).map((integration) => (
+                    <option key={integration.id} value={integration.id}>
+                      {integration.site_url} {integration.is_active ? "" : "(inactiva)"}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-slate-500">
+                  Gestiona tus credenciales y sitios conectados desde{" "}
+                  <Link href="/integrations/woo" className="text-emerald-300 hover:text-emerald-200">
+                    Integraciones
+                  </Link>
+                  .
+                </p>
+              </div>
 
-      <div className="rounded-2xl bg-white p-4 shadow">
-        <h2 className="font-semibold mb-2">Snippet</h2>
-        <p className="text-sm text-gray-600 mb-2">
-          Inserta este script en tu WordPress (footer o widget HTML). Usa la API
-          Key del agente.
-        </p>
-        <pre className="text-xs bg-gray-900 text-green-200 p-3 rounded-lg overflow-auto">
-          {`<script>
-  (function(){
-    var s=document.createElement('script');
-    s.src='https://tu-dominio.com/widget.js?key=${agent.api_key}';
-    s.defer=true; document.head.appendChild(s);
+              <div className="space-y-2">
+                <label
+                  htmlFor="allowed-domains"
+                  className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                >
+                  Dominios permitidos (opcional)
+                </label>
+                <input
+                  id="allowed-domains"
+                  name="allowed_domains"
+                  placeholder="midominio.com, tienda.com"
+                  defaultValue={allowedDomains.join(", ")}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                />
+                <p className="text-xs text-slate-500">
+                  Separa cada dominio con comas. Si lo dejas vacio, el widget se podra
+                  cargar desde cualquier origen.
+                </p>
+                {!!allowedDomains.length && (
+                  <p className="text-xs text-slate-400">
+                    Dominios actuales:{" "}
+                    <span className="font-mono text-emerald-200">
+                      {allowedDomains.join(", ")}
+                    </span>
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <button
+                  type="submit"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto"
+                >
+                  Guardar cambios
+                </button>
+                <Link
+                  href={`/agents/${agent.id}`}
+                  className="inline-flex w-full items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:w-auto"
+                >
+                  Cancelar
+                </Link>
+              </div>
+            </form>
+          </article>
+
+          <aside className="space-y-6">
+            <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur">
+              <h3 className="text-lg font-semibold text-white">Snippet de incrustacion</h3>
+              <p className="mt-2 text-sm text-slate-300">
+                Copia y pega este script en tu WordPress (footer o widget HTML). La API
+                key ya esta incluida para este agente.
+              </p>
+              <pre className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200">
+{`<script>
+  (function () {
+    var s = document.createElement('script');
+    s.src = 'https://tu-dominio.com/widget.js?key=${agent.api_key}';
+    s.defer = true;
+    document.head.appendChild(s);
   })();
 </script>`}
-        </pre>
-      </div>
-    </section>
+              </pre>
+              <p className="mt-3 text-xs text-slate-500">
+                El widget verificara el plan activo y respetara los limites definidos
+                antes de mostrar el chat.
+              </p>
+            </article>
+
+            <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 text-sm text-slate-300 shadow-lg shadow-slate-900/40 backdrop-blur">
+              <h3 className="text-lg font-semibold text-white">Buenas practicas</h3>
+              <ul className="mt-3 space-y-2 text-xs text-slate-400">
+                <li>
+                  - Usa un agente por cada tienda o idioma para mantener las respuestas
+                  alineadas con tu catalogo.
+                </li>
+                <li>
+                  - Si la API key se compromete, genera un nuevo agente y desactiva este
+                  para revocar el acceso.
+                </li>
+                <li>
+                  - Activa alertas de limite de mensajes desde tu panel de facturacion
+                  para evitar interrupciones.
+                </li>
+              </ul>
+            </article>
+          </aside>
+        </div>
+      </section>
+    </main>
   );
 }
