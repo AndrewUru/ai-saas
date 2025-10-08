@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type NavLink = {
@@ -19,14 +19,23 @@ const NAV_LINKS: NavLink[] = [
 ];
 
 export default function Navbar() {
+  const [supabase, setSupabase] = useState<ReturnType<typeof createClient> | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const supabase = useMemo(() => createClient(), []);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setSupabase(createClient());
+  }, []);
 
   useEffect(() => {
+    if (!supabase) {
+      setIsLoadingUser(false);
+      return;
+    }
+
     let isMounted = true;
 
     supabase.auth
@@ -54,7 +63,7 @@ export default function Navbar() {
   const handleSignOut = async () => {
     try {
       setIsSigningOut(true);
-      await supabase.auth.signOut();
+      await supabase?.auth.signOut();
       setUserEmail(null);
       window.location.href = "/login";
     } catch (error) {
