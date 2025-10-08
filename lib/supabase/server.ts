@@ -15,6 +15,23 @@ export const createServer = async () => {
     path: "/",
   });
 
+  const safelyMutateCookie = (mutate: () => void, label: "set" | "remove") => {
+    try {
+      mutate();
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes("Cookies can only be modified in a Server Action or Route Handler")
+      ) {
+        console.warn(
+          `Skipping Supabase cookie ${label}: ${error.message}`,
+        );
+        return;
+      }
+      throw error;
+    }
+  };
+
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -24,13 +41,20 @@ export const createServer = async () => {
           return cookieStore.get(name)?.value;
         },
         set(name: string, value: string, options?: CookieOptions) {
-          cookieStore.set(name, value, withDefaultPath(options));
+          safelyMutateCookie(
+            () => cookieStore.set(name, value, withDefaultPath(options)),
+            "set",
+          );
         },
         remove(name: string, options?: CookieOptions) {
-          cookieStore.set(name, "", {
-            ...withDefaultPath(options),
-            maxAge: 0,
-          });
+          safelyMutateCookie(
+            () =>
+              cookieStore.set(name, "", {
+                ...withDefaultPath(options),
+                maxAge: 0,
+              }),
+            "remove",
+          );
         },
       },
     }

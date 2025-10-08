@@ -2,15 +2,19 @@ import { redirect } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
 
 export default async function DashboardPage() {
+  // 👇 tu función es async, así que aquí usamos await
   const supabase = await createServer();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   if (!user) redirect("/login");
 
+  // perfiles (sin email, se toma de user.email)
   const { data: profile } = await supabase
     .from("profiles")
-    .select("email, plan, active_until")
+    .select("plan, active_until")
     .eq("id", user.id)
     .single();
 
@@ -24,12 +28,12 @@ export default async function DashboardPage() {
     <section className="grid md:grid-cols-3 gap-4">
       <div className="col-span-2 space-y-4">
         <div className="rounded-2xl bg-white p-4 shadow">
-          <h1 className="text-xl font-semibold">¡Hola, {profile?.email}!</h1>
+          <h1 className="text-xl font-semibold">¡Hola, {user.email}!</h1>
           <p className="text-sm text-gray-600">
             Plan: <b>{profile?.plan ?? "free"}</b> · Activo hasta:{" "}
             <b>
               {profile?.active_until
-                ? new Date(profile.active_until).toLocaleDateString()
+                ? new Date(profile.active_until).toLocaleDateString("es-ES")
                 : "—"}
             </b>
           </p>
