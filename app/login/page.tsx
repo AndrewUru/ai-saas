@@ -25,9 +25,12 @@ export default function LoginPage() {
     setStatus({ intent: "info", message: "Sending your magic link..." });
 
     try {
+      const redirectUrl = `${
+        process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
+      }/auth/callback?next=/dashboard`;
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+        options: { emailRedirectTo: redirectUrl },
       });
 
       if (error) {
@@ -51,9 +54,12 @@ export default function LoginPage() {
 
   const signInGoogle = async () => {
     setStatus({ intent: "info", message: "Redirecting to Google..." });
+    const redirectUrl = `${
+      process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
+    }/auth/callback?next=/dashboard`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: redirectUrl },
     });
 
     if (error) {
