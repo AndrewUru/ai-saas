@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServer } from "@/lib/supabase/server";
+import { createAdmin } from "@/lib/supabase/admin";
 
 // ---------------------------------------------------------------------------
 // Configuración opcional: límite de tokens o de mensajes simultáneos
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const supabase = await createServer();
+    const supabase = createAdmin();
 
     // -----------------------------------------------------------------------
     // Buscar agente por API Key

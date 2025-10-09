@@ -13,6 +13,7 @@ function hostFrom(h: string | null) {
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const key = url.searchParams.get("key");
+  const chatEndpoint = `${url.origin}/api/agent/chat`;
 
   if (!key) {
     return new NextResponse("// Falta key", {
@@ -72,6 +73,7 @@ export async function GET(req: Request) {
   const js = `
 (function(){
   try{
+    const CHAT_ENDPOINT = ${JSON.stringify(chatEndpoint)};
     const ready=f=>document.readyState==='loading'?document.addEventListener('DOMContentLoaded',f):f();
     ready(function(){
       if(document.getElementById('ai-saas-chat')) return;
@@ -97,7 +99,7 @@ export async function GET(req: Request) {
         bubble(msg,'user'); input.value='';
         bubble('Pensando...','bot');
         try{
-          const res=await fetch('https://ai-saas-nine-omega.vercel.app/api/agent/chat',{
+          const res=await fetch(CHAT_ENDPOINT,{
             method:'POST', headers:{'Content-Type':'application/json'},
             body:JSON.stringify({ api_key:'${key}', message:msg })
           });
