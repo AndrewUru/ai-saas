@@ -1,61 +1,123 @@
 import { NextResponse } from "next/server";
 import { createServer } from "@/lib/supabase/server";
-// import { runAgent } from "@/lib/agent"; // TU implementación LangChain
 
+// ---------------------------------------------------------------------------
+// Configuración opcional: límite de tokens o de mensajes simultáneos
+const MAX_MESSAGE_LENGTH = 2000;
+
+// ---------------------------------------------------------------------------
+// Función principal del endpoint
 export async function POST(req: Request) {
-  const supabase = await createServer();
-  const { api_key, message } = await req.json();
+  try {
+    const body = await req.json().catch(() => ({}));
+    const apiKey = String(body.api_key || "").trim();
+    const message = String(body.message || "").trim();
 
-  if (!api_key || !message)
+    if (!apiKey || !message) {
+      return NextResponse.json(
+        { error: "Faltan parámetros (api_key o message)" },
+        { status: 400 }
+      );
+    }
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return NextResponse.json(
+        { error: "El mensaje es demasiado largo." },
+        { status: 413 }
+      );
+    }
+
+    const supabase = await createServer();
+
+    // -----------------------------------------------------------------------
+    // Buscar agente por API Key
+    const { data: agent, error: agentError } = await supabase
+      .from("agents")
+      .select("id, user_id, is_active, messages_limit")
+      .eq("api_key", apiKey)
+      .single();
+
+    if (agentError || !agent) {
+      return NextResponse.json(
+        { error: "Agente no encontrado o API key inválida." },
+        { status: 404 }
+      );
+    }
+
+    if (!agent.is_active) {
+      return NextResponse.json(
+        { error: "El agente está inactivo." },
+        { status: 403 }
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // Verificar límite de mensajes (si aplica)
+    if (agent.messages_limit && agent.messages_limit <= 0) {
+      return NextResponse.json(
+        { error: "Se alcanzó el límite de mensajes para este agente." },
+        { status: 403 }
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // ⚙️ Aquí puedes conectar tu modelo de IA real (OpenAI, GPT, etc.)
+    // Ejemplo con OpenAI SDK:
+    //
+    // import OpenAI from "openai";
+    // const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    // const completion = await openai.chat.completions.create({
+    //   model: "gpt-4o-mini",
+    //   messages: [{ role: "user", content: message }],
+    // });
+    // const reply = completion.choices[0]?.message?.content || "Sin respuesta";
+
+    // Por ahora usamos una respuesta simulada:
+    const reply = `Echo: ${message}`;
+
+    // -----------------------------------------------------------------------
+    // Registrar mensaje (opcional) en tabla `agent_messages`
+    await supabase.from("agent_messages").insert({
+      agent_id: agent.id,
+      message,
+      reply,
+      created_at: new Date().toISOString(),
+    });
+
+    // Si hay límite de mensajes, reducirlo:
+    if (agent.messages_limit && agent.messages_limit > 0) {
+      await supabase
+        .from("agents")
+        .update({ messages_limit: agent.messages_limit - 1 })
+        .eq("id", agent.id);
+    }
+
+    // -----------------------------------------------------------------------
     return NextResponse.json(
-      { error: "Parámetros inválidos" },
-      { status: 400 }
+      { reply },
+      {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      }
     );
-
-  const { data: agent } = await supabase
-    .from("agents")
-    .select("id,user_id,is_active,messages_limit")
-    .eq("api_key", api_key)
-    .single();
-  if (!agent || !agent.is_active)
-    return NextResponse.json({ error: "Agente inactivo" }, { status: 403 });
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("plan,active_until")
-    .eq("id", agent.user_id)
-    .single();
-  const active =
-    profile?.active_until && new Date(profile.active_until) > new Date();
-  if (!active)
+  } catch (err) {
+    console.error("[AI SaaS] Error en /api/agent/chat:", err);
     return NextResponse.json(
-      { error: "Suscripción inactiva" },
-      { status: 402 }
-    );
-
-  // Consumo/limite
-  const { count } = await supabase
-    .from("usage_logs")
-    .select("id", { count: "exact", head: true })
-    .eq("agent_id", agent.id);
-  if (agent.messages_limit && count && count >= agent.messages_limit) {
-    return NextResponse.json(
-      { error: "Límite de mensajes alcanzado" },
-      { status: 429 }
+      { error: "Error interno del servidor." },
+      { status: 500 }
     );
   }
+}
 
-  // Respuesta del agente (placeholder)
-  // const reply = await runAgent({ message, agentId: agent.id });
-  const reply = `Echo: ${message}`; // ⚠️ Sustituir por tu LangChain
-
-  // Log de uso
-  await supabase.from("usage_logs").insert({
-    agent_id: agent.id,
-    user_message: message,
-    ai_response: reply,
-    tokens_used: null,
+// ---------------------------------------------------------------------------
+// Preflight para CORS
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+    },
   });
-
-  return NextResponse.json({ reply });
 }
