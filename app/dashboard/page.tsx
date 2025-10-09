@@ -235,6 +235,11 @@ export default async function DashboardPage() {
               <p className="mt-3 text-xs text-slate-400">
                 El widget valida tu plan y límite en el backend antes de mostrar el chat.
               </p>
+              <p className="mt-2 text-xs text-slate-500">
+                Personaliza color o posición agregando parámetros opcionales como{" "}
+                <code className="rounded bg-slate-800 px-1 py-0.5">accent=ff7a45</code> o{" "}
+                <code className="rounded bg-slate-800 px-1 py-0.5">position=left</code> en la URL del script.
+              </p>
             </article>
 
             <article className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-emerald-100 shadow-lg shadow-emerald-500/20 backdrop-blur">
