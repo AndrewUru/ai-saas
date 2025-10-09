@@ -225,8 +225,9 @@ export default async function DashboardPage() {
 {`<script>
   (function () {
     var s = document.createElement('script');
-    s.src = 'https://tu-dominio.com/widget.js?key=AGENT_API_KEY';
+    s.src = 'https://tu-dominio.com/api/widget?key=AGENT_API_KEY';
     s.defer = true;
+    s.onerror = function(){ console.error("[AI SaaS] No se pudo cargar el widget."); };
     document.head.appendChild(s);
   })();
 </script>`}

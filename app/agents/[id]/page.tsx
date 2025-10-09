@@ -324,7 +324,7 @@ export default async function AgentDetailPage({
                 {`<script>
   (function () {
     var s = document.createElement('script');
-    s.src = 'https://ai-saas-nine-omega.vercel.app/widget?key=${agent.api_key}';
+    s.src = '${siteUrl}/api/widget?key=${agent.api_key}';
     s.async = true;
     s.defer = true;
     s.onerror = function(){ console.error("[AI SaaS] No se pudo cargar el widget."); };
@@ -364,3 +364,6 @@ export default async function AgentDetailPage({
     </main>
   );
 }
+  const siteUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+  ).replace(/\/$/, "");
