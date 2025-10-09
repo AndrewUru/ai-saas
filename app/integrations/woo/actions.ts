@@ -87,8 +87,8 @@ export async function createWooIntegration(formData: FormData) {
       user_id: user.id,
       label,
       site_url,
-      ck_cipher: encrypt(consumer_key),
-      cs_cipher: encrypt(consumer_secret),
+      ck_cipher: Buffer.from(encrypt(consumer_key), "utf8"),
+      cs_cipher: Buffer.from(encrypt(consumer_secret), "utf8"),
       is_active: is_active ?? true,
       position: nextPosition,
     });
@@ -146,10 +146,10 @@ export async function updateWooIntegration(formData: FormData) {
     };
 
     if (consumer_key) {
-      patch.ck_cipher = encrypt(consumer_key);
+      patch.ck_cipher = Buffer.from(encrypt(consumer_key), "utf8");
     }
     if (consumer_secret) {
-      patch.cs_cipher = encrypt(consumer_secret);
+      patch.cs_cipher = Buffer.from(encrypt(consumer_secret), "utf8");
     }
 
     const { error } = await supabase

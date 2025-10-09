@@ -75,17 +75,15 @@ export async function POST(req: Request) {
   const { site_url, label, consumer_key, consumer_secret, position, is_active } =
     parsed.data;
 
-  const { data: countData } = await supabase
+  const { count } = await supabase
     .from("integrations_woocommerce")
-    .select("id", { count: "exact" })
+    .select("id", { count: "exact", head: true })
     .eq("user_id", user.id);
 
   const nextPosition =
-    typeof position === "number"
+    typeof position === "number" && !Number.isNaN(position)
       ? position
-      : (countData?.length ?? 0) > 0
-      ? (countData?.length ?? 0)
-      : 0;
+      : (count ?? 0);
 
   const { error: insertError, data } = await supabase
     .from("integrations_woocommerce")
@@ -93,8 +91,8 @@ export async function POST(req: Request) {
       user_id: user.id,
       site_url,
       label,
-      ck_cipher: encrypt(consumer_key),
-      cs_cipher: encrypt(consumer_secret),
+      ck_cipher: Buffer.from(encrypt(consumer_key), "utf8"),
+      cs_cipher: Buffer.from(encrypt(consumer_secret), "utf8"),
       position: nextPosition,
       is_active: is_active ?? true,
     })
@@ -139,8 +137,10 @@ export async function PATCH(req: Request) {
   if (label) patch.label = label;
   if (typeof is_active === "boolean") patch.is_active = is_active;
   if (typeof position === "number") patch.position = position;
-  if (consumer_key) patch.ck_cipher = encrypt(consumer_key);
-  if (consumer_secret) patch.cs_cipher = encrypt(consumer_secret);
+  if (consumer_key)
+    patch.ck_cipher = Buffer.from(encrypt(consumer_key), "utf8");
+  if (consumer_secret)
+    patch.cs_cipher = Buffer.from(encrypt(consumer_secret), "utf8");
 
   const { error: updateError } = await supabase
     .from("integrations_woocommerce")
