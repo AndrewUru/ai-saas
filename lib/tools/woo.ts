@@ -34,10 +34,19 @@ export async function getWooCredsByApiKey(api_key: string) {
     .single();
   if (!integ || !integ.is_active) return null;
 
+  const ckCipher =
+    typeof integ.ck_cipher === "string"
+      ? integ.ck_cipher
+      : Buffer.from(integ.ck_cipher as Uint8Array).toString("utf8");
+  const csCipher =
+    typeof integ.cs_cipher === "string"
+      ? integ.cs_cipher
+      : Buffer.from(integ.cs_cipher as Uint8Array).toString("utf8");
+
   return {
     site_url: integ.site_url,
-    ck: decrypt(Buffer.from(integ.ck_cipher).toString("utf8")),
-    cs: decrypt(Buffer.from(integ.cs_cipher).toString("utf8")),
+    ck: decrypt(ckCipher),
+    cs: decrypt(csCipher),
   };
 }
 

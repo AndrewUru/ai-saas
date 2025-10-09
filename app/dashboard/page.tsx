@@ -89,8 +89,8 @@ export default async function DashboardPage() {
                 </p>
                 <p className="text-xs text-slate-400">
                   {totalAgents === 0
-                    ? "Aún no has creado ningún agente."
-                    : "Todos tus agentes están listos en WooCommerce."}
+                    ? "Aun no has creado ningun agente."
+                    : "Todos tus agentes estan listos en WooCommerce."}
                 </p>
               </article>
 

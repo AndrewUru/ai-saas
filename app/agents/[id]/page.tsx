@@ -143,7 +143,7 @@ export default async function AgentDetailPage({
 
   const { data: integrations } = await supabase
     .from("integrations_woocommerce")
-    .select("id, site_url, is_active, created_at")
+    .select("id, label, site_url, is_active, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -282,12 +282,15 @@ export default async function AgentDetailPage({
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
                 >
                   <option value="none">Sin integracion</option>
-                  {(integrations ?? []).map((integration) => (
-                    <option key={integration.id} value={integration.id}>
-                      {integration.site_url}{" "}
-                      {integration.is_active ? "" : "(inactiva)"}
-                    </option>
-                  ))}
+                  {(integrations ?? []).map((integration) => {
+                    const label =
+                      integration.label?.trim() || integration.site_url;
+                    return (
+                      <option key={integration.id} value={integration.id}>
+                        {label} {integration.is_active ? "" : "(inactiva)"}
+                      </option>
+                    );
+                  })}
                 </select>
                 <p className="text-xs text-slate-500">
                   Gestiona tus credenciales y sitios conectados desde{" "}
