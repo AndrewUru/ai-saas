@@ -1,3 +1,4 @@
+//C:\ai-saas\app\agents\[id]\page.tsx
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
@@ -100,7 +101,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at",
+      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -125,9 +126,7 @@ export default async function AgentDetailPage({
   };
 
   const statusLabel = agent.is_active ? "Activo" : "Pausado";
-  const statusColor = agent.is_active
-    ? "bg-emerald-400"
-    : "bg-slate-500";
+  const statusColor = agent.is_active ? "bg-emerald-400" : "bg-slate-500";
 
   const createdAt = agent.created_at
     ? new Intl.DateTimeFormat("es-ES", {
@@ -159,8 +158,9 @@ export default async function AgentDetailPage({
                 </span>
               </div>
               <p className="max-w-2xl text-sm text-slate-300 sm:text-base">
-                Usa esta vista para vincular WooCommerce, controlar desde que dominios
-                se puede cargar el widget y copiar la API key del agente.
+                Usa esta vista para vincular WooCommerce, controlar desde que
+                dominios se puede cargar el widget y copiar la API key del
+                agente.
               </p>
             </div>
             <Link
@@ -187,13 +187,18 @@ export default async function AgentDetailPage({
               <p className="mt-2 text-lg font-semibold text-white">
                 {agent.messages_limit?.toLocaleString("es-ES") ?? "Sin definir"}
               </p>
-              <p className="text-xs text-slate-500">Ajusta este valor desde la base de datos o proximamente desde el plan.</p>
+              <p className="text-xs text-slate-500">
+                Ajusta este valor desde la base de datos o proximamente desde el
+                plan.
+              </p>
             </div>
             <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300">
               <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
                 Creado el
               </p>
-              <p className="mt-2 text-lg font-semibold text-white">{createdAt}</p>
+              <p className="mt-2 text-lg font-semibold text-white">
+                {createdAt}
+              </p>
               <p className="text-xs text-slate-500">
                 Mantiene registro completo de actividad y dominios permitidos.
               </p>
@@ -218,11 +223,14 @@ export default async function AgentDetailPage({
               Integracion y dominios permitidos
             </h2>
             <p className="mt-1 text-sm text-slate-300">
-              Selecciona la integracion WooCommerce que debe usar este agente y define
-              que dominios pueden embeber el widget.
+              Selecciona la integracion WooCommerce que debe usar este agente y
+              define que dominios pueden embeber el widget.
             </p>
 
-            <form action={updateIntegrationAndDomains} className="mt-6 space-y-6">
+            <form
+              action={updateIntegrationAndDomains}
+              className="mt-6 space-y-6"
+            >
               <input type="hidden" name="agent_id" value={agent.id} />
 
               <div className="space-y-2">
@@ -241,13 +249,17 @@ export default async function AgentDetailPage({
                   <option value="none">Sin integracion</option>
                   {(integrations ?? []).map((integration) => (
                     <option key={integration.id} value={integration.id}>
-                      {integration.site_url} {integration.is_active ? "" : "(inactiva)"}
+                      {integration.site_url}{" "}
+                      {integration.is_active ? "" : "(inactiva)"}
                     </option>
                   ))}
                 </select>
                 <p className="text-xs text-slate-500">
                   Gestiona tus credenciales y sitios conectados desde{" "}
-                  <Link href="/integrations/woo" className="text-emerald-300 hover:text-emerald-200">
+                  <Link
+                    href="/integrations/woo"
+                    className="text-emerald-300 hover:text-emerald-200"
+                  >
                     Integraciones
                   </Link>
                   .
@@ -269,8 +281,8 @@ export default async function AgentDetailPage({
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
                 />
                 <p className="text-xs text-slate-500">
-                  Separa cada dominio con comas. Si lo dejas vacio, el widget se podra
-                  cargar desde cualquier origen.
+                  Separa cada dominio con comas. Si lo dejas vacio, el widget se
+                  podra cargar desde cualquier origen.
                 </p>
                 {!!allowedDomains.length && (
                   <p className="text-xs text-slate-400">
@@ -301,41 +313,48 @@ export default async function AgentDetailPage({
 
           <aside className="space-y-6">
             <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur">
-              <h3 className="text-lg font-semibold text-white">Snippet de incrustacion</h3>
+              <h3 className="text-lg font-semibold text-white">
+                Snippet de incrustacion
+              </h3>
               <p className="mt-2 text-sm text-slate-300">
-                Copia y pega este script en tu WordPress (footer o widget HTML). La API
-                key ya esta incluida para este agente.
+                Copia y pega este script en tu WordPress (footer o widget HTML).
+                La API key ya esta incluida para este agente.
               </p>
               <pre className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200">
-{`<script>
+                {`<script>
   (function () {
     var s = document.createElement('script');
-    s.src = 'https://tu-dominio.com/widget.js?key=${agent.api_key}';
+    s.src = 'https://ai-saas-nine-omega.vercel.app/widget?key=${agent.api_key}';
+    s.async = true;
     s.defer = true;
+    s.onerror = function(){ console.error("[AI SaaS] No se pudo cargar el widget."); };
     document.head.appendChild(s);
   })();
 </script>`}
               </pre>
+
               <p className="mt-3 text-xs text-slate-500">
-                El widget verificara el plan activo y respetara los limites definidos
-                antes de mostrar el chat.
+                El widget verificara el plan activo y respetara los limites
+                definidos antes de mostrar el chat.
               </p>
             </article>
 
             <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 text-sm text-slate-300 shadow-lg shadow-slate-900/40 backdrop-blur">
-              <h3 className="text-lg font-semibold text-white">Buenas practicas</h3>
+              <h3 className="text-lg font-semibold text-white">
+                Buenas practicas
+              </h3>
               <ul className="mt-3 space-y-2 text-xs text-slate-400">
                 <li>
-                  - Usa un agente por cada tienda o idioma para mantener las respuestas
-                  alineadas con tu catalogo.
+                  - Usa un agente por cada tienda o idioma para mantener las
+                  respuestas alineadas con tu catalogo.
                 </li>
                 <li>
-                  - Si la API key se compromete, genera un nuevo agente y desactiva este
-                  para revocar el acceso.
+                  - Si la API key se compromete, genera un nuevo agente y
+                  desactiva este para revocar el acceso.
                 </li>
                 <li>
-                  - Activa alertas de limite de mensajes desde tu panel de facturacion
-                  para evitar interrupciones.
+                  - Activa alertas de limite de mensajes desde tu panel de
+                  facturacion para evitar interrupciones.
                 </li>
               </ul>
             </article>
