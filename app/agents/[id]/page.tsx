@@ -3,6 +3,14 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
 
+const LANGUAGE_OPTIONS = [
+  { value: "auto", label: "Deteccion automatica" },
+  { value: "es", label: "Espanol" },
+  { value: "en", label: "Ingles" },
+  { value: "pt", label: "Portugues" },
+  { value: "fr", label: "Frances" },
+];
+
 // --- Utilities -------------------------------------------------------------
 function toHostname(raw: string): string | null {
   const value = raw.trim().toLowerCase();
@@ -43,10 +51,31 @@ async function updateIntegrationAndDomains(formData: FormData) {
   const agentId = String(formData.get("agent_id") ?? "");
   const integrationId = String(formData.get("integration_id") ?? "");
   const domainsRaw = String(formData.get("allowed_domains") ?? "");
+  const promptSystemRaw = String(formData.get("prompt_system") ?? "");
+  const languageRaw = String(formData.get("language") ?? "");
+  const fallbackUrlRaw = String(formData.get("fallback_url") ?? "").trim();
 
   const allowedDomains = normalizeDomainList(domainsRaw);
   const wooIntegrationId =
     integrationId && integrationId !== "none" ? integrationId : null;
+  const promptSystem = promptSystemRaw.trim() || null;
+  const language =
+    languageRaw && languageRaw !== "auto" ? languageRaw.trim() : null;
+
+  let fallbackUrl: string | null = null;
+  if (fallbackUrlRaw) {
+    try {
+      const url = new URL(
+        fallbackUrlRaw,
+        fallbackUrlRaw.startsWith("http") ? undefined : "https://placeholder.local",
+      );
+      fallbackUrl = url.origin === "https://placeholder.local"
+        ? `${url.pathname}${url.search}${url.hash}`
+        : url.toString();
+    } catch {
+      fallbackUrl = fallbackUrlRaw;
+    }
+  }
 
   if (wooIntegrationId) {
     const { data: integration, error } = await supabase
@@ -68,6 +97,9 @@ async function updateIntegrationAndDomains(formData: FormData) {
     .update({
       woo_integration_id: wooIntegrationId,
       allowed_domains: allowedDomains.length ? allowedDomains : null,
+      prompt_system: promptSystem,
+      language,
+      fallback_url: fallbackUrl,
       updated_at: new Date().toISOString(),
     })
     .eq("id", agentId)
@@ -101,7 +133,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at"
+      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -126,6 +158,11 @@ export default async function AgentDetailPage({
   };
 
   const statusLabel = agent.is_active ? "Activo" : "Pausado";
+  const allowedDomains = agent.allowed_domains ?? [];
+  const promptSystemValue = agent.prompt_system ?? "";
+  const languageValue = agent.language ?? "auto";
+  const fallbackUrlValue = agent.fallback_url ?? "";
+  const descriptionFallback = agent.description ?? "";
   const statusColor = agent.is_active ? "bg-emerald-400" : "bg-slate-500";
 
   const createdAt = agent.created_at
@@ -135,8 +172,6 @@ export default async function AgentDetailPage({
         year: "numeric",
       }).format(new Date(agent.created_at))
     : "Fecha desconocida";
-
-  const allowedDomains = agent.allowed_domains ?? [];
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
@@ -263,6 +298,77 @@ export default async function AgentDetailPage({
                     Integraciones
                   </Link>
                   .
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="prompt-system"
+                  className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                >
+                  Instrucciones del agente (prompt)
+                </label>
+                <textarea
+                  id="prompt-system"
+                  name="prompt_system"
+                  defaultValue={promptSystemValue}
+                  placeholder={
+                    descriptionFallback ||
+                    "Describe tono, politicas y objetivos del agente."
+                  }
+                  rows={5}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                />
+                <p className="text-xs text-slate-500">
+                  Este texto se envia como prompt de sistema al modelo. Usa
+                  variables, tono deseado y pasos de validacion para la marca.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="language"
+                  className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                >
+                  Idioma de respuesta preferido
+                </label>
+                <select
+                  id="language"
+                  name="language"
+                  defaultValue={languageValue}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                >
+                  {LANGUAGE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-slate-500">
+                  En deteccion automatica, el modelo adapta la respuesta al
+                  idioma del cliente.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="fallback-url"
+                  className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                >
+                  URL de fallback (opcional)
+                </label>
+                <input
+                  id="fallback-url"
+                  name="fallback_url"
+                  type="url"
+                  inputMode="url"
+                  defaultValue={fallbackUrlValue}
+                  placeholder="https://tu-agencia.com/contacto"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                />
+                <p className="text-xs text-slate-500">
+                  Se enviara al widget para escalar con humanos cuando sea
+                  necesario.
                 </p>
               </div>
 
