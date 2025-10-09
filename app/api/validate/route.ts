@@ -4,16 +4,12 @@ import { createAdmin } from "@/lib/supabase/admin";
 export async function GET(req: Request) {
   const key = new URL(req.url).searchParams.get("key")?.trim() ?? "";
 
-  if (!key) {
-    return NextResponse.json(
-      {
-        ok: false,
-        data: null,
-        error: { code: "missing_key", message: "Falta key" },
-      },
-      { status: 400 }
-    );
-  }
+  if (!key)
+    return NextResponse.json({
+      ok: false,
+      data: null,
+      error: { code: "missing_key", message: "Falta key" },
+    });
 
   const supabase = createAdmin();
   const { data, error } = await supabase
@@ -34,14 +30,11 @@ export async function GET(req: Request) {
   }
 
   if (!data) {
-    return NextResponse.json(
-      {
-        ok: false,
-        data: null,
-        error: { code: "not_found", message: "Agente no encontrado" },
-      },
-      { status: 404 }
-    );
+    return NextResponse.json({
+      ok: false,
+      data: null,
+      error: { code: "not_found", message: "Agente no encontrado" },
+    });
   }
 
   return NextResponse.json({
