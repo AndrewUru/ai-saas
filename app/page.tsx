@@ -7,43 +7,41 @@ export default function HomePage() {
         <div className="relative mx-auto flex min-h-[70vh] max-w-6xl flex-col justify-center gap-10 px-6 py-24 sm:px-10 lg:px-16">
           <div className="max-w-3xl space-y-6">
             <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-900/40 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">
-              AI agents for commerce
+              Agentes IA para agencias ecommerce
             </span>
             <h1 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
-              Automate store support with AI agents your customers trust
+              Implementa agentes de IA para las tiendas online de tus clientes
             </h1>
             <p className="text-lg text-slate-200 sm:text-xl">
-              Deploy customizable AI agents that answer questions, follow your
-              policies, connect to WooCommerce, and close more sales without the
-              overhead of a support team.
+              Escala un servicio recurrente ofreciendo asistentes entrenados que siguen las politicas de cada marca, consultan WooCommerce y aumentan las ventas sin ampliar el equipo de soporte.
             </p>
             <div className="flex flex-wrap gap-4">
               <a
                 href="/dashboard"
                 className="rounded-full bg-emerald-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
               >
-                Access your dashboard
+                Entrar al panel
               </a>
               <a
                 href="/login"
                 className="rounded-full border border-slate-700 px-6 py-3 text-sm font-semibold text-white transition hover:border-slate-500 hover:text-emerald-200"
               >
-                Start free trial
+                Iniciar prueba gratuita
               </a>
             </div>
           </div>
           <dl className="grid gap-6 sm:grid-cols-3">
             {[
               {
-                label: "Qualified conversations",
+                label: "Consultas gestionadas",
                 value: "40k+",
               },
               {
-                label: "WooCommerce stores assisted",
+                label: "Tiendas WooCommerce atendidas",
                 value: "1,200+",
               },
               {
-                label: "Integrations and automations",
+                label: "Integraciones y automatizaciones",
                 value: "30+",
               },
             ].map((item) => (
@@ -66,39 +64,37 @@ export default function HomePage() {
       <section className="mx-auto max-w-6xl px-6 py-24 sm:px-10 lg:px-16">
         <div className="text-center">
           <h2 className="text-3xl font-semibold sm:text-4xl">
-            Everything you need to launch a revenue ready agent
+            Todo lo que tu agencia necesita para lanzar agentes rentables
           </h2>
           <p className="mt-4 text-base text-slate-300 sm:text-lg">
-            From gathering product data to payment validation, our platform
-            gives you a single place to design, deploy, and measure AI support
-            teams for ecommerce.
+            Desde la recopilacion de catalogos y politicas hasta la validacion de pagos, nuestra plataforma centraliza el diseno, despliegue y medicion de agentes para ecommerce.
           </p>
         </div>
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {[
             {
-              title: "WooCommerce native integration",
-              body: "Sync catalog, stock, and order history in seconds. Your agent always responds with up to date pricing and availability.",
+              title: "Integracion nativa con WooCommerce",
+              body: "Sincroniza catalogos, stock y pedidos para cada tienda en segundos; el agente responde con datos reales.",
             },
             {
-              title: "Conversation guardrails",
-              body: "Define tone, escalation policies, and fallback flows so every interaction reflects your brand voice.",
+              title: "Plantillas listas para agencias",
+              body: "Duplica librerias de prompts y flujos aprobados para acelerar cada nuevo cliente sin empezar desde cero.",
             },
             {
-              title: "Secure credential vault",
-              body: "Store API keys with zero knowledge encryption. Rotate credentials without redeploying widgets.",
+              title: "Control de marca por cliente",
+              body: "Configura tono, recupera guias y define rutas de escalamiento especificas para cada marca.",
             },
             {
-              title: "Multi channel widgets",
-              body: "Embed the chat widget on WordPress, Shopify, or custom storefronts with a single script tag.",
+              title: "Widgets multicanal",
+              body: "Integra el chat en WordPress, Shopify o frontends personalizados con un unico script y estilos propios.",
             },
             {
-              title: "Real time analytics",
-              body: "Track conversions, saved replies, and message volume from a unified dashboard that updates live.",
+              title: "Analitica en tiempo real",
+              body: "Visualiza conversiones, tickets ahorrados y oportunidades por cliente en un panel compartido.",
             },
             {
-              title: "Compliant billing",
-              body: "Connect PayPal or credit card billing to enforce plan limits automatically across all your agents.",
+              title: "Facturacion administrada",
+              body: "Conecta PayPal o tarjetas para cobrar servicios recurrentes y aplicar limites por plan automaticamente.",
             },
           ].map((feature) => (
             <article
@@ -118,18 +114,16 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-6xl gap-12 px-6 py-24 sm:px-10 lg:grid-cols-2 lg:px-16">
           <div className="space-y-6">
             <h2 className="text-3xl font-semibold sm:text-4xl">
-              Built for your existing workflow
+              Pensado para el flujo de trabajo de tu agencia
             </h2>
             <p className="text-base text-slate-300 sm:text-lg">
-              Our API-first stack makes it easy to extend each agent with the
-              tools you already rely on. Connect custom CRMs, marketing
-              automations, or fulfillment systems without compromising security.
+              Nuestra arquitectura API first facilita extender cada agente con las herramientas que ya usas. Conecta CRMs, automatizaciones o sistemas de fulfillment sin comprometer seguridad.
             </p>
             <ul className="space-y-4 text-sm text-slate-200">
               {[
-                "Server side Supabase auth keeps every request scoped to your workspace.",
-                "Webhooks notify your systems when leads, refunds, or VIP customers need a human follow up.",
-                "Granular access controls let you share analytics with teammates while keeping credentials locked down.",
+                "La autenticacion server side de Supabase mantiene cada solicitud dentro del workspace de tu agencia.",
+                "Webhooks alertan a tu stack cuando leads, devoluciones o clientes VIP requieren seguimiento humano.",
+                "Los permisos granulares comparten analiticas con clientes y equipo sin exponer credenciales.",
               ].map((point) => (
                 <li
                   key={point}
@@ -145,41 +139,41 @@ export default function HomePage() {
                 href="/docs"
                 className="rounded-full border border-slate-700 px-6 py-3 text-sm font-semibold text-white transition hover:border-slate-500 hover:text-emerald-200"
               >
-                Explore developer docs
+                Ver documentacion tecnica
               </a>
               <a
                 href="/contact"
                 className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
               >
-                Talk to sales
+                Hablar con ventas
               </a>
             </div>
           </div>
           <div className="space-y-6 rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-black p-8 shadow-2xl shadow-emerald-500/10">
             <h3 className="text-xl font-semibold text-emerald-300">
-              How it works
+              Como funciona
             </h3>
             <ol className="space-y-4 text-sm text-slate-200">
               {[
                 {
-                  title: "Create your agent",
+                  title: "Crea el agente",
                   detail:
-                    "Describe your brand voice, upload FAQs, and define escalation paths in minutes.",
+                    "Describe la voz de la marca, sube FAQs y define rutas de escalamiento en minutos.",
                 },
                 {
-                  title: "Connect data sources",
+                  title: "Conecta fuentes de datos",
                   detail:
-                    "Authorize WooCommerce, knowledge bases, and payment providers with secure tokens.",
+                    "Autoriza WooCommerce, bases de conocimiento y pasarelas de pago con tokens seguros.",
                 },
                 {
-                  title: "Embed the widget",
+                  title: "Incrusta el widget",
                   detail:
-                    "Copy the script snippet into your storefront footer and start serving customers instantly.",
+                    "Copia el script en el footer de la tienda y atiende clientes al instante.",
                 },
                 {
-                  title: "Monitor performance",
+                  title: "Monitorea resultados",
                   detail:
-                    "Review analytics, tweak prompts, and escalate conversations directly from the dashboard.",
+                    "Revisa analiticas, ajusta prompts y escala conversaciones directamente desde el panel.",
                 },
               ].map((step, index) => (
                 <li key={step.title} className="flex gap-4">
@@ -201,30 +195,29 @@ export default function HomePage() {
         <div className="grid gap-12 lg:grid-cols-3">
           <div className="lg:col-span-1">
             <h2 className="text-3xl font-semibold sm:text-4xl">
-              Trusted by digital brands that move fast
+              Agencias y marcas digitales que confian
             </h2>
             <p className="mt-4 text-base text-slate-300 sm:text-lg">
-              Teams across retail, subscriptions, and DTC rely on our agents to
-              keep support available 24/7 while staying on brand.
+              Equipos en retail, suscripciones y DTC confian en nuestros agentes para mantener soporte 24/7 y cuidar cada voz de marca.
             </p>
           </div>
           <div className="space-y-6 lg:col-span-2">
             {[
               {
                 quote:
-                  "We replaced a three person support shift and now resolve 82 percent of tickets automatically. Customers love the instant answers.",
+                  "Reemplazamos un turno completo de soporte y ahora resolvemos 82 por ciento de los tickets automaticamente. Nuestros clientes notan la respuesta inmediata.",
                 author: "Lucia Torres",
-                role: "Head of CX, Nordia Beauty",
+                role: "Directora de CX, Nordia Beauty",
               },
               {
                 quote:
-                  "Integrating WooCommerce took less than five minutes. Seeing real order data inside the chat unlocked proactive upsell flows.",
+                  "Integrar WooCommerce tomo menos de cinco minutos. Ver pedidos reales en el chat nos permite proponer ventas adicionales antes que la competencia.",
                 author: "Victor Ramirez",
-                role: "Founder, Casa Moda Store",
+                role: "Fundador, Casa Moda Store",
               },
               {
                 quote:
-                  "The analytics let us see which prompts convert best and when to bring in a human. It feels like having a teammate that never sleeps.",
+                  "La analitica nos muestra que prompts convierten mejor y cuando involucrar a una persona. Es como tener un aliado que no duerme.",
                 author: "Ana Walker",
                 role: "COO, Sunwave Gear",
               },
@@ -251,31 +244,30 @@ export default function HomePage() {
       <section className="border-t border-slate-900 bg-slate-950/90">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-20 text-center sm:px-10 lg:px-16">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-300">
-            Ready to launch
+            Listo para escalar
           </p>
           <h2 className="text-3xl font-semibold sm:text-4xl">
-            Launch your first AI agent today
+            Lanza tu primer agente para un cliente hoy
           </h2>
           <p className="mx-auto max-w-2xl text-base text-slate-300 sm:text-lg">
-            Create an account, connect your WooCommerce store, and ship a fully
-            branded support experience in under an hour.
+            Crea una cuenta, conecta la tienda WooCommerce de tu cliente y entrega una experiencia de soporte completa en menos de una hora.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href="/signup"
               className="rounded-full bg-emerald-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
             >
-              Create a free account
+              Crear cuenta gratuita
             </a>
             <a
               href="/billing"
               className="rounded-full border border-slate-700 px-6 py-3 text-sm font-semibold text-white transition hover:border-slate-500 hover:text-emerald-200"
             >
-              Compare plans
+              Ver planes
             </a>
           </div>
           <p className="text-xs text-slate-500">
-            No credit card required. Upgrade only when you need more volume.
+            Sin tarjeta requerida. Mejora tu plan solo cuando aumente el volumen.
           </p>
         </div>
       </section>
