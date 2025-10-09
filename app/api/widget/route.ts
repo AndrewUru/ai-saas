@@ -21,14 +21,22 @@ export async function GET(req: Request) {
     });
   }
 
-  const supabase = createAdmin(); // ← bypass RLS
+  // 👇 Usa SIEMPRE admin aquí (endpoint público sin sesión)
+  const supabase = createAdmin();
+
   const { data: agent, error } = await supabase
     .from("agents")
     .select("id, is_active, allowed_domains")
     .eq("api_key", key)
-    .single();
+    .maybeSingle();
 
-  if (error || !agent) {
+  if (error) {
+    return new NextResponse(`// Error DB: ${error.message}`, {
+      headers: { "Content-Type": "application/javascript" },
+      status: 500,
+    });
+  }
+  if (!agent) {
     return new NextResponse("// Agente no encontrado", {
       headers: { "Content-Type": "application/javascript" },
       status: 404,
@@ -41,7 +49,7 @@ export async function GET(req: Request) {
     });
   }
 
-  // (opcional) bloqueo por dominio:
+  // 🔒 Bloqueo por dominio (tu agente tiene ["elsaltoweb.es"])
   const origin = req.headers.get("origin");
   const referer = req.headers.get("referer");
   const host = hostFrom(origin) || hostFrom(referer);
