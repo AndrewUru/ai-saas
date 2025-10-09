@@ -13,7 +13,9 @@ export default function HomePage() {
               Implementa agentes de IA para las tiendas online de tus clientes
             </h1>
             <p className="text-lg text-slate-200 sm:text-xl">
-              Escala un servicio recurrente ofreciendo asistentes entrenados que siguen las politicas de cada marca, consultan WooCommerce y aumentan las ventas sin ampliar el equipo de soporte.
+              Escala un servicio recurrente ofreciendo asistentes entrenados que
+              siguen las politicas de cada marca, consultan WooCommerce y
+              aumentan las ventas sin ampliar el equipo de soporte.
             </p>
             <div className="flex flex-wrap gap-4">
               <a
@@ -67,7 +69,9 @@ export default function HomePage() {
             Todo lo que tu agencia necesita para lanzar agentes rentables
           </h2>
           <p className="mt-4 text-base text-slate-300 sm:text-lg">
-            Desde la recopilacion de catalogos y politicas hasta la validacion de pagos, nuestra plataforma centraliza el diseno, despliegue y medicion de agentes para ecommerce.
+            Desde la recopilacion de catalogos y politicas hasta la validacion
+            de pagos, nuestra plataforma centraliza el diseno, despliegue y
+            medicion de agentes para ecommerce.
           </p>
         </div>
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -117,7 +121,9 @@ export default function HomePage() {
               Pensado para el flujo de trabajo de tu agencia
             </h2>
             <p className="text-base text-slate-300 sm:text-lg">
-              Nuestra arquitectura API first facilita extender cada agente con las herramientas que ya usas. Conecta CRMs, automatizaciones o sistemas de fulfillment sin comprometer seguridad.
+              Nuestra arquitectura API first facilita extender cada agente con
+              las herramientas que ya usas. Conecta CRMs, automatizaciones o
+              sistemas de fulfillment sin comprometer seguridad.
             </p>
             <ul className="space-y-4 text-sm text-slate-200">
               {[
@@ -139,7 +145,7 @@ export default function HomePage() {
                 href="/docs"
                 className="rounded-full border border-slate-700 px-6 py-3 text-sm font-semibold text-white transition hover:border-slate-500 hover:text-emerald-200"
               >
-                Ver documentacion tecnica
+                Ver documentación técnica
               </a>
               <a
                 href="/contact"
@@ -198,7 +204,8 @@ export default function HomePage() {
               Agencias y marcas digitales que confian
             </h2>
             <p className="mt-4 text-base text-slate-300 sm:text-lg">
-              Equipos en retail, suscripciones y DTC confian en nuestros agentes para mantener soporte 24/7 y cuidar cada voz de marca.
+              Equipos en retail, suscripciones y DTC confian en nuestros agentes
+              para mantener soporte 24/7 y cuidar cada voz de marca.
             </p>
           </div>
           <div className="space-y-6 lg:col-span-2">
@@ -250,7 +257,8 @@ export default function HomePage() {
             Lanza tu primer agente para un cliente hoy
           </h2>
           <p className="mx-auto max-w-2xl text-base text-slate-300 sm:text-lg">
-            Crea una cuenta, conecta la tienda WooCommerce de tu cliente y entrega una experiencia de soporte completa en menos de una hora.
+            Crea una cuenta, conecta la tienda WooCommerce de tu cliente y
+            entrega una experiencia de soporte completa en menos de una hora.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
@@ -267,7 +275,8 @@ export default function HomePage() {
             </a>
           </div>
           <p className="text-xs text-slate-500">
-            Sin tarjeta requerida. Mejora tu plan solo cuando aumente el volumen.
+            Sin tarjeta requerida. Mejora tu plan solo cuando aumente el
+            volumen.
           </p>
         </div>
       </section>
