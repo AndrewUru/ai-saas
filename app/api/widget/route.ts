@@ -38,6 +38,22 @@ function rgba(hex: string, alpha: number) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+function relativeLuminance(hex: string) {
+  const { r, g, b } = hexToRgb(hex);
+  const channel = (value: number) => {
+    const v = value / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  };
+  const R = channel(r);
+  const G = channel(g);
+  const B = channel(b);
+  return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+}
+
+function contrastTextColor(hex: string) {
+  return relativeLuminance(hex) > 0.55 ? "#0f172a" : "#f8fafc";
+}
+
 function sanitizeText(value: string | null, fallback: string, max = 60) {
   if (!value) return fallback;
   const trimmed = value.replace(/[<>]/g, "").trim();
@@ -113,6 +129,7 @@ export async function GET(req: Request) {
   const accent = sanitizeHex(
     url.searchParams.get("accent") ?? agent.widget_accent ?? ACCENT_DEFAULT
   );
+  const accentContrast = contrastTextColor(accent);
   const accentShadow = rgba(accent, 0.32);
   const accentLight = rgba(accent, 0.16);
   const accentGradient = `linear-gradient(135deg, ${rgba(
@@ -152,7 +169,7 @@ export async function GET(req: Request) {
   }z-index:2147483000;font-family:"Inter","Helvetica Neue",Arial,sans-serif;}
 #ai-saas-anchor[data-position="left"]{left:18px;right:auto;}
 #ai-saas-anchor[data-position="right"]{right:18px;left:auto;}
-#ai-saas-toggle{display:flex;align-items:center;gap:10px;background:${accent};color:#022c22;padding:12px 16px;border-radius:999px;border:none;font-weight:600;cursor:pointer;box-shadow:0 12px 32px ${accentShadow};transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease;}
+#ai-saas-toggle{display:flex;align-items:center;gap:10px;background:${accent};color:${accentContrast};padding:12px 16px;border-radius:999px;border:none;font-weight:600;cursor:pointer;box-shadow:0 12px 32px ${accentShadow};transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease;}
 #ai-saas-toggle:hover{transform:translateY(-1px);box-shadow:0 18px 38px ${accentShadow};}
 #ai-saas-toggle:focus-visible{outline:2px solid #fff;outline-offset:3px;}
 #ai-saas-toggle .ai-saas-icon{width:26px;height:26px;border-radius:999px;background:#ffffff;color:${accent};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
@@ -160,19 +177,19 @@ export async function GET(req: Request) {
 #ai-saas-anchor.open #ai-saas-toggle{opacity:0;transform:translateY(10px);pointer-events:none;}
 #ai-saas-widget{width:360px;max-width:calc(100vw - 40px);background:#0b1120;border:1px solid rgba(148,163,184,.22);border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(2,6,23,.5);display:flex;flex-direction:column;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .2s ease,transform .2s ease;}
 #ai-saas-anchor.open #ai-saas-widget{opacity:1;transform:translateY(0);pointer-events:auto;}
-#ai-saas-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:${accentGradient};color:#021c16;}
+#ai-saas-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:${accentGradient};color:${accentContrast};}
 .ai-saas-brand{display:flex;align-items:center;gap:12px;}
 .ai-saas-brand-icon{width:44px;height:44px;border-radius:16px;background:${accentLight};color:${accent};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;}
-.ai-saas-brand-text strong{display:block;font-size:15px;}
-.ai-saas-brand-text span{display:block;font-size:12px;opacity:.75;}
-#ai-saas-close{background:rgba(255,255,255,.24);color:#021c16;border:none;width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s ease;}
+.ai-saas-brand-text strong{display:block;font-size:15px;color:${accentContrast};}
+.ai-saas-brand-text span{display:block;font-size:12px;opacity:.8;color:${accentContrast};}
+#ai-saas-close{background:rgba(255,255,255,.24);color:${accentContrast};border:none;width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s ease;}
 #ai-saas-close:hover{opacity:.85;}
 #ai-saas-close svg{width:18px;height:18px;}
 #ai-saas-chat-box{padding:18px;flex:1;overflow:auto;background:linear-gradient(180deg,rgba(15,23,42,.55) 0%,rgba(15,23,42,.82) 100%);}
 #ai-saas-chat-box::-webkit-scrollbar{width:6px;}
 #ai-saas-chat-box::-webkit-scrollbar-thumb{background:rgba(148,163,184,.28);border-radius:999px;}
 .ai-saas-bubble{max-width:85%;padding:10px 14px;margin:6px 0;border-radius:16px;font-size:14px;line-height:1.5;white-space:pre-wrap;}
-.ai-saas-bubble.user{margin-left:auto;background:${accent};color:#021c16;}
+.ai-saas-bubble.user{margin-left:auto;background:${accent};color:${accentContrast};}
 .ai-saas-bubble.bot{margin-right:auto;background:rgba(148,163,184,.16);color:#e2e8f0;border:1px solid rgba(148,163,184,.2);}
 .ai-saas-bubble.ai-saas-error{border-color:rgba(248,113,113,.5);color:#fca5a5;}
 .ai-saas-bubble.typing{display:flex;align-items:center;gap:6px;}
@@ -186,7 +203,7 @@ export async function GET(req: Request) {
 .ai-saas-input-wrapper input{flex:1;background:rgba(15,23,42,.6);color:#e2e8f0;border:1px solid rgba(148,163,184,.25);border-radius:16px;padding:12px 14px;font-size:14px;transition:border-color .2s;}
 .ai-saas-input-wrapper input:focus{border-color:${accent};outline:none;}
 .ai-saas-input-wrapper input::placeholder{color:rgba(148,163,184,.65);}
-.ai-saas-input-wrapper button{background:${accent};color:#021c16;border:none;border-radius:14px;padding:10px 18px;font-weight:600;cursor:pointer;transition:opacity .2s ease,transform .2s ease;}
+.ai-saas-input-wrapper button{background:${accent};color:${accentContrast};border:none;border-radius:14px;padding:10px 18px;font-weight:600;cursor:pointer;transition:opacity .2s ease,transform .2s ease;}
 .ai-saas-input-wrapper button:hover{opacity:.9;}
 .ai-saas-input-wrapper button:disabled{opacity:.55;cursor:not-allowed;}
 .ai-saas-fallback{display:inline-flex;align-items:center;gap:6px;margin:4px 0 0;background:rgba(148,163,184,.16);color:#e2e8f0;padding:8px 12px;border-radius:12px;font-size:13px;text-decoration:none;}
@@ -252,6 +269,7 @@ const config = {
         '</div>' +
       '</form>';
     anchor.appendChild(widget);
+    widget.style.display = "none";
 
     const chatBox = widget.querySelector("#ai-saas-chat-box");
     const form = widget.querySelector("#ai-saas-form");
@@ -264,6 +282,8 @@ const config = {
     let isSending = false;
     const defaultButtonLabel = submitBtn.textContent || "Enviar";
 
+    let hideTimeout;
+
     function setSending(state){
       isSending = state;
       submitBtn.disabled = state;
@@ -272,14 +292,32 @@ const config = {
     }
 
     function openWidget(){
-      anchor.classList.add("open");
-      setTimeout(() => {
-        input.focus();
-      }, 100);
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+      const focusInput = () => {
+        setTimeout(() => {
+          input.focus();
+        }, 120);
+      };
+      if (widget.style.display !== "flex") {
+        widget.style.display = "flex";
+        requestAnimationFrame(() => {
+          anchor.classList.add("open");
+          focusInput();
+        });
+      } else {
+        anchor.classList.add("open");
+        focusInput();
+      }
     }
 
     function closeWidget(){
       anchor.classList.remove("open");
+      hideTimeout = window.setTimeout(() => {
+        widget.style.display = "none";
+      }, 220);
     }
 
     toggle.addEventListener("click", openWidget);
