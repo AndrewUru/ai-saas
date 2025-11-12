@@ -334,8 +334,9 @@ export default async function AgentDetailPage({
           </div>
         )}
 
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_minmax(320px,1fr)]">
-          <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]">
+          <div className="space-y-8">
+            <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">
             <h2 className="text-xl font-semibold text-white">
               Integracion y dominios permitidos
             </h2>
@@ -523,7 +524,7 @@ export default async function AgentDetailPage({
               initialPosition={widgetPositionValue}
             />
           </article>
-
+          </div>
           <aside className="space-y-6">
             <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur">
               <h3 className="text-lg font-semibold text-white">
