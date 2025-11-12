@@ -1,7 +1,20 @@
 import { NextResponse } from "next/server";
 import { createAdmin } from "@/lib/supabase/admin";
+import { getSiteHost, getSiteUrl } from "@/lib/site";
+import {
+  widgetDefaults,
+  widgetLimits,
+  sanitizeHex,
+  sanitizePosition,
+} from "@/lib/widget/defaults";
 
-const ACCENT_DEFAULT = "#10b981";
+const ACCENT_DEFAULT = widgetDefaults.accent;
+const BRAND_DEFAULT = widgetDefaults.brand;
+const LABEL_DEFAULT = widgetDefaults.label;
+const GREETING_DEFAULT = widgetDefaults.greeting;
+const POSITION_DEFAULT = widgetDefaults.position;
+const SITE_URL = getSiteUrl();
+const SITE_HOST = getSiteHost(SITE_URL);
 
 function hostFrom(h: string | null) {
   if (!h) return null;
@@ -10,19 +23,6 @@ function hostFrom(h: string | null) {
   } catch {
     return null;
   }
-}
-
-function sanitizeColor(value: string | null) {
-  if (!value) return ACCENT_DEFAULT;
-  let input = value.trim();
-  if (!input) return ACCENT_DEFAULT;
-  if (!input.startsWith("#")) input = `#${input}`;
-  if (/^#[0-9a-f]{3}$/i.test(input)) {
-    const [, r, g, b] = input;
-    input = `#${r}${r}${g}${g}${b}${b}`;
-  }
-  if (!/^#[0-9a-f]{6}$/i.test(input)) return ACCENT_DEFAULT;
-  return input.toLowerCase();
 }
 
 function hexToRgb(hex: string) {
@@ -61,7 +61,9 @@ export async function GET(req: Request) {
 
   const { data: agent, error } = await supabase
     .from("agents")
-    .select("id, is_active, allowed_domains")
+    .select(
+      "id, is_active, allowed_domains, widget_accent, widget_brand, widget_label, widget_greeting, widget_position",
+    )
     .eq("api_key", key)
     .maybeSingle();
 
@@ -87,20 +89,30 @@ export async function GET(req: Request) {
   const origin = req.headers.get("origin");
   const referer = req.headers.get("referer");
   const host = hostFrom(origin) || hostFrom(referer);
-  if (Array.isArray(agent.allowed_domains) && agent.allowed_domains.length > 0) {
-    const allowed = agent.allowed_domains.map((d) => d.toLowerCase());
-    if (!host || !allowed.includes(host)) {
-      return new NextResponse(
-        `// Dominio no autorizado: ${host ?? "desconocido"}`,
-        {
+  const allowed =
+    Array.isArray(agent.allowed_domains) && agent.allowed_domains.length > 0
+      ? agent.allowed_domains.map((d) => d.toLowerCase())
+      : [];
+  if (allowed.length > 0) {
+    const isDashboardPreview =
+      typeof host === "string" &&
+      (host.includes("localhost") ||
+        host.includes("dashboard") ||
+        (SITE_HOST && host === SITE_HOST));
+
+    if (!isDashboardPreview) {
+      if (!host || !allowed.includes(host)) {
+        return new NextResponse("Domain not allowed", {
           headers: { "Content-Type": "application/javascript" },
           status: 403,
-        }
-      );
+        });
+      }
     }
   }
 
-  const accent = sanitizeColor(url.searchParams.get("accent"));
+  const accent = sanitizeHex(
+    url.searchParams.get("accent") ?? agent.widget_accent ?? ACCENT_DEFAULT
+  );
   const accentShadow = rgba(accent, 0.32);
   const accentLight = rgba(accent, 0.16);
   const accentGradient = `linear-gradient(135deg, ${rgba(
@@ -108,18 +120,30 @@ export async function GET(req: Request) {
     0.18
   )}, ${rgba(accent, 0.4)})`;
 
-  const brandName = sanitizeText(url.searchParams.get("brand"), "Asistente", 40);
+  const storedBrand = agent.widget_brand?.trim() || null;
+  const storedLabel = agent.widget_label?.trim() || null;
+  const storedGreeting = agent.widget_greeting?.trim() || null;
+
+  const brandName = sanitizeText(
+    url.searchParams.get("brand") ?? storedBrand,
+    storedBrand ?? BRAND_DEFAULT,
+    widgetLimits.brand
+  );
   const collapsedLabel = sanitizeText(
-    url.searchParams.get("label"),
-    "Necesitas ayuda?",
-    48
+    url.searchParams.get("label") ?? storedLabel,
+    storedLabel ?? LABEL_DEFAULT,
+    widgetLimits.label
   );
   const greeting = sanitizeText(
-    url.searchParams.get("greeting"),
-    "Estamos en linea",
-    48
+    url.searchParams.get("greeting") ?? storedGreeting,
+    storedGreeting ?? GREETING_DEFAULT,
+    widgetLimits.greeting
   );
-  const position = url.searchParams.get("position") === "left" ? "left" : "right";
+  const position = sanitizePosition(
+    url.searchParams.get("position") ??
+      agent.widget_position ??
+      POSITION_DEFAULT
+  );
   const brandInitial = (brandName.charAt(0).toUpperCase() || "A").slice(0, 1);
 
   const styleContent = `

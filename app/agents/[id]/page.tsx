@@ -2,6 +2,13 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
+import { getSiteUrl } from "@/lib/site";
+import WidgetDesigner from "./WidgetDesigner";
+import {
+  widgetLimits,
+  sanitizeHex,
+  sanitizePosition,
+} from "@/lib/widget/defaults";
 
 const LANGUAGE_OPTIONS = [
   { value: "auto", label: "Deteccion automatica" },
@@ -35,6 +42,12 @@ function normalizeDomainList(input: string): string[] {
     if (host) unique.add(host);
   }
   return Array.from(unique).slice(0, 50);
+}
+
+function normalizeWidgetText(value: string, max: number): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  return trimmed.slice(0, max);
 }
 
 // --- Server action ---------------------------------------------------------
@@ -112,6 +125,47 @@ async function updateIntegrationAndDomains(formData: FormData) {
   redirect(`/agents/${agentId}?saved=1`);
 }
 
+async function updateWidgetBranding(formData: FormData) {
+  "use server";
+
+  const supabase = await createServer();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const agentId = String(formData.get("agent_id") ?? "");
+  if (!agentId) redirect("/agents");
+
+  const accentRaw = String(formData.get("widget_accent") ?? "");
+  const brandRaw = String(formData.get("widget_brand") ?? "");
+  const labelRaw = String(formData.get("widget_label") ?? "");
+  const greetingRaw = String(formData.get("widget_greeting") ?? "");
+  const positionRaw = String(formData.get("widget_position") ?? "");
+
+  const { error: updateError } = await supabase
+    .from("agents")
+    .update({
+      widget_accent: accentRaw.trim() ? sanitizeHex(accentRaw) : null,
+      widget_brand: normalizeWidgetText(brandRaw, widgetLimits.brand),
+      widget_label: normalizeWidgetText(labelRaw, widgetLimits.label),
+      widget_greeting: normalizeWidgetText(greetingRaw, widgetLimits.greeting),
+      widget_position: positionRaw.trim()
+        ? sanitizePosition(positionRaw)
+        : null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", agentId)
+    .eq("user_id", user.id);
+
+  if (updateError) {
+    redirect(`/agents/${agentId}?error=widget`);
+  }
+
+  redirect(`/agents/${agentId}?widget_saved=1`);
+}
+
 type AgentDetailPageProps = {
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -148,6 +202,7 @@ export default async function AgentDetailPage({
     .order("created_at", { ascending: false });
 
   const saved = resolvedSearchParams.saved === "1";
+  const widgetSaved = resolvedSearchParams.widget_saved === "1";
   const errorParam = resolvedSearchParams.error;
   const errorKey = typeof errorParam === "string" ? errorParam : null;
 
@@ -155,6 +210,7 @@ export default async function AgentDetailPage({
     integration: "La integracion seleccionada no pertenece a tu cuenta.",
     integration_inactive: "La integracion seleccionada esta inactiva.",
     save: "No pudimos guardar los cambios. Intenta nuevamente.",
+    widget: "No pudimos guardar la personalizacion del widget.",
   };
 
   const statusLabel = agent.is_active ? "Activo" : "Pausado";
@@ -164,6 +220,27 @@ export default async function AgentDetailPage({
   const fallbackUrlValue = agent.fallback_url ?? "";
   const descriptionFallback = agent.description ?? "";
   const statusColor = agent.is_active ? "bg-emerald-400" : "bg-slate-500";
+  const widgetPositionValue =
+    agent.widget_position === "left" || agent.widget_position === "right"
+      ? agent.widget_position
+      : null;
+  const siteUrl = getSiteUrl();
+
+  const widgetUrlParams = new URLSearchParams({ key: agent.api_key });
+  if (agent.widget_accent) {
+    widgetUrlParams.set("accent", agent.widget_accent.replace(/^#/, ""));
+  }
+  const widgetBrand = agent.widget_brand?.trim();
+  if (widgetBrand) widgetUrlParams.set("brand", widgetBrand);
+
+  const widgetLabel = agent.widget_label?.trim();
+  if (widgetLabel) widgetUrlParams.set("label", widgetLabel);
+
+  const widgetGreeting = agent.widget_greeting?.trim();
+  if (widgetGreeting) widgetUrlParams.set("greeting", widgetGreeting);
+
+  if (widgetPositionValue) widgetUrlParams.set("position", widgetPositionValue);
+  const widgetScriptUrl = `${siteUrl}/api/widget?${widgetUrlParams.toString()}`;
 
   const createdAt = agent.created_at
     ? new Intl.DateTimeFormat("es-ES", {
@@ -244,6 +321,11 @@ export default async function AgentDetailPage({
         {saved && (
           <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/20">
             Cambios guardados correctamente.
+          </div>
+        )}
+        {widgetSaved && (
+          <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/20">
+            Personalizacion del widget guardada.
           </div>
         )}
         {errorKey && (
@@ -420,6 +502,28 @@ export default async function AgentDetailPage({
             </form>
           </article>
 
+          <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">
+            <h2 className="text-xl font-semibold text-white">
+              Personaliza el widget embebible
+            </h2>
+            <p className="mt-1 text-sm text-slate-300">
+              Ajusta color, textos y posicion y prueba el resultado en tiempo
+              real antes de copiar el script.
+            </p>
+
+            <WidgetDesigner
+              formAction={updateWidgetBranding}
+              agentId={agent.id}
+              apiKey={agent.api_key}
+              siteUrl={siteUrl}
+              initialAccent={agent.widget_accent}
+              initialBrand={agent.widget_brand}
+              initialLabel={agent.widget_label}
+              initialGreeting={agent.widget_greeting}
+              initialPosition={widgetPositionValue}
+            />
+          </article>
+
           <aside className="space-y-6">
             <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur">
               <h3 className="text-lg font-semibold text-white">
@@ -427,13 +531,13 @@ export default async function AgentDetailPage({
               </h3>
               <p className="mt-2 text-sm text-slate-300">
                 Copia y pega este script en tu WordPress (footer o widget HTML).
-                La API key ya esta incluida para este agente.
+                Incluye tu API key y los valores de branding configurados arriba.
               </p>
               <pre className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200">
                 {`<script>
   (function () {
     var s = document.createElement('script');
-    s.src = '${siteUrl}/api/widget?key=${agent.api_key}';
+    s.src = '${widgetScriptUrl}';
     s.async = true;
     s.defer = true;
     s.onerror = function(){ console.error("[AI SaaS] No se pudo cargar el widget."); };
@@ -473,6 +577,3 @@ export default async function AgentDetailPage({
     </main>
   );
 }
-  const siteUrl = (
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-  ).replace(/\/$/, "");
