@@ -187,7 +187,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description"
+      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position"
     )
     .eq("id", id)
     .eq("user_id", user.id)
