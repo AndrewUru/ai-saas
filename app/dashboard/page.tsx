@@ -73,39 +73,6 @@ export default async function DashboardPage() {
           <AgentsSection planLimitLabel={planLimitLabel} />
 
           <aside className="space-y-6">
-            <article className="ui-card ui-card--padded">
-              <h3 className="text-lg font-semibold text-white">
-                Snippet de incrustacion
-              </h3>
-              <p className="mt-2 text-xs text-slate-300">
-                Pega este script en el footer de tu WordPress o en un widget HTML.
-                Reemplaza{" "}
-                <code className="rounded bg-slate-800 px-1 py-0.5">
-                  AGENT_API_KEY
-                </code>{" "}
-                con la clave del agente que quieras mostrar.
-              </p>
-              <pre className="mt-4 max-h-60 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200">
-{`<script>
-  (function () {
-    var s = document.createElement('script');
-    s.src = 'https://tu-dominio.com/api/widget?key=AGENT_API_KEY';
-    s.defer = true;
-    s.onerror = function(){ console.error("[AI SaaS] No se pudo cargar el widget."); };
-    document.head.appendChild(s);
-  })();
-</script>`}
-              </pre>
-              <p className="mt-3 text-xs text-slate-400">
-                El widget valida tu plan y limite en el backend antes de mostrar el chat.
-              </p>
-              <p className="mt-2 text-xs text-slate-500">
-                Personaliza color o posicion agregando parametros opcionales como{" "}
-                <code className="rounded bg-slate-800 px-1 py-0.5">accent=ff7a45</code> o{" "}
-                <code className="rounded bg-slate-800 px-1 py-0.5">position=left</code> en la URL del script.
-              </p>
-            </article>
-
             <article className="ui-card ui-card--padded ui-card--strong text-emerald-100">
               <h3 className="text-lg font-semibold">Plan y facturacion</h3>
               <p className="mt-2 text-sm">
