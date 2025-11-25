@@ -78,7 +78,7 @@ export async function GET(req: Request) {
   const { data: agent, error } = await supabase
     .from("agents")
     .select(
-      "id, is_active, allowed_domains, widget_accent, widget_brand, widget_label, widget_greeting, widget_position",
+      "id, is_active, allowed_domains, widget_accent, widget_brand, widget_label, widget_greeting, widget_position"
     )
     .eq("api_key", key)
     .maybeSingle();
@@ -132,10 +132,10 @@ export async function GET(req: Request) {
   const accentContrast = contrastTextColor(accent);
   const accentShadow = rgba(accent, 0.32);
   const accentLight = rgba(accent, 0.16);
-  const accentGradient = `linear-gradient(135deg, ${rgba(
+  const accentGradient = `linear-gradient(135deg, ${rgba(accent, 0.18)}, ${rgba(
     accent,
-    0.18
-  )}, ${rgba(accent, 0.4)})`;
+    0.4
+  )})`;
 
   const storedBrand = agent.widget_brand?.trim() || null;
   const storedLabel = agent.widget_label?.trim() || null;
@@ -182,7 +182,7 @@ export async function GET(req: Request) {
 .ai-saas-brand-icon{width:44px;height:44px;border-radius:16px;background:${accentLight};color:${accent};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;}
 .ai-saas-brand-text strong{display:block;font-size:15px;color:${accentContrast};}
 .ai-saas-brand-text span{display:block;font-size:12px;opacity:.8;color:${accentContrast};}
-#ai-saas-close{background:rgba(255,255,255,.24);color:${accentContrast};border:none;width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s ease;}
+#ai-saas-close{background:rgba(255,255,255,.24);color:#fff;border:none;width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s ease;}
 #ai-saas-close:hover{opacity:.85;}
 #ai-saas-close svg{width:18px;height:18px;}
 #ai-saas-chat-box{padding:18px;flex:1;overflow-y:auto;overflow-x:hidden;background:linear-gradient(180deg,rgba(15,23,42,.55) 0%,rgba(15,23,42,.82) 100%);}
@@ -211,16 +211,16 @@ export async function GET(req: Request) {
 @media (max-width: 480px){#ai-saas-widget{width:calc(100vw - 32px);}}
 `;
 
-const config = {
-  key,
-  chatEndpoint,
-  accent,
-  brandName,
-  brandInitial,
-  collapsedLabel,
-  greeting,
-  position,
-};
+  const config = {
+    key,
+    chatEndpoint,
+    accent,
+    brandName,
+    brandInitial,
+    collapsedLabel,
+    greeting,
+    position,
+  };
 
   const js = `
 (function(){
