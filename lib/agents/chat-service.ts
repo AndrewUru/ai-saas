@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { agentRecordSchema, chatRequestSchema, type AgentRecord } from "@/lib/contracts/agent";
 
-const MAX_MESSAGE_LENGTH = 2000;
 export const FALLBACK_AGENT_MODEL = "gpt-4o-mini";
 const DEFAULT_SYSTEM_PROMPT =
   "Eres un agente de soporte para tiendas online. Responde de forma clara y util, siguiendo las politicas de la marca.";
@@ -10,17 +10,6 @@ const LANGUAGE_HINTS: Record<string, string> = {
   en: "Always respond in English with a helpful, concise ecommerce tone.",
   pt: "Responda em portugues do Brasil com foco em suporte de ecommerce.",
   fr: "Reponds en francais en gardant un ton professionnel et amical.",
-};
-
-type AgentRecord = {
-  id: string;
-  user_id: string;
-  is_active: boolean;
-  messages_limit: number | null;
-  description: string | null;
-  prompt_system: string | null;
-  language: string | null;
-  fallback_url: string | null;
 };
 
 type AgentMessageRecord = {
@@ -82,23 +71,22 @@ export async function chatWithAgent(
   deps: AgentChatDeps
 ): Promise<AgentChatResult> {
   const logger = deps.logger ?? console;
-  const { apiKey, message } = params;
 
-  if (!apiKey || !message) {
+  const parsedRequest = chatRequestSchema.safeParse({
+    api_key: params.apiKey,
+    message: params.message,
+  });
+
+  if (!parsedRequest.success) {
+    const firstIssue = parsedRequest.error.issues[0];
     return {
       ok: false,
-      status: 400,
-      error: "Faltan parametros (api_key o message)",
+      status: firstIssue.code === "too_big" ? 413 : 400,
+      error: firstIssue.message,
     };
   }
 
-  if (message.length > MAX_MESSAGE_LENGTH) {
-    return {
-      ok: false,
-      status: 413,
-      error: "El mensaje es demasiado largo.",
-    };
-  }
+  const { api_key: apiKey, message } = parsedRequest.data;
 
   if (!deps.openaiApiKey) {
     logger.error("[AI SaaS] Falta OPENAI_API_KEY");
@@ -125,28 +113,40 @@ export async function chatWithAgent(
     };
   }
 
-  if (!agent.is_active) {
+  const agentParse = agentRecordSchema.safeParse(agent);
+  if (!agentParse.success) {
+    logger.error("[AI SaaS] Agent parse error:", agentParse.error.flatten().fieldErrors);
+    return {
+      ok: false,
+      status: 500,
+      error: "Error interno del servidor.",
+    };
+  }
+
+  const validAgent: AgentRecord = agentParse.data;
+
+  if (!validAgent.is_active) {
     return {
       ok: false,
       status: 403,
       error: "El agente esta inactivo.",
-      fallbackUrl: agent.fallback_url ?? null,
+      fallbackUrl: validAgent.fallback_url ?? null,
     };
   }
 
-  if (agent.messages_limit && agent.messages_limit <= 0) {
+  if (validAgent.messages_limit && validAgent.messages_limit <= 0) {
     return {
       ok: false,
       status: 403,
       error: "Se alcanzo el limite de mensajes para este agente.",
-      fallbackUrl: agent.fallback_url ?? null,
+      fallbackUrl: validAgent.fallback_url ?? null,
     };
   }
 
   const { data: recentMessages } = await deps.supabase
     .from("agent_messages")
     .select("message, reply")
-    .eq("agent_id", agent.id)
+    .eq("agent_id", validAgent.id)
     .order("created_at", { ascending: false })
     .limit(6);
 
@@ -156,7 +156,7 @@ export async function chatWithAgent(
     model: deps.model ?? FALLBACK_AGENT_MODEL,
     temperature: 0.4,
     messages: [
-      { role: "system" as const, content: buildSystemPrompt(agent) },
+      { role: "system" as const, content: buildSystemPrompt(validAgent) },
       ...history,
       { role: "user" as const, content: message },
     ],
@@ -178,7 +178,7 @@ export async function chatWithAgent(
       ok: false,
       status: 502,
       error: "El modelo no pudo generar una respuesta.",
-      fallbackUrl: agent.fallback_url ?? null,
+      fallbackUrl: validAgent.fallback_url ?? null,
     };
   }
 
@@ -191,22 +191,22 @@ export async function chatWithAgent(
     "Lo siento, no pude generar una respuesta.";
 
   await deps.supabase.from("agent_messages").insert({
-    agent_id: agent.id,
+    agent_id: validAgent.id,
     message,
     reply,
     created_at: deps.now ? deps.now() : new Date().toISOString(),
   });
 
-  if (agent.messages_limit && agent.messages_limit > 0) {
+  if (validAgent.messages_limit && validAgent.messages_limit > 0) {
     await deps.supabase
       .from("agents")
-      .update({ messages_limit: agent.messages_limit - 1 })
-      .eq("id", agent.id);
+      .update({ messages_limit: validAgent.messages_limit - 1 })
+      .eq("id", validAgent.id);
   }
 
   return {
     ok: true,
     reply,
-    fallbackUrl: agent.fallback_url ?? null,
+    fallbackUrl: validAgent.fallback_url ?? null,
   };
 }
