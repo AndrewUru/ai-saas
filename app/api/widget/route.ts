@@ -138,7 +138,9 @@ export async function GET(req: Request) {
   )})`;
   const isLightAccent = relativeLuminance(accent) > 0.8;
   const closeColor = isLightAccent ? "#0f172a" : "#fff";
-  const closeBg = isLightAccent ? "rgba(15,23,42,.12)" : "rgba(255,255,255,.24)";
+  const closeBg = isLightAccent
+    ? "rgba(15,23,42,.12)"
+    : "rgba(255,255,255,.24)";
 
   const storedBrand = agent.widget_brand?.trim() || null;
   const storedLabel = agent.widget_label?.trim() || null;
@@ -175,7 +177,7 @@ export async function GET(req: Request) {
 #ai-saas-toggle{display:flex;align-items:center;gap:10px;background:${accent};color:${accentContrast};padding:12px 16px;border-radius:999px;border:none;font-weight:600;cursor:pointer;box-shadow:0 12px 32px ${accentShadow};transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease;}
 #ai-saas-toggle:hover{transform:translateY(-1px);box-shadow:0 18px 38px ${accentShadow};}
 #ai-saas-toggle:focus-visible{outline:2px solid #fff;outline-offset:3px;}
-#ai-saas-toggle .ai-saas-icon{width:26px;height:26px;border-radius:999px;background:#ffffff;color:${accent};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+#ai-saas-toggle .ai-saas-icon{width:36px;height:36px;border-radius:999px;background:#ffffff;color:${accent};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
 #ai-saas-toggle .ai-saas-label{font-size:13px;}
 #ai-saas-anchor.open #ai-saas-toggle{opacity:0;transform:translateY(10px);pointer-events:none;}
 #ai-saas-widget{width:360px;max-width:calc(100vw - 40px);max-height:calc(100vh - 60px);background:#0b1120;border:1px solid rgba(148,163,184,.22);border-radius:24px;overflow:hidden;box-shadow:0 28px 70px rgba(2,6,23,.5);display:flex;flex-direction:column;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .2s ease,transform .2s ease;}
@@ -185,7 +187,7 @@ export async function GET(req: Request) {
 .ai-saas-brand-icon{width:44px;height:44px;border-radius:16px;background:${accentLight};color:${accent};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;}
 .ai-saas-brand-text strong{display:block;font-size:15px;color:${accentContrast};}
 .ai-saas-brand-text span{display:block;font-size:12px;opacity:.8;color:${accentContrast};}
-#ai-saas-close{background:${closeBg};color:${closeColor};border:none;width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s ease;}
+#ai-saas-close{background:${closeBg};color:${closeColor};border:none;width:85px;height:40px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity .2s ease;}
 
 #ai-saas-close:hover{opacity:.85;}
 #ai-saas-close svg{width:18px;height:18px;}
