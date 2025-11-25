@@ -87,46 +87,45 @@ export default function AgentsSection({ planLimitLabel }: Props) {
 
         {!isError && totalAgents > 0 && (
           <ul className="mt-6 space-y-4">
-            {(isLoading ? Array.from({ length: 3 }) : agents.slice(0, 5)).map((agent, index) => {
-              if (isLoading) {
-                return <AgentSkeleton key={index} />;
-              }
-              const statusColor = agent.is_active ? "bg-emerald-400" : "bg-slate-500";
-              const statusText = agent.is_active ? "Activo" : "Pausado";
-              return (
-                <li
-                  key={agent.id}
-                  className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-950/50 p-5 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className={`h-2.5 w-2.5 rounded-full ${statusColor}`} />
-                      <span className="text-base font-semibold text-white">
-                        {agent.name || "Sin nombre"}
-                      </span>
-                      <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[11px] uppercase tracking-[0.2em] text-slate-400">
-                        {statusText}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-400">
-                      API Key:{" "}
-                      <span className="font-mono text-slate-200">
-                        {(agent.api_key ?? "N/A").slice(0, 6)}...
-                      </span>
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      Limite de mensajes: {agent.messages_limit ?? "Sin limite"}
-                    </p>
-                  </div>
-                  <Link
-                    href={`/agents/${agent.id}`}
-                    className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
-                  >
-                    Configurar
-                  </Link>
-                </li>
-              );
-            })}
+            {isLoading
+              ? Array.from({ length: 3 }).map((_, index) => <AgentSkeleton key={index} />)
+              : agents.slice(0, 5).map((agent) => {
+                  const statusColor = agent.is_active ? "bg-emerald-400" : "bg-slate-500";
+                  const statusText = agent.is_active ? "Activo" : "Pausado";
+                  return (
+                    <li
+                      key={agent.id}
+                      className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-950/50 p-5 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`h-2.5 w-2.5 rounded-full ${statusColor}`} />
+                          <span className="text-base font-semibold text-white">
+                            {agent.name || "Sin nombre"}
+                          </span>
+                          <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[11px] uppercase tracking-[0.2em] text-slate-400">
+                            {statusText}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400">
+                          API Key:{" "}
+                          <span className="font-mono text-slate-200">
+                            {(agent.api_key ?? "N/A").slice(0, 6)}...
+                          </span>
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          Limite de mensajes: {agent.messages_limit ?? "Sin limite"}
+                        </p>
+                      </div>
+                      <Link
+                        href={`/agents/${agent.id}`}
+                        className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
+                      >
+                        Configurar
+                      </Link>
+                    </li>
+                  );
+                })}
             {totalAgents > 5 && !isLoading && (
               <li className="text-center text-xs text-slate-400">
                 Mostramos tus 5 agentes mas recientes. Consulta el listado completo en la seccion de agentes.
