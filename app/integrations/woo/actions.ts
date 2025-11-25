@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { getRedirectError } from "next/dist/client/components/redirect";
+import { RedirectType, getRedirectError } from "next/dist/client/components/redirect";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createServer } from "@/lib/supabase/server";
@@ -101,7 +101,7 @@ export async function createWooIntegration(formData: FormData) {
 
     redirectWithStatus("created");
   } catch (err) {
-    if (err === getRedirectError()) throw err;
+    if (err === getRedirectError(RedirectType.push)) throw err;
     console.error("[Woo] create error", err);
     redirectWithError("unexpected");
   }
@@ -167,7 +167,7 @@ export async function updateWooIntegration(formData: FormData) {
 
     redirectWithStatus("updated");
   } catch (err) {
-    if (err === getRedirectError()) throw err;
+    if (err === getRedirectError(RedirectType.push)) throw err;
     console.error("[Woo] update error", err);
     redirectWithError("unexpected");
   }
@@ -208,7 +208,7 @@ export async function setWooIntegrationState(formData: FormData) {
 
     redirectWithStatus("updated");
   } catch (err) {
-    if (err === getRedirectError()) throw err;
+    if (err === getRedirectError(RedirectType.push)) throw err;
     console.error("[Woo] state error", err);
     redirectWithError("unexpected");
   }
@@ -242,7 +242,7 @@ export async function deleteWooIntegration(formData: FormData) {
 
     redirectWithStatus("deleted");
   } catch (err) {
-    if (err === getRedirectError()) throw err;
+    if (err === getRedirectError(RedirectType.push)) throw err;
     console.error("[Woo] delete error", err);
     redirectWithError("unexpected");
   }
