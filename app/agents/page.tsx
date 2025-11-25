@@ -222,8 +222,8 @@ export default async function AgentsPage() {
 
             <div className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-xs text-slate-400">
               <p>
-                Tras crearlo, abre la ficha del agente para copiar la API key completa
-                y vincularla con tu snippet o integraciones externas.
+                El snippet de incrustacion se genera automaticamente en la ficha del agente
+                con su API key incluida; no necesitas copiarla manualmente.
               </p>
             </div>
 
