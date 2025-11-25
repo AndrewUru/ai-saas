@@ -58,11 +58,11 @@ export default function AgentsSection({ planLimitLabel }: Props) {
           </div>
           <Link
             href="/agents"
-              className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200 transition hover:bg-emerald-500/20"
-            >
-              Ver agentes
-            </Link>
-          </div>
+            className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200 transition hover:bg-emerald-500/20"
+          >
+            Ver agentes
+          </Link>
+        </div>
 
         {isError && (
           <div className="mt-6 rounded-2xl border border-dashed border-red-500/60 bg-red-500/10 p-6 text-sm text-red-100">
@@ -134,7 +134,6 @@ export default function AgentsSection({ planLimitLabel }: Props) {
             )}
           </ul>
         )}
-      </article>
       </Card>
     </section>
   );
