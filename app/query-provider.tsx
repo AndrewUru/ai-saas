@@ -1,6 +1,6 @@
 'use client';
 
-import { HydrationBoundary, QueryClientProvider } from "@tanstack/react-query";
+import { HydrationBoundary, QueryClientProvider, type DehydratedState } from "@tanstack/react-query";
 import { useState } from "react";
 import { createQueryClient } from "@/lib/query/client";
 
@@ -9,7 +9,7 @@ type Props = {
   /**
    * Estado deshidratado para SSR/SSG; opcional.
    */
-  state?: unknown;
+  state?: DehydratedState | null;
 };
 
 export default function QueryProvider({ children, state }: Props) {
