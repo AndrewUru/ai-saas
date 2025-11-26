@@ -1,19 +1,17 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { RedirectType, getRedirectError } from "next/dist/client/components/redirect";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createServer } from "@/lib/supabase/server";
 import { encrypt } from "@/lib/crypto";
 
+// =====================
+// SCHEMAS
+// =====================
 const CreateSchema = z.object({
-  label: z
-    .string()
-    .trim()
-    .min(2, "Etiqueta demasiado corta")
-    .max(80, "Etiqueta demasiado larga"),
-  site_url: z.string().url("URL invalida").max(255),
+  label: z.string().trim().min(2).max(80),
+  site_url: z.string().url().max(255),
   consumer_key: z.string().min(10).max(255),
   consumer_secret: z.string().min(10).max(255),
   is_active: z.boolean().optional(),
@@ -37,6 +35,9 @@ const DeleteSchema = z.object({
   integration_id: z.string().uuid(),
 });
 
+// =====================
+// HELPERS
+// =====================
 function redirectWithStatus(status: string) {
   revalidatePath("/integrations/woo");
   redirect(`/integrations/woo?status=${status}`);
@@ -47,15 +48,23 @@ function redirectWithError(code: string) {
   redirect(`/integrations/woo?error=${code}`);
 }
 
+function handleRedirectError(err: unknown) {
+  // Si Next.js lanzó un redirect, relanzamos.
+  if (err instanceof Error && err.message.includes("NEXT_REDIRECT")) {
+    throw err;
+  }
+}
+
+// =====================
+// CREATE
+// =====================
 export async function createWooIntegration(formData: FormData) {
   try {
     const supabase = await createServer();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) {
-      redirect("/login");
-    }
+    if (!user) redirect("/login");
 
     const parsed = CreateSchema.safeParse({
       label: formData.get("label"),
@@ -64,10 +73,7 @@ export async function createWooIntegration(formData: FormData) {
       consumer_secret: formData.get("consumer_secret"),
       is_active: formData.get("is_active") === "on",
     });
-
-    if (!parsed.success) {
-      return redirectWithError("invalid");
-    }
+    if (!parsed.success) return redirectWithError("invalid");
 
     const { label, site_url, consumer_key, consumer_secret, is_active } =
       parsed.data;
@@ -101,12 +107,15 @@ export async function createWooIntegration(formData: FormData) {
 
     redirectWithStatus("created");
   } catch (err) {
-    if (err === getRedirectError(RedirectType.push)) throw err;
+    handleRedirectError(err);
     console.error("[Woo] create error", err);
     redirectWithError("unexpected");
   }
 }
 
+// =====================
+// UPDATE
+// =====================
 export async function updateWooIntegration(formData: FormData) {
   try {
     const supabase = await createServer();
@@ -116,7 +125,9 @@ export async function updateWooIntegration(formData: FormData) {
     if (!user) redirect("/login");
 
     const consumerKeyRaw = String(formData.get("consumer_key") ?? "").trim();
-    const consumerSecretRaw = String(formData.get("consumer_secret") ?? "").trim();
+    const consumerSecretRaw = String(
+      formData.get("consumer_secret") ?? ""
+    ).trim();
 
     const parsed = UpdateSchema.safeParse({
       integration_id: formData.get("integration_id"),
@@ -126,10 +137,7 @@ export async function updateWooIntegration(formData: FormData) {
       consumer_secret: consumerSecretRaw ? consumerSecretRaw : undefined,
       is_active: formData.get("is_active") === "on",
     });
-
-    if (!parsed.success) {
-      return redirectWithError("invalid");
-    }
+    if (!parsed.success) return redirectWithError("invalid");
 
     const {
       integration_id,
@@ -147,12 +155,10 @@ export async function updateWooIntegration(formData: FormData) {
       updated_at: new Date().toISOString(),
     };
 
-    if (consumer_key) {
+    if (consumer_key)
       patch.ck_cipher = Buffer.from(encrypt(consumer_key), "utf8");
-    }
-    if (consumer_secret) {
+    if (consumer_secret)
       patch.cs_cipher = Buffer.from(encrypt(consumer_secret), "utf8");
-    }
 
     const { error } = await supabase
       .from("integrations_woocommerce")
@@ -167,12 +173,15 @@ export async function updateWooIntegration(formData: FormData) {
 
     redirectWithStatus("updated");
   } catch (err) {
-    if (err === getRedirectError(RedirectType.push)) throw err;
+    handleRedirectError(err);
     console.error("[Woo] update error", err);
     redirectWithError("unexpected");
   }
 }
 
+// =====================
+// TOGGLE
+// =====================
 export async function setWooIntegrationState(formData: FormData) {
   try {
     const supabase = await createServer();
@@ -185,17 +194,14 @@ export async function setWooIntegrationState(formData: FormData) {
       integration_id: formData.get("integration_id"),
       state: formData.get("state"),
     });
-    if (!parsed.success) {
-      return redirectWithError("invalid");
-    }
+    if (!parsed.success) return redirectWithError("invalid");
 
     const { integration_id, state } = parsed.data;
-    const nextState = state === "activate";
 
     const { error } = await supabase
       .from("integrations_woocommerce")
       .update({
-        is_active: nextState,
+        is_active: state === "activate",
         updated_at: new Date().toISOString(),
       })
       .eq("id", integration_id)
@@ -208,12 +214,15 @@ export async function setWooIntegrationState(formData: FormData) {
 
     redirectWithStatus("updated");
   } catch (err) {
-    if (err === getRedirectError(RedirectType.push)) throw err;
+    handleRedirectError(err);
     console.error("[Woo] state error", err);
     redirectWithError("unexpected");
   }
 }
 
+// =====================
+// DELETE
+// =====================
 export async function deleteWooIntegration(formData: FormData) {
   try {
     const supabase = await createServer();
@@ -225,9 +234,7 @@ export async function deleteWooIntegration(formData: FormData) {
     const parsed = DeleteSchema.safeParse({
       integration_id: formData.get("integration_id"),
     });
-    if (!parsed.success) {
-      return redirectWithError("invalid");
-    }
+    if (!parsed.success) return redirectWithError("invalid");
 
     const { error } = await supabase
       .from("integrations_woocommerce")
@@ -242,7 +249,7 @@ export async function deleteWooIntegration(formData: FormData) {
 
     redirectWithStatus("deleted");
   } catch (err) {
-    if (err === getRedirectError(RedirectType.push)) throw err;
+    handleRedirectError(err);
     console.error("[Woo] delete error", err);
     redirectWithError("unexpected");
   }
