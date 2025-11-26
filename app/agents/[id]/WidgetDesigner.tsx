@@ -181,8 +181,9 @@ export default function WidgetDesigner({
     <div
       className="
         mt-8 grid gap-8
-        xl:grid-cols-[minmax(0,1.2fr)_minmax(360px,1fr)]
-        2xl:grid-cols-[minmax(0,1.35fr)_minmax(400px,1fr)]
+        lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,1fr)]
+        xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,1fr)]
+        2xl:grid-cols-[minmax(0,1.35fr)_minmax(420px,1fr)]
         w-full min-w-0
       "
     >
@@ -388,14 +389,14 @@ export default function WidgetDesigner({
           <iframe
             ref={iframeRef}
             title="Widget preview"
-            className="h-[420px] w-full border-0 bg-slate-950"
+            className="h-[460px] w-full border-0 bg-slate-950"
           />
         </div>
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
             URL generada
           </p>
-          <code className="block max-h-28 overflow-auto rounded-xl border border-slate-800 bg-slate-950/80 p-3 text-[11px] text-emerald-200">
+          <code className="block max-h-28 overflow-auto rounded-xl border border-slate-800 bg-slate-950/80 p-3 text-[11px] text-emerald-200 overflow-x-auto break-all">
             {previewUrl}
           </code>
         </div>

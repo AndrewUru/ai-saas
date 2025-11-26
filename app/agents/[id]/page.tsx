@@ -510,7 +510,7 @@ export default async function AgentDetailPage({
             </form>
           </article>
 
-          <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">
+          <article className="w-full min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">
             <h2 className="text-xl font-semibold text-white">
               Personaliza el widget embebible
             </h2>
