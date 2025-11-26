@@ -64,13 +64,12 @@ export default function WidgetDesigner({
   const [labelInput, setLabelInput] = useState(initialLabel ?? "");
   const [greetingInput, setGreetingInput] = useState(initialGreeting ?? "");
   const [position, setPosition] = useState<WidgetPosition>(
-    initialPosition ?? widgetDefaults.position,
+    initialPosition ?? widgetDefaults.position
   );
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
-  const accentPickerValue =
-    normalizeHex(accentInput) ?? widgetDefaults.accent;
+  const accentPickerValue = normalizeHex(accentInput) ?? widgetDefaults.accent;
   const accentError =
     accentInput && !normalizeHex(accentInput)
       ? "Usa un hex de 3 o 6 caracteres."
@@ -179,14 +178,39 @@ export default function WidgetDesigner({
   }
 
   return (
-    <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(280px,1fr)_minmax(260px,1fr)]">
+    <div
+      className="
+        mt-8 grid gap-8
+        xl:grid-cols-[minmax(0,1.2fr)_minmax(360px,1fr)]
+        2xl:grid-cols-[minmax(0,1.35fr)_minmax(400px,1fr)]
+        w-full min-w-0
+      "
+    >
       <form
         action={formAction}
-        className="space-y-5 rounded-2xl border border-slate-800/70 bg-slate-950/60 p-5 shadow-inner shadow-slate-950/40"
+        className="space-y-6 rounded-3xl border border-slate-800/70 bg-gradient-to-br from-slate-950/75 via-slate-950/65 to-slate-900/60 p-6 shadow-xl shadow-slate-950/40"
       >
         <input type="hidden" name="agent_id" value={agentId} />
 
-        <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
+              Branding y UX
+            </p>
+            <h3 className="text-lg font-semibold text-white">
+              Ajusta apariencia y textos visibles
+            </h3>
+          </div>
+          <button
+            type="button"
+            className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300 transition hover:text-emerald-200"
+            onClick={handleReset}
+          >
+            Limpiar campos
+          </button>
+        </div>
+
+        <div className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
           <div className="flex flex-wrap items-center gap-3">
             <label
               htmlFor="widget-accent"
@@ -243,8 +267,8 @@ export default function WidgetDesigner({
             className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
           />
           <p className="text-xs text-slate-500">
-            Máximo {widgetLimits.brand} caracteres. Vacío = “
-            {widgetDefaults.brand}”.
+            Máximo {widgetLimits.brand} caracteres. Vacío = usa &quot;
+            {widgetDefaults.brand}&quot;.
           </p>
         </div>
 
@@ -265,8 +289,8 @@ export default function WidgetDesigner({
             className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
           />
           <p className="text-xs text-slate-500">
-            Máximo {widgetLimits.label} caracteres. Vacío = “
-            {widgetDefaults.label}”.
+            Máximo {widgetLimits.label} caracteres. Vacío = usa &quot;
+            {widgetDefaults.label}&quot;.
           </p>
         </div>
 
@@ -287,12 +311,12 @@ export default function WidgetDesigner({
             className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
           />
           <p className="text-xs text-slate-500">
-            Máximo {widgetLimits.greeting} caracteres. Vacío = “
-            {widgetDefaults.greeting}”.
+            Máximo {widgetLimits.greeting} caracteres. Vacío = usa &quot;
+            {widgetDefaults.greeting}&quot;.
           </p>
         </div>
 
-        <fieldset className="space-y-2">
+        <fieldset className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
           <legend className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
             Posición en pantalla
           </legend>
@@ -337,36 +361,41 @@ export default function WidgetDesigner({
         </div>
 
         <p className="text-xs text-slate-500">
-          Los valores vacíos usan automáticamente los mismos textos y colores
-          que ve el widget por defecto.
+          Los valores vacíos usan automáticamente los textos y colores
+          predeterminados del widget.
         </p>
       </form>
 
-      <div className="space-y-4 rounded-2xl border border-slate-800/70 bg-slate-950/60 p-5 shadow-inner shadow-slate-950/40">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-            Vista previa en vivo
-          </p>
-          <p className="text-sm text-slate-300">
-            Usamos el script real contra{" "}
-            <code className="rounded bg-slate-900 px-2 py-0.5 text-xs text-emerald-200">
-              /api/widget
-            </code>
-            .
-          </p>
+      <div className="space-y-5 rounded-3xl border border-slate-800/70 bg-gradient-to-br from-slate-950/75 via-slate-950/60 to-slate-900/60 p-6 shadow-xl shadow-slate-950/40">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
+              Vista previa en vivo
+            </p>
+            <p className="text-sm text-slate-300">
+              Usamos el script real contra{" "}
+              <code className="rounded bg-slate-900 px-2 py-0.5 text-xs text-emerald-200">
+                /api/widget
+              </code>
+              .
+            </p>
+          </div>
+          <span className="rounded-full border border-slate-800 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-400">
+            Tiempo real
+          </span>
         </div>
-        <div className="rounded-xl border border-slate-800 bg-slate-900/80">
+        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80">
           <iframe
             ref={iframeRef}
             title="Widget preview"
-            className="h-96 w-full rounded-xl border-0 bg-slate-950"
+            className="h-[420px] w-full border-0 bg-slate-950"
           />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
             URL generada
           </p>
-          <code className="block max-h-24 overflow-auto rounded-lg bg-slate-950/80 p-3 text-[11px] text-emerald-200">
+          <code className="block max-h-28 overflow-auto rounded-xl border border-slate-800 bg-slate-950/80 p-3 text-[11px] text-emerald-200">
             {previewUrl}
           </code>
         </div>

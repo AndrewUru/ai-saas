@@ -253,7 +253,7 @@ export default async function AgentDetailPage({
   return (
     <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_60%)]" />
-      <section className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col gap-8 px-6 py-16 md:px-10 lg:px-16">
+      <section className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col gap-12 px-6 py-16 md:px-10 lg:px-16">
         <header className="space-y-4 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="space-y-3">
@@ -334,8 +334,15 @@ export default async function AgentDetailPage({
           </div>
         )}
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]">
-          <div className="space-y-8">
+        <div
+          className="
+            grid gap-10
+            lg:grid-cols-[minmax(0,1.6fr)_minmax(340px,1fr)]
+            xl:grid-cols-[minmax(0,1.85fr)_minmax(380px,1fr)]
+            2xl:grid-cols-[minmax(0,2fr)_minmax(420px,1fr)]
+          "
+        >
+          <div className="space-y-8 min-w-0">
             <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">
             <h2 className="text-xl font-semibold text-white">
               Integracion y dominios permitidos
@@ -523,9 +530,9 @@ export default async function AgentDetailPage({
               initialGreeting={agent.widget_greeting}
               initialPosition={widgetPositionValue}
             />
-          </article>
+            </article>
           </div>
-          <aside className="space-y-6">
+          <aside className="space-y-6 min-w-0">
             <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur">
               <h3 className="text-lg font-semibold text-white">
                 Snippet de incrustacion
