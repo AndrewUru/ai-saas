@@ -73,21 +73,31 @@ export default async function DashboardPage() {
           </div>
         </header>
 
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_minmax(1024px,1fr)]">
-          <AgentsSection planLimitLabel={planLimitLabel} />
+        <div
+          className="
+  grid gap-8
+  lg:grid-cols-[minmax(0,1.3fr)_320px]
+  xl:grid-cols-[minmax(0,1.6fr)_360px]
+  2xl:grid-cols-[minmax(0,2fr)_420px]
+  w-full
+"
+        >
+          <div className="w-full">
+            <AgentsSection planLimitLabel={planLimitLabel} />
+          </div>
 
-          <aside className="space-y-6">
+          <aside className="space-y-6 w-full">
             <article className="ui-card ui-card--padded ui-card--strong text-emerald-100">
-              <h3 className="text-lg font-semibold">Plan y facturacion</h3>
+              <h3 className="text-lg font-semibold">Plan y facturación</h3>
               <p className="mt-2 text-sm">
-                Manten tu plan al dia para seguir enviando mensajes sin
-                interrupciones. Actualiza tu suscripcion cuando lo necesites.
+                Mantén tu plan al día para seguir enviando mensajes sin
+                interrupciones. Actualiza tu suscripción cuando lo necesites.
               </p>
               <Link
                 href="/billing"
                 className="mt-4 inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
               >
-                Gestionar suscripcion
+                Gestionar suscripción
               </Link>
             </article>
           </aside>
