@@ -49,8 +49,8 @@ export default async function DashboardPage() {
               Hola, {user.email}
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-300 sm:text-base">
-              Gestiona tus agentes, revisa el estado de tu plan y comparte el widget
-              con tus tiendas desde un solo lugar.
+              Gestiona tus agentes, revisa el estado de tu plan y comparte el
+              widget con tus tiendas desde un solo lugar.
             </p>
           </div>
           <div className="flex flex-col gap-3 text-sm text-slate-300 md:text-right">
@@ -58,26 +58,30 @@ export default async function DashboardPage() {
               <span className="text-xs uppercase tracking-[0.28em] text-emerald-300">
                 Plan activo
               </span>
-              <div className="text-lg font-semibold text-white">{planLabel}</div>
+              <div className="text-lg font-semibold text-white">
+                {planLabel}
+              </div>
             </div>
             <div>
               <span className="text-xs uppercase tracking-[0.28em] text-emerald-300">
                 Vigente hasta
               </span>
-              <div className="text-lg font-semibold text-white">{activeUntil}</div>
+              <div className="text-lg font-semibold text-white">
+                {activeUntil}
+              </div>
             </div>
           </div>
         </header>
 
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_minmax(320px,1fr)]">
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_minmax(1024px,1fr)]">
           <AgentsSection planLimitLabel={planLimitLabel} />
 
           <aside className="space-y-6">
             <article className="ui-card ui-card--padded ui-card--strong text-emerald-100">
               <h3 className="text-lg font-semibold">Plan y facturacion</h3>
               <p className="mt-2 text-sm">
-                Manten tu plan al dia para seguir enviando mensajes sin interrupciones.
-                Actualiza tu suscripcion cuando lo necesites.
+                Manten tu plan al dia para seguir enviando mensajes sin
+                interrupciones. Actualiza tu suscripcion cuando lo necesites.
               </p>
               <Link
                 href="/billing"

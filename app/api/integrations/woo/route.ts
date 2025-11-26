@@ -91,8 +91,8 @@ export async function POST(req: Request) {
       user_id: user.id,
       site_url,
       label,
-      ck_cipher: Buffer.from(encrypt(consumer_key), "utf8"),
-      cs_cipher: Buffer.from(encrypt(consumer_secret), "utf8"),
+      ck_cipher: encrypt(consumer_key),
+      cs_cipher: encrypt(consumer_secret),
       position: nextPosition,
       is_active: is_active ?? true,
     })
@@ -137,10 +137,8 @@ export async function PATCH(req: Request) {
   if (label) patch.label = label;
   if (typeof is_active === "boolean") patch.is_active = is_active;
   if (typeof position === "number") patch.position = position;
-  if (consumer_key)
-    patch.ck_cipher = Buffer.from(encrypt(consumer_key), "utf8");
-  if (consumer_secret)
-    patch.cs_cipher = Buffer.from(encrypt(consumer_secret), "utf8");
+  if (consumer_key) patch.ck_cipher = encrypt(consumer_key);
+  if (consumer_secret) patch.cs_cipher = encrypt(consumer_secret);
 
   const { error: updateError } = await supabase
     .from("integrations_woocommerce")
