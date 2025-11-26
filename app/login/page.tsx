@@ -156,12 +156,21 @@ export default function LoginPage() {
             <span className="h-px flex-1 bg-slate-800" />
           </div>
 
-          <button
-            onClick={signInGoogle}
-            className="w-full rounded-full border border-slate-700 bg-slate-950/40 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:text-emerald-200"
-          >
-            Continue with Google
-          </button>
+          <div className="mt-6">
+            <button
+              onClick={signInGoogle}
+              className="
+      w-full flex items-center justify-center gap-3
+      px-4 py-3 rounded-full
+      bg-white/10 border border-white/20
+      text-white font-medium
+      hover:bg-white/20 transition
+    "
+            >
+              <img src="/google.svg" className="w-5 h-5" alt="Google" />
+              Continuar con Google
+            </button>
+          </div>
 
           <p className="mt-6 text-center text-xs text-slate-500">
             Trouble signing in?{" "}
