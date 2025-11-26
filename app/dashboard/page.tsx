@@ -75,27 +75,36 @@ export default async function DashboardPage() {
 
         <div
           className="
-  grid gap-8
-  lg:grid-cols-[minmax(0,1.3fr)_320px]
-  xl:grid-cols-[minmax(0,1.6fr)_360px]
-  2xl:grid-cols-[minmax(0,2fr)_420px]
-  w-full
-"
+    grid gap-10
+    lg:grid-cols-[minmax(0,1.4fr)_320px]
+    xl:grid-cols-[minmax(0,1.7fr)_360px]
+    2xl:grid-cols-[minmax(0,2fr)_420px]
+    w-full
+  "
         >
-          <div className="w-full">
+          {/* COLUMNA PRINCIPAL */}
+          <div className="w-full min-w-0">
             <AgentsSection planLimitLabel={planLimitLabel} />
           </div>
 
-          <aside className="space-y-6 w-full">
+          {/* ASIDE */}
+          <aside className="w-full space-y-6 min-w-0">
             <article className="ui-card ui-card--padded ui-card--strong text-emerald-100">
               <h3 className="text-lg font-semibold">Plan y facturación</h3>
+
               <p className="mt-2 text-sm">
                 Mantén tu plan al día para seguir enviando mensajes sin
                 interrupciones. Actualiza tu suscripción cuando lo necesites.
               </p>
+
               <Link
                 href="/billing"
-                className="mt-4 inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
+                className="
+          mt-4 inline-flex items-center justify-center
+          rounded-full bg-white px-4 py-2
+          text-sm font-semibold text-slate-950
+          transition hover:bg-slate-100
+        "
               >
                 Gestionar suscripción
               </Link>
