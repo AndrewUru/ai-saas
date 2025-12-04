@@ -82,7 +82,7 @@ async function updateIntegrationAndDomains(formData: FormData) {
         fallbackUrlRaw,
         fallbackUrlRaw.startsWith("http")
           ? undefined
-          : "https://placeholder.local",
+          : "https://placeholder.local"
       );
       fallbackUrl =
         url.origin === "https://placeholder.local"
@@ -190,7 +190,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position",
+      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -418,247 +418,220 @@ export default async function AgentDetailPage({
           "
           data-oid="9m1.a4i"
         >
-          <div className="space-y-8 min-w-0" data-oid="sru7.4l">
-            <article
-              className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur"
-              data-oid="vgt:6to"
+          {/* COLUMNA IZQUIERDA ARRIBA: Integracion + dominios */}
+          <article
+            className="min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur"
+            data-oid="vgt:6to"
+          >
+            <h2
+              className="text-xl font-semibold text-white"
+              data-oid="o8d-_8w"
             >
-              <h2
-                className="text-xl font-semibold text-white"
-                data-oid="o8d-_8w"
-              >
-                Integracion y dominios permitidos
-              </h2>
-              <p className="mt-1 text-sm text-slate-300" data-oid="-vl6t.d">
-                Selecciona la integracion WooCommerce que debe usar este agente
-                y define que dominios pueden embeber el widget.
-              </p>
+              Integracion y dominios permitidos
+            </h2>
+            <p className="mt-1 text-sm text-slate-300" data-oid="-vl6t.d">
+              Selecciona la integracion WooCommerce que debe usar este agente y
+              define que dominios pueden embeber el widget.
+            </p>
 
-              <form
-                action={updateIntegrationAndDomains}
-                className="mt-6 space-y-6"
-                data-oid="q_-3u9a"
-              >
-                <input
-                  type="hidden"
-                  name="agent_id"
-                  value={agent.id}
-                  data-oid="-vq.ua_"
+            {/* 🔽 deja aquí TODO el <form> exactamente como lo tienes */}
+            <form
+              action={updateIntegrationAndDomains}
+              className="mt-6 space-y-6"
+              data-oid="q_-3u9a"
+            >
+              <input
+                type="hidden"
+                name="agent_id"
+                value={agent.id}
+                data-oid="-vq.ua_"
+              />
+
+              <div className="space-y-2" data-oid="z:wzhrp">
+                <label
+                  htmlFor="integration"
+                  className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                  data-oid="nkfp-u:"
+                >
+                  Integracion WooCommerce
+                </label>
+                <select
+                  id="integration"
+                  name="integration_id"
+                  defaultValue={agent.woo_integration_id || "none"}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                  data-oid="h3757ia"
+                >
+                  <option value="none" data-oid=":626qar">
+                    Sin integracion
+                  </option>
+                  {(integrations ?? []).map((integration) => {
+                    const label =
+                      integration.label?.trim() || integration.site_url;
+                    return (
+                      <option
+                        key={integration.id}
+                        value={integration.id}
+                        data-oid="jbsgh4:"
+                      >
+                        {label} {integration.is_active ? "" : "(inactiva)"}
+                      </option>
+                    );
+                  })}
+                </select>
+                <p className="text-xs text-slate-500" data-oid=".-seh8t">
+                  Gestiona tus credenciales y sitios conectados desde{" "}
+                  <Link
+                    href="/integrations/woo"
+                    className="text-emerald-300 hover:text-emerald-200"
+                    data-oid="zq5csv8"
+                  >
+                    Integraciones
+                  </Link>
+                  .
+                </p>
+              </div>
+
+              <div className="space-y-2" data-oid="znx8fj7">
+                <label
+                  htmlFor="prompt-system"
+                  className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                  data-oid="40p.dsg"
+                >
+                  Instrucciones del agente (prompt)
+                </label>
+                <textarea
+                  id="prompt-system"
+                  name="prompt_system"
+                  defaultValue={promptSystemValue}
+                  placeholder={
+                    descriptionFallback ||
+                    "Describe tono, politicas y objetivos del agente."
+                  }
+                  rows={5}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                  data-oid="rsg2:49"
                 />
 
-                <div className="space-y-2" data-oid="z:wzhrp">
-                  <label
-                    htmlFor="integration"
-                    className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-                    data-oid="nkfp-u:"
-                  >
-                    Integracion WooCommerce
-                  </label>
-                  <select
-                    id="integration"
-                    name="integration_id"
-                    defaultValue={agent.woo_integration_id || "none"}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                    data-oid="h3757ia"
-                  >
-                    <option value="none" data-oid=":626qar">
-                      Sin integracion
-                    </option>
-                    {(integrations ?? []).map((integration) => {
-                      const label =
-                        integration.label?.trim() || integration.site_url;
-                      return (
-                        <option
-                          key={integration.id}
-                          value={integration.id}
-                          data-oid="jbsgh4:"
-                        >
-                          {label} {integration.is_active ? "" : "(inactiva)"}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <p className="text-xs text-slate-500" data-oid=".-seh8t">
-                    Gestiona tus credenciales y sitios conectados desde{" "}
-                    <Link
-                      href="/integrations/woo"
-                      className="text-emerald-300 hover:text-emerald-200"
-                      data-oid="zq5csv8"
-                    >
-                      Integraciones
-                    </Link>
-                    .
-                  </p>
-                </div>
+                <p className="text-xs text-slate-500" data-oid="msp58.n">
+                  Este texto se envia como prompt de sistema al modelo. Usa
+                  variables, tono deseado y pasos de validacion para la marca.
+                </p>
+              </div>
 
-                <div className="space-y-2" data-oid="znx8fj7">
-                  <label
-                    htmlFor="prompt-system"
-                    className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-                    data-oid="40p.dsg"
-                  >
-                    Instrucciones del agente (prompt)
-                  </label>
-                  <textarea
-                    id="prompt-system"
-                    name="prompt_system"
-                    defaultValue={promptSystemValue}
-                    placeholder={
-                      descriptionFallback ||
-                      "Describe tono, politicas y objetivos del agente."
-                    }
-                    rows={5}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                    data-oid="rsg2:49"
-                  />
-
-                  <p className="text-xs text-slate-500" data-oid="msp58.n">
-                    Este texto se envia como prompt de sistema al modelo. Usa
-                    variables, tono deseado y pasos de validacion para la marca.
-                  </p>
-                </div>
-
-                <div className="space-y-2" data-oid="5h4fsnr">
-                  <label
-                    htmlFor="language"
-                    className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-                    data-oid="ma.3o09"
-                  >
-                    Idioma de respuesta preferido
-                  </label>
-                  <select
-                    id="language"
-                    name="language"
-                    defaultValue={languageValue}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                    data-oid="6l05_.p"
-                  >
-                    {LANGUAGE_OPTIONS.map((option) => (
-                      <option
-                        key={option.value}
-                        value={option.value}
-                        data-oid="p3.ozie"
-                      >
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-slate-500" data-oid=".of0xf0">
-                    En deteccion automatica, el modelo adapta la respuesta al
-                    idioma del cliente.
-                  </p>
-                </div>
-
-                <div className="space-y-2" data-oid="u8vdvb:">
-                  <label
-                    htmlFor="fallback-url"
-                    className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-                    data-oid="ddpxzr7"
-                  >
-                    URL de fallback (opcional)
-                  </label>
-                  <input
-                    id="fallback-url"
-                    name="fallback_url"
-                    type="url"
-                    inputMode="url"
-                    defaultValue={fallbackUrlValue}
-                    placeholder="https://tu-agencia.com/contacto"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                    data-oid="..o7do6"
-                  />
-
-                  <p className="text-xs text-slate-500" data-oid="8v0kij7">
-                    Se enviara al widget para escalar con humanos cuando sea
-                    necesario.
-                  </p>
-                </div>
-
-                <div className="space-y-2" data-oid="lsi9jqi">
-                  <label
-                    htmlFor="allowed-domains"
-                    className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-                    data-oid="4jmy990"
-                  >
-                    Dominios permitidos (opcional)
-                  </label>
-                  <input
-                    id="allowed-domains"
-                    name="allowed_domains"
-                    placeholder="midominio.com, tienda.com"
-                    defaultValue={allowedDomains.join(", ")}
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                    data-oid="4winsyn"
-                  />
-
-                  <p className="text-xs text-slate-500" data-oid="547hcs6">
-                    Separa cada dominio con comas. Si lo dejas vacio, el widget
-                    se podra cargar desde cualquier origen.
-                  </p>
-                  {!!allowedDomains.length && (
-                    <p className="text-xs text-slate-400" data-oid="j.1vkzc">
-                      Dominios actuales:{" "}
-                      <span
-                        className="font-mono text-emerald-200"
-                        data-oid="mp6p8il"
-                      >
-                        {allowedDomains.join(", ")}
-                      </span>
-                    </p>
-                  )}
-                </div>
-
-                <div
-                  className="flex flex-col gap-3 sm:flex-row sm:items-center"
-                  data-oid="f23y85m"
+              <div className="space-y-2" data-oid="5h4fsnr">
+                <label
+                  htmlFor="language"
+                  className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                  data-oid="ma.3o09"
                 >
-                  <button
-                    type="submit"
-                    className="inline-flex w-full items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto"
-                    data-oid="g:a3b_n"
-                  >
-                    Guardar cambios
-                  </button>
-                  <Link
-                    href={`/agents/${agent.id}`}
-                    className="inline-flex w-full items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:w-auto"
-                    data-oid="l5ynrvq"
-                  >
-                    Cancelar
-                  </Link>
-                </div>
-              </form>
-            </article>
+                  Idioma de respuesta preferido
+                </label>
+                <select
+                  id="language"
+                  name="language"
+                  defaultValue={languageValue}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                  data-oid="6l05_.p"
+                >
+                  {LANGUAGE_OPTIONS.map((option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                      data-oid="p3.ozie"
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-slate-500" data-oid=".of0xf0">
+                  En deteccion automatica, el modelo adapta la respuesta al
+                  idioma del cliente.
+                </p>
+              </div>
 
-            <article
-              className="w-full min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur"
-              data-oid="7uz0fmi"
-            >
-              <h2
-                className="text-xl font-semibold text-white"
-                data-oid="o127-9d"
+              <div className="space-y-2" data-oid="u8vdvb:">
+                <label
+                  htmlFor="fallback-url"
+                  className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                  data-oid="ddpxzr7"
+                >
+                  URL de fallback (opcional)
+                </label>
+                <input
+                  id="fallback-url"
+                  name="fallback_url"
+                  type="url"
+                  inputMode="url"
+                  defaultValue={fallbackUrlValue}
+                  placeholder="https://tu-agencia.com/contacto"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                  data-oid="..o7do6"
+                />
+
+                <p className="text-xs text-slate-500" data-oid="8v0kij7">
+                  Se enviara al widget para escalar con humanos cuando sea
+                  necesario.
+                </p>
+              </div>
+
+              <div className="space-y-2" data-oid="lsi9jqi">
+                <label
+                  htmlFor="allowed-domains"
+                  className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                  data-oid="4jmy990"
+                >
+                  Dominios permitidos (opcional)
+                </label>
+                <input
+                  id="allowed-domains"
+                  name="allowed_domains"
+                  placeholder="midominio.com, tienda.com"
+                  defaultValue={allowedDomains.join(", ")}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                  data-oid="4winsyn"
+                />
+
+                <p className="text-xs text-slate-500" data-oid="547hcs6">
+                  Separa cada dominio con comas. Si lo dejas vacio, el widget se
+                  podra cargar desde cualquier origen.
+                </p>
+                {!!allowedDomains.length && (
+                  <p className="text-xs text-slate-400" data-oid="j.1vkzc">
+                    Dominios actuales:{" "}
+                    <span
+                      className="font-mono text-emerald-200"
+                      data-oid="mp6p8il"
+                    >
+                      {allowedDomains.join(", ")}
+                    </span>
+                  </p>
+                )}
+              </div>
+
+              <div
+                className="flex flex-col gap-3 sm:flex-row sm:items-center"
+                data-oid="f23y85m"
               >
-                Personaliza el widget embebible
-              </h2>
-              <p className="mt-1 text-sm text-slate-300" data-oid="gyb7lbe">
-                Ajusta color, textos y posicion y prueba el resultado en tiempo
-                real antes de copiar el script.
-              </p>
+                <button
+                  type="submit"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto"
+                  data-oid="g:a3b_n"
+                >
+                  Guardar cambios
+                </button>
+                <Link
+                  href={`/agents/${agent.id}`}
+                  className="inline-flex w-full items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:w-auto"
+                  data-oid="l5ynrvq"
+                >
+                  Cancelar
+                </Link>
+              </div>
+            </form>
+          </article>
 
-              <WidgetDesigner
-                formAction={updateWidgetBranding}
-                agentId={agent.id}
-                apiKey={agent.api_key}
-                siteUrl={siteUrl}
-                initialAccent={agent.widget_accent}
-                initialBrand={agent.widget_brand}
-                initialLabel={agent.widget_label}
-                initialGreeting={agent.widget_greeting}
-                initialPosition={widgetPositionValue}
-                data-oid="qs3rk03"
-              />
-            </article>
-          </div>
+          {/* COLUMNA DERECHA ARRIBA: aside con snippet + buenas prácticas */}
           <aside className="space-y-6 min-w-0" data-oid="no9w3th">
             <article
               className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur"
@@ -726,6 +699,36 @@ export default async function AgentDetailPage({
               </ul>
             </article>
           </aside>
+
+          {/* FILA INFERIOR: ancho completo */}
+          <article
+            className="lg:col-span-2 w-full min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur"
+            data-oid="7uz0fmi"
+          >
+            <h2
+              className="text-xl font-semibold text-white"
+              data-oid="o127-9d"
+            >
+              Personaliza el widget embebible
+            </h2>
+            <p className="mt-1 text-sm text-slate-300" data-oid="gyb7lbe">
+              Ajusta color, textos y posicion y prueba el resultado en tiempo
+              real antes de copiar el script.
+            </p>
+
+            <WidgetDesigner
+              formAction={updateWidgetBranding}
+              agentId={agent.id}
+              apiKey={agent.api_key}
+              siteUrl={siteUrl}
+              initialAccent={agent.widget_accent}
+              initialBrand={agent.widget_brand}
+              initialLabel={agent.widget_label}
+              initialGreeting={agent.widget_greeting}
+              initialPosition={widgetPositionValue}
+              data-oid="qs3rk03"
+            />
+          </article>
         </div>
       </section>
     </main>
