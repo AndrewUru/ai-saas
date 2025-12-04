@@ -3,6 +3,7 @@
 
 export const dynamic = "force-dynamic";
 
+import Image from "next/image";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -170,7 +171,13 @@ export default function LoginPage() {
       hover:bg-white/20 transition
     "
             >
-              <img src="/google.svg" className="w-5 h-5" alt="Google" />
+              <Image
+                src="/google.svg"
+                alt="Google"
+                width={20}
+                height={20}
+                className="h-5 w-5"
+              />
               Continuar con Google
             </button>
           </div>
