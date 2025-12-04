@@ -1,36 +1,36 @@
 # AI Commerce Agents – SaaS Dashboard & Widget
 
-Panel multi-tenant para crear agentes que atienden tiendas online y un widget embebible que se integra en WooCommerce/WordPress, Shopify u otros frontends con un solo `<script>`. El stack combina **Next.js 15 (App Router)**, **Supabase** para auth/DB y **LangChain/OpenAI** para la capa conversacional.
+Multi-tenant panel for creating agents that serve online stores and an embeddable widget that integrates into WooCommerce/WordPress, Shopify, or other frontends with a single `<script>`. The stack combines **Next.js 15 (App Router)**, **Supabase** for auth/DB, and **LangChain/OpenAI** for the conversational layer.
 
-## ⚙️ Características principales
+## ⚙️ Key Features
 
-- Dashboard autenticado (Supabase SSR) para crear y administrar agentes, dominios permitidos y límites de mensajes.
-- Generación automática de API Keys por agente y snippet listo para copiar (`/api/widget?key=...`).
-- Personalización completa del widget (color, branding, textos, posición) con vista previa en tiempo real.
-- API segura (`/api/agent/chat`) que conecta con LangChain/OpenAI respetando los límites de cada plan.
-- Integraciones WooCommerce almacenadas en Supabase y validadas antes de vincularse a un agente.
-- Billing con PayPal Subscriptions y webhooks para registrar planes activos.
+- Authenticated dashboard (Supabase SSR) to create and manage agents, allowed domains, and message limits.
+- Automatic API Key generation per agent with ready-to-copy snippet (`/api/widget?key=...`).
+- Complete widget customization (color, branding, text, position) with real-time preview.
+- Secure API (`/api/agent/chat`) that connects with LangChain/OpenAI respecting each plan's limits.
+- WooCommerce integrations stored in Supabase and validated before linking to an agent.
+- Billing with PayPal Subscriptions and webhooks to register active plans.
 
-## 📦 Estructura rápida
+## 📦 Quick Structure
 
 ```
 app/
-  agents/            # Listado + ficha detallada de cada agente
+  agents/            # List + detailed view of each agent
   api/
-    widget/route.ts  # Script embebible que construye el chat en el frontend remoto
-    agent/chat/      # Endpoint que atiende los mensajes del widget
-    paypal/*         # Suscripciones y webhooks
-  dashboard/         # Home del panel con métricas y snippet genérico
+    widget/route.ts  # Embeddable script that builds the chat on remote frontend
+    agent/chat/      # Endpoint that handles widget messages
+    paypal/*         # Subscriptions and webhooks
+  dashboard/         # Panel home with metrics and generic snippet
 lib/
-  site.ts            # Resolución centralizada de siteUrl y host
-  widget/defaults.ts # Defaults + sanitizadores compartidos por API y UI
+  site.ts            # Centralized siteUrl and host resolution
+  widget/defaults.ts # Defaults + sanitizers shared by API and UI
 supabase/
-  migrations/        # Cambios de esquema (agents, integraciones, billing, etc.)
+  migrations/        # Schema changes (agents, integrations, billing, etc.)
 ```
 
-## 🔐 Variables de entorno
+## 🔐 Environment Variables
 
-Crea `.env.local` siguiendo el ejemplo de abajo (no subir al repo):
+Create `.env.local` following the example below (do not commit to repo):
 
 ```
 NEXT_PUBLIC_SITE_URL=https://ai-saas-nine-omega.vercel.app
@@ -42,50 +42,50 @@ NEXT_PUBLIC_PAYPAL_CLIENT_ID=...
 PAYPAL_CLIENT_SECRET=...
 ```
 
-> Si cambias el dominio de producción, actualiza `NEXT_PUBLIC_SITE_URL` para que el widget y los enlaces de snippet apunten al host correcto.
+> If you change the production domain, update `NEXT_PUBLIC_SITE_URL` so the widget and snippet links point to the correct host.
 
 ## 🛠️ Scripts
 
 ```bash
-npm install         # Instala dependencias
-npm run dev         # Levanta Next.js en modo desarrollo
-npm run build       # Compila para producción
-npm run start       # Sirve la build generada
+npm install         # Install dependencies
+npm run dev         # Start Next.js in development mode
+npm run build       # Build for production
+npm run start       # Serve the generated build
 npm run lint        # ESLint (TS/React)
 ```
 
-## 🗃️ Migraciones
+## 🗃️ Migrations
 
-El proyecto usa las migraciones de Supabase que viven en `supabase/migrations`. Para aplicarlas:
+The project uses Supabase migrations located in `supabase/migrations`. To apply them:
 
 ```bash
-supabase db push           # Requiere CLI de Supabase
-# o, si trabajas directamente contra Postgres:
+supabase db push           # Requires Supabase CLI
+# or, if working directly against Postgres:
 psql $DATABASE_URL -f supabase/migrations/<timestamp>_*.sql
 ```
 
-Asegúrate de ejecutar las migraciones antes de arrancar el dashboard localmente para evitar selects incompletos (p.ej. los campos `widget_*` del agente).
+Make sure to run migrations before starting the dashboard locally to avoid incomplete selects (e.g., agent's `widget_*` fields).
 
-## 🧪 Flujo de desarrollo recomendado
+## 🧪 Recommended Development Flow
 
-1. `npm run dev` y visita `http://localhost:3000`.
-2. Inicia sesión vía Supabase Auth (email magic link).
-3. Desde `/agents` crea un agente, define dominios y personaliza el widget.
-4. Copia la URL que aparece en el snippet y pruébala en otro sitio/iframe con `?key=...`.
-5. Usa los endpoints en `app/api` si necesitas debug (`app/api/_debug/validate` tiene herramientas internas).
+1. Run `npm run dev` and visit `http://localhost:3000`.
+2. Sign in via Supabase Auth (email magic link).
+3. From `/agents` create an agent, define domains, and customize the widget.
+4. Copy the URL shown in the snippet and test it on another site/iframe with `?key=...`.
+5. Use the endpoints in `app/api` if you need debugging (`app/api/_debug/validate` has internal tools).
 
-## 🚀 Despliegue
+## 🚀 Deployment
 
-- **Producción oficial**: `https://ai-saas-nine-omega.vercel.app/`
-- Deploy recomendado en [Vercel](https://vercel.com/) con las mismas variables de entorno que en local.
-- Conecta el proyecto a Supabase y configura los webhooks de PayPal apuntando al dominio público (`/api/paypal/webhook`).
+- **Official production**: `https://ai-saas-nine-omega.vercel.app/`
+- Recommended deployment on [Vercel](https://vercel.com/) with the same environment variables as local.
+- Connect the project to Supabase and configure PayPal webhooks pointing to the public domain (`/api/paypal/webhook`).
 
-## 🤝 Contribuciones
+## 🤝 Contributing
 
 1. Fork / branch.
-2. Aplica cambios + tests (`npm run lint`).
-3. Abre PR explicando el impacto (UI, API, migrations) y cualquier paso manual necesario (p.ej. nuevas env vars).
+2. Apply changes + tests (`npm run lint`).
+3. Open PR explaining the impact (UI, API, migrations) and any manual steps needed (e.g., new env vars).
 
 ---
 
-> ¿Dudas? Revisa `app/api/widget/route.ts` y `app/agents/[id]/WidgetDesigner.tsx` para entender cómo se compone el widget y cómo se persiste la personalización, o contacta al equipo de plataforma.                                                             🧩
+> Questions? Check `app/api/widget/route.ts` and `app/agents/[id]/WidgetDesigner.tsx` to understand how the widget is composed and how customization is persisted, or contact the platform team. 🧩
