@@ -13,7 +13,10 @@ type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 function statusMessage(status: string | null) {
   switch (status) {
     case "created":
-      return { intent: "success" as const, text: "Integracion creada correctamente." };
+      return {
+        intent: "success" as const,
+        text: "Integracion creada correctamente.",
+      };
     case "updated":
       return { intent: "success" as const, text: "Integracion actualizada." };
     case "deleted":
@@ -48,16 +51,12 @@ export default async function WooIntegrationPage({
   if (!user) redirect("/login");
 
   const params = await searchParams;
-  const statusParam =
-    typeof params.status === "string" ? params.status : null;
-  const errorParam =
-    typeof params.error === "string" ? params.error : null;
+  const statusParam = typeof params.status === "string" ? params.status : null;
+  const errorParam = typeof params.error === "string" ? params.error : null;
 
   const { data: integrations, error } = await supabase
     .from("integrations_woocommerce")
-    .select(
-      "id, label, site_url, is_active, position, created_at, updated_at"
-    )
+    .select("id, label, site_url, is_active, position, created_at, updated_at")
     .eq("user_id", user.id)
     .order("position", { ascending: true })
     .order("created_at", { ascending: false });
@@ -80,8 +79,8 @@ export default async function WooIntegrationPage({
             Gestiona las conexiones WooCommerce
           </h1>
           <p className="text-sm text-slate-300 sm:text-base">
-            Guarda las credenciales de cada tienda para que tus agentes respondan con
-            datos de stock, pedidos y clientes en tiempo real.
+            Guarda las credenciales de cada tienda para que tus agentes
+            respondan con datos de stock, pedidos y clientes en tiempo real.
           </p>
         </header>
 
@@ -91,8 +90,7 @@ export default async function WooIntegrationPage({
               "mt-6 rounded-3xl border px-5 py-4 text-sm",
               status?.intent === "success" &&
                 "border-emerald-500/40 bg-emerald-500/10 text-emerald-100",
-              errorMsg &&
-                "border-rose-500/40 bg-rose-500/10 text-rose-100",
+              errorMsg && "border-rose-500/40 bg-rose-500/10 text-rose-100",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -114,7 +112,10 @@ export default async function WooIntegrationPage({
               y nunca se muestran completos.
             </p>
 
-            <form action={createWooIntegration} className="mt-6 space-y-5 text-sm">
+            <form
+              action={createWooIntegration}
+              className="mt-6 space-y-5 text-sm"
+            >
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
@@ -190,8 +191,13 @@ export default async function WooIntegrationPage({
                 ¿Dónde obtengo la clave?
               </p>
               <ol className="mt-2 list-decimal space-y-1 pl-5">
-                <li>En WordPress, ve a WooCommerce → Ajustes → Avanzado → REST API.</li>
-                <li>Crea una clave con permisos de lectura y copia el key/secret.</li>
+                <li>
+                  En WordPress, ve a WooCommerce → Ajustes → Avanzado → REST
+                  API.
+                </li>
+                <li>
+                  Crea una clave con permisos de lectura y copia el key/secret.
+                </li>
                 <li>Introduce los valores aquí para conectar la tienda.</li>
               </ol>
             </div>
@@ -205,8 +211,8 @@ export default async function WooIntegrationPage({
                     Integraciones registradas
                   </h2>
                   <p className="mt-1 text-sm text-slate-300">
-                    Asigna estas conexiones desde la ficha del agente para activar datos
-                    de WooCommerce.
+                    Asigna estas conexiones desde la ficha del agente para
+                    activar datos de WooCommerce.
                   </p>
                 </div>
                 <Link
@@ -258,6 +264,7 @@ export default async function WooIntegrationPage({
                             name="integration_id"
                             value={integration.id}
                           />
+
                           <div className="grid gap-3 sm:grid-cols-2">
                             <label className="space-y-2">
                               <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
@@ -335,11 +342,15 @@ export default async function WooIntegrationPage({
                             name="integration_id"
                             value={integration.id}
                           />
+
                           <input
                             type="hidden"
                             name="state"
-                            value={integration.is_active ? "deactivate" : "activate"}
+                            value={
+                              integration.is_active ? "deactivate" : "activate"
+                            }
                           />
+
                           <button
                             type="submit"
                             className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
@@ -354,6 +365,7 @@ export default async function WooIntegrationPage({
                             name="integration_id"
                             value={integration.id}
                           />
+
                           <button
                             type="submit"
                             className="inline-flex items-center justify-center rounded-full border border-rose-500/40 px-4 py-2 font-semibold text-rose-200 transition hover:border-rose-400 hover:text-rose-100"
@@ -371,8 +383,8 @@ export default async function WooIntegrationPage({
                     Aun no has conectado ninguna tienda.
                   </p>
                   <p>
-                    Crea tu primera integracion con los pasos de la izquierda y despues
-                    asignala a un agente desde su ficha.
+                    Crea tu primera integracion con los pasos de la izquierda y
+                    despues asignala a un agente desde su ficha.
                   </p>
                 </div>
               )}

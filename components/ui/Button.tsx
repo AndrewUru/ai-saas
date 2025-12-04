@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
@@ -18,7 +18,9 @@ export function Button({
   iconRight,
   ...rest
 }: ButtonProps) {
-  const classes = ["ui-button", `ui-button--${variant}`, className].filter(Boolean).join(" ");
+  const classes = ["ui-button", `ui-button--${variant}`, className]
+    .filter(Boolean)
+    .join(" ");
   return (
     <button className={classes} {...rest}>
       {iconLeft}

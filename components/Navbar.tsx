@@ -19,7 +19,9 @@ const NAV_LINKS: NavLink[] = [
 ];
 
 export default function Navbar() {
-  const [supabase, setSupabase] = useState<ReturnType<typeof createClient> | null>(null);
+  const [supabase, setSupabase] = useState<ReturnType<
+    typeof createClient
+  > | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
@@ -156,11 +158,13 @@ export default function Navbar() {
                   isMenuOpen ? "top-2 rotate-45" : "top-0"
                 }`}
               />
+
               <span
                 className={`absolute top-1.5 left-0 block h-0.5 w-full transform rounded-full bg-current transition duration-200 ease-out ${
                   isMenuOpen ? "scale-0 opacity-0" : "scale-100 opacity-100"
                 }`}
               />
+
               <span
                 className={`absolute left-0 block h-0.5 w-full transform rounded-full bg-current transition duration-200 ease-out ${
                   isMenuOpen ? "top-2 -rotate-45" : "top-3"

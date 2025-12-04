@@ -6,12 +6,10 @@ export const dynamic = "force-dynamic";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-type Status =
-  | {
-      intent: "info" | "success" | "error";
-      message: string;
-    }
-  | null;
+type Status = {
+  intent: "info" | "success" | "error";
+  message: string;
+} | null;
 
 export default function LoginPage() {
   const supabase = createClient();
@@ -28,6 +26,7 @@ export default function LoginPage() {
       const redirectUrl = `${
         process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
       }/auth/callback?next=/dashboard`;
+
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: { emailRedirectTo: redirectUrl },
@@ -57,6 +56,7 @@ export default function LoginPage() {
     const redirectUrl = `${
       process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
     }/auth/callback?next=/dashboard`;
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: redirectUrl },
@@ -127,7 +127,10 @@ export default function LoginPage() {
 
           <form onSubmit={signInEmail} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-slate-200">
+              <label
+                htmlFor="email"
+                className="text-sm font-medium text-slate-200"
+              >
                 Work email
               </label>
               <input
@@ -174,7 +177,10 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-xs text-slate-500">
             Trouble signing in?{" "}
-            <a href="/contact" className="text-emerald-300 hover:text-emerald-200">
+            <a
+              href="/contact"
+              className="text-emerald-300 hover:text-emerald-200"
+            >
               Contact support
             </a>
           </p>
@@ -183,9 +189,12 @@ export default function LoginPage() {
             <p
               className={[
                 "mt-6 rounded-2xl border px-4 py-3 text-sm",
-                status.intent === "success" && "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
-                status.intent === "error" && "border-rose-500/40 bg-rose-500/10 text-rose-200",
-                status.intent === "info" && "border-slate-700 bg-slate-900/70 text-slate-200",
+                status.intent === "success" &&
+                  "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
+                status.intent === "error" &&
+                  "border-rose-500/40 bg-rose-500/10 text-rose-200",
+                status.intent === "info" &&
+                  "border-slate-700 bg-slate-900/70 text-slate-200",
               ]
                 .filter(Boolean)
                 .join(" ")}

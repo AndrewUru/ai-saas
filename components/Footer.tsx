@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
 const navigation = [
   {
@@ -99,6 +99,7 @@ export default function Footer() {
               Politica de privacidad
             </Link>
             <span className="h-1 w-1 rounded-full bg-slate-700" />
+
             <Link
               href="/terms"
               className="transition hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
@@ -106,6 +107,7 @@ export default function Footer() {
               Terminos de servicio
             </Link>
             <span className="h-1 w-1 rounded-full bg-slate-700" />
+
             <a
               href="mailto:hola@ai-saas.com"
               className="transition hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"

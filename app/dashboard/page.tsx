@@ -37,36 +37,73 @@ export default async function DashboardPage() {
     : "Sin fecha";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_55%)]" />
-      <section className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col gap-10 px-6 py-16 md:px-10 lg:px-16">
-        <header className="space-y-4 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur md:flex md:items-center md:justify-between md:space-y-0">
-          <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">
+    <main
+      className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100"
+      data-oid="wxnl533"
+    >
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_55%)]"
+        data-oid="t21uf9s"
+      />
+
+      <section
+        className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col gap-10 px-6 py-16 md:px-10 lg:px-16"
+        data-oid="27-sl1_"
+      >
+        <header
+          className="space-y-4 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur md:flex md:items-center md:justify-between md:space-y-0"
+          data-oid="2x:zbka"
+        >
+          <div data-oid="c01_ntz">
+            <p
+              className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200"
+              data-oid="ubqklc1"
+            >
               Panel principal
             </p>
-            <h1 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">
+            <h1
+              className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl"
+              data-oid="cki91e6"
+            >
               Hola, {user.email}
             </h1>
-            <p className="mt-2 max-w-2xl text-sm text-slate-300 sm:text-base">
+            <p
+              className="mt-2 max-w-2xl text-sm text-slate-300 sm:text-base"
+              data-oid="eb7_3y2"
+            >
               Gestiona tus agentes, revisa el estado de tu plan y comparte el
               widget con tus tiendas desde un solo lugar.
             </p>
           </div>
-          <div className="flex flex-col gap-3 text-sm text-slate-300 md:text-right">
-            <div>
-              <span className="text-xs uppercase tracking-[0.28em] text-emerald-300">
+          <div
+            className="flex flex-col gap-3 text-sm text-slate-300 md:text-right"
+            data-oid="y.13oo3"
+          >
+            <div data-oid="ytx_i6c">
+              <span
+                className="text-xs uppercase tracking-[0.28em] text-emerald-300"
+                data-oid="880u9zy"
+              >
                 Plan activo
               </span>
-              <div className="text-lg font-semibold text-white">
+              <div
+                className="text-lg font-semibold text-white"
+                data-oid="bwi0sb7"
+              >
                 {planLabel}
               </div>
             </div>
-            <div>
-              <span className="text-xs uppercase tracking-[0.28em] text-emerald-300">
+            <div data-oid="u1i-_uf">
+              <span
+                className="text-xs uppercase tracking-[0.28em] text-emerald-300"
+                data-oid="0y88hol"
+              >
                 Vigente hasta
               </span>
-              <div className="text-lg font-semibold text-white">
+              <div
+                className="text-lg font-semibold text-white"
+                data-oid="yv.lxc5"
+              >
                 {activeUntil}
               </div>
             </div>
@@ -81,18 +118,24 @@ export default async function DashboardPage() {
     2xl:grid-cols-[minmax(0,2fr)_420px]
     w-full
   "
+          data-oid=":d3cz7i"
         >
           {/* COLUMNA PRINCIPAL */}
-          <div className="w-full min-w-0">
-            <AgentsSection planLimitLabel={planLimitLabel} />
+          <div className="w-full min-w-0" data-oid="5vsj:9n">
+            <AgentsSection planLimitLabel={planLimitLabel} data-oid="nyina8d" />
           </div>
 
           {/* ASIDE */}
-          <aside className="w-full space-y-6 min-w-0">
-            <article className="ui-card ui-card--padded ui-card--strong text-emerald-100">
-              <h3 className="text-lg font-semibold">Plan y facturación</h3>
+          <aside className="w-full space-y-6 min-w-0" data-oid="58_r2lk">
+            <article
+              className="ui-card ui-card--padded ui-card--strong text-emerald-100"
+              data-oid="ooy9qqu"
+            >
+              <h3 className="text-lg font-semibold" data-oid=":1.fum_">
+                Plan y facturación
+              </h3>
 
-              <p className="mt-2 text-sm">
+              <p className="mt-2 text-sm" data-oid="b:ndu2s">
                 Mantén tu plan al día para seguir enviando mensajes sin
                 interrupciones. Actualiza tu suscripción cuando lo necesites.
               </p>
@@ -105,6 +148,7 @@ export default async function DashboardPage() {
           text-sm font-semibold text-slate-950
           transition hover:bg-slate-100
         "
+                data-oid="ncd1973"
               >
                 Gestionar suscripción
               </Link>

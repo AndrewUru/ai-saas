@@ -4,6 +4,7 @@ export default function HomePage() {
     <main className="bg-slate-950 text-white">
       <header className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-950 to-black opacity-90" />
+
         <div className="relative mx-auto flex min-h-[70vh] max-w-6xl flex-col justify-center gap-10 px-6 py-24 sm:px-10 lg:px-16">
           <div className="max-w-3xl space-y-6">
             <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-900/40 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">
@@ -136,6 +137,7 @@ export default function HomePage() {
                   className="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4"
                 >
                   <span className="mt-1 h-2 w-2 rounded-full bg-emerald-400" />
+
                   <span>{point}</span>
                 </li>
               ))}
