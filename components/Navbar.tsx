@@ -1,8 +1,43 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation"; // Nuevo import para UX de estado activo
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+
+// Iconos sencillos (SVG) para mejorar la UX visual sin instalar librerías extra
+const Icons = {
+  SignOut: () => (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+      />
+    </svg>
+  ),
+  User: () => (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+      />
+    </svg>
+  ),
+};
 
 type NavLink = {
   href: string;
@@ -23,6 +58,7 @@ const NAV_LINKS: NavLink[] = [
 ];
 
 export default function Navbar() {
+  const pathname = usePathname(); // Hook para saber la ruta actual
   const [supabase, setSupabase] = useState<ReturnType<
     typeof createClient
   > | null>(null);
@@ -58,7 +94,7 @@ export default function Navbar() {
       (_event, session) => {
         if (!isMounted) return;
         setUserEmail(session?.user?.email ?? null);
-      },
+      }
     );
 
     return () => {
@@ -66,6 +102,7 @@ export default function Navbar() {
       listener?.subscription?.unsubscribe();
     };
   }, [supabase]);
+
   const handleSignOut = async () => {
     try {
       setIsSigningOut(true);
@@ -87,60 +124,81 @@ export default function Navbar() {
   });
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-6">
+    <header className="sticky top-0 z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-md supports-[backdrop-filter]:bg-slate-950/60">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6 lg:px-8">
+        {/* LOGO AREA */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm font-semibold tracking-widest text-emerald-300"
+          className="group flex items-center gap-2.5 transition-opacity hover:opacity-90"
         >
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/10 text-base font-bold">
-            AI
+          <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-tr from-emerald-500 to-emerald-300 shadow-lg shadow-emerald-500/20">
+            <span className="font-bold text-slate-950">AI</span>
+            {/* Brillo decorativo */}
+            <div className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+          </div>
+          <span className="bg-gradient-to-r from-emerald-200 to-white bg-clip-text text-sm font-bold tracking-wide text-transparent sm:text-base">
+            Commerce Agents
           </span>
-          <span>Commerce Agents</span>
         </Link>
 
-        <div className="hidden items-center gap-8 text-sm font-medium text-slate-300 md:flex">
-          {filteredLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="transition hover:text-white"
-            >
-              {link.label}
-            </Link>
-          ))}
+        {/* DESKTOP NAVIGATION */}
+        <div className="hidden items-center gap-1 rounded-full bg-slate-900/40 px-2 py-1.5 shadow-inner shadow-white/5 md:flex">
+          {filteredLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`relative px-4 py-1.5 text-sm font-medium transition-all duration-300 ${
+                  isActive
+                    ? "text-emerald-300"
+                    : "text-slate-400 hover:text-slate-100"
+                }`}
+              >
+                {link.label}
+                {isActive && (
+                  <span className="absolute inset-x-0 -bottom-px mx-auto h-px w-3/4 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                )}
+              </Link>
+            );
+          })}
         </div>
 
+        {/* ACTIONS AREA */}
         <div className="hidden items-center gap-3 md:flex">
           {isLoadingUser ? (
-            <div className="h-9 w-24 animate-pulse rounded-full bg-slate-800/70" />
+            <div className="h-9 w-28 animate-pulse rounded-full bg-slate-800" />
           ) : isLoggedIn ? (
-            <>
-              <span className="flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/70 px-3 py-1.5 text-xs uppercase tracking-[0.22em] text-slate-300">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-200">
+            <div className="group relative flex items-center gap-3">
+              {/* User Capsule */}
+              <div className="flex items-center gap-2 rounded-full border border-slate-700/50 bg-slate-800/50 pl-1 pr-3 py-1 text-xs font-medium text-slate-300 transition hover:border-emerald-500/30 hover:bg-slate-800">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-b from-emerald-400 to-emerald-600 text-[10px] font-bold text-slate-950 shadow-sm">
                   {userEmail?.[0]?.toUpperCase()}
-                </span>
-                {userEmail}
-              </span>
+                </div>
+                <span className="max-w-[100px] truncate">{userEmail}</span>
+              </div>
+
+              {/* Sign Out Button (Minimalist) */}
               <button
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                className="rounded-full border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-emerald-400/60 hover:text-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+                title="Cerrar sesión"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-700 bg-transparent text-slate-400 transition hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isSigningOut ? "Saliendo..." : "Cerrar sesion"}
+                <Icons.SignOut />
               </button>
-            </>
+            </div>
           ) : (
             <>
               <Link
                 href="/login"
-                className="rounded-full border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:text-emerald-300"
+                className="text-sm font-medium text-slate-300 transition hover:text-white"
               >
                 Log in
               </Link>
               <Link
                 href="/signup"
-                className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+                className="group relative inline-flex items-center justify-center rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]"
               >
                 Start for free
               </Link>
@@ -148,99 +206,106 @@ export default function Navbar() {
           )}
         </div>
 
+        {/* MOBILE TOGGLE */}
         <div className="md:hidden">
           <button
             type="button"
-            aria-label={isMenuOpen ? "Cerrar navegacion" : "Abrir navegacion"}
-            aria-expanded={isMenuOpen}
+            aria-label={isMenuOpen ? "Cerrar navegación" : "Abrir navegación"}
             onClick={() => setIsMenuOpen((prev) => !prev)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-800 bg-slate-900/70 text-slate-200 transition hover:border-emerald-400/40 hover:text-emerald-200"
+            className="group relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-800 bg-slate-900/50 text-slate-300 transition active:scale-95"
           >
-            <span className="relative h-4 w-4">
+            <div className="relative h-4 w-5 overflow-hidden">
               <span
-                className={`absolute left-0 block h-0.5 w-full transform rounded-full bg-current transition duration-200 ease-out ${
-                  isMenuOpen ? "top-2 rotate-45" : "top-0"
+                className={`absolute left-0 h-0.5 w-full bg-current transition-all duration-300 ${
+                  isMenuOpen ? "top-1.5 rotate-45" : "top-0"
                 }`}
               />
-
               <span
-                className={`absolute top-1.5 left-0 block h-0.5 w-full transform rounded-full bg-current transition duration-200 ease-out ${
-                  isMenuOpen ? "scale-0 opacity-0" : "scale-100 opacity-100"
+                className={`absolute left-0 top-1.5 h-0.5 w-full bg-current transition-all duration-300 ${
+                  isMenuOpen
+                    ? "-translate-x-full opacity-0"
+                    : "translate-x-0 opacity-100"
                 }`}
               />
-
               <span
-                className={`absolute left-0 block h-0.5 w-full transform rounded-full bg-current transition duration-200 ease-out ${
-                  isMenuOpen ? "top-2 -rotate-45" : "top-3"
+                className={`absolute left-0 h-0.5 w-full bg-current transition-all duration-300 ${
+                  isMenuOpen ? "top-1.5 -rotate-45" : "top-3"
                 }`}
               />
-            </span>
+            </div>
           </button>
         </div>
       </nav>
 
+      {/* MOBILE MENU */}
       <div
-        className={`md:hidden ${
-          isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-        } overflow-hidden transition-[max-height,opacity] duration-300 ease-out`}
+        className={`border-b border-slate-800 bg-slate-950 md:hidden ${
+          isMenuOpen ? "block" : "hidden"
+        }`}
       >
-        <div className="space-y-6 border-t border-slate-800 bg-slate-950/95 px-4 py-6">
-          <div className="flex flex-col gap-4 text-sm font-medium text-slate-200">
-            {filteredLinks.map((link) => (
+        <div className="space-y-1 px-4 py-4">
+          {filteredLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className="rounded-2xl border border-transparent px-3 py-2 transition hover:border-emerald-400/30 hover:text-emerald-200"
+                className={`block rounded-lg px-4 py-3 text-base font-medium transition-colors ${
+                  isActive
+                    ? "bg-emerald-500/10 text-emerald-300"
+                    : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+                }`}
               >
                 {link.label}
               </Link>
-            ))}
-          </div>
+            );
+          })}
+        </div>
 
-          <div className="space-y-3 border-t border-slate-800 pt-4 text-sm">
-            {isLoadingUser ? (
-              <div className="h-10 w-full animate-pulse rounded-full bg-slate-800/70" />
-            ) : isLoggedIn ? (
-              <>
-                <div className="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 px-4 py-3 text-slate-200">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/20 text-lg font-semibold text-emerald-200">
-                    {userEmail?.[0]?.toUpperCase()}
-                  </span>
-                  <div className="flex-1">
-                    <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                      Sesion activa
-                    </p>
-                    <p className="text-sm font-medium">{userEmail}</p>
-                  </div>
+        <div className="border-t border-slate-800 bg-slate-900/30 px-4 py-4">
+          {isLoadingUser ? (
+            <div className="h-12 w-full animate-pulse rounded-lg bg-slate-800" />
+          ) : isLoggedIn ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 px-2">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-slate-950 font-bold">
+                  {userEmail?.[0]?.toUpperCase()}
                 </div>
-                <button
-                  onClick={handleSignOut}
-                  disabled={isSigningOut}
-                  className="w-full rounded-full border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-emerald-400/60 hover:text-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isSigningOut ? "Saliendo..." : "Cerrar sesion"}
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block rounded-full border border-slate-700 px-4 py-2 text-center text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:text-emerald-300"
-                >
-                  Log in
-                </Link>
-                <Link
-                  href="/signup"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block rounded-full bg-emerald-400 px-4 py-2 text-center text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
-                >
-                  Start for free
-                </Link>
-              </>
-            )}
-          </div>
+                <div className="overflow-hidden">
+                  <p className="truncate text-sm font-medium text-slate-200">
+                    {userEmail}
+                  </p>
+                  <p className="text-xs text-emerald-400">Sesión iniciada</p>
+                </div>
+              </div>
+              <button
+                onClick={handleSignOut}
+                disabled={isSigningOut}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 py-3 text-sm font-semibold text-slate-300 transition active:scale-95 disabled:opacity-50"
+              >
+                <Icons.SignOut />
+                {isSigningOut ? "Cerrando..." : "Cerrar sesión"}
+              </button>
+            </div>
+          ) : (
+            <div className="grid gap-3">
+              <Link
+                href="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex w-full justify-center rounded-xl border border-slate-700 bg-slate-800 py-3 text-sm font-semibold text-slate-200 transition active:scale-95"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex w-full justify-center rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-900/20 transition active:scale-95"
+              >
+                Start for free
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>
