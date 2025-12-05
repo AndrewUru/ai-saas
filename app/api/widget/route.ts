@@ -471,8 +471,7 @@ export async function GET(req: Request) {
     });
 
     // Simple control API
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).aiSaasWidget = {
+    window.aiSaasWidget = {
       open: openWidget,
       close: closeWidget,
     };
