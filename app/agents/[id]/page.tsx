@@ -421,10 +421,7 @@ export default async function AgentDetailPage({
             className="min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur"
             data-oid="vgt:6to"
           >
-            <h2
-              className="text-xl font-semibold text-white"
-              data-oid="o8d-_8w"
-            >
+            <h2 className="text-xl font-semibold text-white" data-oid="o8d-_8w">
               Integration and allowed domains
             </h2>
             <p className="mt-1 text-sm text-slate-300" data-oid="-vl6t.d">
@@ -544,7 +541,7 @@ export default async function AgentDetailPage({
                 </select>
                 <p className="text-xs text-slate-500" data-oid=".of0xf0">
                   With automatic detection, the model adapts the response to the
-                  customer's language.
+                  customer&apos;s language.
                 </p>
               </div>
 
@@ -702,10 +699,7 @@ export default async function AgentDetailPage({
             className="lg:col-span-2 w-full min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur"
             data-oid="7uz0fmi"
           >
-            <h2
-              className="text-xl font-semibold text-white"
-              data-oid="o127-9d"
-            >
+            <h2 className="text-xl font-semibold text-white" data-oid="o127-9d">
               Customize the embeddable widget
             </h2>
             <p className="mt-1 text-sm text-slate-300" data-oid="gyb7lbe">

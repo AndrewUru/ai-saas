@@ -94,6 +94,8 @@ export default function WidgetDesigner({
       params.set("position", position);
     }
 
+    params.set("preview", "1");
+
     return `${siteUrl}/api/widget?${params.toString()}`;
   }, [
     accentInput,
@@ -157,6 +159,7 @@ export default function WidgetDesigner({
     const script = doc.createElement("script");
     script.src = previewUrl;
     script.defer = true;
+    script.referrerPolicy = "strict-origin-when-cross-origin";
     script.onload = () => loader.remove();
     script.onerror = () => {
       loader.textContent = "We couldn't load the preview.";

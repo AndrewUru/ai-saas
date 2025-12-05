@@ -104,17 +104,28 @@ export async function GET(req: Request) {
 
   const origin = req.headers.get("origin");
   const referer = req.headers.get("referer");
-  const host = hostFrom(origin) || hostFrom(referer);
+  const fetchSite = req.headers.get("sec-fetch-site");
+  const isSameSiteRequest =
+    fetchSite === null ||
+    fetchSite === "same-site" ||
+    fetchSite === "same-origin";
+  const isPreviewRequest = url.searchParams.get("preview") === "1";
+  const host =
+    hostFrom(origin) ||
+    hostFrom(referer) ||
+    (isPreviewRequest && isSameSiteRequest ? SITE_HOST : null);
   const allowed =
     Array.isArray(agent.allowed_domains) && agent.allowed_domains.length > 0
       ? agent.allowed_domains.map((d) => d.toLowerCase())
       : [];
   if (allowed.length > 0) {
-    const isDashboardPreview =
+    const isDashboardHost =
       typeof host === "string" &&
       (host.includes("localhost") ||
         host.includes("dashboard") ||
         (SITE_HOST && host === SITE_HOST));
+    const isDashboardPreview =
+      isPreviewRequest && isDashboardHost && isSameSiteRequest;
 
     if (!isDashboardPreview) {
       if (!host || !allowed.includes(host)) {
