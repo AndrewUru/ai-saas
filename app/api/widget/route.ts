@@ -16,6 +16,20 @@ const POSITION_DEFAULT = widgetDefaults.position;
 const SITE_URL = getSiteUrl();
 const SITE_HOST = getSiteHost(SITE_URL);
 
+// ----------------------
+// Escape seguro para JS
+// ----------------------
+function escapeForJs(str: string = "") {
+  return String(str)
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "")
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e");
+}
+
 function hostFrom(h: string | null) {
   if (!h) return null;
   try {
@@ -61,6 +75,9 @@ function sanitizeText(value: string | null, fallback: string, max = 60) {
   return trimmed.slice(0, max);
 }
 
+// -----------------------------------------
+// GET HANDLER — Widget Script
+// -----------------------------------------
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const key = url.searchParams.get("key");
@@ -102,28 +119,35 @@ export async function GET(req: Request) {
     });
   }
 
+  // Domain & preview logic
   const origin = req.headers.get("origin");
   const referer = req.headers.get("referer");
   const fetchSite = req.headers.get("sec-fetch-site");
+
   const isSameSiteRequest =
     fetchSite === null ||
     fetchSite === "same-site" ||
     fetchSite === "same-origin";
+
   const isPreviewRequest = url.searchParams.get("preview") === "1";
+
   const host =
     hostFrom(origin) ||
     hostFrom(referer) ||
     (isPreviewRequest && isSameSiteRequest ? SITE_HOST : null);
+
   const allowed =
     Array.isArray(agent.allowed_domains) && agent.allowed_domains.length > 0
       ? agent.allowed_domains.map((d) => d.toLowerCase())
       : [];
+
   if (allowed.length > 0) {
     const isDashboardHost =
       typeof host === "string" &&
       (host.includes("localhost") ||
         host.includes("dashboard") ||
         (SITE_HOST && host === SITE_HOST));
+
     const isDashboardPreview =
       isPreviewRequest && isDashboardHost && isSameSiteRequest;
 
@@ -137,6 +161,7 @@ export async function GET(req: Request) {
     }
   }
 
+  // Widget appearance
   const accent = sanitizeHex(
     url.searchParams.get("accent") ?? agent.widget_accent ?? ACCENT_DEFAULT
   );
@@ -153,31 +178,44 @@ export async function GET(req: Request) {
     ? "rgba(15,23,42,.12)"
     : "rgba(255,255,255,.24)";
 
+  // Sanitize and escape text fields
   const storedBrand = agent.widget_brand?.trim() || null;
   const storedLabel = agent.widget_label?.trim() || null;
   const storedGreeting = agent.widget_greeting?.trim() || null;
 
-  const brandName = sanitizeText(
-    url.searchParams.get("brand") ?? storedBrand,
-    storedBrand ?? BRAND_DEFAULT,
-    widgetLimits.brand
+  const brandName = escapeForJs(
+    sanitizeText(
+      url.searchParams.get("brand") ?? storedBrand,
+      storedBrand ?? BRAND_DEFAULT,
+      widgetLimits.brand
+    )
   );
-  const collapsedLabel = sanitizeText(
-    url.searchParams.get("label") ?? storedLabel,
-    storedLabel ?? LABEL_DEFAULT,
-    widgetLimits.label
+
+  const collapsedLabel = escapeForJs(
+    sanitizeText(
+      url.searchParams.get("label") ?? storedLabel,
+      storedLabel ?? LABEL_DEFAULT,
+      widgetLimits.label
+    )
   );
-  const greeting = sanitizeText(
-    url.searchParams.get("greeting") ?? storedGreeting,
-    storedGreeting ?? GREETING_DEFAULT,
-    widgetLimits.greeting
+
+  const greeting = escapeForJs(
+    sanitizeText(
+      url.searchParams.get("greeting") ?? storedGreeting,
+      storedGreeting ?? GREETING_DEFAULT,
+      widgetLimits.greeting
+    )
   );
+
   const position = sanitizePosition(
     url.searchParams.get("position") ??
       agent.widget_position ??
       POSITION_DEFAULT
   );
-  const brandInitial = (brandName.charAt(0).toUpperCase() || "A").slice(0, 1);
+
+  const brandInitial = escapeForJs(
+    (brandName.charAt(0).toUpperCase() || "A").slice(0, 1)
+  );
 
   const styleContent = `
 #ai-saas-anchor{position:fixed;bottom:18px;${
@@ -228,6 +266,7 @@ export async function GET(req: Request) {
 @media (max-width: 480px){#ai-saas-widget{width:calc(100vw - 32px);}}
 `;
 
+  // CONFIG final seguro
   const config = {
     key,
     chatEndpoint,
@@ -239,11 +278,19 @@ export async function GET(req: Request) {
     position,
   };
 
+  // -------------------------
+  // GENERACIÓN DEL SCRIPT JS
+  // -------------------------
   const js = `
 (function(){
   const CONFIG = ${JSON.stringify(config)};
   const STYLE = ${JSON.stringify(styleContent)};
-  const ready = (fn) => document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", fn) : fn();
+
+  const ready = (fn) =>
+    document.readyState === "loading"
+      ? document.addEventListener("DOMContentLoaded", fn)
+      : fn();
+
   ready(() => {
     if (document.getElementById("ai-saas-anchor")) return;
     if (!document.getElementById("ai-saas-style")) {
@@ -436,8 +483,8 @@ export async function GET(req: Request) {
   return new NextResponse(js, {
     headers: {
       "Content-Type": "application/javascript",
-      "Access-Control-Allow-Origin": "*",
       "Cache-Control": "public, max-age=300",
+      "Access-Control-Allow-Origin": "*",
     },
   });
 }
