@@ -13,14 +13,14 @@ export default function AcademyPage() {
             className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
             data-oid="lfwm:ko"
           >
-            Academia para agencias
+            Agency academy
           </p>
           <h1 className="text-4xl font-bold sm:text-5xl" data-oid="qwtnrl6">
-            Certifica a tu equipo en la implementacion de agentes ecommerce
+            Certify your team in implementing ecommerce agents
           </h1>
           <p className="text-base text-slate-300 sm:text-lg" data-oid="9orvbjn">
-            Accede a sesiones en vivo, playbooks descargables y librerias de
-            prompts listas para replicar en clientes con WooCommerce, Shopify o
+            Get access to live sessions, downloadable playbooks, and prompt
+            libraries ready to reuse with clients on WooCommerce, Shopify, or
             headless storefronts.
           </p>
         </header>
@@ -31,12 +31,11 @@ export default function AcademyPage() {
             data-oid="-qm94uf"
           >
             <h2 className="text-lg font-semibold text-white" data-oid="3.jz.yu">
-              Programa de onboarding express
+              Express onboarding program
             </h2>
             <p className="mt-3 text-sm text-slate-300" data-oid="xtr0ye7">
-              Cuatro modulos auto gestionados que cubren discovery comercial,
-              configuracion tecnica, lanzamiento del widget y seguimiento de
-              resultados con clientes reales.
+              Four self-paced modules covering commercial discovery, technical
+              setup, widget launch, and results tracking with real clients.
             </p>
           </article>
           <article
@@ -44,11 +43,11 @@ export default function AcademyPage() {
             data-oid="nr:ax0u"
           >
             <h2 className="text-lg font-semibold text-white" data-oid="msk5rr7">
-              Laboratorios mensuales
+              Monthly labs
             </h2>
             <p className="mt-3 text-sm text-slate-300" data-oid="rv39icb">
-              Encuentros en vivo para revisar casos de uso, optimizar prompts y
-              compartir automatizaciones entre agencias certificadas.
+              Live sessions to review use cases, optimize prompts, and share
+              automations across certified agencies.
             </p>
           </article>
           <div
@@ -59,12 +58,12 @@ export default function AcademyPage() {
               className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-300"
               data-oid="v7pz709"
             >
-              Proximamente
+              Coming soon
             </p>
             <p className="mt-3 text-sm text-slate-300" data-oid="xof2bj7">
-              Estamos habilitando evaluaciones para certificar consultores
-              senior y un repositorio de casos de exito que podras compartir con
-              clientes potenciales.
+              We’re rolling out assessments to certify senior consultants and a
+              repository of success stories you can share with potential
+              clients.
             </p>
           </div>
         </div>

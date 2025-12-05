@@ -15,44 +15,44 @@ type PlanCard = {
 const PLAN_CARDS: PlanCard[] = [
   {
     id: "free",
-    name: "Plan Free",
+    name: "Free plan",
     price: "$0",
-    cycle: "por mes",
-    limit: "Hasta 1,000 mensajes/mes",
-    blurb: "Ideal para probar el panel y activar tu primer agente.",
+    cycle: "per month",
+    limit: "Up to 1,000 messages/month",
+    blurb: "Perfect to test the dashboard and launch your first agent.",
     features: [
-      "1 agente activo con widget embebible",
-      "Validacion de dominios permitidos",
-      "Prompts y branding personalizables",
-      "Soporte por email con SLA basico",
+      "1 active agent with embeddable widget",
+      "Allowed domains validation",
+      "Customizable prompts and branding",
+      "Email support with basic SLA",
     ],
   },
   {
     id: "basic",
-    name: "Plan Basic",
+    name: "Basic plan",
     price: "$29",
-    cycle: "por mes",
-    limit: "Hasta 2,000 mensajes/mes",
-    blurb: "Para agencias que lanzan agentes en mas de una tienda.",
+    cycle: "per month",
+    limit: "Up to 2,000 messages/month",
+    blurb: "For agencies launching agents in more than one store.",
     features: [
-      "Hasta 5 agentes en paralelo",
-      "Integracion WooCommerce prioritaria",
-      "Alertas cuando se acerque el limite",
-      "Reportes mensuales de uso",
+      "Up to 5 agents in parallel",
+      "Priority WooCommerce integration",
+      "Alerts when you approach the limit",
+      "Monthly usage reports",
     ],
   },
   {
     id: "pro",
-    name: "Plan Pro",
+    name: "Pro plan",
     price: "$79",
-    cycle: "por mes",
-    limit: "Hasta 10,000 mensajes/mes",
-    blurb: "Para operaciones 24/7 con volumen alto y escalamientos.",
+    cycle: "per month",
+    limit: "Up to 10,000 messages/month",
+    blurb: "For 24/7 operations with high volume and escalations.",
     features: [
-      "Hasta 15 agentes dedicados",
-      "Webhook y suscripciones PayPal",
-      "Rutas de escalamiento personalizadas",
-      "Acompanamiento de onboarding",
+      "Up to 15 dedicated agents",
+      "Webhook and PayPal subscriptions",
+      "Custom escalation routes",
+      "Guided onboarding support",
     ],
   },
 ];
@@ -87,31 +87,31 @@ export default async function BillingPage() {
       <section className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 py-16 md:px-10 lg:px-16">
         <header className="space-y-4 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur">
           <p className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">
-            Facturacion
+            Billing
           </p>
 
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="space-y-2">
               <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
-                Gestiona tu plan y limites
+                Manage your plan and limits
               </h1>
               <p className="text-sm text-slate-300 sm:text-base">
-                Revisa tu plan activo, fecha de vigencia y opciones para escalar
-                cuando aumente el volumen de mensajes.
+                Review your active plan, validity date, and options to scale
+                when your message volume grows.
               </p>
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-950/50 px-4 py-3 text-sm text-slate-200">
               <p className="text-xs uppercase tracking-[0.26em] text-slate-400">
-                Plan actual
+                Current plan
               </p>
               <p className="mt-1 text-lg font-semibold text-white">
                 {activePlan.toUpperCase()}
               </p>
               <p className="text-xs text-slate-500">
                 {activeUntil
-                  ? `Vigente hasta ${activeUntil}`
-                  : "Sin fecha activa registrada"}
+                  ? `Active until ${activeUntil}`
+                  : "No active date on record"}
               </p>
             </div>
           </div>
@@ -137,13 +137,11 @@ export default async function BillingPage() {
                     <h2 className="mt-2 text-2xl font-semibold text-white">
                       {plan.name}
                     </h2>
-                    <p className="mt-1 text-sm text-slate-300">
-                      {plan.blurb}
-                    </p>
+                    <p className="mt-1 text-sm text-slate-300">{plan.blurb}</p>
                   </div>
                   {isActive && (
                     <span className="rounded-full border border-emerald-400/50 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-200">
-                      Activo
+                      Active
                     </span>
                   )}
                 </div>
@@ -175,14 +173,14 @@ export default async function BillingPage() {
                       disabled
                       className="w-full rounded-full border border-emerald-400/60 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-100 shadow-inner shadow-emerald-500/20"
                     >
-                      Plan activo
+                      Active plan
                     </button>
                   ) : (
                     <Link
                       href="/contact"
                       className="inline-flex w-full items-center justify-center rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
                     >
-                      Hablar para actualizar
+                      Talk to upgrade
                     </Link>
                   )}
                 </div>
@@ -193,24 +191,24 @@ export default async function BillingPage() {
 
         <section className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur">
           <h3 className="text-lg font-semibold text-white">
-            Necesitas una factura o tienes dudas?
+            Need an invoice or have questions?
           </h3>
           <p className="mt-2 text-sm text-slate-300">
-            Podemos ayudarte a ajustar tu plan, emitir facturas personalizadas
-            o configurar una suscripcion recurrente.
+            We can help you adjust your plan, issue custom invoices, or set up a
+            recurring subscription.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <a
               href="mailto:billing@ai-saas.test"
               className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-400/60 hover:text-emerald-100"
             >
-              Escribir a soporte de facturacion
+              Email billing support
             </a>
             <Link
               href="/dashboard"
               className="inline-flex items-center justify-center rounded-full border border-slate-800 bg-slate-950/70 px-4 py-2 text-sm font-semibold text-white transition hover:border-emerald-400/60 hover:text-emerald-200"
             >
-              Volver al panel
+              Back to dashboard
             </Link>
           </div>
         </section>

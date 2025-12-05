@@ -13,14 +13,15 @@ export default function DocsPage() {
             className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
             data-oid="tr1c-33"
           >
-            Documentacion
+            Documentation
           </p>
           <h1 className="text-4xl font-bold sm:text-5xl" data-oid="-qki1x_">
-            Guia tecnica para desplegar agentes en proyectos ecommerce
+            Simple guides to launch widgets on your clients’ stores
           </h1>
           <p className="text-base text-slate-300 sm:text-lg" data-oid="r0dur6o">
-            Encuentra endpoints, esquemas de base de datos y ejemplos de
-            integracion para conectar AI SaaS con los sistemas de tus clientes.
+            Follow step-by-step tutorials to create, customize, and install
+            widgets on WooCommerce, Shopify, or custom storefronts — without
+            touching databases, API keys, or complex configs.
           </p>
         </header>
 
@@ -30,12 +31,12 @@ export default function DocsPage() {
             data-oid="gmk.gia"
           >
             <h2 className="text-lg font-semibold text-white" data-oid="np..4gn">
-              Empezar con la API
+              Create your first widget
             </h2>
             <p className="mt-3 text-sm text-slate-300" data-oid="s4b799e">
-              Consulta la referencia REST y ejemplos de autenticacion con
-              Supabase para validar agentes, enviar mensajes y sincronizar
-              inventario.
+              Learn how to pick an agent, copy a ready-made script, and embed it
+              on any page. No Supabase setup, no API keys — just copy, paste,
+              and test on your client’s staging site.
             </p>
           </article>
           <article
@@ -43,11 +44,12 @@ export default function DocsPage() {
             data-oid="6gf5wq0"
           >
             <h2 className="text-lg font-semibold text-white" data-oid="7.cmkwx">
-              Widgets y componentes
+              Widgets & components
             </h2>
             <p className="mt-3 text-sm text-slate-300" data-oid="bcf-ip2">
-              Aprende a personalizar el widget, agregar eventos de analytics y
-              disparar flujos de marketing automation desde el chat.
+              Customize colors, texts, and position of the widget, add basic
+              analytics events, and trigger your existing marketing flows — all
+              with copy-paste snippets your dev team can plug into any stack.
             </p>
           </article>
         </div>
@@ -57,18 +59,18 @@ export default function DocsPage() {
           data-oid="n3lm32s"
         >
           <h2 className="text-lg font-semibold text-white" data-oid="h8anqps">
-            Necesitas algo especifico?
+            Need something specific?
           </h2>
           <p className="mt-3 text-sm text-slate-300" data-oid="5p76lqs">
-            Escribenos a soporte para recibir ejemplos personalizados o una
-            sesion tecnica junto a tu equipo de desarrollo.
+            Reach out to support to get tailored examples or a technical
+            walkthrough alongside your dev team.
           </p>
           <a
             href="/contact"
             className="mt-6 inline-flex items-center justify-center rounded-full bg-emerald-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
             data-oid="-sjtxrr"
           >
-            Contactar soporte tecnico
+            Contact technical support
           </a>
         </div>
       </section>

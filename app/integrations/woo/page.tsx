@@ -15,12 +15,12 @@ function statusMessage(status: string | null) {
     case "created":
       return {
         intent: "success" as const,
-        text: "Integracion creada correctamente.",
+        text: "Integration created successfully.",
       };
     case "updated":
-      return { intent: "success" as const, text: "Integracion actualizada." };
+      return { intent: "success" as const, text: "Integration updated." };
     case "deleted":
-      return { intent: "success" as const, text: "Integracion eliminada." };
+      return { intent: "success" as const, text: "Integration deleted." };
     default:
       return null;
   }
@@ -29,11 +29,11 @@ function statusMessage(status: string | null) {
 function errorMessage(error: string | null) {
   switch (error) {
     case "invalid":
-      return "Revisa los campos: hay datos invalidos.";
+      return "Check the fields: there is invalid data.";
     case "db":
-      return "No pudimos guardar los cambios. Intenta nuevamente.";
+      return "We couldn’t save the changes. Please try again.";
     case "unexpected":
-      return "Ocurrio un error inesperado procesando la integracion.";
+      return "An unexpected error occurred while processing the integration.";
     default:
       return null;
   }
@@ -73,14 +73,14 @@ export default async function WooIntegrationPage({
       <section className="mx-auto max-w-5xl px-6 py-20 sm:px-10 lg:px-16">
         <header className="space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">
-            Integraciones
+            Integrations
           </p>
           <h1 className="text-3xl font-semibold sm:text-4xl">
-            Gestiona las conexiones WooCommerce
+            Manage your WooCommerce connections
           </h1>
           <p className="text-sm text-slate-300 sm:text-base">
-            Guarda las credenciales de cada tienda para que tus agentes
-            respondan con datos de stock, pedidos y clientes en tiempo real.
+            Store each shop’s credentials so your agents can reply with
+            real-time stock, orders, and customer data.
           </p>
         </header>
 
@@ -102,14 +102,14 @@ export default async function WooIntegrationPage({
         <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(320px,0.9fr)_minmax(320px,1fr)]">
           <section className="space-y-6 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-slate-900/40 backdrop-blur">
             <h2 className="text-xl font-semibold text-white">
-              Registrar nueva tienda
+              Register new store
             </h2>
             <p className="text-sm text-slate-300">
-              Los campos de clave y secreto se cifran con tu{" "}
+              The key and secret fields are encrypted with your{" "}
               <code className="rounded bg-slate-800 px-1 py-0.5 text-xs">
                 CRED_ENC_KEY
               </code>{" "}
-              y nunca se muestran completos.
+              and are never shown in full.
             </p>
 
             <form
@@ -119,25 +119,25 @@ export default async function WooIntegrationPage({
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                    Etiqueta interna
+                    Internal label
                   </span>
                   <input
                     name="label"
                     required
                     maxLength={80}
-                    placeholder="WooCommerce principal"
+                    placeholder="Main WooCommerce"
                     className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
                   />
                 </label>
                 <label className="space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                    URL de la tienda
+                    Store URL
                   </span>
                   <input
                     name="site_url"
                     type="url"
                     required
-                    placeholder="https://tienda.com"
+                    placeholder="https://store.com"
                     className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
                   />
                 </label>
@@ -175,30 +175,30 @@ export default async function WooIntegrationPage({
                   defaultChecked
                   className="h-4 w-4 rounded border border-slate-600 bg-transparent text-emerald-400 focus:ring-emerald-400"
                 />
-                Marcar como activa al crear
+                Mark as active on creation
               </label>
 
               <button
                 type="submit"
                 className="inline-flex w-full items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto"
               >
-                Guardar integracion
+                Save integration
               </button>
             </form>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4 text-xs text-slate-400">
               <p className="font-semibold text-slate-200">
-                ¿Dónde obtengo la clave?
+                Where do I get the key?
               </p>
               <ol className="mt-2 list-decimal space-y-1 pl-5">
                 <li>
-                  En WordPress, ve a WooCommerce → Ajustes → Avanzado → REST
+                  In WordPress, go to WooCommerce → Settings → Advanced → REST
                   API.
                 </li>
                 <li>
-                  Crea una clave con permisos de lectura y copia el key/secret.
+                  Create a key with read permissions and copy the key/secret.
                 </li>
-                <li>Introduce los valores aquí para conectar la tienda.</li>
+                <li>Paste the values here to connect the store.</li>
               </ol>
             </div>
           </section>
@@ -208,18 +208,18 @@ export default async function WooIntegrationPage({
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h2 className="text-xl font-semibold text-white">
-                    Integraciones registradas
+                    Registered integrations
                   </h2>
                   <p className="mt-1 text-sm text-slate-300">
-                    Asigna estas conexiones desde la ficha del agente para
-                    activar datos de WooCommerce.
+                    Assign these connections from the agent detail page to
+                    enable WooCommerce data.
                   </p>
                 </div>
                 <Link
                   href="/agents"
                   className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200 transition hover:bg-emerald-500/20"
                 >
-                  Ver agentes
+                  View agents
                 </Link>
               </div>
 
@@ -247,13 +247,13 @@ export default async function WooIntegrationPage({
                               : "border-slate-700 bg-slate-800/70 text-slate-300",
                           ].join(" ")}
                         >
-                          {integration.is_active ? "Activa" : "Pausada"}
+                          {integration.is_active ? "Active" : "Paused"}
                         </span>
                       </div>
 
                       <details className="rounded-xl border border-slate-800/60 bg-slate-900/40 p-4">
                         <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                          Editar integracion
+                          Edit integration
                         </summary>
                         <form
                           action={updateWooIntegration}
@@ -268,7 +268,7 @@ export default async function WooIntegrationPage({
                           <div className="grid gap-3 sm:grid-cols-2">
                             <label className="space-y-2">
                               <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                                Etiqueta interna
+                                Internal label
                               </span>
                               <input
                                 name="label"
@@ -279,7 +279,7 @@ export default async function WooIntegrationPage({
                             </label>
                             <label className="space-y-2">
                               <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                                URL de la tienda
+                                Store URL
                               </span>
                               <input
                                 name="site_url"
@@ -294,7 +294,7 @@ export default async function WooIntegrationPage({
                           <div className="grid gap-3 sm:grid-cols-2">
                             <label className="space-y-2">
                               <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                                Consumer key (dejar vacio para mantener)
+                                Consumer key (leave empty to keep)
                               </span>
                               <input
                                 name="consumer_key"
@@ -304,7 +304,7 @@ export default async function WooIntegrationPage({
                             </label>
                             <label className="space-y-2">
                               <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                                Consumer secret (dejar vacio para mantener)
+                                Consumer secret (leave empty to keep)
                               </span>
                               <input
                                 name="consumer_secret"
@@ -321,7 +321,7 @@ export default async function WooIntegrationPage({
                               defaultChecked={integration.is_active ?? false}
                               className="h-4 w-4 rounded border border-slate-600 bg-transparent text-emerald-400 focus:ring-emerald-400"
                             />
-                            Mantener activa
+                            Keep active
                           </label>
 
                           <div className="flex flex-wrap gap-2">
@@ -329,7 +329,7 @@ export default async function WooIntegrationPage({
                               type="submit"
                               className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
                             >
-                              Guardar cambios
+                              Save changes
                             </button>
                           </div>
                         </form>
@@ -355,7 +355,7 @@ export default async function WooIntegrationPage({
                             type="submit"
                             className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
                           >
-                            {integration.is_active ? "Pausar" : "Activar"}
+                            {integration.is_active ? "Pause" : "Activate"}
                           </button>
                         </form>
 
@@ -370,7 +370,7 @@ export default async function WooIntegrationPage({
                             type="submit"
                             className="inline-flex items-center justify-center rounded-full border border-rose-500/40 px-4 py-2 font-semibold text-rose-200 transition hover:border-rose-400 hover:text-rose-100"
                           >
-                            Eliminar
+                            Delete
                           </button>
                         </form>
                       </div>
@@ -380,11 +380,11 @@ export default async function WooIntegrationPage({
               ) : (
                 <div className="mt-6 space-y-3 rounded-2xl border border-dashed border-slate-700 bg-slate-950/50 p-6 text-sm text-slate-300">
                   <p className="font-medium text-white">
-                    Aun no has conectado ninguna tienda.
+                    You haven’t connected any store yet.
                   </p>
                   <p>
-                    Crea tu primera integracion con los pasos de la izquierda y
-                    despues asignala a un agente desde su ficha.
+                    Create your first integration using the steps on the left,
+                    then assign it to an agent from its detail page.
                   </p>
                 </div>
               )}

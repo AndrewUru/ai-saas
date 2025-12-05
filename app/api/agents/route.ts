@@ -11,7 +11,7 @@ export async function GET() {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
   const { data, error } = await supabase
@@ -22,17 +22,14 @@ export async function GET() {
 
   if (error) {
     return NextResponse.json(
-      { error: "No se pudieron cargar los agentes" },
+      { error: "Could not load agents" },
       { status: 500 }
     );
   }
 
   const parsed = agentListSchema.safeParse(data ?? []);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Datos de agentes invalidos" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Invalid agent data" }, { status: 500 });
   }
 
   return NextResponse.json(parsed.data);

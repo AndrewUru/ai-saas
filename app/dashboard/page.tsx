@@ -18,6 +18,10 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
+  // 👉 sacar nombre a partir del email
+  const email = user.email ?? "";
+  const username = email.split("@")[0];
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("plan, active_until")
@@ -61,11 +65,8 @@ export default async function DashboardPage() {
             >
               Main dashboard
             </p>
-            <h1
-              className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl"
-              data-oid="cki91e6"
-            >
-              Hello, {user.email}
+            <h1 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">
+              Hello, {username}
             </h1>
             <p
               className="mt-2 max-w-2xl text-sm text-slate-300 sm:text-base"

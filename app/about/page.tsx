@@ -13,16 +13,16 @@ export default function AboutPage() {
             className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
             data-oid="ehr-brh"
           >
-            Sobre nosotros
+            About us
           </p>
           <h1 className="text-4xl font-bold sm:text-5xl" data-oid="os.8q_6">
-            Potenciamos a las agencias que crean ecommerce memorables
+            We empower agencies that build memorable ecommerce stores
           </h1>
           <p className="text-base text-slate-300 sm:text-lg" data-oid="nh9_7-b">
-            AI SaaS nacio tras acompanar a estudios web que necesitaban escalar
-            soporte sin perder el tono de cada marca. Construimos la plataforma
-            para que tu equipo despliegue agentes confiables, mida resultados y
-            ofrezca un servicio recurrente a sus clientes.
+            AI SaaS was born after working alongside web studios that needed to
+            scale support without losing each brand’s tone. We built the
+            platform so your team can deploy reliable agents, measure results,
+            and offer a recurring service to your clients.
           </p>
         </header>
 
@@ -32,13 +32,13 @@ export default function AboutPage() {
             data-oid="p:hibob"
           >
             <h2 className="text-xl font-semibold text-white" data-oid="rg.xk7u">
-              Nuestro manifiesto
+              Our manifesto
             </h2>
             <p className="text-sm text-slate-300" data-oid="ngr5lj0">
-              Creemos que la automatizacion debe reforzar la relacion entre
-              agencia y marca, no reemplazarla. Por eso priorizamos controles
-              granulares, analitica transparente y un onboarding que tu equipo
-              puede replicar en horas.
+              We believe automation should strengthen the relationship between
+              agency and brand, not replace it. That’s why we prioritize
+              granular controls, transparent analytics, and an onboarding flow
+              your team can replicate in a matter of hours.
             </p>
           </article>
           <article
@@ -46,12 +46,12 @@ export default function AboutPage() {
             data-oid="tetk81i"
           >
             <h2 className="text-xl font-semibold text-white" data-oid="0y_o.i3">
-              Lo que sigue
+              What’s next
             </h2>
             <p className="text-sm text-slate-300" data-oid=".kbgccp">
-              Estamos ampliando integraciones con CRMs y plataformas de pagos,
-              ademas de un marketplace de prompts verificados por agencias para
-              acelerar cada nuevo proyecto ecommerce.
+              We’re expanding integrations with CRMs and payment platforms, plus
+              a marketplace of agency-verified prompts to speed up every new
+              ecommerce project.
             </p>
           </article>
         </div>

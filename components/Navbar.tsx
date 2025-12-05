@@ -13,6 +13,10 @@ type NavLink = {
 
 const NAV_LINKS: NavLink[] = [
   { href: "/#features", label: "Features" },
+  { href: "/about", label: "About" },
+  { href: "/academy", label: "Academy" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/contact", label: "Contact" },
   { href: "/agents", label: "Agents", requiresAuth: true },
   { href: "/dashboard", label: "Dashboard", requiresAuth: true },
   { href: "/billing", label: "Billing", requiresAuth: true },
