@@ -3,7 +3,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
@@ -22,10 +22,14 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<Status>(null);
+  const [redirectUrl, setRedirectUrl] = useState("");
 
-  const redirectUrl = `${
-    process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
-  }/auth/callback?next=/dashboard`;
+  useEffect(() => {
+    const base =
+      process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+
+    setRedirectUrl(`${base}/auth/callback?next=/dashboard`);
+  }, []);
 
   // --- Email + password ----------------------------------------------------
   const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -38,6 +42,8 @@ export default function SignupPage() {
       });
       return;
     }
+
+    if (!redirectUrl) return;
 
     setIsSubmitting(true);
     setStatus({ intent: "info", message: "Creating your account..." });
@@ -86,6 +92,8 @@ export default function SignupPage() {
 
   // --- Google OAuth --------------------------------------------------------
   const signUpWithGoogle = async () => {
+    if (!redirectUrl) return;
+
     setStatus({ intent: "info", message: "Redirecting to Google..." });
 
     const { error } = await supabase.auth.signInWithOAuth({
@@ -107,6 +115,8 @@ export default function SignupPage() {
       });
       return;
     }
+
+    if (!redirectUrl) return;
 
     setIsSubmitting(true);
     setStatus({
