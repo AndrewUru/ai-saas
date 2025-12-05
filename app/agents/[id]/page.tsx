@@ -11,11 +11,11 @@ import {
 } from "@/lib/widget/defaults";
 
 const LANGUAGE_OPTIONS = [
-  { value: "auto", label: "Deteccion automatica" },
-  { value: "es", label: "Espanol" },
-  { value: "en", label: "Ingles" },
-  { value: "pt", label: "Portugues" },
-  { value: "fr", label: "Frances" },
+  { value: "auto", label: "Automatic detection" },
+  { value: "es", label: "Spanish" },
+  { value: "en", label: "English" },
+  { value: "pt", label: "Portuguese" },
+  { value: "fr", label: "French" },
 ];
 
 // --- Utilities -------------------------------------------------------------
@@ -210,13 +210,13 @@ export default async function AgentDetailPage({
   const errorKey = typeof errorParam === "string" ? errorParam : null;
 
   const errorMessages: Record<string, string> = {
-    integration: "La integracion seleccionada no pertenece a tu cuenta.",
-    integration_inactive: "La integracion seleccionada esta inactiva.",
-    save: "No pudimos guardar los cambios. Intenta nuevamente.",
-    widget: "No pudimos guardar la personalizacion del widget.",
+    integration: "The selected integration does not belong to your account.",
+    integration_inactive: "The selected integration is inactive.",
+    save: "We could not save your changes. Please try again.",
+    widget: "We could not save the widget customization.",
   };
 
-  const statusLabel = agent.is_active ? "Activo" : "Pausado";
+  const statusLabel = agent.is_active ? "Active" : "Paused";
   const allowedDomains = agent.allowed_domains ?? [];
   const promptSystemValue = agent.prompt_system ?? "";
   const languageValue = agent.language ?? "auto";
@@ -246,12 +246,12 @@ export default async function AgentDetailPage({
   const widgetScriptUrl = `${siteUrl}/api/widget?${widgetUrlParams.toString()}`;
 
   const createdAt = agent.created_at
-    ? new Intl.DateTimeFormat("es-ES", {
+    ? new Intl.DateTimeFormat("en-US", {
         day: "2-digit",
         month: "long",
         year: "numeric",
       }).format(new Date(agent.created_at))
-    : "Fecha desconocida";
+    : "Unknown date";
 
   return (
     <main
@@ -280,7 +280,7 @@ export default async function AgentDetailPage({
                 className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200"
                 data-oid="0dlwbcw"
               >
-                Ficha del agente
+                Agent profile
               </p>
               <div
                 className="flex flex-wrap items-center gap-3"
@@ -308,9 +308,8 @@ export default async function AgentDetailPage({
                 className="max-w-2xl text-sm text-slate-300 sm:text-base"
                 data-oid="5n39n:4"
               >
-                Usa esta vista para vincular WooCommerce, controlar desde que
-                dominios se puede cargar el widget y copiar la API key del
-                agente.
+                Use this view to connect WooCommerce, control which domains can
+                load the widget, and copy the agent API key.
               </p>
             </div>
             <Link
@@ -318,7 +317,7 @@ export default async function AgentDetailPage({
               className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
               data-oid="kv5fmuu"
             >
-              Volver a agentes
+              Back to agents
             </Link>
           </div>
 
@@ -348,17 +347,16 @@ export default async function AgentDetailPage({
                 className="text-xs uppercase tracking-[0.24em] text-slate-400"
                 data-oid="p.fs_ti"
               >
-                Limite de mensajes
+                Message limit
               </p>
               <p
                 className="mt-2 text-lg font-semibold text-white"
                 data-oid=":fbp3vm"
               >
-                {agent.messages_limit?.toLocaleString("es-ES") ?? "Sin definir"}
+                {agent.messages_limit?.toLocaleString("en-US") ?? "Not set"}
               </p>
               <p className="text-xs text-slate-500" data-oid="klqta:k">
-                Ajusta este valor desde la base de datos o proximamente desde el
-                plan.
+                Adjust this value from the database or soon from your plan.
               </p>
             </div>
             <div
@@ -369,7 +367,7 @@ export default async function AgentDetailPage({
                 className="text-xs uppercase tracking-[0.24em] text-slate-400"
                 data-oid="1ak26on"
               >
-                Creado el
+                Created on
               </p>
               <p
                 className="mt-2 text-lg font-semibold text-white"
@@ -378,7 +376,7 @@ export default async function AgentDetailPage({
                 {createdAt}
               </p>
               <p className="text-xs text-slate-500" data-oid="hgppn8m">
-                Mantiene registro completo de actividad y dominios permitidos.
+                Keeps a full activity log and allowed domains.
               </p>
             </div>
           </div>
@@ -389,7 +387,7 @@ export default async function AgentDetailPage({
             className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/20"
             data-oid="ux46g7i"
           >
-            Cambios guardados correctamente.
+            Changes saved successfully.
           </div>
         )}
         {widgetSaved && (
@@ -397,7 +395,7 @@ export default async function AgentDetailPage({
             className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/20"
             data-oid="o3ru:en"
           >
-            Personalizacion del widget guardada.
+            Widget customization saved.
           </div>
         )}
         {errorKey && (
@@ -405,7 +403,7 @@ export default async function AgentDetailPage({
             className="rounded-3xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-100 shadow-lg shadow-rose-500/20"
             data-oid="ejtkdg0"
           >
-            {errorMessages[errorKey] ?? "Ocurrio un error inesperado."}
+            {errorMessages[errorKey] ?? "An unexpected error occurred."}
           </div>
         )}
 
@@ -418,7 +416,7 @@ export default async function AgentDetailPage({
           "
           data-oid="9m1.a4i"
         >
-          {/* COLUMNA IZQUIERDA ARRIBA: Integracion + dominios */}
+          {/* LEFT COLUMN TOP: Integration + domains */}
           <article
             className="min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur"
             data-oid="vgt:6to"
@@ -427,14 +425,14 @@ export default async function AgentDetailPage({
               className="text-xl font-semibold text-white"
               data-oid="o8d-_8w"
             >
-              Integracion y dominios permitidos
+              Integration and allowed domains
             </h2>
             <p className="mt-1 text-sm text-slate-300" data-oid="-vl6t.d">
-              Selecciona la integracion WooCommerce que debe usar este agente y
-              define que dominios pueden embeber el widget.
+              Select the WooCommerce integration this agent should use and
+              define which domains can embed the widget.
             </p>
 
-            {/* 🔽 deja aquí TODO el <form> exactamente como lo tienes */}
+            {/* Keep the entire form exactly as it is */}
             <form
               action={updateIntegrationAndDomains}
               className="mt-6 space-y-6"
@@ -453,7 +451,7 @@ export default async function AgentDetailPage({
                   className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                   data-oid="nkfp-u:"
                 >
-                  Integracion WooCommerce
+                  WooCommerce integration
                 </label>
                 <select
                   id="integration"
@@ -463,7 +461,7 @@ export default async function AgentDetailPage({
                   data-oid="h3757ia"
                 >
                   <option value="none" data-oid=":626qar">
-                    Sin integracion
+                    No integration
                   </option>
                   {(integrations ?? []).map((integration) => {
                     const label =
@@ -474,19 +472,19 @@ export default async function AgentDetailPage({
                         value={integration.id}
                         data-oid="jbsgh4:"
                       >
-                        {label} {integration.is_active ? "" : "(inactiva)"}
+                        {label} {integration.is_active ? "" : "(inactive)"}
                       </option>
                     );
                   })}
                 </select>
                 <p className="text-xs text-slate-500" data-oid=".-seh8t">
-                  Gestiona tus credenciales y sitios conectados desde{" "}
+                  Manage your credentials and connected sites from{" "}
                   <Link
                     href="/integrations/woo"
                     className="text-emerald-300 hover:text-emerald-200"
                     data-oid="zq5csv8"
                   >
-                    Integraciones
+                    Integrations
                   </Link>
                   .
                 </p>
@@ -498,7 +496,7 @@ export default async function AgentDetailPage({
                   className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                   data-oid="40p.dsg"
                 >
-                  Instrucciones del agente (prompt)
+                  Agent instructions (prompt)
                 </label>
                 <textarea
                   id="prompt-system"
@@ -506,7 +504,7 @@ export default async function AgentDetailPage({
                   defaultValue={promptSystemValue}
                   placeholder={
                     descriptionFallback ||
-                    "Describe tono, politicas y objetivos del agente."
+                    "Describe tone, policies, and objectives for the agent."
                   }
                   rows={5}
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
@@ -514,8 +512,8 @@ export default async function AgentDetailPage({
                 />
 
                 <p className="text-xs text-slate-500" data-oid="msp58.n">
-                  Este texto se envia como prompt de sistema al modelo. Usa
-                  variables, tono deseado y pasos de validacion para la marca.
+                  This text is sent as the system prompt to the model. Use
+                  variables, the desired tone, and brand guardrails.
                 </p>
               </div>
 
@@ -525,7 +523,7 @@ export default async function AgentDetailPage({
                   className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                   data-oid="ma.3o09"
                 >
-                  Idioma de respuesta preferido
+                  Preferred response language
                 </label>
                 <select
                   id="language"
@@ -545,8 +543,8 @@ export default async function AgentDetailPage({
                   ))}
                 </select>
                 <p className="text-xs text-slate-500" data-oid=".of0xf0">
-                  En deteccion automatica, el modelo adapta la respuesta al
-                  idioma del cliente.
+                  With automatic detection, the model adapts the response to the
+                  customer's language.
                 </p>
               </div>
 
@@ -556,7 +554,7 @@ export default async function AgentDetailPage({
                   className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                   data-oid="ddpxzr7"
                 >
-                  URL de fallback (opcional)
+                  Fallback URL (optional)
                 </label>
                 <input
                   id="fallback-url"
@@ -564,14 +562,13 @@ export default async function AgentDetailPage({
                   type="url"
                   inputMode="url"
                   defaultValue={fallbackUrlValue}
-                  placeholder="https://tu-agencia.com/contacto"
+                  placeholder="https://your-agency.com/contact"
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
                   data-oid="..o7do6"
                 />
 
                 <p className="text-xs text-slate-500" data-oid="8v0kij7">
-                  Se enviara al widget para escalar con humanos cuando sea
-                  necesario.
+                  Sent to the widget to escalate to humans when necessary.
                 </p>
               </div>
 
@@ -581,24 +578,24 @@ export default async function AgentDetailPage({
                   className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                   data-oid="4jmy990"
                 >
-                  Dominios permitidos (opcional)
+                  Allowed domains (optional)
                 </label>
                 <input
                   id="allowed-domains"
                   name="allowed_domains"
-                  placeholder="midominio.com, tienda.com"
+                  placeholder="myshop.com, store.com"
                   defaultValue={allowedDomains.join(", ")}
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
                   data-oid="4winsyn"
                 />
 
                 <p className="text-xs text-slate-500" data-oid="547hcs6">
-                  Separa cada dominio con comas. Si lo dejas vacio, el widget se
-                  podra cargar desde cualquier origen.
+                  Separate each domain with commas. If left empty, the widget
+                  can load from any origin.
                 </p>
                 {!!allowedDomains.length && (
                   <p className="text-xs text-slate-400" data-oid="j.1vkzc">
-                    Dominios actuales:{" "}
+                    Current domains:{" "}
                     <span
                       className="font-mono text-emerald-200"
                       data-oid="mp6p8il"
@@ -618,20 +615,20 @@ export default async function AgentDetailPage({
                   className="inline-flex w-full items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto"
                   data-oid="g:a3b_n"
                 >
-                  Guardar cambios
+                  Save changes
                 </button>
                 <Link
                   href={`/agents/${agent.id}`}
                   className="inline-flex w-full items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:w-auto"
                   data-oid="l5ynrvq"
                 >
-                  Cancelar
+                  Cancel
                 </Link>
               </div>
             </form>
           </article>
 
-          {/* COLUMNA DERECHA ARRIBA: aside con snippet + buenas prácticas */}
+          {/* RIGHT COLUMN TOP: snippet + best practices */}
           <aside className="space-y-6 min-w-0" data-oid="no9w3th">
             <article
               className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur"
@@ -641,12 +638,12 @@ export default async function AgentDetailPage({
                 className="text-lg font-semibold text-white"
                 data-oid="jm::wov"
               >
-                Snippet de incrustacion
+                Embed snippet
               </h3>
               <p className="mt-2 text-sm text-slate-300" data-oid=":kfo7gj">
-                Copia y pega este script en tu WordPress (footer o widget HTML).
-                Incluye tu API key y los valores de branding configurados
-                arriba.
+                Copy and paste this script into your WordPress (footer or HTML
+                widget). It includes your API key and the branding values
+                configured above.
               </p>
               <pre
                 className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200"
@@ -658,15 +655,15 @@ export default async function AgentDetailPage({
     s.src = '${widgetScriptUrl}';
     s.async = true;
     s.defer = true;
-    s.onerror = function(){ console.error("[AI SaaS] No se pudo cargar el widget."); };
+    s.onerror = function(){ console.error("[AI SaaS] Could not load the widget."); };
     document.head.appendChild(s);
   })();
 </script>`}
               </pre>
 
               <p className="mt-3 text-xs text-slate-500" data-oid="0m_0vll">
-                El widget verificara el plan activo y respetara los limites
-                definidos antes de mostrar el chat.
+                The widget will check the active plan and respect the defined
+                limits before showing the chat.
               </p>
             </article>
 
@@ -678,23 +675,23 @@ export default async function AgentDetailPage({
                 className="text-lg font-semibold text-white"
                 data-oid="fv3.m8j"
               >
-                Buenas practicas
+                Best practices
               </h3>
               <ul
                 className="mt-3 space-y-2 text-xs text-slate-400"
                 data-oid="8a_zbch"
               >
                 <li data-oid="6tqf_u-">
-                  - Usa un agente por cada tienda o idioma para mantener las
-                  respuestas alineadas con tu catalogo.
+                  - Use one agent per store or language to keep responses
+                  aligned with your catalog.
                 </li>
                 <li data-oid="zqn.dxx">
-                  - Si la API key se compromete, genera un nuevo agente y
-                  desactiva este para revocar el acceso.
+                  - If the API key is compromised, create a new agent and
+                  deactivate this one to revoke access.
                 </li>
                 <li data-oid="4-5yftx">
-                  - Activa alertas de limite de mensajes desde tu panel de
-                  facturacion para evitar interrupciones.
+                  - Enable message limit alerts from your billing panel to avoid
+                  interruptions.
                 </li>
               </ul>
             </article>
@@ -709,11 +706,11 @@ export default async function AgentDetailPage({
               className="text-xl font-semibold text-white"
               data-oid="o127-9d"
             >
-              Personaliza el widget embebible
+              Customize the embeddable widget
             </h2>
             <p className="mt-1 text-sm text-slate-300" data-oid="gyb7lbe">
-              Ajusta color, textos y posicion y prueba el resultado en tiempo
-              real antes de copiar el script.
+              Adjust color, text, and position and preview the result in real
+              time before copying the script.
             </p>
 
             <WidgetDesigner
