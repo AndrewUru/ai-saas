@@ -84,21 +84,20 @@ export default async function AgentsPage() {
               className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200"
               data-oid="p4h.8zd"
             >
-              Centro de agentes
+              Agents center
             </p>
             <h1
               className="text-3xl font-semibold leading-tight sm:text-4xl"
               data-oid="86qyzy7"
             >
-              Diseña y controla tus agentes de comercio
+              Design and control your commerce agents
             </h1>
             <p
               className="max-w-2xl text-sm text-slate-300 sm:text-base"
               data-oid="3vd.8k7"
             >
-              Verifica integraciones, copia las API keys y ajusta los límites de
-              mensajes en segundos. Cada agente puede conectarse a un sitio
-              WooCommerce distinto.
+              Verify integrations, copy API keys, and adjust message limits in
+              seconds. Each agent can connect to a different WooCommerce site.
             </p>
             <div className="flex flex-wrap gap-3" data-oid="8fjee:-">
               <Link
@@ -106,14 +105,14 @@ export default async function AgentsPage() {
                 className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200 transition hover:bg-emerald-500/20"
                 data-oid=".h58guz"
               >
-                Crear agente
+                Create agent
               </Link>
               <Link
                 href="/integrations/woo"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-950/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
                 data-oid="rhpbvm:"
               >
-                Revisar integraciones
+                Review integrations
               </Link>
             </div>
           </div>
@@ -129,7 +128,7 @@ export default async function AgentsPage() {
                 className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400"
                 data-oid="b6_i.ol"
               >
-                Agentes registrados
+                Registered agents
               </p>
               <p
                 className="mt-2 text-2xl font-semibold text-white"
@@ -138,7 +137,7 @@ export default async function AgentsPage() {
                 {agents?.length ?? 0}
               </p>
               <p className="mt-1 text-xs text-slate-400" data-oid="jqc5wy_">
-                Mantén tus agentes bajo control para respuestas rápidas.
+                Keep your agents under control for fast responses.
               </p>
             </div>
             <div
@@ -149,16 +148,16 @@ export default async function AgentsPage() {
                 className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400"
                 data-oid="1idyumh"
               >
-                Límite inicial
+                Initial limit
               </p>
               <p
                 className="mt-2 text-2xl font-semibold text-white"
                 data-oid="oq-q.47"
               >
-                {defaultMessagesLimit.toLocaleString("es-ES")} mensajes
+                {defaultMessagesLimit.toLocaleString("en-US")} messages
               </p>
               <p className="mt-1 text-xs text-slate-400" data-oid="huuc0ii">
-                Ajusta el límite por agente según tu plan.
+                Adjust the limit per agent according to your plan.
               </p>
             </div>
           </div>
@@ -184,11 +183,11 @@ export default async function AgentsPage() {
                   className="text-xl font-semibold text-white"
                   data-oid="vuq6jdj"
                 >
-                  Tus agentes activos
+                  Your active agents
                 </h2>
                 <p className="text-sm text-slate-300" data-oid="epvmjeg">
-                  Crea agentes segmentados por marca, idioma o catálogo y
-                  configúralos desde su ficha.
+                  Create agents segmented by brand, language, or catalog and
+                  configure them from their detail page.
                 </p>
               </div>
               <Link
@@ -196,7 +195,7 @@ export default async function AgentsPage() {
                 className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200 transition hover:bg-emerald-500/20"
                 data-oid="u.kacd7"
               >
-                Nuevo agente
+                New agent
               </Link>
             </div>
 
@@ -206,18 +205,18 @@ export default async function AgentsPage() {
                 data-oid="ag-.qxa"
               >
                 <p className="font-medium text-white" data-oid="ytd-n0b">
-                  Aún no tienes agentes configurados.
+                  You don&apos;t have any agents configured yet.
                 </p>
                 <p className="mt-2" data-oid="vm05z.f">
-                  Crea tu primer agente para generar API keys únicas y comenzar
-                  a automatizar respuestas en tu ecommerce.
+                  Create your first agent to generate unique API keys and start
+                  automating replies in your ecommerce.
                 </p>
                 <Link
                   href="#create-agent"
                   className="mt-4 inline-flex items-center justify-center rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
                   data-oid="z_1sk7."
                 >
-                  Crear agente ahora
+                  Create agent now
                 </Link>
               </div>
             ) : (
@@ -226,7 +225,7 @@ export default async function AgentsPage() {
                   const statusColor = agent.is_active
                     ? "bg-emerald-400"
                     : "bg-slate-500";
-                  const statusText = agent.is_active ? "Activo" : "Pausado";
+                  const statusText = agent.is_active ? "Active" : "Paused";
                   const maskedKey = `${agent.api_key?.slice(0, 6) ?? "N/A"}...`;
 
                   const limit = agent.messages_limit ?? defaultMessagesLimit;
@@ -280,7 +279,7 @@ export default async function AgentsPage() {
                             className="rounded-full bg-slate-900/80 px-2 py-1"
                             data-oid="5z3-fuy"
                           >
-                            Límite: {limit.toLocaleString("es-ES")}
+                            Limit: {limit.toLocaleString("en-US")}
                           </span>
                         </div>
                       </div>
@@ -290,7 +289,7 @@ export default async function AgentsPage() {
                           className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
                           data-oid="190mxdo"
                         >
-                          Configurar
+                          Configure
                         </Link>
                         <form
                           action={deleteAgent}
@@ -309,7 +308,7 @@ export default async function AgentsPage() {
                             className="inline-flex items-center justify-center rounded-full border border-red-500/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-red-100 transition hover:border-red-400 hover:text-red-200"
                             data-oid="x9a-uqq"
                           >
-                            Eliminar
+                            Delete
                           </button>
                         </form>
                       </div>
@@ -330,18 +329,18 @@ export default async function AgentsPage() {
                 className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-200"
                 data-oid="mumbgs7"
               >
-                Nuevo agente
+                New agent
               </p>
               <h2
                 className="text-lg font-semibold text-white"
                 data-oid="va651vg"
               >
-                Genera una API key en segundos
+                Generate an API key in seconds
               </h2>
               <p className="text-sm text-slate-300" data-oid="gz7oo7n">
-                Asigna un nombre descriptivo para identificar rápidamente el
-                canal o la marca asociada. Podrás editar límites y credenciales
-                después.
+                Give it a descriptive name so you can quickly identify the
+                channel or associated brand. You can edit limits and credentials
+                later.
               </p>
             </div>
 
@@ -352,12 +351,12 @@ export default async function AgentsPage() {
                   className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400"
                   data-oid="jbdwzey"
                 >
-                  Nombre del agente
+                  Agent name
                 </label>
                 <input
                   id="agent-name"
                   name="name"
-                  placeholder="Soporte WooCommerce"
+                  placeholder="WooCommerce Support"
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
                   required
                   data-oid="-kfcof_"
@@ -368,7 +367,7 @@ export default async function AgentsPage() {
                 className="w-full rounded-full bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
                 data-oid="djiq7ej"
               >
-                Generar agente
+                Generate agent
               </button>
             </form>
 
@@ -377,9 +376,9 @@ export default async function AgentsPage() {
               data-oid="66r:fy:"
             >
               <p data-oid="igsb8.2">
-                El snippet de incrustación se genera automáticamente en la ficha
-                del agente con su API key incluida; no necesitas copiarla
-                manualmente.
+                The embed snippet is generated automatically on the agent page
+                with its API key included; you don&apos;t need to copy it
+                manually.
               </p>
             </div>
 
@@ -388,9 +387,9 @@ export default async function AgentsPage() {
               data-oid="hcx8eh1"
             >
               <p data-oid="t09fn7w">
-                Cada agente comienza con un límite de{" "}
-                {defaultMessagesLimit.toLocaleString("es-ES")} mensajes. Ajusta
-                el valor al crecer tu plan o tu volumen de ventas.
+                Each agent starts with a limit of{" "}
+                {defaultMessagesLimit.toLocaleString("en-US")} messages. Adjust
+                the value as your plan or sales volume grows.
               </p>
             </div>
           </aside>

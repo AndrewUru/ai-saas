@@ -1,15 +1,19 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { agentRecordSchema, chatRequestSchema, type AgentRecord } from "@/lib/contracts/agent";
+import {
+  agentRecordSchema,
+  chatRequestSchema,
+  type AgentRecord,
+} from "@/lib/contracts/agent";
 
 export const FALLBACK_AGENT_MODEL = "gpt-4o-mini";
 const DEFAULT_SYSTEM_PROMPT =
-  "Eres un agente de soporte para tiendas online. Responde de forma clara y util, siguiendo las politicas de la marca.";
+  "You are a support agent for online stores. Answer clearly and helpfully, following the brand's policies.";
 
 const LANGUAGE_HINTS: Record<string, string> = {
-  es: "Responde siempre en espanol neutral para ecommerce. Manten un tono profesional cercano.",
+  es: "Responde siempre en español neutro para ecommerce. Mantén un tono profesional y cercano.",
   en: "Always respond in English with a helpful, concise ecommerce tone.",
-  pt: "Responda em portugues do Brasil com foco em suporte de ecommerce.",
-  fr: "Reponds en francais en gardant un ton professionnel et amical.",
+  pt: "Responda em português do Brasil com foco em suporte de ecommerce.",
+  fr: "Réponds en français en gardant un ton professionnel et amical.",
 };
 
 type AgentMessageRecord = {
@@ -47,13 +51,17 @@ function buildSystemPrompt(agent: AgentRecord) {
 
   const languageInstruction = agent.language
     ? LANGUAGE_HINTS[agent.language] ??
-      `Responde siempre en ${agent.language} salvo que el cliente solicite lo contrario.`
+      `Always respond in ${agent.language} unless the customer explicitly asks otherwise.`
     : null;
 
-  return [basePrompt, ...extras, languageInstruction].filter(Boolean).join("\n\n");
+  return [basePrompt, ...extras, languageInstruction]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
-function buildHistory(recentMessages: AgentMessageRecord[] | null | undefined): ChatHistoryItem[] {
+function buildHistory(
+  recentMessages: AgentMessageRecord[] | null | undefined
+): ChatHistoryItem[] {
   return (recentMessages ?? []).flatMap((entry) => {
     const pairs: ChatHistoryItem[] = [];
     if (entry.message) {
@@ -89,11 +97,11 @@ export async function chatWithAgent(
   const { api_key: apiKey, message } = parsedRequest.data;
 
   if (!deps.openaiApiKey) {
-    logger.error("[AI SaaS] Falta OPENAI_API_KEY");
+    logger.error("[AI SaaS] Missing OPENAI_API_KEY");
     return {
       ok: false,
       status: 500,
-      error: "Configuracion incompleta del modelo.",
+      error: "Model configuration is incomplete.",
     };
   }
 
@@ -109,17 +117,20 @@ export async function chatWithAgent(
     return {
       ok: false,
       status: 404,
-      error: "Agente no encontrado o API key invalida.",
+      error: "Agent not found or invalid API key.",
     };
   }
 
   const agentParse = agentRecordSchema.safeParse(agent);
   if (!agentParse.success) {
-    logger.error("[AI SaaS] Agent parse error:", agentParse.error.flatten().fieldErrors);
+    logger.error(
+      "[AI SaaS] Agent parse error:",
+      agentParse.error.flatten().fieldErrors
+    );
     return {
       ok: false,
       status: 500,
-      error: "Error interno del servidor.",
+      error: "Internal server error.",
     };
   }
 
@@ -129,7 +140,7 @@ export async function chatWithAgent(
     return {
       ok: false,
       status: 403,
-      error: "El agente esta inactivo.",
+      error: "This agent is inactive.",
       fallbackUrl: validAgent.fallback_url ?? null,
     };
   }
@@ -138,7 +149,7 @@ export async function chatWithAgent(
     return {
       ok: false,
       status: 403,
-      error: "Se alcanzo el limite de mensajes para este agente.",
+      error: "The message limit for this agent has been reached.",
       fallbackUrl: validAgent.fallback_url ?? null,
     };
   }
@@ -162,14 +173,17 @@ export async function chatWithAgent(
     ],
   };
 
-  const response = await (deps.fetcher ?? fetch)("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${deps.openaiApiKey}`,
-    },
-    body: JSON.stringify(payload),
-  });
+  const response = await (deps.fetcher ?? fetch)(
+    "https://api.openai.com/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${deps.openaiApiKey}`,
+      },
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (!response.ok) {
     const errorBody = await response.text().catch(() => "");
@@ -177,7 +191,7 @@ export async function chatWithAgent(
     return {
       ok: false,
       status: 502,
-      error: "El modelo no pudo generar una respuesta.",
+      error: "The model could not generate a response.",
       fallbackUrl: validAgent.fallback_url ?? null,
     };
   }
@@ -188,7 +202,7 @@ export async function chatWithAgent(
 
   const reply =
     completion.choices?.[0]?.message?.content?.trim() ||
-    "Lo siento, no pude generar una respuesta.";
+    "Sorry, I couldn't generate a response.";
 
   await deps.supabase.from("agent_messages").insert({
     agent_id: validAgent.id,

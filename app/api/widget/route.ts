@@ -67,7 +67,7 @@ export async function GET(req: Request) {
   const chatEndpoint = `${url.origin}/api/agent/chat`;
 
   if (!key) {
-    return new NextResponse("// Falta key", {
+    return new NextResponse("// Missing key", {
       headers: { "Content-Type": "application/javascript" },
       status: 400,
     });
@@ -84,19 +84,19 @@ export async function GET(req: Request) {
     .maybeSingle();
 
   if (error) {
-    return new NextResponse(`// Error DB: ${error.message}`, {
+    return new NextResponse(`// DB Error: ${error.message}`, {
       headers: { "Content-Type": "application/javascript" },
       status: 500,
     });
   }
   if (!agent) {
-    return new NextResponse("// Agente no encontrado", {
+    return new NextResponse("// Agent not found", {
       headers: { "Content-Type": "application/javascript" },
       status: 404,
     });
   }
   if (!agent.is_active) {
-    return new NextResponse("// Agente inactivo", {
+    return new NextResponse("// Inactive agent", {
       headers: { "Content-Type": "application/javascript" },
       status: 403,
     });
@@ -263,15 +263,15 @@ export async function GET(req: Request) {
           '<span class="ai-saas-brand-icon">' + CONFIG.brandInitial + '</span>' +
           '<div class="ai-saas-brand-text"><strong>' + CONFIG.brandName + '</strong><span>' + CONFIG.greeting + '</span></div>' +
         '</div>' +
-        '<button type="button" id="ai-saas-close" aria-label="Minimizar">' +
+        '<button type="button" id="ai-saas-close" aria-label="Minimize">' +
           '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 6 8 8m0-8-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' +
         '</button>' +
       '</header>' +
       '<div id="ai-saas-chat-box" aria-live="polite"></div>' +
       '<form id="ai-saas-form">' +
         '<div class="ai-saas-input-wrapper">' +
-          '<input id="ai-saas-input" type="text" placeholder="Escribe tu mensaje..." autocomplete="off" />' +
-          '<button type="submit">Enviar</button>' +
+          '<input id="ai-saas-input" type="text" placeholder="Type your message..." autocomplete="off" />' +
+          '<button type="submit">Send</button>' +
         '</div>' +
       '</form>';
     anchor.appendChild(widget);
@@ -286,14 +286,14 @@ export async function GET(req: Request) {
     if (!chatBox || !form || !input || !closeBtn || !submitBtn) return;
 
     let isSending = false;
-    const defaultButtonLabel = submitBtn.textContent || "Enviar";
+    const defaultButtonLabel = submitBtn.textContent || "Send";
 
     let hideTimeout;
 
     function setSending(state){
       isSending = state;
       submitBtn.disabled = state;
-      submitBtn.textContent = state ? "Enviando..." : defaultButtonLabel;
+      submitBtn.textContent = state ? "Sending..." : defaultButtonLabel;
       input.disabled = state;
     }
 
@@ -360,7 +360,7 @@ export async function GET(req: Request) {
         link.href = url;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
-        link.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10a7 7 0 1114 0 7 7 0 01-14 0zm7-4a1 1 0 100 2 1 1 0 000-2zm0 3a1 1 0 00-1 1v3a1 1 0 002 0v-3a1 1 0 00-1-1z" fill="currentColor"/></svg><span>Hablar con una persona</span>';
+        link.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10a7 7 0 1114 0 7 7 0 01-14 0zm7-4a1 1 0 100 2 1 1 0 000-2zm0 3a1 1 0 00-1 1v3a1 1 0 002 0v-3a1 1 0 00-1-1z" fill="currentColor"/></svg><span>Talk to a person</span>';
         chatBox.appendChild(link);
         chatBox.scrollTop = chatBox.scrollHeight;
       }catch(err){
@@ -395,7 +395,7 @@ export async function GET(req: Request) {
         if (response.ok && data.reply) {
           typingBubble.textContent = data.reply;
         } else {
-          typingBubble.textContent = data.error || "No fue posible obtener una respuesta.";
+          typingBubble.textContent = data.error || "We couldn't get a response.";
           typingBubble.classList.add("ai-saas-error");
           if (data.fallback_url) {
             showFallback(data.fallback_url);
@@ -404,7 +404,7 @@ export async function GET(req: Request) {
       } catch (err){
         console.error("[AI SaaS] fetch error", err);
         typingBubble.classList.remove("typing");
-        typingBubble.textContent = "Error conectando con el agente.";
+        typingBubble.textContent = "Error connecting to the agent.";
         typingBubble.classList.add("ai-saas-error");
       } finally {
         setSending(false);
@@ -412,7 +412,9 @@ export async function GET(req: Request) {
       }
     });
 
-    window.aiSaasWidget = {
+    // Simple control API
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).aiSaasWidget = {
       open: openWidget,
       close: closeWidget,
     };

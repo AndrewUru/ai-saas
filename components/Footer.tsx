@@ -2,27 +2,27 @@ import Link from "next/link";
 
 const navigation = [
   {
-    title: "Producto",
+    title: "Product",
     links: [
-      { label: "Caracteristicas", href: "/#features" },
-      { label: "Agentes", href: "/agents" },
-      { label: "Planes", href: "/billing" },
+      { label: "Features", href: "/#features" },
+      { label: "Agents", href: "/agents" },
+      { label: "Pricing", href: "/billing" },
     ],
   },
   {
-    title: "Recursos",
+    title: "Resources",
     links: [
-      { label: "Documentacion", href: "/docs" },
-      { label: "Academia", href: "/academy" },
+      { label: "Documentation", href: "/docs" },
+      { label: "Academy", href: "/academy" },
       { label: "Changelog", href: "/changelog" },
     ],
   },
   {
-    title: "Compania",
+    title: "Company",
     links: [
-      { label: "Sobre nosotros", href: "/about" },
+      { label: "About us", href: "/about" },
       { label: "Blog", href: "/blog" },
-      { label: "Contacto", href: "/contact" },
+      { label: "Contact", href: "/contact" },
     ],
   },
 ];
@@ -50,8 +50,8 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-slate-400">
-              Agentes de soporte entrenados para ecommerce. Conecta WooCommerce,
-              automatiza respuestas y escala sin perder control.
+              Support agents trained for e-commerce. Connect WooCommerce,
+              automate responses, and scale without losing control.
             </p>
             <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
               {social.map((item) => (
@@ -90,13 +90,13 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col gap-4 border-t border-slate-900 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-          <p>Copyright {year} AI-SaaS. Todos los derechos reservados.</p>
+          <p>Copyright {year} AI-SaaS. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/privacy"
               className="transition hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             >
-              Politica de privacidad
+              Privacy Policy
             </Link>
             <span className="h-1 w-1 rounded-full bg-slate-700" />
 
@@ -104,7 +104,7 @@ export default function Footer() {
               href="/terms"
               className="transition hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             >
-              Terminos de servicio
+              Terms of Service
             </Link>
             <span className="h-1 w-1 rounded-full bg-slate-700" />
 

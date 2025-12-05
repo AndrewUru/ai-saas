@@ -18,35 +18,35 @@ export default function AgentsSection({ planLimitLabel }: Props) {
     <section className="space-y-6" data-oid="lu:-88d">
       <div className="grid gap-4 sm:grid-cols-3" data-oid="ioh0f4a">
         <StatCard
-          label="Agentes creados"
+          label="Agents created"
           value={isLoading ? "-" : totalAgents}
           helper={
             isLoading
-              ? "Cargando tus agentes..."
+              ? "Loading your agents..."
               : totalAgents === 0
-                ? "Aun no has creado ningun agente."
-                : "Todos tus agentes estan listos en WooCommerce."
+              ? "You haven't created any agents yet."
+              : "All your agents are ready in WooCommerce."
           }
           data-oid="q-2n.nx"
         />
 
         <StatCard
-          label="Agentes activos"
+          label="Active agents"
           value={isLoading ? "-" : activeAgents}
           helper={
             isLoading
-              ? "Calculando estado..."
+              ? "Checking status..."
               : activeAgents === totalAgents
-                ? "Todos tus agentes estan activos."
-                : "Activa los agentes que necesites desde su ficha."
+              ? "All your agents are active."
+              : "Activate the agents you need from each agent page."
           }
           data-oid="npzqtff"
         />
 
         <StatCard
-          label="Limite de mensajes"
+          label="Message limit"
           value={planLimitLabel}
-          helper="Controla tus mensajes desde los reportes semanales."
+          helper="Track your usage from the weekly reports."
           data-oid="swq4kpj"
         />
       </div>
@@ -58,11 +58,11 @@ export default function AgentsSection({ planLimitLabel }: Props) {
         >
           <div data-oid="imr64r5">
             <h2 className="text-xl font-semibold text-white" data-oid="mz_h.db">
-              Tus agentes
+              Your agents
             </h2>
             <p className="mt-1 text-sm text-slate-300" data-oid="oo3-ux-">
-              Gestiona las integraciones, copia las API keys y revisa el limite
-              de mensajes de cada agente.
+              Manage integrations, copy API keys, and review the message limit
+              for each agent.
             </p>
           </div>
           <Link
@@ -70,7 +70,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
             className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200 transition hover:bg-emerald-500/20"
             data-oid="39yaa0d"
           >
-            Ver agentes
+            View agents
           </Link>
         </div>
 
@@ -79,7 +79,8 @@ export default function AgentsSection({ planLimitLabel }: Props) {
             className="mt-6 rounded-2xl border border-dashed border-red-500/60 bg-red-500/10 p-6 text-sm text-red-100"
             data-oid="oj_6vi9"
           >
-            No pudimos cargar tus agentes. Intentalo de nuevo en unos segundos.
+            We couldn&apos;t load your agents. Please try again in a few
+            seconds.
           </div>
         )}
 
@@ -89,18 +90,18 @@ export default function AgentsSection({ planLimitLabel }: Props) {
             data-oid="xm8pwt-"
           >
             <p className="font-medium text-white" data-oid="f3tz1mg">
-              Todavia no tienes agentes configurados.
+              You don&apos;t have any agents configured yet.
             </p>
             <p className="mt-2" data-oid="tzq6n80">
-              Crea tu primer agente para conectar WooCommerce y empezar a
-              responder chats automaticamente.
+              Create your first agent to connect WooCommerce and start replying
+              to chats automatically.
             </p>
             <Link
               href="/agents"
               className="mt-4 inline-flex items-center justify-center rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
               data-oid="wl9.y-8"
             >
-              Crear agente
+              Create agent
             </Link>
           </div>
         )}
@@ -115,7 +116,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                   const statusColor = agent.is_active
                     ? "bg-emerald-400"
                     : "bg-slate-500";
-                  const statusText = agent.is_active ? "Activo" : "Pausado";
+                  const statusText = agent.is_active ? "Active" : "Paused";
                   return (
                     <li
                       key={agent.id}
@@ -136,7 +137,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                             className="text-base font-semibold text-white"
                             data-oid="5_666:c"
                           >
-                            {agent.name || "Sin nombre"}
+                            {agent.name || "Unnamed"}
                           </span>
                           <span
                             className="rounded-full border border-slate-700 px-2 py-0.5 text-[11px] uppercase tracking-[0.2em] text-slate-400"
@@ -161,8 +162,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                           className="text-xs text-slate-400"
                           data-oid="u3iu--n"
                         >
-                          Limite de mensajes:{" "}
-                          {agent.messages_limit ?? "Sin limite"}
+                          Message limit: {agent.messages_limit ?? "No limit"}
                         </p>
                       </div>
                       <Link
@@ -170,7 +170,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                         className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
                         data-oid="w_cw22u"
                       >
-                        Configurar
+                        Configure
                       </Link>
                     </li>
                   );
@@ -180,8 +180,8 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                 className="text-center text-xs text-slate-400"
                 data-oid="vc6k3aq"
               >
-                Mostramos tus 5 agentes mas recientes. Consulta el listado
-                completo en la seccion de agentes.
+                Showing your 5 most recent agents. See the full list in the
+                agents section.
               </li>
             )}
           </ul>

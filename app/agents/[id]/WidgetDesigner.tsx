@@ -64,7 +64,7 @@ export default function WidgetDesigner({
   const [labelInput, setLabelInput] = useState(initialLabel ?? "");
   const [greetingInput, setGreetingInput] = useState(initialGreeting ?? "");
   const [position, setPosition] = useState<WidgetPosition>(
-    initialPosition ?? widgetDefaults.position,
+    initialPosition ?? widgetDefaults.position
   );
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -72,7 +72,7 @@ export default function WidgetDesigner({
   const accentPickerValue = normalizeHex(accentInput) ?? widgetDefaults.accent;
   const accentError =
     accentInput && !normalizeHex(accentInput)
-      ? "Usa un hex de 3 o 6 caracteres."
+      ? "Use a 3- or 6-character hex value."
       : null;
 
   const previewUrl = useMemo(() => {
@@ -114,7 +114,7 @@ export default function WidgetDesigner({
 
     doc.open();
     doc.write(`<!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -138,13 +138,13 @@ export default function WidgetDesigner({
     </style>
   </head>
   <body>
-    <span class="preview-hint">Vista previa</span>
+    <span class="preview-hint">Preview</span>
   </body>
 </html>`);
     doc.close();
 
     const loader = doc.createElement("div");
-    loader.textContent = "Cargando widget...";
+    loader.textContent = "Loading widget...";
     loader.style.position = "absolute";
     loader.style.bottom = "18px";
     loader.style.left = "50%";
@@ -159,7 +159,7 @@ export default function WidgetDesigner({
     script.defer = true;
     script.onload = () => loader.remove();
     script.onerror = () => {
-      loader.textContent = "No pudimos cargar la vista previa.";
+      loader.textContent = "We couldn't load the preview.";
     };
 
     doc.body.appendChild(script);
@@ -209,10 +209,10 @@ export default function WidgetDesigner({
               className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200"
               data-oid="4b64i86"
             >
-              Branding y UX
+              Branding & UX
             </p>
             <h3 className="text-lg font-semibold text-white" data-oid="p-6tv_5">
-              Ajusta apariencia y textos visibles
+              Adjust appearance and visible texts
             </h3>
           </div>
           <button
@@ -221,7 +221,7 @@ export default function WidgetDesigner({
             onClick={handleReset}
             data-oid="n3p3iaq"
           >
-            Limpiar campos
+            Clear fields
           </button>
         </div>
 
@@ -235,11 +235,11 @@ export default function WidgetDesigner({
               className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
               data-oid="c2k588v"
             >
-              Color de acento
+              Accent color
             </label>
             <input
               type="color"
-              aria-label="Selector de color"
+              aria-label="Color picker"
               className="h-9 w-9 cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-0"
               value={accentPickerValue}
               onChange={(event) => setAccentInput(event.target.value)}
@@ -252,7 +252,7 @@ export default function WidgetDesigner({
               onClick={() => setAccentInput("")}
               data-oid=":2z4hte"
             >
-              Restablecer
+              Reset
             </button>
           </div>
           <input
@@ -266,7 +266,7 @@ export default function WidgetDesigner({
           />
 
           <p className="text-xs text-slate-500" data-oid="0i5e_qi">
-            Acepta formatos #RRGGBB o RRGGBB. Vacío = color predeterminado (
+            Accepts #RRGGBB or RRGGBB formats. Empty = default color (
             {widgetDefaults.accent}).
           </p>
           {accentError && (
@@ -282,7 +282,7 @@ export default function WidgetDesigner({
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
             data-oid="e60tg4g"
           >
-            Nombre visible
+            Visible name
           </label>
           <input
             id="widget-brand"
@@ -296,7 +296,7 @@ export default function WidgetDesigner({
           />
 
           <p className="text-xs text-slate-500" data-oid="lcnq7:a">
-            Máximo {widgetLimits.brand} caracteres. Vacío = usa &quot;
+            Max {widgetLimits.brand} characters. Empty = uses &quot;
             {widgetDefaults.brand}&quot;.
           </p>
         </div>
@@ -307,7 +307,7 @@ export default function WidgetDesigner({
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
             data-oid="whzi3k0"
           >
-            Texto del botón
+            Button text
           </label>
           <input
             id="widget-label"
@@ -321,7 +321,7 @@ export default function WidgetDesigner({
           />
 
           <p className="text-xs text-slate-500" data-oid="vq44tl2">
-            Máximo {widgetLimits.label} caracteres. Vacío = usa &quot;
+            Max {widgetLimits.label} characters. Empty = uses &quot;
             {widgetDefaults.label}&quot;.
           </p>
         </div>
@@ -332,7 +332,7 @@ export default function WidgetDesigner({
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
             data-oid="f8xxhfp"
           >
-            Mensaje inicial
+            Initial message
           </label>
           <input
             id="widget-greeting"
@@ -346,7 +346,7 @@ export default function WidgetDesigner({
           />
 
           <p className="text-xs text-slate-500" data-oid="kvmvqb_">
-            Máximo {widgetLimits.greeting} caracteres. Vacío = usa &quot;
+            Max {widgetLimits.greeting} characters. Empty = uses &quot;
             {widgetDefaults.greeting}&quot;.
           </p>
         </div>
@@ -359,7 +359,7 @@ export default function WidgetDesigner({
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
             data-oid="y1g8xuq"
           >
-            Posición en pantalla
+            Screen position
           </legend>
           <div className="flex flex-wrap gap-3" data-oid="e15cqmj">
             {widgetPositions.map((option) => (
@@ -382,7 +382,7 @@ export default function WidgetDesigner({
                   data-oid="rh-xnxd"
                 />
 
-                {option === "right" ? "Derecha" : "Izquierda"}
+                {option === "right" ? "Right" : "Left"}
               </label>
             ))}
           </div>
@@ -394,7 +394,7 @@ export default function WidgetDesigner({
             className="inline-flex flex-1 items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:flex-none"
             data-oid="zkgau69"
           >
-            Guardar personalización
+            Save customization
           </button>
           <button
             type="button"
@@ -402,13 +402,13 @@ export default function WidgetDesigner({
             className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:flex-none"
             data-oid="ieqnf6g"
           >
-            Valores predeterminados
+            Default values
           </button>
         </div>
 
         <p className="text-xs text-slate-500" data-oid="-fejw8x">
-          Los valores vacíos usan automáticamente los textos y colores
-          predeterminados del widget.
+          Empty values automatically use the widget&apos;s default texts and
+          colors.
         </p>
       </form>
 
@@ -425,10 +425,10 @@ export default function WidgetDesigner({
               className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200"
               data-oid="of:9saq"
             >
-              Vista previa en vivo
+              Live preview
             </p>
             <p className="text-sm text-slate-300" data-oid="y_n0dm:">
-              Usamos el script real contra{" "}
+              We use the real script against{" "}
               <code
                 className="rounded bg-slate-900 px-2 py-0.5 text-xs text-emerald-200"
                 data-oid="bwtk_.a"
@@ -442,7 +442,7 @@ export default function WidgetDesigner({
             className="rounded-full border border-slate-800 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-400"
             data-oid="7q2j0hl"
           >
-            Tiempo real
+            Real time
           </span>
         </div>
         <div
@@ -461,7 +461,7 @@ export default function WidgetDesigner({
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
             data-oid="pu8qhx_"
           >
-            URL generada
+            Generated URL
           </p>
           <code
             className="block max-h-28 overflow-auto rounded-xl border border-slate-800 bg-slate-950/80 p-3 text-[11px] text-emerald-200 overflow-x-auto break-all"

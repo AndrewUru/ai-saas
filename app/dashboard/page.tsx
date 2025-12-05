@@ -34,7 +34,7 @@ export default async function DashboardPage() {
         month: "long",
         year: "numeric",
       }).format(new Date(profile.active_until))
-    : "Sin fecha";
+    : "No date";
 
   return (
     <main
@@ -59,20 +59,20 @@ export default async function DashboardPage() {
               className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200"
               data-oid="ubqklc1"
             >
-              Panel principal
+              Main dashboard
             </p>
             <h1
               className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl"
               data-oid="cki91e6"
             >
-              Hola, {user.email}
+              Hello, {user.email}
             </h1>
             <p
               className="mt-2 max-w-2xl text-sm text-slate-300 sm:text-base"
               data-oid="eb7_3y2"
             >
-              Gestiona tus agentes, revisa el estado de tu plan y comparte el
-              widget con tus tiendas desde un solo lugar.
+              Manage your agents, check your plan status, and share the widget
+              with your stores from a single place.
             </p>
           </div>
           <div
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
                 className="text-xs uppercase tracking-[0.28em] text-emerald-300"
                 data-oid="880u9zy"
               >
-                Plan activo
+                Active plan
               </span>
               <div
                 className="text-lg font-semibold text-white"
@@ -98,7 +98,7 @@ export default async function DashboardPage() {
                 className="text-xs uppercase tracking-[0.28em] text-emerald-300"
                 data-oid="0y88hol"
               >
-                Vigente hasta
+                Active until
               </span>
               <div
                 className="text-lg font-semibold text-white"
@@ -120,7 +120,7 @@ export default async function DashboardPage() {
   "
           data-oid=":d3cz7i"
         >
-          {/* COLUMNA PRINCIPAL */}
+          {/* MAIN COLUMN */}
           <div className="w-full min-w-0" data-oid="5vsj:9n">
             <AgentsSection planLimitLabel={planLimitLabel} data-oid="nyina8d" />
           </div>
@@ -132,12 +132,12 @@ export default async function DashboardPage() {
               data-oid="ooy9qqu"
             >
               <h3 className="text-lg font-semibold" data-oid=":1.fum_">
-                Plan y facturación
+                Plan & billing
               </h3>
 
               <p className="mt-2 text-sm" data-oid="b:ndu2s">
-                Mantén tu plan al día para seguir enviando mensajes sin
-                interrupciones. Actualiza tu suscripción cuando lo necesites.
+                Keep your plan up to date to continue sending messages without
+                interruptions. Update your subscription whenever you need.
               </p>
 
               <Link
@@ -150,7 +150,7 @@ export default async function DashboardPage() {
         "
                 data-oid="ncd1973"
               >
-                Gestionar suscripción
+                Manage subscription
               </Link>
             </article>
           </aside>
