@@ -187,9 +187,7 @@ ready(() => {
   });
 
   // Simple control API
-  const win = window as typeof window & {
-    aiSaasWidget?: { open: () => void; close: () => void };
-  };
+  const win = window;
   win.aiSaasWidget = {
     open: openWidget,
     close: closeWidget,
