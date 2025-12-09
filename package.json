@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@langchain/openai": "^0.6.14",
+    "@paypal/react-paypal-js": "^8.9.2",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.74.0",
     "@tanstack/react-query": "^5.62.8",
