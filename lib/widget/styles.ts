@@ -17,8 +17,8 @@ export function renderStyles(a: WidgetAppearance) {
   justify-content: center;
   width: 60px;
   height: 60px;
-  background: #25D366; /* WhatsApp Green */
-  color: #fff;
+  background: ${a.colorToggleBg}; /* Default: WhatsApp Green */
+  color: ${a.colorToggleText};
   border-radius: 50%;
   border: none;
   cursor: pointer;

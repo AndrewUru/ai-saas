@@ -25,7 +25,10 @@ type WidgetDesignerProps = {
   initialColorUserBubbleBg: string | null;
   initialColorUserBubbleText: string | null;
   initialColorBotBubbleBg: string | null;
+  initialColorBotBubbleBg: string | null;
   initialColorBotBubbleText: string | null;
+  initialColorToggleBg: string | null;
+  initialColorToggleText: string | null;
 };
 
 // Start Helper Component for Color Input
@@ -120,6 +123,8 @@ export default function WidgetDesigner({
   initialColorUserBubbleText,
   initialColorBotBubbleBg,
   initialColorBotBubbleText,
+  initialColorToggleBg,
+  initialColorToggleText,
 }: WidgetDesignerProps) {
   const [accentInput, setAccentInput] = useState(initialAccent ?? "");
   const [brandInput, setBrandInput] = useState(initialBrand ?? "");
@@ -146,6 +151,10 @@ export default function WidgetDesigner({
   );
   const [colorBotBubbleText, setColorBotBubbleText] = useState(
     initialColorBotBubbleText ?? ""
+  );
+  const [colorToggleBg, setColorToggleBg] = useState(initialColorToggleBg ?? "");
+  const [colorToggleText, setColorToggleText] = useState(
+    initialColorToggleText ?? ""
   );
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -190,6 +199,10 @@ export default function WidgetDesigner({
       params.set("colorBotBubbleBg", toParamHex(colorBotBubbleBg)!);
     if (toParamHex(colorBotBubbleText))
       params.set("colorBotBubbleText", toParamHex(colorBotBubbleText)!);
+    if (toParamHex(colorToggleBg))
+      params.set("colorToggleBg", toParamHex(colorToggleBg)!);
+    if (toParamHex(colorToggleText))
+      params.set("colorToggleText", toParamHex(colorToggleText)!);
 
     params.set("preview", "1");
 
@@ -208,7 +221,10 @@ export default function WidgetDesigner({
     colorUserBubbleBg,
     colorUserBubbleText,
     colorBotBubbleBg,
+    colorBotBubbleBg,
     colorBotBubbleText,
+    colorToggleBg,
+    colorToggleText,
   ]);
 
   useEffect(() => {
@@ -292,6 +308,8 @@ export default function WidgetDesigner({
     setColorUserBubbleText("");
     setColorBotBubbleBg("");
     setColorBotBubbleText("");
+    setColorToggleBg("");
+    setColorToggleText("");
   }
 
   return (
@@ -423,6 +441,26 @@ export default function WidgetDesigner({
               value={colorBotBubbleText}
               onChange={setColorBotBubbleText}
               defaultValue="#111b21"
+            />
+              name="widget_color_bot_bubble_text"
+              value={colorBotBubbleText}
+              onChange={setColorBotBubbleText}
+              defaultValue="#111b21"
+            />
+            <div /> {/* Spacer */}
+            <ColorInput
+              label="Toggle Button BG"
+              name="widget_color_toggle_bg"
+              value={colorToggleBg}
+              onChange={setColorToggleBg}
+              defaultValue="#25D366"
+            />
+            <ColorInput
+              label="Toggle Button Icon"
+              name="widget_color_toggle_text"
+              value={colorToggleText}
+              onChange={setColorToggleText}
+              defaultValue="#ffffff"
             />
           </div>
         </div>

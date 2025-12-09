@@ -21,6 +21,8 @@ export interface WidgetAppearance {
   colorUserBubbleText: string;
   colorBotBubbleBg: string;
   colorBotBubbleText: string;
+  colorToggleBg: string;
+  colorToggleText: string;
 }
 
 export interface WidgetConfig {
@@ -40,6 +42,8 @@ export interface WidgetConfig {
     colorUserBubbleText: string;
     colorBotBubbleBg: string;
     colorBotBubbleText: string;
+    colorToggleBg: string;
+    colorToggleText: string;
   };
 }
 
@@ -59,4 +63,6 @@ export interface AgentRecord {
   widget_color_user_bubble_text: string | null;
   widget_color_bot_bubble_bg: string | null;
   widget_color_bot_bubble_text: string | null;
+  widget_color_toggle_bg: string | null;
+  widget_color_toggle_text: string | null;
 }

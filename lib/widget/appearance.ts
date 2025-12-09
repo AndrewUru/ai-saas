@@ -150,6 +150,14 @@ export function buildAppearance(
       agent.widget_color_bot_bubble_text ??
       "#111b21"
   );
+  // Default Toggle Bg: WhatsApp Green (#25D366)
+  const colorToggleBg = sanitizeHex(
+    params.get("colorToggleBg") ?? agent.widget_color_toggle_bg ?? "#25D366"
+  );
+  // Default Toggle Text: White
+  const colorToggleText = sanitizeHex(
+    params.get("colorToggleText") ?? agent.widget_color_toggle_text ?? "#ffffff"
+  );
 
   return {
     accent,
@@ -171,6 +179,8 @@ export function buildAppearance(
     colorUserBubbleText,
     colorBotBubbleBg,
     colorBotBubbleText,
+    colorToggleBg,
+    colorToggleText,
   };
 }
 
@@ -196,6 +206,8 @@ export function buildConfig(
       colorUserBubbleText: appearance.colorUserBubbleText,
       colorBotBubbleBg: appearance.colorBotBubbleBg,
       colorBotBubbleText: appearance.colorBotBubbleText,
+      colorToggleBg: appearance.colorToggleBg,
+      colorToggleText: appearance.colorToggleText,
     },
   };
 }

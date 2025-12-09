@@ -229,7 +229,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text"
+      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -762,7 +762,10 @@ export default async function AgentDetailPage({
               initialColorUserBubbleBg={agent.widget_color_user_bubble_bg}
               initialColorUserBubbleText={agent.widget_color_user_bubble_text}
               initialColorBotBubbleBg={agent.widget_color_bot_bubble_bg}
+              initialColorBotBubbleBg={agent.widget_color_bot_bubble_bg}
               initialColorBotBubbleText={agent.widget_color_bot_bubble_text}
+              initialColorToggleBg={agent.widget_color_toggle_bg}
+              initialColorToggleText={agent.widget_color_toggle_text}
               data-oid="qs3rk03"
             />
           </article>
