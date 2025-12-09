@@ -5,48 +5,66 @@ export function renderStyles(a: WidgetAppearance) {
 
 #ai-saas-anchor {
   position: fixed;
-  bottom: 20px;
-  ${a.position === "left" ? "left: 20px; right: auto;" : "right: 20px; left: auto;"}
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  ${a.position === "left" ? "left: 18px; right: auto;" : "right: 18px; left: auto;"}
+  display: flex;
+  flex-direction: column;
+  align-items: ${a.position === "left" ? "flex-start" : "flex-end"};
+  gap: 12px;
   z-index: 2147483000;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 #ai-saas-toggle {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
-  background: ${a.colorToggleBg}; /* Default: WhatsApp Green */
+  min-width: 56px;
+  height: 56px;
+  padding: 0 18px;
+  background: linear-gradient(135deg, ${a.colorToggleBg}, ${a.accent});
   color: ${a.colorToggleText};
-  border-radius: 50%;
-  border: none;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 28px ${a.accentShadow};
+  gap: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  backdrop-filter: blur(6px);
 }
 
 #ai-saas-toggle:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px) scale(1.04);
+  box-shadow: 0 12px 32px ${a.accentShadow};
+  filter: brightness(1.02);
 }
 
 #ai-saas-toggle .ai-saas-icon {
   width: 32px;
   height: 32px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-weight: 700;
 }
 
 #ai-saas-toggle .ai-saas-icon svg {
-  width: 32px;
-  height: 32px;
-  fill: currentColor;
+  display: none;
 }
 
 #ai-saas-toggle .ai-saas-label {
-  display: none; /* Icon only for WhatsApp style usually */
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #ai-saas-anchor.open #ai-saas-toggle {
@@ -54,22 +72,22 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 #ai-saas-widget {
-  width: 380px;
-  max-width: calc(100vw - 40px);
-  height: 600px;
-  max-height: calc(100vh - 100px);
-  background: #efe7dd; /* WhatsApp Beige */
-  border-radius: 12px;
+  width: clamp(360px, 32vw + 120px, 520px);
+  max-width: min(540px, calc(100vw - 48px));
+  height: clamp(520px, 70vh, 760px);
+  max-height: min(88vh, 820px);
+  background: #f8fafc;
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
   display: flex;
   flex-direction: column;
   opacity: 0;
-  transform: translateY(20px) scale(0.95);
+  transform: translateY(18px) scale(0.96);
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
   position: absolute;
-  bottom: 80px;
+  bottom: 88px;
   ${a.position === "left" ? "left: 0;" : "right: 0;"}
 }
 
@@ -144,7 +162,7 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 #ai-saas-chat-box {
-  padding: 20px 8%;
+  padding: 18px min(7%, 32px);
   flex: 1;
   overflow-y: auto;
   background-color: ${a.colorChatBg};
@@ -318,17 +336,29 @@ export function renderStyles(a: WidgetAppearance) {
   text-decoration: underline;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   #ai-saas-widget {
     position: fixed;
-    bottom: 0;
-    right: 0 !important;
-    width: 90%;
-    height: 90%;
-    max-width: none;
-    max-height: none;
-    border-radius: 0;
-    transform: none !important; /* Prevent transform issues on mobile open */
+    left: 12px;
+    right: 12px;
+    width: auto;
+    height: min(78vh, 620px);
+    max-height: calc(100vh - 100px);
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+    border-radius: 16px;
+    transform: translateY(0) scale(0.98);
+  }
+
+  #ai-saas-toggle {
+    width: 100%;
+    min-height: 54px;
+    justify-content: center;
+    padding: 0 16px;
+  }
+
+  #ai-saas-toggle .ai-saas-label {
+    display: inline-flex;
+    font-size: 14px;
   }
 }
 `;
