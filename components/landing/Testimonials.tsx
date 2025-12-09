@@ -3,10 +3,10 @@ export function Testimonials() {
     <section className="mx-auto max-w-6xl px-6 py-24 sm:px-10 lg:px-16">
       <div className="grid gap-12 lg:grid-cols-3">
         <div className="lg:col-span-1">
-          <h2 className="text-3xl font-semibold sm:text-4xl">
+          <h2 className="text-3xl font-semibold sm:text-4xl text-foreground">
             Agencies and digital brands that trust us
           </h2>
-          <p className="mt-4 text-base text-slate-300 sm:text-lg">
+          <p className="mt-4 text-base text-[var(--foreground-muted)] sm:text-lg">
             Retail, subscription, and DTC teams rely on our agents to keep
             support running 24/7 and protect each brand voice.
           </p>
@@ -34,13 +34,13 @@ export function Testimonials() {
           ].map((testimonial) => (
             <figure
               key={testimonial.author}
-              className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 shadow-lg shadow-slate-900/40"
+              className="ui-card p-8"
             >
-              <blockquote className="text-lg text-slate-200">
+              <blockquote className="text-lg text-[var(--foreground-muted)]">
                 &ldquo;{testimonial.quote}&rdquo;
               </blockquote>
-              <figcaption className="mt-4 text-sm text-slate-400">
-                <span className="font-semibold text-white">
+              <figcaption className="mt-4 text-sm text-[var(--foreground-muted)]">
+                <span className="font-semibold text-foreground">
                   {testimonial.author}
                 </span>{" "}
                 &mdash; {testimonial.role}

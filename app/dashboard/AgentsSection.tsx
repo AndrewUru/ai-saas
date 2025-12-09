@@ -15,19 +15,19 @@ export default function AgentsSection({ planLimitLabel }: Props) {
   const activeAgents = agents.filter((agent) => agent.is_active).length;
 
   return (
-    <section className="space-y-6" data-oid="lu:-88d">
-      <div className="grid gap-4 sm:grid-cols-3" data-oid="ioh0f4a">
+    <section className="space-y-6">
+      {/* KPI Grid */}
+      <div className="grid gap-4 sm:grid-cols-3">
         <StatCard
           label="Agents created"
           value={isLoading ? "-" : totalAgents}
           helper={
             isLoading
-              ? "Loading your agents..."
+              ? "Loading..."
               : totalAgents === 0
-              ? "You haven't created any agents yet."
-              : "All your agents are ready in WooCommerce."
+              ? "No agents yet"
+              : "Ready in WooCommerce"
           }
-          data-oid="q-2n.nx"
         />
 
         <StatCard
@@ -35,71 +35,56 @@ export default function AgentsSection({ planLimitLabel }: Props) {
           value={isLoading ? "-" : activeAgents}
           helper={
             isLoading
-              ? "Checking status..."
+              ? "Checking..."
               : activeAgents === totalAgents
-              ? "All your agents are active."
-              : "Activate the agents you need from each agent page."
+              ? "All active"
+              : "Some are paused"
           }
-          data-oid="npzqtff"
         />
 
         <StatCard
           label="Message limit"
           value={planLimitLabel}
-          helper="Track your usage from the weekly reports."
-          data-oid="swq4kpj"
+          helper="Monthly capacity"
         />
       </div>
 
-      <Card className="p-7" strong data-oid="-0zf-8r">
-        <div
-          className="flex flex-wrap items-start justify-between gap-4"
-          data-oid="8f0zq3."
-        >
-          <div data-oid="imr64r5">
-            <h2 className="text-xl font-semibold text-white" data-oid="mz_h.db">
+      <div className="ui-card flex flex-col p-6 backdrop-blur-md bg-surface/40">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6 mb-6">
+          <div>
+            <h2 className="text-xl font-semibold text-foreground">
               Your agents
             </h2>
-            <p className="mt-1 text-sm text-slate-300" data-oid="oo3-ux-">
-              Manage integrations, copy API keys, and review the message limit
-              for each agent.
+            <p className="mt-1 text-sm text-[var(--foreground-muted)]">
+              Manage integrations and performance
             </p>
           </div>
           <Link
             href="/agents"
-            className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200 transition hover:bg-emerald-500/20"
-            data-oid="39yaa0d"
+            className="ui-button ui-button--ghost text-xs"
           >
-            View agents
+            View all agents
           </Link>
         </div>
 
         {isError && (
-          <div
-            className="mt-6 rounded-2xl border border-dashed border-red-500/60 bg-red-500/10 p-6 text-sm text-red-100"
-            data-oid="oj_6vi9"
-          >
-            We couldn&apos;t load your agents. Please try again in a few
-            seconds.
+          <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-sm text-red-200">
+            Failed to load agents. Please refresh.
           </div>
         )}
 
         {!isError && totalAgents === 0 && !isLoading && (
-          <div
-            className="mt-6 rounded-2xl border border-dashed border-slate-700 bg-slate-950/50 p-6 text-center text-sm text-slate-300"
-            data-oid="xm8pwt-"
-          >
-            <p className="font-medium text-white" data-oid="f3tz1mg">
-              You don&apos;t have any agents configured yet.
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-12 text-center">
+            <p className="font-medium text-foreground">
+              No agents configured
             </p>
-            <p className="mt-2" data-oid="tzq6n80">
+            <p className="mt-2 text-sm text-[var(--foreground-muted)] max-w-sm">
               Create your first agent to connect WooCommerce and start replying
               to chats automatically.
             </p>
             <Link
               href="/agents"
-              className="mt-4 inline-flex items-center justify-center rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
-              data-oid="wl9.y-8"
+              className="mt-6 ui-button ui-button--primary"
             >
               Create agent
             </Link>
@@ -107,68 +92,47 @@ export default function AgentsSection({ planLimitLabel }: Props) {
         )}
 
         {!isError && totalAgents > 0 && (
-          <ul className="mt-6 space-y-4" data-oid="b0u4dxy">
+          <ul className="space-y-3">
             {isLoading
               ? Array.from({ length: 3 }).map((_, index) => (
-                  <AgentSkeleton key={index} data-oid="tj3_ati" />
+                  <AgentSkeleton key={index} />
                 ))
               : agents.slice(0, 5).map((agent) => {
                   const statusColor = agent.is_active
-                    ? "bg-emerald-400"
-                    : "bg-slate-500";
+                    ? "bg-accent"
+                    : "bg-[var(--foreground-muted)]";
                   const statusText = agent.is_active ? "Active" : "Paused";
+                  
                   return (
                     <li
                       key={agent.id}
-                      className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-950/50 p-5 sm:flex-row sm:items-center sm:justify-between"
-                      data-oid="9d8q1ye"
+                      className="group flex flex-col gap-4 rounded-xl border border-border bg-surface/30 p-4 transition-all hover:bg-surface/50 hover:border-accent/20 sm:flex-row sm:items-center sm:justify-between"
                     >
-                      <div className="space-y-1" data-oid="g3wu9kx">
-                        <div
-                          className="flex items-center gap-2"
-                          data-oid="iiemg1s"
-                        >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-3">
                           <span
-                            className={`h-2.5 w-2.5 rounded-full ${statusColor}`}
-                            data-oid="p564ufu"
+                            className={`h-2 w-2 rounded-full shadow-[0_0_8px_currentColor] ${statusColor}`}
                           />
-
-                          <span
-                            className="text-base font-semibold text-white"
-                            data-oid="5_666:c"
-                          >
-                            {agent.name || "Unnamed"}
+                          <span className="text-sm font-semibold text-foreground">
+                            {agent.name || "Unnamed Agent"}
                           </span>
-                          <span
-                            className="rounded-full border border-slate-700 px-2 py-0.5 text-[11px] uppercase tracking-[0.2em] text-slate-400"
-                            data-oid="7rmyv1-"
-                          >
+                          <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">
                             {statusText}
                           </span>
                         </div>
-                        <p
-                          className="text-xs text-slate-400"
-                          data-oid="h0bk39o"
-                        >
-                          API Key:{" "}
-                          <span
-                            className="font-mono text-slate-200"
-                            data-oid="d_:cjo8"
-                          >
-                            {(agent.api_key ?? "N/A").slice(0, 6)}...
+                        <div className="flex items-center gap-4 text-xs text-[var(--foreground-muted)]">
+                          <span>
+                            Key: <span className="font-mono text-foreground/70">{(agent.api_key ?? "N/A").slice(0, 6)}...</span>
                           </span>
-                        </p>
-                        <p
-                          className="text-xs text-slate-400"
-                          data-oid="u3iu--n"
-                        >
-                          Message limit: {agent.messages_limit ?? "No limit"}
-                        </p>
+                          <span className="hidden sm:inline">•</span>
+                          <span>
+                             Limit: {agent.messages_limit ?? "∞"}
+                          </span>
+                        </div>
                       </div>
                       <Link
                         href={`/agents/${agent.id}`}
-                        className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
-                        data-oid="w_cw22u"
+                        className="ui-button ui-button--subtle py-1.5 px-3 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         Configure
                       </Link>
@@ -176,17 +140,13 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                   );
                 })}
             {totalAgents > 5 && !isLoading && (
-              <li
-                className="text-center text-xs text-slate-400"
-                data-oid="vc6k3aq"
-              >
-                Showing your 5 most recent agents. See the full list in the
-                agents section.
+              <li className="pt-2 text-center text-xs text-[var(--foreground-muted)]">
+                Showing recent 5 agents
               </li>
             )}
           </ul>
         )}
-      </Card>
+      </div>
     </section>
   );
 }
@@ -201,46 +161,30 @@ function StatCard({
   helper: string;
 }) {
   return (
-    <Card padded data-oid="vunbzju">
-      <p
-        className="text-xs uppercase tracking-[0.24em] text-slate-400"
-        data-oid="80d8vu-"
-      >
+    <div className="ui-card p-5 group hover:border-accent/20 transition-colors">
+      <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--foreground-muted)] font-semibold">
         {label}
       </p>
-      <p className="mt-2 text-3xl font-semibold text-white" data-oid="n22u9tq">
+      <p className="mt-2 text-2xl font-bold text-foreground tracking-tight group-hover:text-accent transition-colors">
         {value}
       </p>
-      <p className="text-xs text-slate-400" data-oid="6yjapt_">
+      <p className="text-xs text-[var(--foreground-muted)] mt-1 opacity-70">
         {helper}
       </p>
-    </Card>
+    </div>
   );
 }
 
 function AgentSkeleton() {
   return (
-    <li
-      className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-950/50 p-5 sm:flex-row sm:items-center sm:justify-between"
-      data-oid="ylh.-4i"
-    >
-      <div className="space-y-2" data-oid="aa56kkq">
-        <div className="flex items-center gap-3" data-oid="meaju8s">
-          <span
-            className="h-2.5 w-2.5 rounded-full bg-slate-700"
-            data-oid=".sxikcb"
-          />
-
-          <span className="h-4 w-32 rounded bg-slate-800" data-oid="kz6q774" />
-          <span
-            className="h-5 w-16 rounded-full bg-slate-800"
-            data-oid="x0dj1lu"
-          />
+    <li className="flex flex-col gap-3 rounded-xl border border-border bg-surface/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="space-y-2 w-full">
+        <div className="flex items-center gap-3">
+          <span className="h-2 w-2 rounded-full bg-border" />
+          <span className="h-4 w-32 rounded bg-border/50 animate-pulse" />
         </div>
-        <div className="h-3 w-44 rounded bg-slate-800" data-oid="d-h0rh9" />
-        <div className="h-3 w-36 rounded bg-slate-800" data-oid="w2.ywl:" />
+        <div className="h-3 w-48 rounded bg-border/30 animate-pulse" />
       </div>
-      <span className="h-8 w-28 rounded-full bg-slate-800" data-oid="3_ucf4f" />
     </li>
   );
 }

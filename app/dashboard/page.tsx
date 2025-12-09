@@ -18,7 +18,6 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
-  // 👉 sacar nombre a partir del email
   const email = user.email ?? "";
   const username = email.split("@")[0];
 
@@ -33,130 +32,110 @@ export default async function DashboardPage() {
   const planLimitLabel = PLAN_LIMITS[plan] ?? PLAN_LIMITS.free;
 
   const activeUntil = profile?.active_until
-    ? new Intl.DateTimeFormat("es-ES", {
-        day: "2-digit",
-        month: "long",
+    ? new Intl.DateTimeFormat("en-US", {
+        day: "numeric",
+        month: "short",
         year: "numeric",
       }).format(new Date(profile.active_until))
-    : "No date";
+    : "No expiry";
 
   return (
-    <main
-      className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100"
-      data-oid="wxnl533"
-    >
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_55%)]"
-        data-oid="t21uf9s"
-      />
-
-      <section
-        className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col gap-10 px-6 py-16 md:px-10 lg:px-16"
-        data-oid="27-sl1_"
-      >
-        <header
-          className="space-y-4 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur md:flex md:items-center md:justify-between md:space-y-0"
-          data-oid="2x:zbka"
-        >
-          <div data-oid="c01_ntz">
-            <p
-              className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200"
-              data-oid="ubqklc1"
-            >
-              Main dashboard
-            </p>
-            <h1 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">
-              Hello, {username}
-            </h1>
-            <p
-              className="mt-2 max-w-2xl text-sm text-slate-300 sm:text-base"
-              data-oid="eb7_3y2"
-            >
-              Manage your agents, check your plan status, and share the widget
-              with your stores from a single place.
-            </p>
+    <main className="min-h-screen bg-background text-foreground">
+      {/* Top Navigation / Branding */}
+      <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded-md bg-accent" />
+            <span className="font-bold tracking-tight">AI SAAS</span>
+            <span className="ml-2 rounded-full border border-border bg-surface px-2 py-0.5 text-[10px] uppercase font-semibold text-[var(--foreground-muted)]">
+              Board
+            </span>
           </div>
-          <div
-            className="flex flex-col gap-3 text-sm text-slate-300 md:text-right"
-            data-oid="y.13oo3"
-          >
-            <div data-oid="ytx_i6c">
-              <span
-                className="text-xs uppercase tracking-[0.28em] text-emerald-300"
-                data-oid="880u9zy"
-              >
-                Active plan
-              </span>
-              <div
-                className="text-lg font-semibold text-white"
-                data-oid="bwi0sb7"
-              >
-                {planLabel}
-              </div>
-            </div>
-            <div data-oid="u1i-_uf">
-              <span
-                className="text-xs uppercase tracking-[0.28em] text-emerald-300"
-                data-oid="0y88hol"
-              >
-                Active until
-              </span>
-              <div
-                className="text-lg font-semibold text-white"
-                data-oid="yv.lxc5"
-              >
-                {activeUntil}
-              </div>
+          <div className="flex items-center gap-4">
+            <Link 
+              href="/docs" 
+              className="text-sm font-medium text-[var(--foreground-muted)] hover:text-foreground transition-colors"
+            >
+               Documentation
+            </Link>
+            <div className="h-8 w-8 rounded-full bg-surface-strong border border-border flex items-center justify-center text-xs font-bold">
+              {username[0].toUpperCase()}
             </div>
           </div>
-        </header>
-
-        <div
-          className="
-    grid gap-10
-    lg:grid-cols-[minmax(0,1.4fr)_320px]
-    xl:grid-cols-[minmax(0,1.7fr)_360px]
-    2xl:grid-cols-[minmax(0,2fr)_420px]
-    w-full
-  "
-          data-oid=":d3cz7i"
-        >
-          {/* MAIN COLUMN */}
-          <div className="w-full min-w-0" data-oid="5vsj:9n">
-            <AgentsSection planLimitLabel={planLimitLabel} data-oid="nyina8d" />
-          </div>
-
-          {/* ASIDE */}
-          <aside className="w-full space-y-6 min-w-0" data-oid="58_r2lk">
-            <article
-              className="ui-card ui-card--padded ui-card--strong text-emerald-100"
-              data-oid="ooy9qqu"
-            >
-              <h3 className="text-lg font-semibold" data-oid=":1.fum_">
-                Plan & billing
-              </h3>
-
-              <p className="mt-2 text-sm" data-oid="b:ndu2s">
-                Keep your plan up to date to continue sending messages without
-                interruptions. Update your subscription whenever you need.
-              </p>
-
-              <Link
-                href="/billing"
-                className="
-          mt-4 inline-flex items-center justify-center
-          rounded-full bg-white px-4 py-2
-          text-sm font-semibold text-slate-950
-          transition hover:bg-slate-100
-        "
-                data-oid="ncd1973"
-              >
-                Manage subscription
-              </Link>
-            </article>
-          </aside>
         </div>
-      </section>
+      </header>
+
+      <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+        
+        {/* Stats Rack / HUD */}
+        <div className="mb-8 grid gap-4 sm:grid-cols-4">
+          <div className="ui-card p-4 flex flex-col justify-between">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">Current Plan</span>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_#34d399]" />
+              <span className="text-lg font-bold">{planLabel}</span>
+            </div>
+          </div>
+          
+          <div className="ui-card p-4 flex flex-col justify-between">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">Status</span>
+            <span className="text-lg font-bold mt-1">Active</span>
+          </div>
+          
+           <div className="ui-card p-4 flex flex-col justify-between">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">Renewal</span>
+            <span className="text-lg font-bold mt-1 text-[var(--foreground-muted)]">{activeUntil}</span>
+          </div>
+
+          <div className="ui-card p-4 flex flex-col justify-between bg-accent/10 border-accent/20">
+            <span className="text-[10px] uppercase tracking-wider text-accent">Quick action</span>
+            <Link href="/agents/new" className="text-sm font-semibold text-accent hover:underline decoration-accent/50 underline-offset-4 mt-1">
+              + Deploy new agent
+            </Link>
+          </div>
+        </div>
+
+        {/* Main Board Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Canvas - Main Content */}
+          <div className="lg:col-span-8 xl:col-span-9 space-y-6">
+             <AgentsSection planLimitLabel={planLimitLabel} />
+          </div>
+
+          {/* Sidebar - Quick Actions & Info */}
+          <aside className="lg:col-span-4 xl:col-span-3 space-y-6">
+            <div className="ui-card p-6 space-y-4 sticky top-24">
+              <h3 className="font-semibold text-foreground">Platform Status</h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-[var(--foreground-muted)]">API Uptime</span>
+                  <span className="text-accent">99.9%</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-[var(--foreground-muted)]">Engine</span>
+                  <span className="text-accent">v2.4.0</span>
+                </div>
+                <div className="h-px bg-border my-2" />
+                <div className="flex items-center justify-between text-sm">
+                   <span className="text-[var(--foreground-muted)]">Response Time</span>
+                   <span className="text-foreground">120ms</span>
+                </div>
+              </div>
+
+              <div className="pt-4">
+                 <Link
+                  href="/billing"
+                  className="ui-button ui-button--secondary w-full justify-center"
+                >
+                  Manage Subscription
+                </Link>
+              </div>
+            </div>
+          </aside>
+
+        </div>
+      </div>
     </main>
   );
 }

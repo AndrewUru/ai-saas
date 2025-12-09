@@ -5,28 +5,49 @@
 @import "tailwindcss/theme";
 @import "tailwindcss/utilities";
 
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ring: var(--ring);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+}
+
 :root {
   color-scheme: dark;
-  --background: #020617;
-  --foreground: #e2e8f0;
-  --muted: #94a3b8;
-  --muted-strong: #cbd5e1;
-  --border: rgba(148, 163, 184, 0.2);
-  --border-strong: rgba(148, 163, 184, 0.35);
-  --ring: rgba(45, 212, 191, 0.35);
-  --accent: #22d3ee;
-  --accent-strong: #14b8a6;
-  --surface: rgba(15, 23, 42, 0.8);
-  --surface-strong: rgba(15, 23, 42, 0.95);
-  --card-radius: 24px;
-  --pill-radius: 999px;
-  --shadow-soft: 0 18px 40px rgba(2, 6, 23, 0.55);
-  --shadow-strong: 0 26px 72px rgba(2, 6, 23, 0.65);
-  --spacing-2: 8px;
-  --spacing-3: 12px;
-  --spacing-4: 16px;
-  --spacing-5: 20px;
-  --spacing-6: 24px;
+  
+  /* Modern Black Palette */
+  --background: #050505;       /* Deepest Black */
+  --foreground: #fafafa;       /* Zinc 50 */
+  --foreground-muted: #a1a1aa; /* Zinc 400 */
+  
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  
+  /* Rings & Focus */
+  --ring: rgba(52, 211, 153, 0.5); /* Emerald 400 with opacity */
+  
+  /* Accents */
+  --accent: #34d399;           /* Emerald 400 - Electric Green */
+  --accent-strong: #10b981;    /* Emerald 500 */
+  --accent-secondary: #8b5cf6; /* Violet 500 - Cyber styling */
+  
+  /* Surfaces */
+  --surface: rgba(10, 10, 10, 0.6);
+  --surface-strong: rgba(20, 20, 20, 0.85);
+  
+  /* Design Tokens */
+  --card-radius: 20px;
+  --pill-radius: 9999px;
+  
+  /* Shadows */
+  --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(52, 211, 153, 0.15);
 }
 
 html {
@@ -34,8 +55,7 @@ html {
   scroll-behavior: smooth;
   background-color: var(--background);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -45,12 +65,10 @@ body {
   min-height: 100dvh;
   margin: 0;
   padding: 0;
-  background: radial-gradient(
-      circle at top,
-      rgba(45, 212, 191, 0.15),
-      transparent 55%
-    ),
-    radial-gradient(circle at bottom, rgba(14, 165, 233, 0.12), transparent 60%),
+  /* Complex modern background with dual glow points */
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(52, 211, 153, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 10%, rgba(139, 92, 246, 0.08), transparent 30%),
     var(--background);
   color: var(--foreground);
   display: flex;
@@ -67,16 +85,18 @@ section {
   overscroll-behavior-y: none;
 }
 
+/* Links */
 a {
   color: inherit;
   text-decoration: none;
-  transition: color 150ms ease, opacity 150ms ease;
+  transition: color 200ms ease, opacity 200ms ease;
 }
 
 a:hover {
-  color: #5eead4;
+  color: var(--accent);
 }
 
+/* Reset buttons/inputs */
 button,
 input,
 select,
@@ -97,39 +117,41 @@ a:focus-visible {
 }
 
 ::selection {
-  background: rgba(45, 212, 191, 0.24);
-  color: #0f172a;
+  background: rgba(52, 211, 153, 0.2);
+  color: #fff;
 }
 
-/* Utility helpers */
+/* Utility Helpers & Glassmorphism */
+
 .glass-pane {
   background: linear-gradient(
-    120deg,
-    rgba(15, 23, 42, 0.85),
-    rgba(15, 23, 42, 0.65)
+    145deg,
+    rgba(20, 20, 20, 0.7),
+    rgba(10, 10, 10, 0.4)
   );
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  box-shadow: 0 24px 60px rgba(2, 6, 23, 0.6);
-  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-/* Design system primitives */
 .ui-card {
   border: 1px solid var(--border);
   background: var(--surface);
   border-radius: var(--card-radius);
   box-shadow: var(--shadow-soft);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(12px);
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+
+.ui-card:hover {
+  border-color: var(--border-strong);
 }
 
 .ui-card--strong {
   border-color: var(--border-strong);
   background: var(--surface-strong);
-  box-shadow: var(--shadow-strong);
-}
-
-.ui-card--padded {
-  padding: var(--spacing-5);
+  box-shadow: var(--shadow-soft), var(--shadow-glow);
 }
 
 .ui-button {
@@ -138,38 +160,36 @@ a:focus-visible {
   justify-content: center;
   gap: 8px;
   border-radius: var(--pill-radius);
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: 10px 16px;
+  font-weight: 500;
+  font-size: 0.925rem;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+  transition: all 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
   border: 1px solid transparent;
 }
 
 .ui-button--primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  color: #0b1224;
-  box-shadow: 0 18px 35px rgba(20, 184, 166, 0.35);
+  background: var(--accent);
+  color: #000;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);
 }
 
-.ui-button--ghost {
-  background: rgba(226, 232, 240, 0.06);
-  border-color: var(--border);
-  color: var(--foreground);
-}
-
-.ui-button--subtle {
-  background: rgba(15, 23, 42, 0.6);
-  border-color: var(--border);
-  color: var(--foreground);
-}
-
-.ui-button:hover {
+.ui-button--primary:hover {
+  background: var(--accent-strong);
+  box-shadow: 0 6px 16px rgba(52, 211, 153, 0.4);
   transform: translateY(-1px);
 }
 
-.ui-button:active {
-  transform: translateY(0);
+.ui-button--ghost {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.ui-button--ghost:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .ui-badge {
@@ -177,20 +197,46 @@ a:focus-visible {
   align-items: center;
   gap: 6px;
   border-radius: var(--pill-radius);
-  padding: 6px 10px;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  background: rgba(148, 163, 184, 0.1);
-  color: var(--foreground);
+  padding: 4px 12px;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  background: rgba(52, 211, 153, 0.08);
+  color: var(--accent);
   font-size: 0.75rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.05em;
+  font-weight: 600;
   text-transform: uppercase;
 }
 
 .ui-input {
   width: 100%;
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid var(--border);
-  background: rgba(15, 23, 42, 0.7);
-  padding: 12px;
+  background: rgba(20, 20, 20, 0.6);
+  padding: 12px 16px;
   color: var(--foreground);
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.ui-input:focus {
+  border-color: var(--accent);
+  background: rgba(20, 20, 20, 0.9);
+  outline: none;
+}
+
+/* Animations */
+@keyframes gradient-x {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 4s ease infinite;
 }
