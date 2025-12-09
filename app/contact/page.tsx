@@ -32,11 +32,11 @@ export default function ContactPage() {
             <p className="text-sm text-slate-300" data-oid="_1e2a9p">
               Envía tus consultas a{" "}
               <a
-                href="mailto:hola@ai-saas.agency"
+                href="mailto:atobio459@gmail.com"
                 className="text-emerald-300 hover:text-emerald-200"
                 data-oid="0a_f2jq"
               >
-                hola@ai-saas.agency
+                atobio459@gmail.com
               </a>{" "}
               indicando la tienda y el número de agentes que necesitas.
             </p>
