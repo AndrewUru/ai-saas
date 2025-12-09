@@ -89,7 +89,7 @@ export default async function DashboardPage() {
 
           <div className="ui-card p-4 flex flex-col justify-between bg-accent/10 border-accent/20">
             <span className="text-[10px] uppercase tracking-wider text-accent">Quick action</span>
-            <Link href="/agents/new" className="text-sm font-semibold text-accent hover:underline decoration-accent/50 underline-offset-4 mt-1">
+            <Link href="/agents" className="text-sm font-semibold text-accent hover:underline decoration-accent/50 underline-offset-4 mt-1">
               + Deploy new agent
             </Link>
           </div>

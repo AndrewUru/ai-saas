@@ -47,7 +47,6 @@ type NavLink = {
 };
 
 const NAV_LINKS: NavLink[] = [
-  { href: "/#features", label: "Features" },
   { href: "/about", label: "About" },
   { href: "/academy", label: "Academy" },
   { href: "/pricing", label: "Pricing" },

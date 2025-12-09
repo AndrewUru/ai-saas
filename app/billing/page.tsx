@@ -196,7 +196,7 @@ export default async function BillingPage() {
                     </button>
                   ) : (
                     <Link
-                      href="/contact"
+                      href="/pricing"
                       className="ui-button ui-button--primary w-full justify-center py-3"
                     >
                       Upgrade Plan
@@ -219,7 +219,7 @@ export default async function BillingPage() {
           </div>
           <div className="flex flex-wrap gap-4">
             <a
-              href="mailto:billing@ai-saas.test"
+              href="mailto:atobio459@gmail.com"
               className="ui-button ui-button--ghost"
             >
               Contact Support
