@@ -44,8 +44,8 @@ ready(() => {
     '<div id="ai-saas-chat-box" aria-live="polite"></div>' +
     '<form id="ai-saas-form">' +
       '<div class="ai-saas-input-wrapper">' +
-        '<input id="ai-saas-input" type="text" placeholder="Type your message..." autocomplete="off" />' +
-        '<button type="submit">Send</button>' +
+        '<input id="ai-saas-input" type="text" placeholder="Tu mensaje..." autocomplete="off" />' +
+        '<button type="submit">Enviar</button>' +
       '</div>' +
     '</form>';
   anchor.appendChild(widget);
@@ -60,14 +60,14 @@ ready(() => {
   if (!chatBox || !form || !input || !closeBtn || !submitBtn) return;
 
   let isSending = false;
-  const defaultButtonLabel = submitBtn.textContent || "Send";
+  const defaultButtonLabel = submitBtn.textContent || "Enviar";
 
   let hideTimeout;
 
   function setSending(state){
     isSending = state;
     submitBtn.disabled = state;
-    submitBtn.textContent = state ? "Sending..." : defaultButtonLabel;
+    submitBtn.textContent = state ? "Enviando..." : defaultButtonLabel;
     input.disabled = state;
   }
 
