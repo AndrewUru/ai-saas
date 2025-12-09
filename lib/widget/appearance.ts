@@ -115,6 +115,42 @@ export function buildAppearance(
     (brandName.charAt(0).toUpperCase() || "A").slice(0, 1)
   );
 
+  // Custom Colors with Fallbacks
+  // Default Header: WhatsApp Teal (#008069)
+  const colorHeaderBg = sanitizeHex(
+    params.get("colorHeaderBg") ?? agent.widget_color_header_bg ?? "#008069"
+  );
+  // Default Header Text: White
+  const colorHeaderText = sanitizeHex(
+    params.get("colorHeaderText") ?? agent.widget_color_header_text ?? "#ffffff"
+  );
+  // Default Chat Bg: WhatsApp Beige (#efe7dd)
+  const colorChatBg = sanitizeHex(
+    params.get("colorChatBg") ?? agent.widget_color_chat_bg ?? "#efe7dd"
+  );
+  // Default User Bubble: WhatsApp Light Green (#d9fdd3)
+  const colorUserBubbleBg = sanitizeHex(
+    params.get("colorUserBubbleBg") ??
+      agent.widget_color_user_bubble_bg ??
+      "#d9fdd3"
+  );
+  // Default User Text: Black
+  const colorUserBubbleText = sanitizeHex(
+    params.get("colorUserBubbleText") ??
+      agent.widget_color_user_bubble_text ??
+      "#111b21"
+  );
+  // Default Bot Bubble: White
+  const colorBotBubbleBg = sanitizeHex(
+    params.get("colorBotBubbleBg") ?? agent.widget_color_bot_bubble_bg ?? "#ffffff"
+  );
+  // Default Bot Text: Black
+  const colorBotBubbleText = sanitizeHex(
+    params.get("colorBotBubbleText") ??
+      agent.widget_color_bot_bubble_text ??
+      "#111b21"
+  );
+
   return {
     accent,
     accentContrast,
@@ -128,6 +164,13 @@ export function buildAppearance(
     collapsedLabel,
     greeting,
     position,
+    colorHeaderBg,
+    colorHeaderText,
+    colorChatBg,
+    colorUserBubbleBg,
+    colorUserBubbleText,
+    colorBotBubbleBg,
+    colorBotBubbleText,
   };
 }
 
@@ -145,5 +188,14 @@ export function buildConfig(
     collapsedLabel: appearance.collapsedLabel,
     greeting: appearance.greeting,
     position: appearance.position,
+    appearance: {
+      colorHeaderBg: appearance.colorHeaderBg,
+      colorHeaderText: appearance.colorHeaderText,
+      colorChatBg: appearance.colorChatBg,
+      colorUserBubbleBg: appearance.colorUserBubbleBg,
+      colorUserBubbleText: appearance.colorUserBubbleText,
+      colorBotBubbleBg: appearance.colorBotBubbleBg,
+      colorBotBubbleText: appearance.colorBotBubbleText,
+    },
   };
 }

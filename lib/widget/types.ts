@@ -13,6 +13,14 @@ export interface WidgetAppearance {
   collapsedLabel: string;
   greeting: string;
   position: WidgetPosition;
+  // New customization fields
+  colorHeaderBg: string;
+  colorHeaderText: string;
+  colorChatBg: string;
+  colorUserBubbleBg: string;
+  colorUserBubbleText: string;
+  colorBotBubbleBg: string;
+  colorBotBubbleText: string;
 }
 
 export interface WidgetConfig {
@@ -24,6 +32,15 @@ export interface WidgetConfig {
   collapsedLabel: string;
   greeting: string;
   position: WidgetPosition;
+  appearance: {
+    colorHeaderBg: string;
+    colorHeaderText: string;
+    colorChatBg: string;
+    colorUserBubbleBg: string;
+    colorUserBubbleText: string;
+    colorBotBubbleBg: string;
+    colorBotBubbleText: string;
+  };
 }
 
 export interface AgentRecord {
@@ -35,4 +52,11 @@ export interface AgentRecord {
   widget_label: string | null;
   widget_greeting: string | null;
   widget_position: WidgetPosition | null;
+  widget_color_header_bg: string | null;
+  widget_color_header_text: string | null;
+  widget_color_chat_bg: string | null;
+  widget_color_user_bubble_bg: string | null;
+  widget_color_user_bubble_text: string | null;
+  widget_color_bot_bubble_bg: string | null;
+  widget_color_bot_bubble_text: string | null;
 }

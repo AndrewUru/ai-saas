@@ -84,8 +84,8 @@ export function renderStyles(a: WidgetAppearance) {
   align-items: center;
   gap: 12px;
   padding: 10px 16px;
-  background: #008069; /* WhatsApp Teal */
-  color: #fff;
+  background: ${a.colorHeaderBg};
+  color: ${a.colorHeaderText};
   height: 60px;
 }
 
@@ -101,7 +101,7 @@ export function renderStyles(a: WidgetAppearance) {
   height: 40px;
   border-radius: 50%;
   background: #fff;
-  color: #008069;
+  color: ${a.colorHeaderBg};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -127,7 +127,7 @@ export function renderStyles(a: WidgetAppearance) {
 
 #ai-saas-close {
   background: transparent;
-  color: #fff;
+  color: ${a.colorHeaderText};
   border: none;
   width: 36px;
   height: 36px;
@@ -144,11 +144,11 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 #ai-saas-chat-box {
-  padding: 20px 8%; /* Adjust side padding */
+  padding: 20px 8%;
   flex: 1;
   overflow-y: auto;
-  background-color: #efe7dd;
-  background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png"); /* Subtle pattern optional, effectively beige solid if fails */
+  background-color: ${a.colorChatBg};
+  background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
   background-repeat: repeat;
   background-size: 400px;
 }
@@ -166,7 +166,7 @@ export function renderStyles(a: WidgetAppearance) {
   position: relative;
   max-width: 80%;
   padding: 8px 12px;
-  margin-bottom: 8px; /* Tighter spacing */
+  margin-bottom: 8px;
   border-radius: 7.5px;
   font-size: 14.2px;
   line-height: 19px;
@@ -177,7 +177,8 @@ export function renderStyles(a: WidgetAppearance) {
 
 .ai-saas-bubble.user {
   margin-left: auto;
-  background: #d9fdd3;
+  background: ${a.colorUserBubbleBg};
+  color: ${a.colorUserBubbleText};
   border-top-right-radius: 0;
 }
 
@@ -189,7 +190,7 @@ export function renderStyles(a: WidgetAppearance) {
   width: 0;
   height: 0;
   border: 8px solid transparent;
-  border-top-color: #d9fdd3;
+  border-top-color: ${a.colorUserBubbleBg};
   border-left: 0;
   border-bottom: 0;
   margin-top: 0;
@@ -198,7 +199,8 @@ export function renderStyles(a: WidgetAppearance) {
 
 .ai-saas-bubble.bot {
   margin-right: auto;
-  background: #ffffff;
+  background: ${a.colorBotBubbleBg};
+  color: ${a.colorBotBubbleText};
   border-top-left-radius: 0;
 }
 
@@ -210,7 +212,7 @@ export function renderStyles(a: WidgetAppearance) {
   width: 0;
   height: 0;
   border: 8px solid transparent;
-  border-top-color: #ffffff;
+  border-top-color: ${a.colorBotBubbleBg};
   border-right: 0;
   border-bottom: 0;
 }
@@ -319,10 +321,8 @@ export function renderStyles(a: WidgetAppearance) {
 @media (max-width: 480px) {
   #ai-saas-widget {
     position: fixed;
-    top: 0;
     bottom: 0;
     right: 0 !important;
-    left: 0 !important;
     width: 90%;
     height: 90%;
     max-width: none;

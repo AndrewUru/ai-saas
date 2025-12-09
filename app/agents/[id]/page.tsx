@@ -147,6 +147,24 @@ async function updateWidgetBranding(formData: FormData) {
   const greetingRaw = String(formData.get("widget_greeting") ?? "");
   const positionRaw = String(formData.get("widget_position") ?? "");
 
+  const colorHeaderBgRaw = String(formData.get("widget_color_header_bg") ?? "");
+  const colorHeaderTextRaw = String(
+    formData.get("widget_color_header_text") ?? ""
+  );
+  const colorChatBgRaw = String(formData.get("widget_color_chat_bg") ?? "");
+  const colorUserBubbleBgRaw = String(
+    formData.get("widget_color_user_bubble_bg") ?? ""
+  );
+  const colorUserBubbleTextRaw = String(
+    formData.get("widget_color_user_bubble_text") ?? ""
+  );
+  const colorBotBubbleBgRaw = String(
+    formData.get("widget_color_bot_bubble_bg") ?? ""
+  );
+  const colorBotBubbleTextRaw = String(
+    formData.get("widget_color_bot_bubble_text") ?? ""
+  );
+
   const { error: updateError } = await supabase
     .from("agents")
     .update({
@@ -156,6 +174,27 @@ async function updateWidgetBranding(formData: FormData) {
       widget_greeting: normalizeWidgetText(greetingRaw, widgetLimits.greeting),
       widget_position: positionRaw.trim()
         ? sanitizePosition(positionRaw)
+        : null,
+      widget_color_header_bg: colorHeaderBgRaw.trim()
+        ? sanitizeHex(colorHeaderBgRaw)
+        : null,
+      widget_color_header_text: colorHeaderTextRaw.trim()
+        ? sanitizeHex(colorHeaderTextRaw)
+        : null,
+      widget_color_chat_bg: colorChatBgRaw.trim()
+        ? sanitizeHex(colorChatBgRaw)
+        : null,
+      widget_color_user_bubble_bg: colorUserBubbleBgRaw.trim()
+        ? sanitizeHex(colorUserBubbleBgRaw)
+        : null,
+      widget_color_user_bubble_text: colorUserBubbleTextRaw.trim()
+        ? sanitizeHex(colorUserBubbleTextRaw)
+        : null,
+      widget_color_bot_bubble_bg: colorBotBubbleBgRaw.trim()
+        ? sanitizeHex(colorBotBubbleBgRaw)
+        : null,
+      widget_color_bot_bubble_text: colorBotBubbleTextRaw.trim()
+        ? sanitizeHex(colorBotBubbleTextRaw)
         : null,
       updated_at: new Date().toISOString(),
     })
@@ -190,7 +229,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position"
+      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -717,6 +756,13 @@ export default async function AgentDetailPage({
               initialLabel={agent.widget_label}
               initialGreeting={agent.widget_greeting}
               initialPosition={widgetPositionValue}
+              initialColorHeaderBg={agent.widget_color_header_bg}
+              initialColorHeaderText={agent.widget_color_header_text}
+              initialColorChatBg={agent.widget_color_chat_bg}
+              initialColorUserBubbleBg={agent.widget_color_user_bubble_bg}
+              initialColorUserBubbleText={agent.widget_color_user_bubble_text}
+              initialColorBotBubbleBg={agent.widget_color_bot_bubble_bg}
+              initialColorBotBubbleText={agent.widget_color_bot_bubble_text}
               data-oid="qs3rk03"
             />
           </article>
