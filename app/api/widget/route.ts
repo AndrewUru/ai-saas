@@ -24,8 +24,8 @@ export async function GET(req: Request) {
   try {
     const agent = await loadAgentByKey(key);
     const isPreview = url.searchParams.get("preview") === "1";
-    const { host, isSameSite } = resolveHost(req, isPreview);
-    ensureDomainAllowed(agent, host, isPreview, isSameSite);
+    const { host, isSameSite, siteHost } = resolveHost(req, isPreview);
+    ensureDomainAllowed(agent, host, isPreview, isSameSite, siteHost);
 
     const appearance = buildAppearance(agent, url.searchParams);
     const config = buildConfig(key, `${url.origin}/api/agent/chat`, appearance);

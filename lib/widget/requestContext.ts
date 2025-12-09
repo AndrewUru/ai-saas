@@ -3,9 +3,6 @@ import type { AgentRecord } from "./types";
 
 type StatusError = Error & { status: number };
 
-const SITE_URL = getSiteUrl();
-const SITE_HOST = getSiteHost(SITE_URL);
-
 function hostFrom(h: string | null) {
   if (!h) return null;
   try {
@@ -21,10 +18,16 @@ function makeStatusError(message: string, status: number): StatusError {
   return err;
 }
 
+function resolveSiteHost(): string | null {
+  const host = getSiteHost(getSiteUrl());
+  return host || null;
+}
+
 export function resolveHost(req: Request, isPreview: boolean) {
   const origin = req.headers.get("origin");
   const referer = req.headers.get("referer");
   const fetchSite = req.headers.get("sec-fetch-site");
+  const siteHost = resolveSiteHost();
 
   const isSameSite =
     fetchSite === null ||
@@ -34,16 +37,17 @@ export function resolveHost(req: Request, isPreview: boolean) {
   const host =
     hostFrom(origin) ||
     hostFrom(referer) ||
-    (isPreview && isSameSite ? SITE_HOST : null);
+    (isPreview && isSameSite ? siteHost : null);
 
-  return { host, isSameSite };
+  return { host, isSameSite, siteHost };
 }
 
 export function ensureDomainAllowed(
   agent: AgentRecord,
   host: string | null,
   isPreview: boolean,
-  isSameSite: boolean
+  isSameSite: boolean,
+  siteHost: string | null
 ) {
   const allowed =
     Array.isArray(agent.allowed_domains) && agent.allowed_domains.length > 0
@@ -56,7 +60,7 @@ export function ensureDomainAllowed(
     typeof host === "string" &&
     (host.includes("localhost") ||
       host.includes("dashboard") ||
-      (SITE_HOST && host === SITE_HOST));
+      (siteHost && host === siteHost));
 
   const isDashboardPreview = isPreview && isDashboardHost && isSameSite;
 
