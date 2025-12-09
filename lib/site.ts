@@ -11,6 +11,10 @@ export function getSiteUrl() {
     return normalized.replace(/\/$/, "");
   }
 
+  if (process.env.NODE_ENV === "development") {
+    return LOCAL_FALLBACK;
+  }
+
   return (VERCEL_DEPLOY_URL || LOCAL_FALLBACK).replace(/\/$/, "");
 }
 
