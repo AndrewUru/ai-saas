@@ -4,7 +4,11 @@ import { createServer } from "@/lib/supabase/server";
 
 const defaultMessagesLimit = 1000;
 
-export default async function AgentsPage() {
+export default async function AgentsPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const supabase = await createServer();
   const {
     data: { user },
@@ -29,6 +33,42 @@ export default async function AgentsPage() {
     } = await supabase.auth.getUser();
 
     if (!user) return;
+
+    // 1. Get user plan
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan")
+      .eq("id", user.id)
+      .single();
+
+    const currentPlan = (profile?.plan ?? "free").toLowerCase();
+
+    // 2. Define limits
+    const PLAN_LIMITS_AGENTS: Record<string, number> = {
+      free: 1,
+      basic: 5,
+      pro: Infinity,
+    };
+
+    const maxAgents = PLAN_LIMITS_AGENTS[currentPlan] ?? 1;
+
+    // 3. Count existing agents
+    const { count: currentCount } = await supabase
+      .from("agents")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+
+    // 4. Validate
+    if (currentCount !== null && currentCount >= maxAgents) {
+      const errorMsg =
+        currentPlan === "free" || currentPlan === "basic"
+          ? `Plan ${currentPlan} limit reached (${maxAgents} agent${
+              maxAgents === 1 ? "" : "s"
+            }). Upgrade to create more.`
+          : `Limit reached (${maxAgents} agents).`;
+
+      redirect(`/agents?error=${encodeURIComponent(errorMsg)}`);
+    }
 
     const apiKey =
       "agt_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -75,6 +115,13 @@ export default async function AgentsPage() {
         className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col gap-12 px-6 py-16 md:px-10 lg:px-16"
         data-oid="v_71yzg"
       >
+        {searchParams.error && typeof searchParams.error === "string" && (
+          <div className="rounded-2xl border border-red-500/50 bg-red-500/10 px-6 py-4 text-red-200">
+            <p className="font-semibold">Unable to create agent</p>
+            <p className="text-sm">{searchParams.error}</p>
+          </div>
+        )}
+
         <header
           className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur md:grid md:grid-cols-[minmax(0,1.6fr)_minmax(280px,1fr)] md:items-center md:gap-8"
           data-oid="30m1z5p"
