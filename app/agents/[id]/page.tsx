@@ -762,7 +762,6 @@ export default async function AgentDetailPage({
               initialColorUserBubbleBg={agent.widget_color_user_bubble_bg}
               initialColorUserBubbleText={agent.widget_color_user_bubble_text}
               initialColorBotBubbleBg={agent.widget_color_bot_bubble_bg}
-              initialColorBotBubbleBg={agent.widget_color_bot_bubble_bg}
               initialColorBotBubbleText={agent.widget_color_bot_bubble_text}
               initialColorToggleBg={agent.widget_color_toggle_bg}
               initialColorToggleText={agent.widget_color_toggle_text}
