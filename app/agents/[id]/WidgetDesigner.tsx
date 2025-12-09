@@ -87,7 +87,7 @@ function normalizeHex(value: string): string | null {
       .join("");
   }
 
-  if (/^[0-9a-f]{6}$/i.test(hex)) return null;
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return null;
   return `#${hex.toLowerCase()}`;
 }
 
