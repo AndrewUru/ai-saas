@@ -25,7 +25,6 @@ type WidgetDesignerProps = {
   initialColorUserBubbleBg: string | null;
   initialColorUserBubbleText: string | null;
   initialColorBotBubbleBg: string | null;
-  initialColorBotBubbleBg: string | null;
   initialColorBotBubbleText: string | null;
   initialColorToggleBg: string | null;
   initialColorToggleText: string | null;
@@ -220,7 +219,6 @@ export default function WidgetDesigner({
     colorChatBg,
     colorUserBubbleBg,
     colorUserBubbleText,
-    colorBotBubbleBg,
     colorBotBubbleBg,
     colorBotBubbleText,
     colorToggleBg,
@@ -437,11 +435,6 @@ export default function WidgetDesigner({
             />
             <ColorInput
               label="Bot Bubble Text"
-              name="widget_color_bot_bubble_text"
-              value={colorBotBubbleText}
-              onChange={setColorBotBubbleText}
-              defaultValue="#111b21"
-            />
               name="widget_color_bot_bubble_text"
               value={colorBotBubbleText}
               onChange={setColorBotBubbleText}
