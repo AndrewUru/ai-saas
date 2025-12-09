@@ -323,8 +323,8 @@ export function renderStyles(a: WidgetAppearance) {
     bottom: 0;
     right: 0 !important;
     left: 0 !important;
-    width: 100%;
-    height: 100%;
+    width: 90%;
+    height: 90%;
     max-width: none;
     max-height: none;
     border-radius: 0;
