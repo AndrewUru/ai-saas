@@ -109,10 +109,10 @@ export default function Footer() {
             <span className="h-1 w-1 rounded-full bg-slate-700" />
 
             <a
-              href="mailto:hola@ai-saas.com"
+              href="mailto:atobio459@gmail.com"
               className="transition hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
             >
-              hola@ai-saas.com
+              atobio459@gmail.com
             </a>
           </div>
         </div>
