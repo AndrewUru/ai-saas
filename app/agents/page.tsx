@@ -4,11 +4,13 @@ import { createServer } from "@/lib/supabase/server";
 
 const defaultMessagesLimit = 1000;
 
-export default async function AgentsPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function AgentsPage(
+  props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const currentError = searchParams.error;
   const supabase = await createServer();
   const {
     data: { user },
@@ -115,10 +117,10 @@ export default async function AgentsPage({
         className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col gap-12 px-6 py-16 md:px-10 lg:px-16"
         data-oid="v_71yzg"
       >
-        {searchParams.error && typeof searchParams.error === "string" && (
+        {currentError && typeof currentError === "string" && (
           <div className="rounded-2xl border border-red-500/50 bg-red-500/10 px-6 py-4 text-red-200">
             <p className="font-semibold">Unable to create agent</p>
-            <p className="text-sm">{searchParams.error}</p>
+            <p className="text-sm">{currentError}</p>
           </div>
         )}
 
