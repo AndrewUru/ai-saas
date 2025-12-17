@@ -4,6 +4,7 @@ import {
   chatRequestSchema,
   type AgentRecord,
 } from "@/lib/contracts/agent";
+import { wooSearchProductsByApiKey } from "@/lib/tools/woo";
 
 export const FALLBACK_AGENT_MODEL = "gpt-4o-mini";
 const DEFAULT_SYSTEM_PROMPT =
@@ -21,10 +22,12 @@ type AgentMessageRecord = {
   reply: string | null;
 };
 
+// Simplified chat history type for internal use
 type ChatHistoryItem =
   | { role: "user"; content: string }
-  | { role: "assistant"; content: string }
-  | { role: "system"; content: string };
+  | { role: "assistant"; content: string; tool_calls?: any[] }
+  | { role: "system"; content: string }
+  | { role: "tool"; tool_call_id: string; content: string };
 
 export type AgentChatDeps = {
   supabase: SupabaseClient;
@@ -38,6 +41,27 @@ export type AgentChatDeps = {
 export type AgentChatResult =
   | { ok: true; reply: string; fallbackUrl: string | null }
   | { ok: false; status: number; error: string; fallbackUrl?: string | null };
+
+const TOOLS = [
+  {
+    type: "function",
+    function: {
+      name: "search_products",
+      description:
+        "Search for products in the store catalog by name or keyword. Use this to find prices, stock status, and permalinks.",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The product name or keyword to search for.",
+          },
+        },
+        required: ["query"],
+      },
+    },
+  },
+];
 
 function buildSystemPrompt(agent: AgentRecord) {
   const sections = [
@@ -163,27 +187,32 @@ export async function chatWithAgent(
 
   const history = buildHistory(recentMessages).reverse();
 
-  const payload = {
-    model: deps.model ?? FALLBACK_AGENT_MODEL,
-    temperature: 0.4,
-    messages: [
-      { role: "system" as const, content: buildSystemPrompt(validAgent) },
-      ...history,
-      { role: "user" as const, content: message },
-    ],
-  };
+  // Initial messages payload
+  const messages: ChatHistoryItem[] = [
+    { role: "system", content: buildSystemPrompt(validAgent) },
+    ...history,
+    { role: "user", content: message },
+  ];
 
-  const response = await (deps.fetcher ?? fetch)(
-    "https://api.openai.com/v1/chat/completions",
-    {
+  const fetchOpenAI = async (msgs: ChatHistoryItem[]) => {
+    return (deps.fetcher ?? fetch)("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${deps.openaiApiKey}`,
       },
-      body: JSON.stringify(payload),
-    }
-  );
+      body: JSON.stringify({
+        model: deps.model ?? FALLBACK_AGENT_MODEL,
+        temperature: 0.4,
+        messages: msgs,
+        tools: TOOLS, // Activate tools
+        tool_choice: "auto",
+      }),
+    });
+  };
+
+  // 1st Round Trip
+  let response = await fetchOpenAI(messages);
 
   if (!response.ok) {
     const errorBody = await response.text().catch(() => "");
@@ -196,14 +225,68 @@ export async function chatWithAgent(
     };
   }
 
-  const completion = (await response.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
+  let completion = (await response.json()) as {
+    choices?: Array<{
+      message?: { content?: string; tool_calls?: any[] };
+    }>;
   };
 
-  const reply =
-    completion.choices?.[0]?.message?.content?.trim() ||
-    "Sorry, I couldn't generate a response.";
+  let assistantMsg = completion.choices?.[0]?.message;
+  let reply = assistantMsg?.content?.trim() || "";
 
+  // Check for tool calls
+  if (assistantMsg?.tool_calls && assistantMsg.tool_calls.length > 0) {
+    // Append assistant's intention to call tools
+    messages.push({
+      role: "assistant",
+      content: reply,
+      tool_calls: assistantMsg.tool_calls,
+    });
+
+    // Execute tools
+    for (const toolCall of assistantMsg.tool_calls) {
+      if (toolCall.function.name === "search_products") {
+        try {
+          const args = JSON.parse(toolCall.function.arguments);
+          const products = await wooSearchProductsByApiKey(apiKey, args.query);
+          const resultStr = JSON.stringify(products);
+
+          messages.push({
+            role: "tool",
+            tool_call_id: toolCall.id,
+            content: resultStr,
+          });
+        } catch (err) {
+          logger.error("[AI SaaS] Tool error:", err);
+          messages.push({
+            role: "tool",
+            tool_call_id: toolCall.id,
+            content: "Error retrieving products. Please try again later.",
+          });
+        }
+      }
+    }
+
+    // 2nd Round Trip (with tool results)
+    response = await fetchOpenAI(messages);
+    if (!response.ok) {
+      // If 2nd call fails, we just return what we have or generic error
+      // Ideally we fallback or just return the tool output if possible, but let's error gracefully
+      return {
+        ok: false,
+        status: 502,
+        error: "The model could not process tool results.",
+        fallbackUrl: validAgent.fallback_url ?? null,
+      };
+    }
+
+    completion = await response.json();
+    reply =
+      completion.choices?.[0]?.message?.content?.trim() ||
+      "Sorry, I couldn't generate a final response.";
+  }
+
+  // Save conversation
   await deps.supabase.from("agent_messages").insert({
     agent_id: validAgent.id,
     message,
