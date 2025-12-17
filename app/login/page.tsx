@@ -293,7 +293,7 @@ export default function LoginPage() {
                 height={20}
                 className="h-5 w-5"
               />
-              Continuar con Google
+              Continue with Google
             </button>
           </div>
 
