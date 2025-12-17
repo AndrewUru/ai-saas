@@ -4,6 +4,8 @@ import { redirect, notFound } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/site";
 import WidgetDesigner from "./WidgetDesigner";
+import EmbedSnippet from "./EmbedSnippet";
+
 import {
   widgetLimits,
   sanitizeHex,
@@ -558,31 +560,7 @@ export default async function AgentDetailPage({
           {/* RIGHT COLUMN TOP: snippet + best practices */}
           <aside className="space-y-6 min-w-0">
             <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur">
-              <h3 className="text-lg font-semibold text-white">
-                Embed snippet
-              </h3>
-              <p className="mt-2 text-sm text-slate-300">
-                Copy and paste this script into your WordPress (footer or HTML
-                widget). It includes your API key and the branding values
-                configured above.
-              </p>
-              <pre className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200">
-                {`<script>
-  (function () {
-    var s = document.createElement('script');
-    s.src = '${widgetScriptUrl}';
-    s.async = true;
-    s.defer = true;
-    s.onerror = function(){ console.error("[AI SaaS] Could not load the widget."); };
-    document.head.appendChild(s);
-  })();
-</script>`}
-              </pre>
-
-              <p className="mt-3 text-xs text-slate-500">
-                The widget will check the active plan and respect the defined
-                limits before showing the chat.
-              </p>
+              <EmbedSnippet widgetScriptUrl={widgetScriptUrl} />
             </article>
 
             <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 text-sm text-slate-300 shadow-lg shadow-slate-900/40 backdrop-blur">
