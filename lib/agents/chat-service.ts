@@ -22,10 +22,20 @@ type AgentMessageRecord = {
   reply: string | null;
 };
 
+// Simplified types for OpenAI structures
+type OpenAIToolCall = {
+  id: string;
+  type: "function";
+  function: {
+    name: string;
+    arguments: string;
+  };
+};
+
 // Simplified chat history type for internal use
 type ChatHistoryItem =
   | { role: "user"; content: string }
-  | { role: "assistant"; content: string; tool_calls?: any[] }
+  | { role: "assistant"; content: string; tool_calls?: OpenAIToolCall[] }
   | { role: "system"; content: string }
   | { role: "tool"; tool_call_id: string; content: string };
 
@@ -227,11 +237,11 @@ export async function chatWithAgent(
 
   let completion = (await response.json()) as {
     choices?: Array<{
-      message?: { content?: string; tool_calls?: any[] };
+      message?: { content?: string; tool_calls?: OpenAIToolCall[] };
     }>;
   };
 
-  let assistantMsg = completion.choices?.[0]?.message;
+  const assistantMsg = completion.choices?.[0]?.message;
   let reply = assistantMsg?.content?.trim() || "";
 
   // Check for tool calls

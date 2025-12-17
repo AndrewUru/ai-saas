@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation"; // Nuevo import para UX de estado activo
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -127,19 +128,20 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-md supports-[backdrop-filter]:bg-slate-950/60">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6 lg:px-8">
         {/* LOGO AREA */}
-        <Link
-          href="/"
-          className="group flex items-center gap-2.5 transition-opacity hover:opacity-90"
-        >
-          <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-tr from-emerald-500 to-emerald-300 shadow-lg shadow-emerald-500/20">
-            <span className="font-bold text-slate-950">AI</span>
-            {/* Brillo decorativo */}
-            <div className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
-          </div>
-          <span className="bg-gradient-to-r from-emerald-200 to-white bg-clip-text text-sm font-bold tracking-wide text-transparent sm:text-base">
-            Commerce Agents
-          </span>
-        </Link>
+<Link
+  href="/"
+  className="group flex items-center transition-opacity hover:opacity-90"
+>
+  <Image
+    src="/logo.svg"
+    alt="AICommerce"
+    width={120}        // controla aquí el tamaño
+    height={32}        // proporcional al SVG original
+    className="object-contain"
+    priority
+  />
+</Link>
+
 
         {/* DESKTOP NAVIGATION */}
         <div className="hidden items-center gap-1 rounded-full bg-slate-900/40 px-2 py-1.5 shadow-inner shadow-white/5 md:flex">
@@ -198,7 +200,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/signup"
-                className="group relative inline-flex items-center justify-center rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]"
+                className="group relative inline-flex items-center justify-center rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-slate-950 hover:text-amber-50 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]"
               >
                 Start for free
               </Link>

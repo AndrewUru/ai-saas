@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAgents } from "./hooks/useAgents";
-import { Card } from "@/components/ui/Card";
+
 
 type Props = {
   planLimitLabel: string;
