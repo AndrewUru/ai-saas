@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import QueryProvider from "./query-provider";
+import AIWidget from "@/components/AIWidget";
+
 
 export const metadata: Metadata = {
   title: "AI SaaS",
@@ -23,6 +25,7 @@ export default function RootLayout({
           {children}
           <Footer />
         </QueryProvider>
+        <AIWidget />
       </body>
     </html>
   );
