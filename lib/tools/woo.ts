@@ -7,7 +7,12 @@ function buildWooUrl(
   path: string,
   params: Record<string, string>
 ) {
-  const url = new URL(`/wp-json/wc/v3${path}`, base);
+  // Ensure base ends with slash to treat it as a directory for relative path resolution
+  const validBase = base.endsWith("/") ? base : `${base}/`;
+  // Relative path to append (no leading slash)
+  const relativePath = `wp-json/wc/v3${path}`.replace(/^\//, "");
+  
+  const url = new URL(relativePath, validBase);
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
   return url.toString();
 }
@@ -57,7 +62,12 @@ export async function wooSearchProductsByApiKey(
   });
 
   const res = await fetch(url, { headers: { Accept: "application/json" } });
-  if (!res.ok) throw new Error(`Woo error ${res.status}`);
+  
+  if (!res.ok) {
+    const body = await res.text();
+    console.error(`[Woo] Error ${res.status} at ${url}:`, body);
+    throw new Error(`Woo error ${res.status}: ${body.slice(0, 100)}`);
+  }
 
   type WooProductApi = {
     id: number;
