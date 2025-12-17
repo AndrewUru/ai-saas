@@ -57,6 +57,7 @@ function ColorInput({
           value={pickerValue}
           onChange={(e) => onChange(e.target.value)}
         />
+
         <input
           name={name}
           placeholder={defaultValue}
@@ -64,6 +65,7 @@ function ColorInput({
           onChange={(e) => onChange(e.target.value)}
           className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-2 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
         />
+
         <button
           type="button"
           onClick={() => onChange("")}
@@ -130,30 +132,34 @@ export default function WidgetDesigner({
   const [labelInput, setLabelInput] = useState(initialLabel ?? "");
   const [greetingInput, setGreetingInput] = useState(initialGreeting ?? "");
   const [position, setPosition] = useState<WidgetPosition>(
-    initialPosition ?? widgetDefaults.position
+    initialPosition ?? widgetDefaults.position,
   );
 
   // New States
-  const [colorHeaderBg, setColorHeaderBg] = useState(initialColorHeaderBg ?? "");
+  const [colorHeaderBg, setColorHeaderBg] = useState(
+    initialColorHeaderBg ?? "",
+  );
   const [colorHeaderText, setColorHeaderText] = useState(
-    initialColorHeaderText ?? ""
+    initialColorHeaderText ?? "",
   );
   const [colorChatBg, setColorChatBg] = useState(initialColorChatBg ?? "");
   const [colorUserBubbleBg, setColorUserBubbleBg] = useState(
-    initialColorUserBubbleBg ?? ""
+    initialColorUserBubbleBg ?? "",
   );
   const [colorUserBubbleText, setColorUserBubbleText] = useState(
-    initialColorUserBubbleText ?? ""
+    initialColorUserBubbleText ?? "",
   );
   const [colorBotBubbleBg, setColorBotBubbleBg] = useState(
-    initialColorBotBubbleBg ?? ""
+    initialColorBotBubbleBg ?? "",
   );
   const [colorBotBubbleText, setColorBotBubbleText] = useState(
-    initialColorBotBubbleText ?? ""
+    initialColorBotBubbleText ?? "",
   );
-  const [colorToggleBg, setColorToggleBg] = useState(initialColorToggleBg ?? "");
+  const [colorToggleBg, setColorToggleBg] = useState(
+    initialColorToggleBg ?? "",
+  );
   const [colorToggleText, setColorToggleText] = useState(
-    initialColorToggleText ?? ""
+    initialColorToggleText ?? "",
   );
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -381,7 +387,9 @@ export default function WidgetDesigner({
             Accepts #RRGGBB or RRGGBB formats. Empty = default color (
             {widgetDefaults.accent}).
           </p>
-          {accentError && <p className="text-xs text-rose-300">{accentError}</p>}
+          {accentError && (
+            <p className="text-xs text-rose-300">{accentError}</p>
+          )}
         </div>
 
         {/* Detailed Color Customization */}

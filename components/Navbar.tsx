@@ -22,6 +22,7 @@ const Icons = {
       />
     </svg>
   ),
+
   User: () => (
     <svg
       className="w-4 h-4"
@@ -93,7 +94,7 @@ export default function Navbar() {
       (_event, session) => {
         if (!isMounted) return;
         setUserEmail(session?.user?.email ?? null);
-      }
+      },
     );
 
     return () => {
@@ -219,6 +220,7 @@ export default function Navbar() {
                   isMenuOpen ? "top-1.5 rotate-45" : "top-0"
                 }`}
               />
+
               <span
                 className={`absolute left-0 top-1.5 h-0.5 w-full bg-current transition-all duration-300 ${
                   isMenuOpen
@@ -226,6 +228,7 @@ export default function Navbar() {
                     : "translate-x-0 opacity-100"
                 }`}
               />
+
               <span
                 className={`absolute left-0 h-0.5 w-full bg-current transition-all duration-300 ${
                   isMenuOpen ? "top-1.5 -rotate-45" : "top-3"

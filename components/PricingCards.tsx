@@ -13,11 +13,8 @@ const plans = [
     price: "0",
     period: "per month",
     description: "Perfect to test the dashboard and launch your first agent.",
-    features: [
-      "1 active agent",
-      "Standard support",
-      "Basic customization",
-    ],
+    features: ["1 active agent", "Standard support", "Basic customization"],
+
     highlight: false,
     badge: "Free forever",
   },
@@ -34,6 +31,7 @@ const plans = [
       "Priority email support",
       "Removed branding",
     ],
+
     highlight: true,
     badge: "Most Popular",
   },
@@ -50,6 +48,7 @@ const plans = [
       "Dedicated success manager",
       "SLA 99.9%",
     ],
+
     highlight: false,
     badge: null,
   },
@@ -136,6 +135,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                         plan.highlight ? "bg-emerald-400" : "bg-slate-500"
                       }`}
                     />
+
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -156,7 +156,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                   amount={plan.price}
                   onSuccess={() =>
                     setSuccessMsg(
-                      `Plan ${plan.name} activated successfully! Redirecting...`
+                      `Plan ${plan.name} activated successfully! Redirecting...`,
                     )
                   }
                   onError={(msg) => setErrorMsg(msg)}

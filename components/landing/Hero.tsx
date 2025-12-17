@@ -11,7 +11,11 @@ export function Hero() {
             AI agents for ecommerce agencies
           </div>
           <h1 className="text-5xl font-bold leading-[1.1] tracking-tight sm:text-6xl lg:text-7xl text-foreground">
-            Deploy <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-accent to-accent-secondary animate-gradient-x">AI agents</span> for your clients&apos; online stores
+            Deploy{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-accent to-accent-secondary animate-gradient-x">
+              AI agents
+            </span>{" "}
+            for your clients&apos; online stores
           </h1>
           <p className="max-w-2xl text-lg text-[var(--foreground-muted)] sm:text-xl leading-relaxed">
             Scale a recurring service by offering trained assistants that follow

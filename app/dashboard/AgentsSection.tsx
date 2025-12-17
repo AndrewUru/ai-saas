@@ -25,8 +25,8 @@ export default function AgentsSection({ planLimitLabel }: Props) {
             isLoading
               ? "Loading..."
               : totalAgents === 0
-              ? "No agents yet"
-              : "Ready in WooCommerce"
+                ? "No agents yet"
+                : "Ready in WooCommerce"
           }
         />
 
@@ -37,8 +37,8 @@ export default function AgentsSection({ planLimitLabel }: Props) {
             isLoading
               ? "Checking..."
               : activeAgents === totalAgents
-              ? "All active"
-              : "Some are paused"
+                ? "All active"
+                : "Some are paused"
           }
         />
 
@@ -59,10 +59,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
               Manage integrations and performance
             </p>
           </div>
-          <Link
-            href="/agents"
-            className="ui-button ui-button--ghost text-xs"
-          >
+          <Link href="/agents" className="ui-button ui-button--ghost text-xs">
             View all agents
           </Link>
         </div>
@@ -75,17 +72,12 @@ export default function AgentsSection({ planLimitLabel }: Props) {
 
         {!isError && totalAgents === 0 && !isLoading && (
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-12 text-center">
-            <p className="font-medium text-foreground">
-              No agents configured
-            </p>
+            <p className="font-medium text-foreground">No agents configured</p>
             <p className="mt-2 text-sm text-[var(--foreground-muted)] max-w-sm">
               Create your first agent to connect WooCommerce and start replying
               to chats automatically.
             </p>
-            <Link
-              href="/agents"
-              className="mt-6 ui-button ui-button--primary"
-            >
+            <Link href="/agents" className="mt-6 ui-button ui-button--primary">
               Create agent
             </Link>
           </div>
@@ -102,7 +94,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                     ? "bg-accent"
                     : "bg-[var(--foreground-muted)]";
                   const statusText = agent.is_active ? "Active" : "Paused";
-                  
+
                   return (
                     <li
                       key={agent.id}
@@ -113,6 +105,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                           <span
                             className={`h-2 w-2 rounded-full shadow-[0_0_8px_currentColor] ${statusColor}`}
                           />
+
                           <span className="text-sm font-semibold text-foreground">
                             {agent.name || "Unnamed Agent"}
                           </span>
@@ -122,12 +115,13 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                         </div>
                         <div className="flex items-center gap-4 text-xs text-[var(--foreground-muted)]">
                           <span>
-                            Key: <span className="font-mono text-foreground/70">{(agent.api_key ?? "N/A").slice(0, 6)}...</span>
+                            Key:{" "}
+                            <span className="font-mono text-foreground/70">
+                              {(agent.api_key ?? "N/A").slice(0, 6)}...
+                            </span>
                           </span>
                           <span className="hidden sm:inline">•</span>
-                          <span>
-                             Limit: {agent.messages_limit ?? "∞"}
-                          </span>
+                          <span>Limit: {agent.messages_limit ?? "∞"}</span>
                         </div>
                       </div>
                       <Link

@@ -27,24 +27,16 @@ export function Workflow() {
             ))}
           </ul>
           <div className="flex flex-wrap gap-4">
-            <a
-              href="/docs"
-              className="ui-button ui-button--ghost"
-            >
+            <a href="/docs" className="ui-button ui-button--ghost">
               View technical docs
             </a>
-            <a
-              href="/contact"
-              className="ui-button ui-button--subtle"
-            >
+            <a href="/contact" className="ui-button ui-button--subtle">
               Talk to sales
             </a>
           </div>
         </div>
         <div className="space-y-6 rounded-3xl border border-border bg-gradient-to-br from-surface via-surface-strong to-black p-8 shadow-2xl shadow-accent/5">
-          <h3 className="text-xl font-semibold text-accent">
-            How it works
-          </h3>
+          <h3 className="text-xl font-semibold text-accent">How it works</h3>
           <ol className="space-y-4 text-sm text-[var(--foreground-muted)]">
             {[
               {
@@ -74,7 +66,9 @@ export function Workflow() {
                 </span>
                 <div>
                   <p className="font-medium text-foreground">{step.title}</p>
-                  <p className="mt-1 text-[var(--foreground-muted)]">{step.detail}</p>
+                  <p className="mt-1 text-[var(--foreground-muted)]">
+                    {step.detail}
+                  </p>
                 </div>
               </li>
             ))}

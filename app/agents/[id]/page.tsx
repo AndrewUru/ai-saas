@@ -82,7 +82,7 @@ async function updateIntegrationAndDomains(formData: FormData) {
         fallbackUrlRaw,
         fallbackUrlRaw.startsWith("http")
           ? undefined
-          : "https://placeholder.local"
+          : "https://placeholder.local",
       );
       fallbackUrl =
         url.origin === "https://placeholder.local"
@@ -149,20 +149,20 @@ async function updateWidgetBranding(formData: FormData) {
 
   const colorHeaderBgRaw = String(formData.get("widget_color_header_bg") ?? "");
   const colorHeaderTextRaw = String(
-    formData.get("widget_color_header_text") ?? ""
+    formData.get("widget_color_header_text") ?? "",
   );
   const colorChatBgRaw = String(formData.get("widget_color_chat_bg") ?? "");
   const colorUserBubbleBgRaw = String(
-    formData.get("widget_color_user_bubble_bg") ?? ""
+    formData.get("widget_color_user_bubble_bg") ?? "",
   );
   const colorUserBubbleTextRaw = String(
-    formData.get("widget_color_user_bubble_text") ?? ""
+    formData.get("widget_color_user_bubble_text") ?? "",
   );
   const colorBotBubbleBgRaw = String(
-    formData.get("widget_color_bot_bubble_bg") ?? ""
+    formData.get("widget_color_bot_bubble_bg") ?? "",
   );
   const colorBotBubbleTextRaw = String(
-    formData.get("widget_color_bot_bubble_text") ?? ""
+    formData.get("widget_color_bot_bubble_text") ?? "",
   );
 
   const { error: updateError } = await supabase
@@ -229,7 +229,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text"
+      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -293,60 +293,27 @@ export default async function AgentDetailPage({
     : "Unknown date";
 
   return (
-    <main
-      className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100"
-      data-oid="5nde4u4"
-    >
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_60%)]"
-        data-oid="bk3to85"
-      />
+    <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_60%)]" />
 
-      <section
-        className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col gap-12 px-6 py-16 md:px-10 lg:px-16"
-        data-oid="b-vhzuy"
-      >
-        <header
-          className="space-y-4 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur"
-          data-oid="xtqys.."
-        >
-          <div
-            className="flex flex-wrap items-start justify-between gap-6"
-            data-oid="1u2yczr"
-          >
-            <div className="space-y-3" data-oid="i2p2-9.">
-              <p
-                className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200"
-                data-oid="0dlwbcw"
-              >
+      <section className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col gap-12 px-6 py-16 md:px-10 lg:px-16">
+        <header className="space-y-4 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div className="space-y-3">
+              <p className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">
                 Agent profile
               </p>
-              <div
-                className="flex flex-wrap items-center gap-3"
-                data-oid="vcxdcc:"
-              >
-                <h1
-                  className="text-3xl font-semibold leading-tight sm:text-4xl"
-                  data-oid="7p.7axh"
-                >
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
                   {agent.name}
                 </h1>
-                <span
-                  className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-300"
-                  data-oid="p4.d.3p"
-                >
-                  <span
-                    className={`h-2.5 w-2.5 rounded-full ${statusColor}`}
-                    data-oid="8mh.-xf"
-                  />
+                <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-300">
+                  <span className={`h-2.5 w-2.5 rounded-full ${statusColor}`} />
 
                   {statusLabel}
                 </span>
               </div>
-              <p
-                className="max-w-2xl text-sm text-slate-300 sm:text-base"
-                data-oid="5n39n:4"
-              >
+              <p className="max-w-2xl text-sm text-slate-300 sm:text-base">
                 Use this view to connect WooCommerce, control which domains can
                 load the widget, and copy the agent API key.
               </p>
@@ -354,67 +321,39 @@ export default async function AgentDetailPage({
             <Link
               href="/agents"
               className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
-              data-oid="kv5fmuu"
             >
               Back to agents
             </Link>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3" data-oid="8v..f-u">
-            <div
-              className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300"
-              data-oid="n5b0oba"
-            >
-              <p
-                className="text-xs uppercase tracking-[0.24em] text-slate-400"
-                data-oid="qmx3t2h"
-              >
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300">
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
                 API Key
               </p>
-              <p
-                className="mt-2 break-all font-mono text-emerald-200"
-                data-oid="3e7.8ys"
-              >
+              <p className="mt-2 break-all font-mono text-emerald-200">
                 {agent.api_key}
               </p>
             </div>
-            <div
-              className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300"
-              data-oid="n5xn3v1"
-            >
-              <p
-                className="text-xs uppercase tracking-[0.24em] text-slate-400"
-                data-oid="p.fs_ti"
-              >
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300">
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
                 Message limit
               </p>
-              <p
-                className="mt-2 text-lg font-semibold text-white"
-                data-oid=":fbp3vm"
-              >
+              <p className="mt-2 text-lg font-semibold text-white">
                 {agent.messages_limit?.toLocaleString("en-US") ?? "Not set"}
               </p>
-              <p className="text-xs text-slate-500" data-oid="klqta:k">
+              <p className="text-xs text-slate-500">
                 Adjust this value from the database or soon from your plan.
               </p>
             </div>
-            <div
-              className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300"
-              data-oid="1w1pm.q"
-            >
-              <p
-                className="text-xs uppercase tracking-[0.24em] text-slate-400"
-                data-oid="1ak26on"
-              >
+            <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300">
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
                 Created on
               </p>
-              <p
-                className="mt-2 text-lg font-semibold text-white"
-                data-oid="_z3qn9o"
-              >
+              <p className="mt-2 text-lg font-semibold text-white">
                 {createdAt}
               </p>
-              <p className="text-xs text-slate-500" data-oid="hgppn8m">
+              <p className="text-xs text-slate-500">
                 Keeps a full activity log and allowed domains.
               </p>
             </div>
@@ -422,26 +361,17 @@ export default async function AgentDetailPage({
         </header>
 
         {saved && (
-          <div
-            className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/20"
-            data-oid="ux46g7i"
-          >
+          <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/20">
             Changes saved successfully.
           </div>
         )}
         {widgetSaved && (
-          <div
-            className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/20"
-            data-oid="o3ru:en"
-          >
+          <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/20">
             Widget customization saved.
           </div>
         )}
         {errorKey && (
-          <div
-            className="rounded-3xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-100 shadow-lg shadow-rose-500/20"
-            data-oid="ejtkdg0"
-          >
+          <div className="rounded-3xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-100 shadow-lg shadow-rose-500/20">
             {errorMessages[errorKey] ?? "An unexpected error occurred."}
           </div>
         )}
@@ -453,17 +383,13 @@ export default async function AgentDetailPage({
             xl:grid-cols-[minmax(0,1.85fr)_minmax(380px,1fr)]
             2xl:grid-cols-[minmax(0,2fr)_minmax(420px,1fr)]
           "
-          data-oid="9m1.a4i"
         >
           {/* LEFT COLUMN TOP: Integration + domains */}
-          <article
-            className="min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur"
-            data-oid="vgt:6to"
-          >
-            <h2 className="text-xl font-semibold text-white" data-oid="o8d-_8w">
+          <article className="min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">
+            <h2 className="text-xl font-semibold text-white">
               Integration and allowed domains
             </h2>
-            <p className="mt-1 text-sm text-slate-300" data-oid="-vl6t.d">
+            <p className="mt-1 text-sm text-slate-300">
               Select the WooCommerce integration this agent should use and
               define which domains can embed the widget.
             </p>
@@ -472,20 +398,13 @@ export default async function AgentDetailPage({
             <form
               action={updateIntegrationAndDomains}
               className="mt-6 space-y-6"
-              data-oid="q_-3u9a"
             >
-              <input
-                type="hidden"
-                name="agent_id"
-                value={agent.id}
-                data-oid="-vq.ua_"
-              />
+              <input type="hidden" name="agent_id" value={agent.id} />
 
-              <div className="space-y-2" data-oid="z:wzhrp">
+              <div className="space-y-2">
                 <label
                   htmlFor="integration"
                   className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-                  data-oid="nkfp-u:"
                 >
                   WooCommerce integration
                 </label>
@@ -494,31 +413,23 @@ export default async function AgentDetailPage({
                   name="integration_id"
                   defaultValue={agent.woo_integration_id || "none"}
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                  data-oid="h3757ia"
                 >
-                  <option value="none" data-oid=":626qar">
-                    No integration
-                  </option>
+                  <option value="none">No integration</option>
                   {(integrations ?? []).map((integration) => {
                     const label =
                       integration.label?.trim() || integration.site_url;
                     return (
-                      <option
-                        key={integration.id}
-                        value={integration.id}
-                        data-oid="jbsgh4:"
-                      >
+                      <option key={integration.id} value={integration.id}>
                         {label} {integration.is_active ? "" : "(inactive)"}
                       </option>
                     );
                   })}
                 </select>
-                <p className="text-xs text-slate-500" data-oid=".-seh8t">
+                <p className="text-xs text-slate-500">
                   Manage your credentials and connected sites from{" "}
                   <Link
                     href="/integrations/woo"
                     className="text-emerald-300 hover:text-emerald-200"
-                    data-oid="zq5csv8"
                   >
                     Integrations
                   </Link>
@@ -526,11 +437,10 @@ export default async function AgentDetailPage({
                 </p>
               </div>
 
-              <div className="space-y-2" data-oid="znx8fj7">
+              <div className="space-y-2">
                 <label
                   htmlFor="prompt-system"
                   className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-                  data-oid="40p.dsg"
                 >
                   Agent instructions (prompt)
                 </label>
@@ -544,20 +454,18 @@ export default async function AgentDetailPage({
                   }
                   rows={5}
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                  data-oid="rsg2:49"
                 />
 
-                <p className="text-xs text-slate-500" data-oid="msp58.n">
+                <p className="text-xs text-slate-500">
                   This text is sent as the system prompt to the model. Use
                   variables, the desired tone, and brand guardrails.
                 </p>
               </div>
 
-              <div className="space-y-2" data-oid="5h4fsnr">
+              <div className="space-y-2">
                 <label
                   htmlFor="language"
                   className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-                  data-oid="ma.3o09"
                 >
                   Preferred response language
                 </label>
@@ -566,29 +474,23 @@ export default async function AgentDetailPage({
                   name="language"
                   defaultValue={languageValue}
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                  data-oid="6l05_.p"
                 >
                   {LANGUAGE_OPTIONS.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      data-oid="p3.ozie"
-                    >
+                    <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-slate-500" data-oid=".of0xf0">
+                <p className="text-xs text-slate-500">
                   With automatic detection, the model adapts the response to the
                   customer&apos;s language.
                 </p>
               </div>
 
-              <div className="space-y-2" data-oid="u8vdvb:">
+              <div className="space-y-2">
                 <label
                   htmlFor="fallback-url"
                   className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-                  data-oid="ddpxzr7"
                 >
                   Fallback URL (optional)
                 </label>
@@ -600,19 +502,17 @@ export default async function AgentDetailPage({
                   defaultValue={fallbackUrlValue}
                   placeholder="https://your-agency.com/contact"
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                  data-oid="..o7do6"
                 />
 
-                <p className="text-xs text-slate-500" data-oid="8v0kij7">
+                <p className="text-xs text-slate-500">
                   Sent to the widget to escalate to humans when necessary.
                 </p>
               </div>
 
-              <div className="space-y-2" data-oid="lsi9jqi">
+              <div className="space-y-2">
                 <label
                   htmlFor="allowed-domains"
                   className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-                  data-oid="4jmy990"
                 >
                   Allowed domains (optional)
                 </label>
@@ -622,41 +522,32 @@ export default async function AgentDetailPage({
                   placeholder="myshop.com, store.com"
                   defaultValue={allowedDomains.join(", ")}
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                  data-oid="4winsyn"
                 />
 
-                <p className="text-xs text-slate-500" data-oid="547hcs6">
+                <p className="text-xs text-slate-500">
                   Separate each domain with commas. If left empty, the widget
                   can load from any origin.
                 </p>
                 {!!allowedDomains.length && (
-                  <p className="text-xs text-slate-400" data-oid="j.1vkzc">
+                  <p className="text-xs text-slate-400">
                     Current domains:{" "}
-                    <span
-                      className="font-mono text-emerald-200"
-                      data-oid="mp6p8il"
-                    >
+                    <span className="font-mono text-emerald-200">
                       {allowedDomains.join(", ")}
                     </span>
                   </p>
                 )}
               </div>
 
-              <div
-                className="flex flex-col gap-3 sm:flex-row sm:items-center"
-                data-oid="f23y85m"
-              >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <button
                   type="submit"
                   className="inline-flex w-full items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto"
-                  data-oid="g:a3b_n"
                 >
                   Save changes
                 </button>
                 <Link
                   href={`/agents/${agent.id}`}
                   className="inline-flex w-full items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:w-auto"
-                  data-oid="l5ynrvq"
                 >
                   Cancel
                 </Link>
@@ -665,26 +556,17 @@ export default async function AgentDetailPage({
           </article>
 
           {/* RIGHT COLUMN TOP: snippet + best practices */}
-          <aside className="space-y-6 min-w-0" data-oid="no9w3th">
-            <article
-              className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur"
-              data-oid="9s_wyt2"
-            >
-              <h3
-                className="text-lg font-semibold text-white"
-                data-oid="jm::wov"
-              >
+          <aside className="space-y-6 min-w-0">
+            <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur">
+              <h3 className="text-lg font-semibold text-white">
                 Embed snippet
               </h3>
-              <p className="mt-2 text-sm text-slate-300" data-oid=":kfo7gj">
+              <p className="mt-2 text-sm text-slate-300">
                 Copy and paste this script into your WordPress (footer or HTML
                 widget). It includes your API key and the branding values
                 configured above.
               </p>
-              <pre
-                className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200"
-                data-oid="y32oes5"
-              >
+              <pre className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200">
                 {`<script>
   (function () {
     var s = document.createElement('script');
@@ -697,35 +579,26 @@ export default async function AgentDetailPage({
 </script>`}
               </pre>
 
-              <p className="mt-3 text-xs text-slate-500" data-oid="0m_0vll">
+              <p className="mt-3 text-xs text-slate-500">
                 The widget will check the active plan and respect the defined
                 limits before showing the chat.
               </p>
             </article>
 
-            <article
-              className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 text-sm text-slate-300 shadow-lg shadow-slate-900/40 backdrop-blur"
-              data-oid=".sku.hl"
-            >
-              <h3
-                className="text-lg font-semibold text-white"
-                data-oid="fv3.m8j"
-              >
+            <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 text-sm text-slate-300 shadow-lg shadow-slate-900/40 backdrop-blur">
+              <h3 className="text-lg font-semibold text-white">
                 Best practices
               </h3>
-              <ul
-                className="mt-3 space-y-2 text-xs text-slate-400"
-                data-oid="8a_zbch"
-              >
-                <li data-oid="6tqf_u-">
+              <ul className="mt-3 space-y-2 text-xs text-slate-400">
+                <li>
                   - Use one agent per store or language to keep responses
                   aligned with your catalog.
                 </li>
-                <li data-oid="zqn.dxx">
+                <li>
                   - If the API key is compromised, create a new agent and
                   deactivate this one to revoke access.
                 </li>
-                <li data-oid="4-5yftx">
+                <li>
                   - Enable message limit alerts from your billing panel to avoid
                   interruptions.
                 </li>
@@ -734,14 +607,11 @@ export default async function AgentDetailPage({
           </aside>
 
           {/* FILA INFERIOR: ancho completo */}
-          <article
-            className="lg:col-span-2 w-full min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur"
-            data-oid="7uz0fmi"
-          >
-            <h2 className="text-xl font-semibold text-white" data-oid="o127-9d">
+          <article className="lg:col-span-2 w-full min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">
+            <h2 className="text-xl font-semibold text-white">
               Customize the embeddable widget
             </h2>
-            <p className="mt-1 text-sm text-slate-300" data-oid="gyb7lbe">
+            <p className="mt-1 text-sm text-slate-300">
               Adjust color, text, and position and preview the result in real
               time before copying the script.
             </p>
@@ -765,7 +635,6 @@ export default async function AgentDetailPage({
               initialColorBotBubbleText={agent.widget_color_bot_bubble_text}
               initialColorToggleBg={agent.widget_color_toggle_bg}
               initialColorToggleText={agent.widget_color_toggle_text}
-              data-oid="qs3rk03"
             />
           </article>
         </div>

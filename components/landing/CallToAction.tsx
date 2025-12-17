@@ -13,16 +13,10 @@ export function CallToAction() {
           deliver a full support experience in under an hour.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <a
-            href="/signup"
-            className="ui-button ui-button--primary"
-          >
+          <a href="/signup" className="ui-button ui-button--primary">
             Create free account
           </a>
-          <a
-            href="/billing"
-            className="ui-button ui-button--ghost"
-          >
+          <a href="/billing" className="ui-button ui-button--ghost">
             View plans
           </a>
         </div>

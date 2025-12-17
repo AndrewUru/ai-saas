@@ -52,11 +52,11 @@ export default async function DashboardPage() {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <Link 
-              href="/docs" 
+            <Link
+              href="/docs"
               className="text-sm font-medium text-[var(--foreground-muted)] hover:text-foreground transition-colors"
             >
-               Documentation
+              Documentation
             </Link>
             <div className="h-8 w-8 rounded-full bg-surface-strong border border-border flex items-center justify-center text-xs font-bold">
               {username[0].toUpperCase()}
@@ -66,30 +66,42 @@ export default async function DashboardPage() {
       </header>
 
       <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-        
         {/* Stats Rack / HUD */}
         <div className="mb-8 grid gap-4 sm:grid-cols-4">
           <div className="ui-card p-4 flex flex-col justify-between">
-            <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">Current Plan</span>
+            <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">
+              Current Plan
+            </span>
             <div className="flex items-center gap-2 mt-1">
               <div className="h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_#34d399]" />
               <span className="text-lg font-bold">{planLabel}</span>
             </div>
           </div>
-          
+
           <div className="ui-card p-4 flex flex-col justify-between">
-            <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">Status</span>
+            <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">
+              Status
+            </span>
             <span className="text-lg font-bold mt-1">Active</span>
           </div>
-          
-           <div className="ui-card p-4 flex flex-col justify-between">
-            <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">Renewal</span>
-            <span className="text-lg font-bold mt-1 text-[var(--foreground-muted)]">{activeUntil}</span>
+
+          <div className="ui-card p-4 flex flex-col justify-between">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">
+              Renewal
+            </span>
+            <span className="text-lg font-bold mt-1 text-[var(--foreground-muted)]">
+              {activeUntil}
+            </span>
           </div>
 
           <div className="ui-card p-4 flex flex-col justify-between bg-accent/10 border-accent/20">
-            <span className="text-[10px] uppercase tracking-wider text-accent">Quick action</span>
-            <Link href="/agents" className="text-sm font-semibold text-accent hover:underline decoration-accent/50 underline-offset-4 mt-1">
+            <span className="text-[10px] uppercase tracking-wider text-accent">
+              Quick action
+            </span>
+            <Link
+              href="/agents"
+              className="text-sm font-semibold text-accent hover:underline decoration-accent/50 underline-offset-4 mt-1"
+            >
               + Deploy new agent
             </Link>
           </div>
@@ -97,10 +109,9 @@ export default async function DashboardPage() {
 
         {/* Main Board Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
           {/* Canvas - Main Content */}
           <div className="lg:col-span-8 xl:col-span-9 space-y-6">
-             <AgentsSection planLimitLabel={planLimitLabel} />
+            <AgentsSection planLimitLabel={planLimitLabel} />
           </div>
 
           {/* Sidebar - Quick Actions & Info */}
@@ -109,7 +120,9 @@ export default async function DashboardPage() {
               <h3 className="font-semibold text-foreground">Platform Status</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-[var(--foreground-muted)]">API Uptime</span>
+                  <span className="text-[var(--foreground-muted)]">
+                    API Uptime
+                  </span>
                   <span className="text-accent">99.9%</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
@@ -118,13 +131,15 @@ export default async function DashboardPage() {
                 </div>
                 <div className="h-px bg-border my-2" />
                 <div className="flex items-center justify-between text-sm">
-                   <span className="text-[var(--foreground-muted)]">Response Time</span>
-                   <span className="text-foreground">120ms</span>
+                  <span className="text-[var(--foreground-muted)]">
+                    Response Time
+                  </span>
+                  <span className="text-foreground">120ms</span>
                 </div>
               </div>
 
               <div className="pt-4">
-                 <Link
+                <Link
                   href="/billing"
                   className="ui-button ui-button--secondary w-full justify-center"
                 >
@@ -133,7 +148,6 @@ export default async function DashboardPage() {
               </div>
             </div>
           </aside>
-
         </div>
       </div>
     </main>

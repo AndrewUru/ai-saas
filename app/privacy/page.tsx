@@ -6,9 +6,7 @@ export default function PrivacyPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">
             Legal Documentation
           </p>
-          <h1 className="text-3xl font-semibold sm:text-4xl">
-            Privacy Policy
-          </h1>
+          <h1 className="text-3xl font-semibold sm:text-4xl">Privacy Policy</h1>
           <p className="text-sm text-slate-300 sm:text-base">
             This page summarizes how we collect, use, and protect the data
             entrusted to us by ecommerce agencies and their clients. This
@@ -18,15 +16,12 @@ export default function PrivacyPage() {
 
         <article className="mt-12 space-y-6 text-sm text-slate-300">
           <section className="space-y-2">
-            <h2 className="text-lg font-semibold text-white">
-              Data We Store
-            </h2>
+            <h2 className="text-lg font-semibold text-white">Data We Store</h2>
             <p>
               We only store the information required to operate the agents:
-              encrypted credentials from external services, billing details,
-              and the messages exchanged with end customers. We do not share
-              this data with third parties outside the agency that owns the
-              account.
+              encrypted credentials from external services, billing details, and
+              the messages exchanged with end customers. We do not share this
+              data with third parties outside the agency that owns the account.
             </p>
           </section>
 

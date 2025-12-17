@@ -32,10 +32,7 @@ export function Testimonials() {
               role: "COO, Sunwave Gear",
             },
           ].map((testimonial) => (
-            <figure
-              key={testimonial.author}
-              className="ui-card p-8"
-            >
+            <figure key={testimonial.author} className="ui-card p-8">
               <blockquote className="text-lg text-[var(--foreground-muted)]">
                 &ldquo;{testimonial.quote}&rdquo;
               </blockquote>

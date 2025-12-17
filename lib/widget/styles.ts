@@ -342,7 +342,7 @@ export function renderStyles(a: WidgetAppearance) {
     left: 12px;
     right: 12px;
     width: auto;
-    height: min(78vh, 620px);
+    height: min(40vh, 320px);
     max-height: calc(100vh - 100px);
     bottom: calc(70px + env(safe-area-inset-bottom, 0px));
     border-radius: 16px;

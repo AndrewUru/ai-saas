@@ -96,11 +96,11 @@ export default async function BillingPage() {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <Link 
-              href="/dashboard" 
+            <Link
+              href="/dashboard"
               className="text-sm font-medium text-[var(--foreground-muted)] hover:text-foreground transition-colors"
             >
-               Back to Board
+              Back to Board
             </Link>
             <div className="h-8 w-8 rounded-full bg-surface-strong border border-border flex items-center justify-center text-xs font-bold">
               {username[0].toUpperCase()}
@@ -110,27 +110,31 @@ export default async function BillingPage() {
       </header>
 
       <section className="relative z-10 mx-auto max-w-7xl px-6 py-12 lg:px-8">
-        
         <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground">
               Manage your plan
             </h1>
             <p className="mt-4 text-lg text-[var(--foreground-muted)]">
-              Review your usage limits, upgrade to scale your operations, and manage your invoices.
+              Review your usage limits, upgrade to scale your operations, and
+              manage your invoices.
             </p>
           </div>
-          
-           <div className="ui-card p-4 flex flex-col min-w-[200px] border-accent/20 bg-accent/5">
-              <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">Current Plan</span>
-              <div className="flex items-center gap-2 mt-1">
-                <div className="h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_#34d399]" />
-                <span className="text-xl font-bold text-foreground">{activePlan.toUpperCase()}</span>
-              </div>
-              <span className="text-xs text-[var(--foreground-muted)] mt-1">
-                 {activeUntil ? `Renews on ${activeUntil}` : "No expiry date"}
+
+          <div className="ui-card p-4 flex flex-col min-w-[200px] border-accent/20 bg-accent/5">
+            <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">
+              Current Plan
+            </span>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_#34d399]" />
+              <span className="text-xl font-bold text-foreground">
+                {activePlan.toUpperCase()}
               </span>
             </div>
+            <span className="text-xs text-[var(--foreground-muted)] mt-1">
+              {activeUntil ? `Renews on ${activeUntil}` : "No expiry date"}
+            </span>
+          </div>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
@@ -160,8 +164,10 @@ export default async function BillingPage() {
                     </span>
                   )}
                 </div>
-                
-                <p className="mt-4 text-sm text-[var(--foreground-muted)] h-10">{plan.blurb}</p>
+
+                <p className="mt-4 text-sm text-[var(--foreground-muted)] h-10">
+                  {plan.blurb}
+                </p>
 
                 <div className="mt-6 flex items-baseline gap-1">
                   <span className="text-4xl font-bold text-foreground">
@@ -178,8 +184,18 @@ export default async function BillingPage() {
                       key={feature}
                       className="flex items-start gap-3 text-sm text-[var(--foreground-muted)]"
                     >
-                      <svg className="w-5 h-5 text-accent shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <svg
+                        className="w-5 h-5 text-accent shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                       <span>{feature}</span>
                     </li>
@@ -214,7 +230,8 @@ export default async function BillingPage() {
               Questions about enterprise billing?
             </h3>
             <p className="text-[var(--foreground-muted)] max-w-xl">
-              We offer custom plans for large agencies, including dedicated support, custom integrations, and consolidated billing.
+              We offer custom plans for large agencies, including dedicated
+              support, custom integrations, and consolidated billing.
             </p>
           </div>
           <div className="flex flex-wrap gap-4">
@@ -224,10 +241,7 @@ export default async function BillingPage() {
             >
               Contact Support
             </a>
-            <Link
-              href="/dashboard"
-              className="ui-button ui-button--secondary"
-            >
+            <Link href="/dashboard" className="ui-button ui-button--secondary">
               Return to Dashboard
             </Link>
           </div>

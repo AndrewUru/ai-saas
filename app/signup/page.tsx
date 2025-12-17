@@ -25,8 +25,7 @@ export default function SignupPage() {
   const [redirectUrl, setRedirectUrl] = useState("");
 
   useEffect(() => {
-    const base =
-      process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    const base = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
 
     setRedirectUrl(`${base}/auth/callback?next=/dashboard`);
   }, []);

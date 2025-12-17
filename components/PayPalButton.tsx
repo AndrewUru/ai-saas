@@ -53,13 +53,13 @@ export function SubscriptionPayPalButton({
         onApprove={async (data, actions) => {
           try {
             if (!actions.order) throw new Error("No capture method");
-            
+
             // Capture on PayPal side (optional if handled via server, but standard flow captures first then verifies)
             // But usually we want server verification.
             // Let's stick to the confirm route logic which expects an OrderID (Status COMPLETED).
             // So we must capture here first.
             const order = await actions.order.capture();
-            
+
             const res = await fetch("/api/paypal/confirm", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
