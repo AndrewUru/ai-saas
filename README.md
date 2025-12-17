@@ -1,4 +1,9 @@
-# AI Commerce Agents – SaaS Dashboard & Widget
+![logo](https://github.com/user-attachments/assets/17dcd404-3e45-4678-b652-98171c0587be)# AI Commerce Agents – SaaS Dashboard & Widget
+
+
+
+
+
 
 Multi-tenant panel for creating agents that serve online stores and an embeddable widget that integrates into WooCommerce/WordPress, Shopify, or other frontends with a single `<script>`. The stack combines **Next.js 15 (App Router)**, **Supabase** for auth/DB, and **LangChain/OpenAI** for the conversational layer.
 
