@@ -8,12 +8,12 @@ import { wooSearchProductsByApiKey } from "@/lib/tools/woo";
 
 export const FALLBACK_AGENT_MODEL = "gpt-4o-mini";
 const DEFAULT_SYSTEM_PROMPT =
-  "You are a support agent for online stores. Answer clearly and helpfully, following the brand's policies.";
+  "You are a support agent. Answer clearly and helpfully, following the brand's policies.";
 
 const LANGUAGE_HINTS: Record<string, string> = {
-  es: "Responde siempre en español neutro para ecommerce. Mantén un tono profesional y cercano.",
-  en: "Always respond in English with a helpful, concise ecommerce tone.",
-  pt: "Responda em português do Brasil com foco em suporte de ecommerce.",
+  es: "Responde siempre en español neutro. Mantén un tono profesional y cercano.",
+  en: "Always respond in English with a helpful, concise tone.",
+  pt: "Responda em português do Brasil com foco em suporte.",
   fr: "Réponds en français en gardant un ton professionnel et amical.",
 };
 
