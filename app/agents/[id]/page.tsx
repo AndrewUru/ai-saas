@@ -241,7 +241,9 @@ export default async function AgentDetailPage({
 
   const { data: integrations } = await supabase
     .from("integrations_woocommerce")
-    .select("id, label, site_url, is_active, created_at")
+    .select(
+      "id, label, store_url, is_active, created_at, last_sync_status, products_indexed_count"
+    )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -419,10 +421,18 @@ export default async function AgentDetailPage({
                   <option value="none">No integration</option>
                   {(integrations ?? []).map((integration) => {
                     const label =
-                      integration.label?.trim() || integration.site_url;
+                      integration.label?.trim() || integration.store_url;
+                    const indexedCount =
+                      integration.products_indexed_count ?? 0;
+                    const syncLabel =
+                      integration.last_sync_status === "success" &&
+                      indexedCount > 0
+                        ? `indexed ${indexedCount}`
+                        : "not indexed";
                     return (
                       <option key={integration.id} value={integration.id}>
-                        {label} {integration.is_active ? "" : "(inactive)"}
+                        {label} - {syncLabel}{" "}
+                        {integration.is_active ? "" : "(inactive)"}
                       </option>
                     );
                   })}

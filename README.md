@@ -43,8 +43,11 @@ NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
 OPENAI_API_KEY=...
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 NEXT_PUBLIC_PAYPAL_CLIENT_ID=...
 PAYPAL_CLIENT_SECRET=...
+INTEGRATIONS_SYNC_SECRET=...
+INTEGRATIONS_RECONCILE_SECRET=...
 ```
 
 > If you change the production domain, update `NEXT_PUBLIC_SITE_URL` so the widget and snippet links point to the correct host.
@@ -57,7 +60,17 @@ npm run dev         # Start Next.js in development mode
 npm run build       # Build for production
 npm run start       # Serve the generated build
 npm run lint        # ESLint (TS/React)
+npm run sync:woo    # Trigger a WooCommerce product sync
 ```
+
+## WooCommerce sync
+
+- Run migrations to enable the pgvector extension and Woo tables.
+- Use the Integrations page to sync products and copy the webhook URL.
+- Webhook endpoint: `/api/integrations/woocommerce/webhook?integration_id=...&token=...`
+- Reconcile endpoint (cron-friendly): POST `/api/integrations/woocommerce/reconcile`
+  with `Authorization: Bearer $INTEGRATIONS_RECONCILE_SECRET`.
+- Local sync script: `INTEGRATION_ID=... npm run sync:woo`
 
 ## 🗃️ Migrations
 

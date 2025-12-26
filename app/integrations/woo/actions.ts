@@ -4,14 +4,22 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createServer } from "@/lib/supabase/server";
-import { encrypt } from "@/lib/crypto";
+import { decrypt, encrypt } from "@/lib/crypto";
+import { randomUUID } from "crypto";
+import {
+  buildWooAuthHeaders,
+  buildWooUrl,
+  normalizeWooStoreUrl,
+  wooFetch,
+} from "@/lib/woo/client";
+import { syncWooProducts } from "@/lib/woo/sync";
 
 // =====================
 // SCHEMAS
 // =====================
 const CreateSchema = z.object({
   label: z.string().trim().min(2).max(80),
-  site_url: z.string().url().max(255),
+  store_url: z.string().url().max(255),
   consumer_key: z.string().min(10).max(255),
   consumer_secret: z.string().min(10).max(255),
   is_active: z.boolean().optional(),
@@ -20,7 +28,7 @@ const CreateSchema = z.object({
 const UpdateSchema = z.object({
   integration_id: z.string().uuid(),
   label: z.string().trim().min(2).max(80),
-  site_url: z.string().url().max(255),
+  store_url: z.string().url().max(255),
   consumer_key: z.string().min(10).max(255).optional(),
   consumer_secret: z.string().min(10).max(255).optional(),
   is_active: z.boolean().optional(),
@@ -32,6 +40,14 @@ const ToggleSchema = z.object({
 });
 
 const DeleteSchema = z.object({
+  integration_id: z.string().uuid(),
+});
+
+const TestSchema = z.object({
+  integration_id: z.string().uuid(),
+});
+
+const SyncSchema = z.object({
   integration_id: z.string().uuid(),
 });
 
@@ -68,15 +84,17 @@ export async function createWooIntegration(formData: FormData) {
 
     const parsed = CreateSchema.safeParse({
       label: formData.get("label"),
-      site_url: formData.get("site_url"),
+      store_url: formData.get("site_url"),
       consumer_key: formData.get("consumer_key"),
       consumer_secret: formData.get("consumer_secret"),
       is_active: formData.get("is_active") === "on",
     });
     if (!parsed.success) return redirectWithError("invalid");
 
-    const { label, site_url, consumer_key, consumer_secret, is_active } =
+    const { label, store_url, consumer_key, consumer_secret, is_active } =
       parsed.data;
+    const normalizedStoreUrl = normalizeWooStoreUrl(store_url);
+    if (!normalizedStoreUrl) return redirectWithError("invalid");
 
     const { data: positionData } = await supabase
       .from("integrations_woocommerce")
@@ -93,11 +111,12 @@ export async function createWooIntegration(formData: FormData) {
     const { error } = await supabase.from("integrations_woocommerce").insert({
       user_id: user.id,
       label,
-      site_url,
+      store_url: normalizedStoreUrl,
       ck_cipher: encrypt(consumer_key),
       cs_cipher: encrypt(consumer_secret),
       is_active: is_active ?? true,
       position: nextPosition,
+      webhook_token: randomUUID(),
     });
 
     if (error) {
@@ -132,7 +151,7 @@ export async function updateWooIntegration(formData: FormData) {
     const parsed = UpdateSchema.safeParse({
       integration_id: formData.get("integration_id"),
       label: formData.get("label"),
-      site_url: formData.get("site_url"),
+      store_url: formData.get("site_url"),
       consumer_key: consumerKeyRaw ? consumerKeyRaw : undefined,
       consumer_secret: consumerSecretRaw ? consumerSecretRaw : undefined,
       is_active: formData.get("is_active") === "on",
@@ -142,15 +161,17 @@ export async function updateWooIntegration(formData: FormData) {
     const {
       integration_id,
       label,
-      site_url,
+      store_url,
       consumer_key,
       consumer_secret,
       is_active,
     } = parsed.data;
+    const normalizedStoreUrl = normalizeWooStoreUrl(store_url);
+    if (!normalizedStoreUrl) return redirectWithError("invalid");
 
     const patch: Record<string, unknown> = {
       label,
-      site_url,
+      store_url: normalizedStoreUrl,
       is_active,
       updated_at: new Date().toISOString(),
     };
@@ -250,5 +271,88 @@ export async function deleteWooIntegration(formData: FormData) {
     handleRedirectError(err);
     console.error("[Woo] delete error", err);
     redirectWithError("unexpected");
+  }
+}
+
+// =====================
+// TEST CONNECTION
+// =====================
+export async function testWooIntegration(formData: FormData) {
+  try {
+    const supabase = await createServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) redirect("/login");
+
+    const parsed = TestSchema.safeParse({
+      integration_id: formData.get("integration_id"),
+    });
+    if (!parsed.success) return redirectWithError("invalid");
+
+    const { data: integration } = await supabase
+      .from("integrations_woocommerce")
+      .select("id, store_url, ck_cipher, cs_cipher")
+      .eq("id", parsed.data.integration_id)
+      .eq("user_id", user.id)
+      .single();
+
+    if (!integration) return redirectWithError("invalid");
+
+    const url = buildWooUrl(integration.store_url, "/products", {
+      per_page: 1,
+    });
+
+    await wooFetch(url, {
+      headers: {
+        Accept: "application/json",
+        ...buildWooAuthHeaders(
+          decrypt(integration.ck_cipher),
+          decrypt(integration.cs_cipher)
+        ),
+      },
+    });
+
+    revalidatePath("/integrations/woo");
+    redirect("/integrations/woo?status=test_ok");
+  } catch (err) {
+    handleRedirectError(err);
+    console.error("[Woo] test error", err);
+    redirectWithError("unexpected");
+  }
+}
+
+// =====================
+// SYNC PRODUCTS
+// =====================
+export async function syncWooIntegration(formData: FormData) {
+  try {
+    const supabase = await createServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) redirect("/login");
+
+    const parsed = SyncSchema.safeParse({
+      integration_id: formData.get("integration_id"),
+    });
+    if (!parsed.success) return redirectWithError("invalid");
+
+    const { data: integration } = await supabase
+      .from("integrations_woocommerce")
+      .select("id")
+      .eq("id", parsed.data.integration_id)
+      .eq("user_id", user.id)
+      .single();
+
+    if (!integration) return redirectWithError("invalid");
+
+    await syncWooProducts(integration.id);
+    revalidatePath("/integrations/woo");
+    redirect("/integrations/woo?status=sync_ok");
+  } catch (err) {
+    handleRedirectError(err);
+    console.error("[Woo] sync error", err);
+    redirect("/integrations/woo?error=sync_failed");
   }
 }

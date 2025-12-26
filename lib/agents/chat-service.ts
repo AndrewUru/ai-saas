@@ -58,13 +58,23 @@ const TOOLS = [
     function: {
       name: "search_products",
       description:
-        "Search for products in the store catalog by name or keyword. Use this to find prices, stock status, and permalinks.",
+        "Search the store catalog by name or keyword. Returns a compact list of products; use require_freshness only when you must confirm stock or pricing right now.",
       parameters: {
         type: "object",
         properties: {
           query: {
             type: "string",
             description: "The product name or keyword to search for.",
+          },
+          require_freshness: {
+            type: "boolean",
+            description:
+              "Set true only if the user explicitly asks to confirm live stock or pricing.",
+          },
+          product_id: {
+            type: "number",
+            description:
+              "WooCommerce product ID to refresh live if available.",
           },
         },
         required: ["query"],
@@ -258,7 +268,9 @@ export async function chatWithAgent(
       if (toolCall.function.name === "search_products") {
         try {
           const args = JSON.parse(toolCall.function.arguments);
-          const products = await wooSearchProductsByApiKey(apiKey, args.query);
+          const products = await wooSearchProductsByApiKey(apiKey, args, {
+            openaiApiKey: deps.openaiApiKey,
+          });
           const resultStr = JSON.stringify(products);
 
           messages.push({

@@ -1,88 +1,157 @@
-// lib/tools/woo.ts
-import { decrypt } from "@/lib/crypto";
-import { createServer } from "@/lib/supabase/server";
+import { z } from "zod";
+import { createAdmin } from "@/lib/supabase/admin";
+import {
+  buildWooAuthHeaders,
+  buildWooUrl,
+  getWooCredsByApiKey,
+  wooFetch,
+} from "@/lib/woo/client";
+import { embedText, toPgVector } from "@/lib/woo/embeddings";
+import { syncWooProductById } from "@/lib/woo/sync";
 
-function buildWooUrl(
-  base: string,
-  path: string,
-  params: Record<string, string>
-) {
-  // Ensure base ends with slash to treat it as a directory for relative path resolution
-  const validBase = base.endsWith("/") ? base : `${base}/`;
-  // Relative path to append (no leading slash)
-  const relativePath = `wp-json/wc/v3${path}`.replace(/^\//, "");
-  
-  const url = new URL(relativePath, validBase);
-  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-  return url.toString();
+const MAX_RESULTS = 8;
+
+const searchArgsSchema = z.object({
+  query: z.string().min(1).max(200),
+  require_freshness: z.boolean().optional(),
+  product_id: z.coerce.number().int().positive().optional(),
+  limit: z.coerce.number().int().min(1).max(MAX_RESULTS).optional(),
+});
+
+type WooProductApi = {
+  id: number;
+  name: string;
+  price?: string;
+  permalink?: string;
+  stock_status?: string;
+  images?: Array<{ src: string }>;
+};
+
+type WooSearchResult = {
+  woo_product_id: number;
+  name: string;
+  price: string | null;
+  stock_status: string | null;
+  permalink: string | null;
+  image: string | null;
+  score: number | null;
+};
+
+function toSearchResult(
+  product: WooProductApi,
+  score: number | null
+): WooSearchResult {
+  return {
+    woo_product_id: product.id,
+    name: product.name,
+    price: product.price ?? null,
+    stock_status: product.stock_status ?? null,
+    permalink: product.permalink ?? null,
+    image: product.images?.[0]?.src ?? null,
+    score,
+  };
 }
 
-/**
- * Obtiene credenciales Woo para el agente identificado por api_key
- */
-export async function getWooCredsByApiKey(api_key: string) {
-  const supabase = await createServer();
-  // 1) agent -> woo_integration_id
-  const { data: agent } = await supabase
-    .from("agents")
-    .select("user_id, woo_integration_id")
-    .eq("api_key", api_key)
-    .single();
-  if (!agent?.woo_integration_id) return null;
+async function searchWooProductsLive(
+  creds: NonNullable<Awaited<ReturnType<typeof getWooCredsByApiKey>>>,
+  query: string,
+  limit: number
+) {
+  const url = buildWooUrl(creds.store_url, "/products", {
+    search: query,
+    per_page: limit,
+  });
 
-  // 2) integration -> site_url + ck/cs
-  const { data: integ } = await supabase
-    .from("integrations_woocommerce")
-    .select("site_url, ck_cipher, cs_cipher, is_active")
-    .eq("id", agent.woo_integration_id)
-    .eq("user_id", agent.user_id)
-    .single();
-  if (!integ || !integ.is_active) return null;
+  const res = await wooFetch(url, {
+    headers: {
+      Accept: "application/json",
+      ...buildWooAuthHeaders(creds.ck, creds.cs),
+    },
+  });
 
-  return {
-    site_url: integ.site_url,
-    ck: decrypt(integ.ck_cipher),
-    cs: decrypt(integ.cs_cipher),
-  };
+  const items = (await res.json()) as WooProductApi[];
+  return items.map((product) => toSearchResult(product, null));
+}
+
+async function refreshWooProduct(
+  creds: NonNullable<Awaited<ReturnType<typeof getWooCredsByApiKey>>>,
+  productId: number
+) {
+  const url = buildWooUrl(creds.store_url, `/products/${productId}`);
+  const res = await wooFetch(url, {
+    headers: {
+      Accept: "application/json",
+      ...buildWooAuthHeaders(creds.ck, creds.cs),
+    },
+  });
+
+  const product = (await res.json()) as WooProductApi;
+  await syncWooProductById(creds.integration_id, product.id);
+  return toSearchResult(product, null);
 }
 
 export async function wooSearchProductsByApiKey(
-  api_key: string,
-  query: string,
-  perPage = 5
+  apiKey: string,
+  args: unknown,
+  options: { openaiApiKey: string }
 ) {
-  const creds = await getWooCredsByApiKey(api_key);
-  if (!creds) throw new Error("Integración Woo no configurada");
-
-  const url = buildWooUrl(creds.site_url, "/products", {
-    search: query,
-    per_page: String(perPage),
-    consumer_key: creds.ck,
-    consumer_secret: creds.cs,
-  });
-
-  const res = await fetch(url, { headers: { Accept: "application/json" } });
-  
-  if (!res.ok) {
-    const body = await res.text();
-    console.error(`[Woo] Error ${res.status} at ${url}:`, body);
-    throw new Error(`Woo error ${res.status}: ${body.slice(0, 100)}`);
+  const parsed = searchArgsSchema.safeParse(args);
+  if (!parsed.success) {
+    throw new Error("Invalid search arguments.");
   }
 
-  type WooProductApi = {
-    id: number;
-    name: string;
-    price: string;
-    permalink: string;
-    stock_status: string;
-  };
+  const { query, require_freshness, product_id, limit } = parsed.data;
+  const maxResults = limit ?? MAX_RESULTS;
 
-  const items = (await res.json()) as WooProductApi[];
-  return items.map((product) => ({
-    id: product.id,
-    name: product.name,
-    price: product.price,
-    permalink: product.permalink,
-    stock_status: product.stock_status,
-  }));
+  const creds = await getWooCredsByApiKey(apiKey);
+  if (!creds) {
+    throw new Error("Woo integration not configured.");
+  }
+
+  const hasIndex =
+    creds.products_indexed_count !== null &&
+    creds.products_indexed_count > 0 &&
+    creds.last_sync_status === "success";
+
+  const supabase = createAdmin();
+  let results: WooSearchResult[] = [];
+
+  if (hasIndex && options.openaiApiKey) {
+    const embedding = await embedText(query, options.openaiApiKey);
+    const { data } = await supabase.rpc("match_woo_products", {
+      query_embedding: toPgVector(embedding),
+      match_count: maxResults,
+      target_integration: creds.integration_id,
+      match_threshold: 0.2,
+    });
+
+    results = (data ?? []).map(
+      (row: WooSearchResult & { similarity: number }) => ({
+        woo_product_id: row.woo_product_id,
+        name: row.name,
+        price: row.price ?? null,
+        stock_status: row.stock_status ?? null,
+        permalink: row.permalink ?? null,
+        image: row.image ?? null,
+        score: row.similarity ?? null,
+      })
+    );
+  }
+
+  if (!results.length) {
+    results = await searchWooProductsLive(creds, query, maxResults);
+  }
+
+  if (require_freshness) {
+    const refreshId = product_id ?? results[0]?.woo_product_id;
+    if (refreshId) {
+      const fresh = await refreshWooProduct(creds, refreshId);
+      results = [
+        fresh,
+        ...results.filter((item) => item.woo_product_id !== refreshId),
+      ].slice(0, maxResults);
+    }
+  }
+
+  return results.slice(0, maxResults);
 }

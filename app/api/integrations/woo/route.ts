@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { createServer } from "@/lib/supabase/server";
 import { encrypt } from "@/lib/crypto";
 import { z } from "zod";
+import { normalizeWooStoreUrl } from "@/lib/woo/client";
 
 const BaseSchema = z.object({
-  site_url: z.string().url().max(255),
+  store_url: z.string().url().max(255),
   label: z
     .string()
     .trim()
@@ -46,7 +47,7 @@ export async function GET(req: Request) {
 
   const { data, error: dbError } = await supabase
     .from("integrations_woocommerce")
-    .select("id, site_url, label, is_active, position, created_at, updated_at")
+    .select("id, store_url, label, is_active, position, created_at, updated_at")
     .eq("user_id", user.id)
     .order("position", { ascending: true })
     .order("created_at", { ascending: false })
@@ -72,8 +73,18 @@ export async function POST(req: Request) {
     return error("Payload invalido");
   }
 
-  const { site_url, label, consumer_key, consumer_secret, position, is_active } =
-    parsed.data;
+  const {
+    store_url,
+    label,
+    consumer_key,
+    consumer_secret,
+    position,
+    is_active,
+  } = parsed.data;
+  const normalizedStoreUrl = normalizeWooStoreUrl(store_url);
+  if (!normalizedStoreUrl) {
+    return error("Payload invalido");
+  }
 
   const { count } = await supabase
     .from("integrations_woocommerce")
@@ -89,7 +100,7 @@ export async function POST(req: Request) {
     .from("integrations_woocommerce")
     .insert({
       user_id: user.id,
-      site_url,
+      store_url: normalizedStoreUrl,
       label,
       ck_cipher: encrypt(consumer_key),
       cs_cipher: encrypt(consumer_secret),
@@ -121,19 +132,25 @@ export async function PATCH(req: Request) {
 
   const {
     integration_id,
-    site_url,
+    store_url,
     label,
     consumer_key,
     consumer_secret,
     position,
     is_active,
   } = parsed.data;
+  const normalizedStoreUrl = store_url
+    ? normalizeWooStoreUrl(store_url)
+    : null;
+  if (store_url && !normalizedStoreUrl) {
+    return error("Payload invalido");
+  }
 
   const patch: Record<string, unknown> = {
     updated_at: new Date().toISOString(),
   };
 
-  if (site_url) patch.site_url = site_url;
+  if (normalizedStoreUrl) patch.store_url = normalizedStoreUrl;
   if (label) patch.label = label;
   if (typeof is_active === "boolean") patch.is_active = is_active;
   if (typeof position === "number") patch.position = position;
