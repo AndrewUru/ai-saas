@@ -19,39 +19,38 @@ export function renderStyles(a: WidgetAppearance) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 56px;
-  height: 56px;
-  padding: 0 18px;
-  background: linear-gradient(135deg, ${a.colorToggleBg}, ${a.accent});
+  min-width: 52px;
+  height: 52px;
+  padding: 0 16px;
+  background: ${a.colorToggleBg};
   color: ${a.colorToggleText};
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(15, 23, 42, 0.12);
   cursor: pointer;
-  box-shadow: 0 10px 28px ${a.accentShadow};
-  gap: 10px;
-  font-weight: 700;
-  font-size: 14px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+  gap: 8px;
+  font-weight: 600;
+  font-size: 13px;
   letter-spacing: 0.01em;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-  backdrop-filter: blur(6px);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 #ai-saas-toggle:hover {
-  transform: translateY(-1px) scale(1.04);
-  box-shadow: 0 12px 32px ${a.accentShadow};
-  filter: brightness(1.02);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
+  border-color: rgba(15, 23, 42, 0.18);
 }
 
 #ai-saas-toggle .ai-saas-icon {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  font-weight: 700;
+  background: transparent;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  font-weight: 600;
 }
 
 #ai-saas-toggle .ai-saas-icon svg {
@@ -74,16 +73,17 @@ export function renderStyles(a: WidgetAppearance) {
 #ai-saas-widget {
   width: clamp(360px, 32vw + 120px, 520px);
   max-width: min(540px, calc(100vw - 48px));
-  height: clamp(520px, 70vh, 760px);
-  max-height: min(88vh, 820px);
-  background: #f8fafc;
-  border-radius: 18px;
+  height: clamp(480px, 62vh, 720px);
+  max-height: min(78vh, 820px);
+  background: #ffffff;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.14);
   display: flex;
   flex-direction: column;
   opacity: 0;
-  transform: translateY(18px) scale(0.96);
+  transform: translateY(14px);
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
   position: absolute;
@@ -93,18 +93,26 @@ export function renderStyles(a: WidgetAppearance) {
 
 #ai-saas-anchor.open #ai-saas-widget {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
   pointer-events: auto;
+}
+  /* Laptops con poca altura (ej: 768px o menos) */
+@media (max-height: 800px) {
+  #ai-saas-widget {
+    height: min(620px, 68vh);
+    max-height: 68vh;
+  }
 }
 
 #ai-saas-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
+  gap: 10px;
+  padding: 10px 14px;
   background: ${a.colorHeaderBg};
   color: ${a.colorHeaderText};
-  height: 60px;
+  height: 54px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .ai-saas-brand {
@@ -115,16 +123,17 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 .ai-saas-brand-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #fff;
-  color: ${a.colorHeaderBg};
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: transparent;
+  color: ${a.colorHeaderText};
+  border: 1px solid rgba(15, 23, 42, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 18px;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .ai-saas-brand-text {
@@ -133,23 +142,23 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 .ai-saas-brand-text strong {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
 }
 
 .ai-saas-brand-text span {
-  font-size: 13px;
-  opacity: 0.8;
+  font-size: 12px;
+  opacity: 0.72;
 }
 
 #ai-saas-close {
   background: transparent;
   color: ${a.colorHeaderText};
-  border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -158,17 +167,15 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 #ai-saas-close:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.06);
 }
 
 #ai-saas-chat-box {
-  padding: 18px min(7%, 32px);
+  padding: 16px min(7%, 28px);
   flex: 1;
   overflow-y: auto;
   background-color: ${a.colorChatBg};
-  background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
-  background-repeat: repeat;
-  background-size: 400px;
+  background-image: none;
 }
 
 #ai-saas-chat-box::-webkit-scrollbar {
@@ -182,14 +189,15 @@ export function renderStyles(a: WidgetAppearance) {
 
 .ai-saas-bubble {
   position: relative;
-  max-width: 80%;
+  max-width: 78%;
   padding: 8px 12px;
   margin-bottom: 8px;
-  border-radius: 7.5px;
-  font-size: 14.2px;
-  line-height: 19px;
-  color: #111b21;
-  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 20px;
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: none;
   word-wrap: break-word;
 }
 
@@ -197,42 +205,12 @@ export function renderStyles(a: WidgetAppearance) {
   margin-left: auto;
   background: ${a.colorUserBubbleBg};
   color: ${a.colorUserBubbleText};
-  border-top-right-radius: 0;
-}
-
-.ai-saas-bubble.user::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: -8px;
-  width: 0;
-  height: 0;
-  border: 8px solid transparent;
-  border-top-color: ${a.colorUserBubbleBg};
-  border-left: 0;
-  border-bottom: 0;
-  margin-top: 0;
-  margin-right: 0;
 }
 
 .ai-saas-bubble.bot {
   margin-right: auto;
   background: ${a.colorBotBubbleBg};
   color: ${a.colorBotBubbleText};
-  border-top-left-radius: 0;
-}
-
-.ai-saas-bubble.bot::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -8px;
-  width: 0;
-  height: 0;
-  border: 8px solid transparent;
-  border-top-color: ${a.colorBotBubbleBg};
-  border-right: 0;
-  border-bottom: 0;
 }
 
 .ai-saas-bubble.typing {
@@ -267,11 +245,12 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 #ai-saas-form {
-  padding: 10px;
-  background: #f0f2f5;
+  padding: 10px 12px;
+  background: #ffffff;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .ai-saas-input-wrapper {
@@ -279,30 +258,31 @@ export function renderStyles(a: WidgetAppearance) {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fff;
-  border-radius: 24px;
-  padding: 8px 16px;
+  background: transparent;
+  border-radius: 12px;
+  padding: 8px 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
 }
 
 .ai-saas-input-wrapper input {
   flex: 1;
   border: none;
   outline: none;
-  font-size: 15px;
+  font-size: 14px;
   background: transparent;
-  color: #111b21;
+  color: #0f172a;
   padding: 4px 0;
 }
 
 .ai-saas-input-wrapper input::placeholder {
-  color: #8696a0;
+  color: #94a3b8;
 }
 
 .ai-saas-input-wrapper button {
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #54656f;
+  color: #475569;
   padding: 4px;
   display: flex;
   align-items: center;
@@ -311,7 +291,7 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 .ai-saas-input-wrapper button:hover {
-  color: #008069;
+  color: ${a.accent};
 }
 
 .ai-saas-input-wrapper button:disabled {
@@ -321,15 +301,16 @@ export function renderStyles(a: WidgetAppearance) {
 
 /* Fallback/Error Styles in Bubble */
 .ai-saas-bubble.ai-saas-error {
-  background: #fdf2f2;
-  color: #a02222;
+  background: #fff1f2;
+  color: #9f1239;
+  border-color: rgba(159, 18, 57, 0.15);
 }
 
 .ai-saas-fallback {
   display: block;
   margin-top: 4px;
   font-size: 12px;
-  color: #027eb5;
+  color: ${a.accent};
   text-decoration: none;
 }
 .ai-saas-fallback:hover {
