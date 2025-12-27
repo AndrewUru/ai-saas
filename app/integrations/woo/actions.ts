@@ -6,12 +6,7 @@ import { z } from "zod";
 import { createServer } from "@/lib/supabase/server";
 import { decrypt, encrypt } from "@/lib/crypto";
 import { randomUUID } from "crypto";
-import {
-  buildWooAuthHeaders,
-  buildWooUrl,
-  normalizeWooStoreUrl,
-  wooFetch,
-} from "@/lib/woo/client";
+import { normalizeWooStoreUrl } from "@/lib/woo/client";
 import { syncWooProducts } from "@/lib/woo/sync";
 
 // =====================
@@ -299,19 +294,54 @@ export async function testWooIntegration(formData: FormData) {
 
     if (!integration) return redirectWithError("invalid");
 
-    const url = buildWooUrl(integration.store_url, "/products", {
-      per_page: 1,
+    const normalizedStoreUrl = normalizeWooStoreUrl(integration.store_url);
+    if (!normalizedStoreUrl) return redirectWithError("invalid");
+
+    const hostname = new URL(normalizedStoreUrl).hostname;
+    const baseUrl = `https://${hostname}`;
+    const endpoint = `${baseUrl}/wp-json/wc/v3/system_status`;
+    const auth = Buffer.from(
+      `${decrypt(integration.ck_cipher)}:${decrypt(integration.cs_cipher)}`
+    ).toString("base64");
+
+    const res = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        Authorization: `Basic ${auth}`,
+        "User-Agent": "ai-saas/1.0",
+        Accept: "application/json",
+      },
+      cache: "no-store",
     });
 
-    await wooFetch(url, {
-      headers: {
-        Accept: "application/json",
-        ...buildWooAuthHeaders(
-          decrypt(integration.ck_cipher),
-          decrypt(integration.cs_cipher)
-        ),
-      },
-    });
+    if (!res.ok) {
+      const text = await res.text();
+
+      let wooCode = "";
+      let wooMessage = "";
+      try {
+        const j = JSON.parse(text);
+        wooCode = typeof j?.code === "string" ? j.code : "";
+        wooMessage = typeof j?.message === "string" ? j.message : "";
+      } catch {
+        // no JSON
+      }
+
+      console.error("[Woo] system_status failed", {
+        status: res.status,
+        wooCode,
+        wooMessage,
+        bodyPreview: text.slice(0, 500),
+      });
+
+      const params = new URLSearchParams({
+        error: "sync_failed",
+        status: String(res.status),
+      });
+      if (wooCode) params.set("code", wooCode);
+
+      redirect(`/integrations/woo?${params.toString()}`);
+    }
 
     revalidatePath("/integrations/woo");
     redirect("/integrations/woo?status=test_ok");

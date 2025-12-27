@@ -11,6 +11,8 @@ import {
   updateWooIntegration,
 } from "./actions";
 
+export const runtime = "nodejs";
+
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 function statusMessage(status: string | null) {
@@ -33,14 +35,49 @@ function statusMessage(status: string | null) {
   }
 }
 
-function errorMessage(error: string | null) {
+function errorMessage(
+  error: string | null,
+  status: number | null,
+  code: string | null
+) {
+  if (error === "sync_failed") {
+    const detailParts = [];
+    if (status) detailParts.push(`status ${status}`);
+    if (code) detailParts.push(`code ${code}`);
+    const details = detailParts.length ? ` (${detailParts.join(", ")})` : "";
+
+    if (status === 401) {
+      return (
+        "Credenciales invalidas o sin permisos. Regenera la API key en Woo (Read)." +
+        details
+      );
+    }
+    if (status === 403) {
+      return (
+        "Bloqueado por seguridad/WAF. Permite /wp-json/wc/v3 desde Vercel." +
+        details
+      );
+    }
+    if (status === 404 || code === "rest_no_route") {
+      return (
+        "Ruta Woo REST no disponible. Revisa permalinks y WooCommerce." +
+        details
+      );
+    }
+    if (status === 429) {
+      return "Rate limit. Reintenta en unos minutos." + details;
+    }
+    if (status && status >= 500) {
+      return "Error del servidor de la tienda." + details;
+    }
+    return "Sync failed. Please verify the credentials and try again." + details;
+  }
+
   switch (error) {
     case "invalid":
       return "Check the fields: there is invalid data.";
     case "db":
-      return "We couldn’t save the changes. Please try again.";
-    case "sync_failed":
-      return "Sync failed. Please verify the credentials and try again.";
+      return "We couldn??Tt save the changes. Please try again.";
     case "unexpected":
       return "An unexpected error occurred while processing the integration.";
     default:
@@ -70,6 +107,13 @@ export default async function WooIntegrationPage({
   const params = await searchParams;
   const statusParam = typeof params.status === "string" ? params.status : null;
   const errorParam = typeof params.error === "string" ? params.error : null;
+  const codeParam = typeof params.code === "string" ? params.code : null;
+  const statusCodeRaw =
+    errorParam === "sync_failed" && statusParam ? Number(statusParam) : null;
+  const statusCode =
+    typeof statusCodeRaw === "number" && Number.isFinite(statusCodeRaw)
+      ? statusCodeRaw
+      : null;
 
   const { data: integrations, error } = await supabase
     .from("integrations_woocommerce")
@@ -85,7 +129,7 @@ export default async function WooIntegrationPage({
   }
 
   const status = statusMessage(statusParam);
-  const errorMsg = errorMessage(errorParam);
+  const errorMsg = errorMessage(errorParam, statusCode, codeParam);
 
   return (
     <main className="bg-slate-950 text-slate-100">
