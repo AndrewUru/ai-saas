@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createServer } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/site";
+import SyncControls from "./SyncControls";
 import {
   createWooIntegration,
   deleteWooIntegration,
@@ -108,6 +109,7 @@ export default async function WooIntegrationPage({
   const statusParam = typeof params.status === "string" ? params.status : null;
   const errorParam = typeof params.error === "string" ? params.error : null;
   const codeParam = typeof params.code === "string" ? params.code : null;
+  const syncTargetId = typeof params.sync_id === "string" ? params.sync_id : null;
   const statusCodeRaw =
     errorParam === "sync_failed" && statusParam ? Number(statusParam) : null;
   const statusCode =
@@ -397,116 +399,32 @@ export default async function WooIntegrationPage({
                           </div>
                         </form>
                       </details>
-
-                      <div className="grid gap-3 rounded-xl border border-slate-800/60 bg-slate-900/40 p-4 text-xs text-slate-300">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <span className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                            Sync status
-                          </span>
-                          <span className="text-xs font-semibold text-white">
-                            {integration.last_sync_status ?? "Not synced"}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <span className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                            Products indexed
-                          </span>
-                          <span className="text-xs font-semibold text-white">
-                            {integration.products_indexed_count ?? 0}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <span className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                            Last sync
-                          </span>
-                          <span className="text-xs font-semibold text-white">
-                            {formatSyncDate(integration.last_sync_at ?? null)}
-                          </span>
-                        </div>
-                        {integration.last_sync_error && (
-                          <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
-                            {integration.last_sync_error}
-                          </p>
+                      <SyncControls
+                        integration={{
+                          id: integration.id,
+                          is_active: integration.is_active ?? false,
+                          last_sync_status: integration.last_sync_status ?? null,
+                          last_sync_error: integration.last_sync_error ?? null,
+                          last_sync_at: integration.last_sync_at ?? null,
+                          products_indexed_count:
+                            integration.products_indexed_count ?? 0,
+                        }}
+                        formattedLastSync={formatSyncDate(
+                          integration.last_sync_at ?? null
                         )}
-                        {integration.webhook_token && (
-                          <div className="rounded-lg border border-slate-800/60 bg-slate-950/60 px-3 py-2">
-                            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
-                              Webhook URL
-                            </p>
-                            <p className="mt-1 break-all font-mono text-[11px] text-emerald-200">
-                              {`${getSiteUrl()}/api/integrations/woocommerce/webhook?integration_id=${integration.id}&token=${integration.webhook_token}`}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-3 text-xs">
-                        <form action={setWooIntegrationState}>
-                          <input
-                            type="hidden"
-                            name="integration_id"
-                            value={integration.id}
-                          />
-
-                          <input
-                            type="hidden"
-                            name="state"
-                            value={
-                              integration.is_active ? "deactivate" : "activate"
-                            }
-                          />
-
-                          <button
-                            type="submit"
-                            className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
-                          >
-                            {integration.is_active ? "Pause" : "Activate"}
-                          </button>
-                        </form>
-
-                        <form action={testWooIntegration}>
-                          <input
-                            type="hidden"
-                            name="integration_id"
-                            value={integration.id}
-                          />
-                          <button
-                            type="submit"
-                            className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
-                          >
-                            Test connection
-                          </button>
-                        </form>
-
-                        <form action={syncWooIntegration}>
-                          <input
-                            type="hidden"
-                            name="integration_id"
-                            value={integration.id}
-                          />
-                          <button
-                            type="submit"
-                            className="inline-flex items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 font-semibold text-emerald-200 transition hover:border-emerald-400/70 hover:bg-emerald-500/20"
-                          >
-                            Sync products now
-                          </button>
-                        </form>
-
-                        <form action={deleteWooIntegration}>
-                          <input
-                            type="hidden"
-                            name="integration_id"
-                            value={integration.id}
-                          />
-
-                          <button
-                            type="submit"
-                            className="inline-flex items-center justify-center rounded-full border border-rose-500/40 px-4 py-2 font-semibold text-rose-200 transition hover:border-rose-400 hover:text-rose-100"
-                          >
-                            Delete
-                          </button>
-                        </form>
-                      </div>
+                        webhookUrl={
+                          integration.webhook_token
+                            ? `${getSiteUrl()}/api/integrations/woocommerce/webhook?integration_id=${integration.id}&token=${integration.webhook_token}`
+                            : null
+                        }
+                        statusParam={statusParam}
+                        errorParam={errorParam}
+                        syncTargetId={syncTargetId}
+                        onToggle={setWooIntegrationState}
+                        onSync={syncWooIntegration}
+                        onTest={testWooIntegration}
+                        onDelete={deleteWooIntegration}
+                      />
                     </li>
                   ))}
                 </ul>

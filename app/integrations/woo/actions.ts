@@ -379,10 +379,14 @@ export async function syncWooIntegration(formData: FormData) {
 
     await syncWooProducts(integration.id);
     revalidatePath("/integrations/woo");
-    redirect("/integrations/woo?status=sync_ok");
+    redirect(`/integrations/woo?status=sync_ok&sync_id=${integration.id}`);
   } catch (err) {
     handleRedirectError(err);
     console.error("[Woo] sync error", err);
-    redirect("/integrations/woo?error=sync_failed");
+    redirect(
+      `/integrations/woo?error=sync_failed&sync_id=${String(
+        formData.get("integration_id") ?? ""
+      )}`
+    );
   }
 }
