@@ -299,7 +299,7 @@ export async function testWooIntegration(formData: FormData) {
 
     const hostname = new URL(normalizedStoreUrl).hostname;
     const baseUrl = `https://${hostname}`;
-    const endpoint = `${baseUrl}/wp-json/wc/v3/system_status`;
+    const endpoint = `${baseUrl}/wp-json/wc/v3/products?per_page=1`;
     const auth = Buffer.from(
       `${decrypt(integration.ck_cipher)}:${decrypt(integration.cs_cipher)}`
     ).toString("base64");
