@@ -22,6 +22,16 @@ type AgentMessageRecord = {
   reply: string | null;
 };
 
+type ProductSearchItem = {
+  woo_product_id: number;
+  name: string;
+  price: string | null;
+  stock_status: string | null;
+  permalink: string | null;
+  image: string | null;
+  score: number | null;
+};
+
 // Simplified types for OpenAI structures
 type OpenAIToolCall = {
   id: string;
@@ -82,6 +92,50 @@ const TOOLS = [
     },
   },
 ];
+
+function buildProductListTitle(language: string | null, query: string | null) {
+  const trimmedQuery = query?.trim();
+  const baseTitles: Record<string, string> = {
+    es: "Productos sugeridos",
+    en: "Suggested products",
+    pt: "Produtos sugeridos",
+    fr: "Produits suggeres",
+  };
+
+  if (!trimmedQuery) {
+    return baseTitles[language ?? ""] ?? "Suggested products";
+  }
+
+  switch (language) {
+    case "es":
+      return `Resultados para \"${trimmedQuery}\"`;
+    case "pt":
+      return `Resultados para \"${trimmedQuery}\"`;
+    case "fr":
+      return `Resultats pour \"${trimmedQuery}\"`;
+    default:
+      return `Results for \"${trimmedQuery}\"`;
+  }
+}
+
+function buildProductListReply(
+  items: ProductSearchItem[],
+  language: string | null,
+  query: string | null
+) {
+  return JSON.stringify({
+    type: "product_list",
+    title: buildProductListTitle(language, query),
+    items: items.map((item) => ({
+      id: item.woo_product_id,
+      name: item.name,
+      price: item.price,
+      permalink: item.permalink,
+      image: item.image,
+      stock_status: item.stock_status,
+    })),
+  });
+}
 
 function buildSystemPrompt(agent: AgentRecord) {
   const sections = [
@@ -263,15 +317,22 @@ export async function chatWithAgent(
       tool_calls: assistantMsg.tool_calls,
     });
 
+    let productResults: ProductSearchItem[] | null = null;
+    let productQuery: string | null = null;
+
     // Execute tools
     for (const toolCall of assistantMsg.tool_calls) {
       if (toolCall.function.name === "search_products") {
         try {
           const args = JSON.parse(toolCall.function.arguments);
+          if (typeof args?.query === "string") {
+            productQuery = args.query;
+          }
           const products = await wooSearchProductsByApiKey(apiKey, args, {
             openaiApiKey: deps.openaiApiKey,
           });
           const resultStr = JSON.stringify(products);
+          productResults = products;
 
           messages.push({
             role: "tool",
@@ -289,6 +350,13 @@ export async function chatWithAgent(
       }
     }
 
+    if (productResults && productResults.length > 0) {
+      reply = buildProductListReply(
+        productResults,
+        validAgent.language ?? null,
+        productQuery
+      );
+    } else {
     // 2nd Round Trip (with tool results)
     response = await fetchOpenAI(messages);
     if (!response.ok) {
@@ -306,6 +374,7 @@ export async function chatWithAgent(
     reply =
       completion.choices?.[0]?.message?.content?.trim() ||
       "Sorry, I couldn't generate a final response.";
+    }
   }
 
   // Save conversation
