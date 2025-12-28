@@ -1,6 +1,6 @@
 import { createAdmin } from "@/lib/supabase/admin";
 import { decrypt } from "@/lib/crypto";
-import { buildWooAuthHeaders, buildWooUrl, wooFetch } from "@/lib/woo/client";
+import { buildWooUrl, wooFetch } from "@/lib/woo/client";
 import { embedTexts, toPgVector } from "@/lib/woo/embeddings";
 
 type WooProductApi = {
@@ -136,12 +136,13 @@ export async function syncWooProducts(integrationId: string) {
       const url = buildWooUrl(integration.store_url, "/products", {
         per_page: 100,
         page,
+        consumer_key: ck,
+        consumer_secret: cs,
       });
 
       const res = await wooFetch(url, {
         headers: {
           Accept: "application/json",
-          ...buildWooAuthHeaders(ck, cs),
         },
       });
 
@@ -205,11 +206,13 @@ export async function syncWooProductById(
   const ck = integration.ck_cipher ? decrypt(integration.ck_cipher) : "";
   const cs = integration.cs_cipher ? decrypt(integration.cs_cipher) : "";
 
-  const url = buildWooUrl(integration.store_url, `/products/${wooProductId}`);
+  const url = buildWooUrl(integration.store_url, `/products/${wooProductId}`, {
+    consumer_key: ck,
+    consumer_secret: cs,
+  });
   const res = await wooFetch(url, {
     headers: {
       Accept: "application/json",
-      ...buildWooAuthHeaders(ck, cs),
     },
   });
 
@@ -260,12 +263,13 @@ export async function reconcileWooProducts(integrationId: string) {
     orderby: "modified",
     order: "desc",
     modified_after: integration.last_sync_at ?? undefined,
+    consumer_key: ck,
+    consumer_secret: cs,
   });
 
   const res = await wooFetch(url, {
     headers: {
       Accept: "application/json",
-      ...buildWooAuthHeaders(ck, cs),
     },
   });
 

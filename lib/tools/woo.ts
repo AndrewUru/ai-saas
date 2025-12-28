@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { createAdmin } from "@/lib/supabase/admin";
 import {
-  buildWooAuthHeaders,
   buildWooUrl,
   getWooCredsByApiKey,
   wooFetch,
@@ -60,12 +59,13 @@ async function searchWooProductsLive(
   const url = buildWooUrl(creds.store_url, "/products", {
     search: query,
     per_page: limit,
+    consumer_key: creds.ck,
+    consumer_secret: creds.cs,
   });
 
   const res = await wooFetch(url, {
     headers: {
       Accept: "application/json",
-      ...buildWooAuthHeaders(creds.ck, creds.cs),
     },
   });
 
@@ -77,11 +77,13 @@ async function refreshWooProduct(
   creds: NonNullable<Awaited<ReturnType<typeof getWooCredsByApiKey>>>,
   productId: number
 ) {
-  const url = buildWooUrl(creds.store_url, `/products/${productId}`);
+  const url = buildWooUrl(creds.store_url, `/products/${productId}`, {
+    consumer_key: creds.ck,
+    consumer_secret: creds.cs,
+  });
   const res = await wooFetch(url, {
     headers: {
       Accept: "application/json",
-      ...buildWooAuthHeaders(creds.ck, creds.cs),
     },
   });
 

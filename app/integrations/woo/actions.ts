@@ -299,15 +299,15 @@ export async function testWooIntegration(formData: FormData) {
 
     const hostname = new URL(normalizedStoreUrl).hostname;
     const baseUrl = `https://${hostname}`;
-    const endpoint = `${baseUrl}/wp-json/wc/v3/products?per_page=1`;
-    const auth = Buffer.from(
-      `${decrypt(integration.ck_cipher)}:${decrypt(integration.cs_cipher)}`
-    ).toString("base64");
+    const ck = decrypt(integration.ck_cipher);
+    const cs = decrypt(integration.cs_cipher);
+    const endpoint = `${baseUrl}/wp-json/wc/v3/products?per_page=1&consumer_key=${encodeURIComponent(
+      ck
+    )}&consumer_secret=${encodeURIComponent(cs)}`;
 
     const res = await fetch(endpoint, {
       method: "GET",
       headers: {
-        Authorization: `Basic ${auth}`,
         "User-Agent": "ai-saas/1.0",
         Accept: "application/json",
       },
@@ -327,7 +327,7 @@ export async function testWooIntegration(formData: FormData) {
         // no JSON
       }
 
-      console.error("[Woo] system_status failed", {
+      console.error("[Woo] test failed", {
         status: res.status,
         wooCode,
         wooMessage,

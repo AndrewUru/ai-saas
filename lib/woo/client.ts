@@ -27,11 +27,16 @@ export function buildWooUrl(
   const validBase = base.endsWith("/") ? base : `${base}/`;
   const relativePath = `wp-json/wc/v3${path}`.replace(/^\//, "");
   const url = new URL(relativePath, validBase);
-  Object.entries(params).forEach(([key, value]) => {
-    if (value === undefined) return;
-    url.searchParams.set(key, String(value));
-  });
-  return url.toString();
+  const entries = Object.entries(params).filter(([, value]) => value !== undefined);
+  if (!entries.length) return url.toString();
+
+  const query = entries
+    .map(([key, value]) => {
+      return `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`;
+    })
+    .join("&");
+
+  return `${url.toString()}?${query}`;
 }
 
 export function buildWooAuthHeaders(ck: string, cs: string) {
