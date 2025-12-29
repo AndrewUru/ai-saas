@@ -1,9 +1,10 @@
+//C:\ai-saas\components\PricingCards.tsx
 "use client";
 
-import { PayPalScriptProvider } from "@paypal/react-paypal-js";
-import { SubscriptionPayPalButton } from "./PayPalButton";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const plans = [
   {
@@ -11,52 +12,30 @@ const plans = [
     name: "Free",
     headline: "Start building agents",
     price: "0",
-    period: "per month",
+    period: "forever",
     description: "Perfect to test the dashboard and launch your first agent.",
-    features: ["1 active agent", "Standard support", "Basic customization"],
-
+    features: ["1 agent", "Standard support", "Basic customization"],
     highlight: false,
     badge: "Free forever",
   },
   {
-    id: "basic",
-    name: "Basic",
-    headline: "Scale your reach",
-    price: "29",
-    period: "per month",
-    description: "For agencies and stores growing their automated support.",
-    features: [
-      "Up to 5 agents",
-      "WooCommerce Deep Integration",
-      "Priority email support",
-      "Removed branding",
-    ],
-
-    highlight: true,
-    badge: "Most Popular",
-  },
-  {
     id: "pro",
     name: "Pro",
-    headline: "Maximum power",
-    price: "79",
-    period: "per month",
-    description: "For high-volume operations requiring dedicated resources.",
-    features: [
-      "Unlimited agents",
-      "Custom functions access",
-      "Dedicated success manager",
-      "SLA 99.9%",
-    ],
-
-    highlight: false,
-    badge: null,
+    headline: "Create more chat-bots",
+    price: "22",
+    period: "one-time",
+    description:
+      "Unlock multiple agents. All plans can use AI — PRO increases how many agents you can create.",
+    features: ["Up to 5 agents", "Removed branding", "Priority support"],
+    highlight: true,
+    badge: "Best value",
   },
-];
+] as const;
 
 export default function PricingCards({ clientId }: { clientId: string }) {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const router = useRouter();
 
   if (!clientId) {
     return (
@@ -67,7 +46,14 @@ export default function PricingCards({ clientId }: { clientId: string }) {
   }
 
   return (
-    <PayPalScriptProvider options={{ clientId, currency: "USD" }}>
+    <PayPalScriptProvider
+      options={{
+        clientId,
+        currency: "EUR",
+        intent: "capture",
+        components: "buttons",
+      }}
+    >
       {successMsg && (
         <div className="fixed top-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-emerald-500/50 bg-emerald-950/90 px-6 py-3 text-emerald-200 backdrop-blur-md">
           {successMsg}
@@ -79,10 +65,10 @@ export default function PricingCards({ clientId }: { clientId: string }) {
         </div>
       )}
 
-      <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-2">
         {plans.map((plan) => (
           <article
-            key={plan.name}
+            key={plan.id}
             className={`relative flex flex-col gap-5 rounded-3xl border bg-slate-900/70 p-6 shadow-xl transition hover:-translate-y-1 hover:shadow-2xl ${
               plan.highlight
                 ? "border-emerald-400/60 bg-gradient-to-b from-emerald-500/10 via-slate-900/80 to-slate-900/90 shadow-emerald-500/10"
@@ -110,19 +96,23 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                 {plan.headline}
               </p>
               <h2 className="text-3xl font-bold text-white">{plan.name}</h2>
-              <p className="text-sm text-slate-300 leading-relaxed">
+              <p className="text-sm leading-relaxed text-slate-300">
                 {plan.description}
               </p>
             </div>
 
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-bold text-white">
-                ${plan.price}
-              </span>
-              {plan.price !== "0" && (
-                <span className="text-sm font-medium text-slate-400">
-                  /{plan.period.replace("per ", "")}
-                </span>
+            <div className="flex items-baseline gap-2">
+              {plan.price === "0" ? (
+                <span className="text-4xl font-bold text-white">€0</span>
+              ) : (
+                <>
+                  <span className="text-4xl font-bold text-white">
+                    €{plan.price}
+                  </span>
+                  <span className="text-sm font-medium text-slate-400">
+                    one-time
+                  </span>
+                </>
               )}
             </div>
 
@@ -135,7 +125,6 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                         plan.highlight ? "bg-emerald-400" : "bg-slate-500"
                       }`}
                     />
-
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -151,16 +140,76 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                   Go to Dashboard
                 </Link>
               ) : (
-                <SubscriptionPayPalButton
-                  planName={plan.id}
-                  amount={plan.price}
-                  onSuccess={() =>
-                    setSuccessMsg(
-                      `Plan ${plan.name} activated successfully! Redirecting...`,
-                    )
-                  }
-                  onError={(msg) => setErrorMsg(msg)}
-                />
+                <div className="space-y-3">
+                  <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-3">
+                    <PayPalButtons
+                      style={{
+                        layout: "vertical",
+                        shape: "pill",
+                        label: "paypal",
+                      }}
+                      createOrder={async () => {
+                        setErrorMsg("");
+                        setSuccessMsg("");
+
+                        // ✅ No mandamos amount/currency desde el client
+                        const res = await fetch("/api/paypal/create-order", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ plan: "pro" }),
+                        });
+
+                        const data = await res.json();
+
+                        if (!res.ok || !data?.orderId) {
+                          throw new Error(
+                            data?.error || "Could not create order"
+                          );
+                        }
+
+                        return data.orderId as string;
+                      }}
+                      onApprove={async (data) => {
+                        setErrorMsg("");
+                        setSuccessMsg(
+                          "Payment approved. Activating your account…"
+                        );
+
+                        const res = await fetch("/api/paypal/capture-order", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ orderId: data.orderID }),
+                        });
+
+                        const out = await res.json();
+
+                        if (!res.ok || !out?.ok) {
+                          setSuccessMsg("");
+                          setErrorMsg(out?.error || "Payment capture failed");
+                          return;
+                        }
+
+                        setSuccessMsg("PRO activated! Redirecting…");
+                        router.push("/dashboard");
+                        router.refresh();
+                      }}
+                      onCancel={() => {
+                        setSuccessMsg("");
+                        setErrorMsg("");
+                      }}
+                      onError={(err) => {
+                        setSuccessMsg("");
+                        setErrorMsg(
+                          err instanceof Error ? err.message : "PayPal error"
+                        );
+                      }}
+                    />
+                  </div>
+
+                  <p className="text-center text-xs text-slate-400">
+                    Secure checkout powered by PayPal.
+                  </p>
+                </div>
               )}
             </div>
           </article>

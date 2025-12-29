@@ -6,14 +6,14 @@ import { PayPalButtons } from "@paypal/react-paypal-js";
 interface PayPalButtonProps {
   amount: string;
   currency?: string;
-  planName: string; // e.g., "basic", "pro"
+  planName: string; // "pro"
   onSuccess: () => void;
   onError: (msg: string) => void;
 }
 
-export function SubscriptionPayPalButton({
+export function PayPalUpgradeButton({
   amount,
-  currency = "USD",
+  currency = "EUR",
   planName,
   onSuccess,
   onError,
@@ -27,6 +27,7 @@ export function SubscriptionPayPalButton({
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
         </div>
       )}
+
       <PayPalButtons
         disabled={isProcessing}
         style={{
@@ -37,11 +38,12 @@ export function SubscriptionPayPalButton({
         }}
         createOrder={(data, actions) => {
           setIsProcessing(true);
+
           return actions.order.create({
             intent: "CAPTURE",
             purchase_units: [
               {
-                description: `Suscripción ${planName}`,
+                description: `Upgrade ${planName.toUpperCase()} (one-time)`,
                 amount: {
                   currency_code: currency,
                   value: amount,
@@ -50,35 +52,33 @@ export function SubscriptionPayPalButton({
             ],
           });
         }}
-        onApprove={async (data, _actions) => {
+        onApprove={async (data) => {
           try {
-            const orderID = data.orderID;
-            if (!orderID) throw new Error("orderID missing");
+            const orderId = data.orderID;
+            if (!orderId) throw new Error("orderID missing");
 
             const res = await fetch("/api/paypal/capture-order", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                orderID,
-              }),
+              body: JSON.stringify({ orderId }),
             });
 
             const result = await res.json();
             if (!res.ok || !result.ok) {
-              throw new Error(result.error || "Error al capturar pago");
+              throw new Error(result.error || "Error capturing payment");
             }
 
             onSuccess();
           } catch (err) {
             console.error(err);
-            onError(err instanceof Error ? err.message : "Fallo en el pago");
+            onError(err instanceof Error ? err.message : "Payment failed");
           } finally {
             setIsProcessing(false);
           }
         }}
         onError={(err) => {
           console.error("PayPal Error:", err);
-          onError("Hubo un error conectando con PayPal");
+          onError("PayPal connection error");
           setIsProcessing(false);
         }}
         onCancel={() => setIsProcessing(false)}

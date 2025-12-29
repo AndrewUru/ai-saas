@@ -14,25 +14,59 @@ export default function PricingPage() {
           <p className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">
             Pricing
           </p>
+
           <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
-            Choose the plan that fits your agents
+            Free AI for everyone. Upgrade to create more chat-bots.
           </h1>
-          <p className="text-sm text-slate-300 sm:text-base">
-            Switch plans as your volume grows. Every plan includes secure
-            widgets, prompts, and domain controls out of the box.
+
+          <p className="mx-auto max-w-2xl text-sm text-slate-300 sm:text-base">
+            All users can chat with AI. The difference is how many agents you
+            can create and manage. Start free and upgrade anytime.
           </p>
         </div>
 
         <PricingCards clientId={paypalClientId} />
 
-        <div className="mt-12 rounded-3xl border border-slate-800 bg-slate-900/70 p-6 text-sm text-slate-300 shadow-lg shadow-emerald-500/10">
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-300">
+            <p className="text-sm font-semibold text-white">What’s included</p>
+            <ul className="mt-3 space-y-2 text-xs text-slate-400">
+              <li>• AI chat for all plans</li>
+              <li>• Secure widget + domain allowlist</li>
+              <li>• Prompt & branding customization</li>
+              <li>• Analytics & message limits (per plan)</li>
+            </ul>
+          </div>
+
+          <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-300">
+            <p className="text-sm font-semibold text-white">Free plan</p>
+            <p className="mt-2 text-xs text-slate-400">
+              Ideal to test the widget and run a single agent.
+            </p>
+            <p className="mt-3 text-xs text-slate-400">
+              • 1 agent • Basic limits • Community support
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-sm text-slate-200 shadow-lg shadow-emerald-500/10">
+            <p className="text-sm font-semibold text-white">PRO</p>
+            <p className="mt-2 text-xs text-emerald-100/80">
+              For creators & agencies managing multiple stores/clients.
+            </p>
+            <p className="mt-3 text-xs text-emerald-100/80">
+              • Multiple agents • Higher limits • Priority support
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-10 rounded-3xl border border-slate-800 bg-slate-900/70 p-6 text-sm text-slate-300 shadow-lg shadow-emerald-500/10">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-semibold text-white">
-                Need more than 10,000 messages?
+                Need custom limits or agency features?
               </p>
               <p className="text-xs text-slate-400">
-                We support higher volumes with custom limits, SLAs, and routing.
+                We can tailor agent caps, message volumes, and onboarding.
               </p>
             </div>
             <Link

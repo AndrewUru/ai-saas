@@ -1,3 +1,5 @@
+//C:\ai-saas\app\api\paypal\capture-order\route.ts
+
 import { NextResponse } from "next/server";
 import { createServer } from "@/lib/supabase/server";
 import { createAdmin } from "@/lib/supabase/admin";
@@ -82,14 +84,17 @@ async function captureOrder(
   orderID: string,
   token: string
 ): Promise<PayPalOrderCapture> {
-  const res = await fetch(`${PAYPAL_API}/v2/checkout/orders/${orderID}/capture`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${PAYPAL_API}/v2/checkout/orders/${orderID}/capture`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    }
+  );
 
   if (res.ok) return (await res.json()) as PayPalOrderCapture;
 
@@ -116,10 +121,13 @@ async function captureOrder(
 export async function POST(req: Request) {
   try {
     const bodyUnknown: unknown = await req.json().catch(() => null);
-    const orderID =
-      typeof (bodyUnknown as { orderID?: unknown } | null)?.orderID === "string"
-        ? (bodyUnknown as { orderID: string }).orderID.trim()
-        : "";
+
+    const raw =
+      (bodyUnknown as any)?.orderId ??
+      (bodyUnknown as any)?.orderID ??
+      "";
+
+    const orderID = typeof raw === "string" ? raw.trim() : "";
 
     if (!orderID) {
       return NextResponse.json(
@@ -188,6 +196,9 @@ export async function POST(req: Request) {
           status: "active",
           paypal_capture_id: captureId,
           user_id: user.id,
+          plan: "pro",
+          amount: 22,
+          currency: "EUR",
         })
         .eq("paypal_order_id", orderID);
 
@@ -201,9 +212,12 @@ export async function POST(req: Request) {
     } else {
       const { error: subInsertErr } = await admin.from("subscriptions").insert({
         user_id: user.id,
+        plan: "pro",
         paypal_order_id: orderID,
         status: "active",
         paypal_capture_id: captureId,
+        amount: 22,
+        currency: "EUR",
       });
 
       if (subInsertErr) {
@@ -217,7 +231,7 @@ export async function POST(req: Request) {
 
     const { data: profRows, error: profUpdateErr } = await admin
       .from("profiles")
-      .update({ is_paid: true })
+      .update({ is_paid: true, plan: "pro" })
       .eq("id", user.id)
       .select("id");
 
@@ -230,10 +244,9 @@ export async function POST(req: Request) {
     }
 
     if (!profRows || profRows.length === 0) {
-      const { error: profUpsertErr } = await admin.from("profiles").upsert(
-        { id: user.id, is_paid: true },
-        { onConflict: "id" }
-      );
+      const { error: profUpsertErr } = await admin
+        .from("profiles")
+        .upsert({ id: user.id, is_paid: true, plan: "pro" }, { onConflict: "id" });
 
       if (profUpsertErr) {
         console.error(profUpsertErr);
@@ -247,7 +260,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, status: "COMPLETED" });
   } catch (error) {
     console.error(error);
-    const message = error instanceof Error ? error.message : "Error desconocido";
+    const message =
+      error instanceof Error ? error.message : "Error desconocido";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
