@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requirePaidUser } from "@/lib/auth/requirePaidUser";
+import { requireUser } from "@/lib/auth/requireUser";
 import { getSiteUrl } from "@/lib/site";
 import SyncControls from "./SyncControls";
 import {
@@ -70,7 +70,9 @@ function errorMessage(
     if (status && status >= 500) {
       return "Error del servidor de la tienda." + details;
     }
-    return "Sync failed. Please verify the credentials and try again." + details;
+    return (
+      "Sync failed. Please verify the credentials and try again." + details
+    );
   }
 
   switch (error) {
@@ -98,13 +100,14 @@ export default async function WooIntegrationPage({
 }: {
   searchParams: SearchParams;
 }) {
-  const { supabase, user } = await requirePaidUser();
+  const { supabase, user } = await requireUser();
 
   const params = await searchParams;
   const statusParam = typeof params.status === "string" ? params.status : null;
   const errorParam = typeof params.error === "string" ? params.error : null;
   const codeParam = typeof params.code === "string" ? params.code : null;
-  const syncTargetId = typeof params.sync_id === "string" ? params.sync_id : null;
+  const syncTargetId =
+    typeof params.sync_id === "string" ? params.sync_id : null;
   const statusCodeRaw =
     errorParam === "sync_failed" && statusParam ? Number(statusParam) : null;
   const statusCode =
@@ -398,7 +401,8 @@ export default async function WooIntegrationPage({
                         integration={{
                           id: integration.id,
                           is_active: integration.is_active ?? false,
-                          last_sync_status: integration.last_sync_status ?? null,
+                          last_sync_status:
+                            integration.last_sync_status ?? null,
                           last_sync_error: integration.last_sync_error ?? null,
                           last_sync_at: integration.last_sync_at ?? null,
                           products_indexed_count:
@@ -409,7 +413,9 @@ export default async function WooIntegrationPage({
                         )}
                         webhookUrl={
                           integration.webhook_token
-                            ? `${getSiteUrl()}/api/integrations/woocommerce/webhook?integration_id=${integration.id}&token=${integration.webhook_token}`
+                            ? `${getSiteUrl()}/api/integrations/woocommerce/webhook?integration_id=${
+                                integration.id
+                              }&token=${integration.webhook_token}`
                             : null
                         }
                         statusParam={statusParam}

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/requireUser";
-import { requirePaidUser } from "@/lib/auth/requirePaidUser";
 import { getSiteUrl } from "@/lib/site";
 import WidgetDesigner from "./WidgetDesigner";
 import EmbedSnippet from "./EmbedSnippet";
