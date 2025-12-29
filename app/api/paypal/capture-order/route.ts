@@ -122,9 +122,14 @@ export async function POST(req: Request) {
   try {
     const bodyUnknown: unknown = await req.json().catch(() => null);
 
+    const body =
+      typeof bodyUnknown === "object" && bodyUnknown !== null
+        ? (bodyUnknown as Record<string, unknown>)
+        : {};
+
     const raw =
-      (bodyUnknown as any)?.orderId ??
-      (bodyUnknown as any)?.orderID ??
+      body["orderId"] ??
+      body["orderID"] ??
       "";
 
     const orderID = typeof raw === "string" ? raw.trim() : "";
