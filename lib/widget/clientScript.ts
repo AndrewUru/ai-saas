@@ -44,8 +44,8 @@ ready(() => {
     '<div id="ai-saas-chat-box" aria-live="polite"></div>' +
     '<form id="ai-saas-form">' +
       '<div class="ai-saas-input-wrapper">' +
-        '<input id="ai-saas-input" type="text" placeholder="Tu mensaje..." autocomplete="off" />' +
-        '<button type="submit">Enviar</button>' +
+        '<input id="ai-saas-input" type="text" placeholder="Your message..." autocomplete="off" />' +
+        '<button type="submit">Send</button>' +
       '</div>' +
     '</form>';
   anchor.appendChild(widget);
@@ -67,7 +67,7 @@ ready(() => {
   function setSending(state){
     isSending = state;
     submitBtn.disabled = state;
-    submitBtn.textContent = state ? "Enviando..." : defaultButtonLabel;
+    submitBtn.textContent = state ? "Sending..." : defaultButtonLabel;
     input.disabled = state;
   }
 
@@ -214,7 +214,7 @@ ready(() => {
 
     const price = document.createElement("span");
     price.className = "ai-saas-product-price";
-    price.textContent = item.price ? item.price : "Consultar precio";
+    price.textContent = item.price ? item.price : "Consult price";
 
     const stock = document.createElement("span");
     stock.className = "ai-saas-product-stock";
