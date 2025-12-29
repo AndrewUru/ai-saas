@@ -92,9 +92,7 @@ export default async function AgentsPage(props: {
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
           <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded-md bg-accent" />
-            <span className="font-bold tracking-tight">AI SAAS</span>
-            <span className="ml-2 rounded-full border border-border bg-surface px-2 py-0.5 text-[10px] uppercase font-semibold text-[var(--foreground-muted)]">
+            <span className="ml-2 rounded-full border border-border bg-surface px-2 py-0.5 text-[14px] uppercase font-semibold text-[var(--foreground-muted)]">
               Agents
             </span>
           </div>
