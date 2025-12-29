@@ -11,7 +11,7 @@ export function SignOutButton() {
         window.location.href = "/login";
       }}
     >
-      Cerrar sesión
+      Sign Out
     </button>
   );
 }

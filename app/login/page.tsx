@@ -308,12 +308,12 @@ export default function LoginPage() {
           </p>
 
           <p className="mt-2 text-center text-xs text-slate-500">
-            ¿Aún no tienes cuenta?{" "}
+            ¿Dont have an account?{" "}
             <a
               href="/signup"
               className="text-emerald-300 hover:text-emerald-200"
             >
-              Crea una ahora
+              Create one here
             </a>
           </p>
 
