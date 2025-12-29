@@ -1,7 +1,7 @@
 //C:\ai-saas\app\agents\[id]\page.tsx
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
-import { createServer } from "@/lib/supabase/server";
+import { requirePaidUser } from "@/lib/auth/requirePaidUser";
 import { getSiteUrl } from "@/lib/site";
 import WidgetDesigner from "./WidgetDesigner";
 import EmbedSnippet from "./EmbedSnippet";
@@ -56,12 +56,7 @@ function normalizeWidgetText(value: string, max: number): string | null {
 async function updateIntegrationAndDomains(formData: FormData) {
   "use server";
 
-  const supabase = await createServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
+  const { supabase, user } = await requirePaidUser();
 
   const agentId = String(formData.get("agent_id") ?? "");
   const integrationId = String(formData.get("integration_id") ?? "");
@@ -133,12 +128,7 @@ async function updateIntegrationAndDomains(formData: FormData) {
 async function updateWidgetBranding(formData: FormData) {
   "use server";
 
-  const supabase = await createServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
+  const { supabase, user } = await requirePaidUser();
 
   const agentId = String(formData.get("agent_id") ?? "");
   if (!agentId) redirect("/agents");
@@ -222,11 +212,7 @@ export default async function AgentDetailPage({
   const { id } = await params;
   const resolvedSearchParams = await searchParams;
 
-  const supabase = await createServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user } = await requirePaidUser();
 
   const { data: agent, error: agentError } = await supabase
     .from("agents")

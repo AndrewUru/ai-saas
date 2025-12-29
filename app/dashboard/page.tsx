@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import AgentsSection from "./AgentsSection";
-import { createServer } from "@/lib/supabase/server";
+import { requirePaidUser } from "@/lib/auth/requirePaidUser";
 
 const PLAN_LIMITS: Record<string, string> = {
   free: "1,000",
@@ -10,13 +9,7 @@ const PLAN_LIMITS: Record<string, string> = {
 };
 
 export default async function DashboardPage() {
-  const supabase = await createServer();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
+  const { supabase, user } = await requirePaidUser();
 
   const email = user.email ?? "";
   const username = email.split("@")[0];

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createServer } from "@/lib/supabase/server";
+import { requirePaidUser } from "@/lib/auth/requirePaidUser";
 
 const defaultMessagesLimit = 1000;
 
@@ -9,11 +9,7 @@ export default async function AgentsPage(props: {
 }) {
   const searchParams = await props.searchParams;
   const currentError = searchParams.error;
-  const supabase = await createServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user } = await requirePaidUser();
 
   const email = user.email ?? "";
   const username = email.split("@")[0];
@@ -30,12 +26,7 @@ export default async function AgentsPage(props: {
     const name = String(formData.get("name") ?? "").trim();
     if (!name) return;
 
-    const supabase = await createServer();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) return;
+    const { supabase, user } = await requirePaidUser();
 
     // 1. Get user plan
     const { data: profile } = await supabase
@@ -93,11 +84,7 @@ export default async function AgentsPage(props: {
     const id = String(formData.get("agent_id") ?? "").trim();
     if (!id) return;
 
-    const supabase = await createServer();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
+    const { supabase, user } = await requirePaidUser();
 
     await supabase.from("agents").delete().eq("id", id).eq("user_id", user.id);
 

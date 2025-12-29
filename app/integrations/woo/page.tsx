@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createServer } from "@/lib/supabase/server";
+import { requirePaidUser } from "@/lib/auth/requirePaidUser";
 import { getSiteUrl } from "@/lib/site";
 import SyncControls from "./SyncControls";
 import {
@@ -99,11 +98,7 @@ export default async function WooIntegrationPage({
 }: {
   searchParams: SearchParams;
 }) {
-  const supabase = await createServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user } = await requirePaidUser();
 
   const params = await searchParams;
   const statusParam = typeof params.status === "string" ? params.status : null;
