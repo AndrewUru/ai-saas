@@ -1,6 +1,6 @@
 import Link from "next/link";
 import AgentsSection from "./AgentsSection";
-import { requirePaidUser } from "@/lib/auth/requirePaidUser";
+import { createServer } from "@/lib/supabase/server";
 
 const PLAN_LIMITS: Record<string, string> = {
   free: "1,000",
@@ -9,16 +9,23 @@ const PLAN_LIMITS: Record<string, string> = {
 };
 
 export default async function DashboardPage() {
-  const { supabase, user } = await requirePaidUser();
+  const supabase = await createServer();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const email = user.email ?? "";
-  const username = email.split("@")[0];
+  const email = user?.email ?? "";
+  const username = user ? email.split("@")[0] : "Guest";
+  const avatarInitial = (username.trim().charAt(0) || "G").toUpperCase();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("plan, active_until")
-    .eq("id", user.id)
-    .single();
+  type Profile = { plan: string | null; active_until: string | null };
+  const { data: profile } = user
+    ? await supabase
+        .from("profiles")
+        .select("plan, active_until")
+        .eq("id", user.id)
+        .single<Profile>()
+    : { data: null };
 
   const plan = (profile?.plan ?? "free").toLowerCase();
   const planLabel = plan.toUpperCase();
@@ -52,7 +59,7 @@ export default async function DashboardPage() {
               Documentation
             </Link>
             <div className="h-8 w-8 rounded-full bg-surface-strong border border-border flex items-center justify-center text-xs font-bold">
-              {username[0].toUpperCase()}
+              {avatarInitial}
             </div>
           </div>
         </div>
