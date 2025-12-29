@@ -1,6 +1,6 @@
-//C:\ai-saas\app\agents\[id]\page.tsx
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
+import { requireUser } from "@/lib/auth/requireUser";
 import { requirePaidUser } from "@/lib/auth/requirePaidUser";
 import { getSiteUrl } from "@/lib/site";
 import WidgetDesigner from "./WidgetDesigner";
@@ -56,7 +56,7 @@ function normalizeWidgetText(value: string, max: number): string | null {
 async function updateIntegrationAndDomains(formData: FormData) {
   "use server";
 
-  const { supabase, user } = await requirePaidUser();
+  const { supabase, user } = await requireUser();
 
   const agentId = String(formData.get("agent_id") ?? "");
   const integrationId = String(formData.get("integration_id") ?? "");
@@ -79,7 +79,7 @@ async function updateIntegrationAndDomains(formData: FormData) {
         fallbackUrlRaw,
         fallbackUrlRaw.startsWith("http")
           ? undefined
-          : "https://placeholder.local",
+          : "https://placeholder.local"
       );
       fallbackUrl =
         url.origin === "https://placeholder.local"
@@ -128,7 +128,7 @@ async function updateIntegrationAndDomains(formData: FormData) {
 async function updateWidgetBranding(formData: FormData) {
   "use server";
 
-  const { supabase, user } = await requirePaidUser();
+  const { supabase, user } = await requireUser();
 
   const agentId = String(formData.get("agent_id") ?? "");
   if (!agentId) redirect("/agents");
@@ -141,20 +141,20 @@ async function updateWidgetBranding(formData: FormData) {
 
   const colorHeaderBgRaw = String(formData.get("widget_color_header_bg") ?? "");
   const colorHeaderTextRaw = String(
-    formData.get("widget_color_header_text") ?? "",
+    formData.get("widget_color_header_text") ?? ""
   );
   const colorChatBgRaw = String(formData.get("widget_color_chat_bg") ?? "");
   const colorUserBubbleBgRaw = String(
-    formData.get("widget_color_user_bubble_bg") ?? "",
+    formData.get("widget_color_user_bubble_bg") ?? ""
   );
   const colorUserBubbleTextRaw = String(
-    formData.get("widget_color_user_bubble_text") ?? "",
+    formData.get("widget_color_user_bubble_text") ?? ""
   );
   const colorBotBubbleBgRaw = String(
-    formData.get("widget_color_bot_bubble_bg") ?? "",
+    formData.get("widget_color_bot_bubble_bg") ?? ""
   );
   const colorBotBubbleTextRaw = String(
-    formData.get("widget_color_bot_bubble_text") ?? "",
+    formData.get("widget_color_bot_bubble_text") ?? ""
   );
 
   const { error: updateError } = await supabase
@@ -212,12 +212,12 @@ export default async function AgentDetailPage({
   const { id } = await params;
   const resolvedSearchParams = await searchParams;
 
-  const { supabase, user } = await requirePaidUser();
+  const { supabase, user } = await requireUser();
 
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
+      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text"
     )
     .eq("id", id)
     .eq("user_id", user.id)
