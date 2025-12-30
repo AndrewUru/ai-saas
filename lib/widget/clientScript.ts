@@ -24,6 +24,9 @@ ready(() => {
   const toggle = document.createElement("button");
   toggle.id = "ai-saas-toggle";
   toggle.type = "button";
+  toggle.setAttribute("aria-label", "Open chat");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.setAttribute("aria-controls", "ai-saas-widget");
   toggle.innerHTML = '<span class="ai-saas-icon">' + CONFIG.brandInitial + '</span><span class="ai-saas-label">' + CONFIG.collapsedLabel + '</span>';
   anchor.appendChild(toggle);
 
@@ -31,6 +34,7 @@ ready(() => {
   widget.id = "ai-saas-widget";
   widget.setAttribute("role", "dialog");
   widget.setAttribute("aria-label", CONFIG.brandName + " chat");
+  widget.setAttribute("aria-hidden", "true");
   widget.innerHTML =
     '<header id="ai-saas-header">' +
       '<div class="ai-saas-brand">' +
@@ -45,7 +49,7 @@ ready(() => {
     '<form id="ai-saas-form">' +
       '<div class="ai-saas-input-wrapper">' +
         '<input id="ai-saas-input" type="text" placeholder="Your message..." autocomplete="off" />' +
-        '<button type="submit">Send</button>' +
+        '<button type="submit" class="ai-saas-send"><span class="ai-saas-send-text">Send</span><svg class="ai-saas-send-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12m0 0-4-4m4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></button>' +
       '</div>' +
     '</form>';
   anchor.appendChild(widget);
@@ -56,18 +60,24 @@ ready(() => {
   const input = widget.querySelector("#ai-saas-input");
   const closeBtn = widget.querySelector("#ai-saas-close");
   const submitBtn = form?.querySelector('button[type="submit"]');
+  const submitLabel = submitBtn?.querySelector(".ai-saas-send-text");
 
   if (!chatBox || !form || !input || !closeBtn || !submitBtn) return;
 
   let isSending = false;
-  const defaultButtonLabel = submitBtn.textContent || "Enviar";
+  const defaultButtonLabel =
+    submitLabel?.textContent || submitBtn.textContent || "Send";
 
   let hideTimeout;
 
   function setSending(state){
     isSending = state;
     submitBtn.disabled = state;
-    submitBtn.textContent = state ? "Sending..." : defaultButtonLabel;
+    if (submitLabel) {
+      submitLabel.textContent = state ? "Sending..." : defaultButtonLabel;
+    } else {
+      submitBtn.textContent = state ? "Sending..." : defaultButtonLabel;
+    }
     input.disabled = state;
   }
 
@@ -85,16 +95,22 @@ ready(() => {
       widget.style.display = "flex";
       requestAnimationFrame(() => {
         anchor.classList.add("open");
+        toggle.setAttribute("aria-expanded", "true");
+        widget.setAttribute("aria-hidden", "false");
         focusInput();
       });
     } else {
       anchor.classList.add("open");
+      toggle.setAttribute("aria-expanded", "true");
+      widget.setAttribute("aria-hidden", "false");
       focusInput();
     }
   }
 
   function closeWidget(){
     anchor.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+    widget.setAttribute("aria-hidden", "true");
     hideTimeout = window.setTimeout(() => {
       widget.style.display = "none";
     }, 220);
@@ -110,7 +126,7 @@ ready(() => {
 
   function appendBubble(content, role){
     const bubble = document.createElement("div");
-    bubble.className = "ai-saas-bubble " + role;
+    bubble.className = "ai-saas-bubble " + role + " ai-saas-enter";
     bubble.textContent = content;
     chatBox.appendChild(bubble);
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -119,7 +135,7 @@ ready(() => {
 
   function appendTyping(){
     const bubble = document.createElement("div");
-    bubble.className = "ai-saas-bubble bot typing";
+    bubble.className = "ai-saas-bubble bot typing ai-saas-enter";
     bubble.innerHTML =
       '<div class="ai-saas-typing"><span></span><span></span><span></span></div>' +
       '<div class="ai-saas-typing-skeleton">' +
@@ -243,7 +259,7 @@ ready(() => {
 
   function appendProductList(payload){
     const bubble = document.createElement("div");
-    bubble.className = "ai-saas-bubble bot product-list";
+    bubble.className = "ai-saas-bubble bot product-list ai-saas-enter";
     bubble.setAttribute("role", "group");
     bubble.setAttribute("aria-label", payload.title);
 
@@ -253,8 +269,11 @@ ready(() => {
 
     const grid = document.createElement("div");
     grid.className = "ai-saas-product-list-grid";
-    payload.items.forEach((item) => {
-      grid.appendChild(createProductCard(item));
+    payload.items.forEach((item, index) => {
+      const card = createProductCard(item);
+      card.classList.add("ai-saas-enter");
+      card.style.setProperty("--enter-delay", index * 60 + "ms");
+      grid.appendChild(card);
     });
 
     bubble.appendChild(header);
@@ -269,6 +288,7 @@ ready(() => {
     try{
       const link = document.createElement("a");
       link.className = "ai-saas-fallback";
+      link.classList.add("ai-saas-enter");
       link.href = url;
       link.target = "_blank";
       link.rel = "noopener noreferrer";

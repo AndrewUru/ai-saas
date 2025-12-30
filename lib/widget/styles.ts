@@ -16,47 +16,91 @@ export function renderStyles(a: WidgetAppearance) {
   align-items: ${a.position === "left" ? "flex-start" : "flex-end"};
   gap: 12px;
   z-index: 2147483000;
-  font-family: "Sora", "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  font-family: "Space Grotesk", "Sora", "Avenir Next", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  --ai-accent: ${a.accent};
+  --ai-accent-contrast: ${a.accentContrast};
+  --ai-accent-shadow: ${a.accentShadow};
+  --ai-accent-light: ${a.accentLight};
+  --ai-accent-gradient: ${a.accentGradient};
+  --ai-header-bg: ${a.colorHeaderBg};
+  --ai-header-text: ${a.colorHeaderText};
+  --ai-chat-bg: ${a.colorChatBg};
+  --ai-user-bg: ${a.colorUserBubbleBg};
+  --ai-user-text: ${a.colorUserBubbleText};
+  --ai-bot-bg: ${a.colorBotBubbleBg};
+  --ai-bot-text: ${a.colorBotBubbleText};
+  --ai-toggle-bg: ${a.colorToggleBg};
+  --ai-toggle-text: ${a.colorToggleText};
+  --ai-close-bg: ${a.closeBg};
+  --ai-close-text: ${a.closeColor};
+  --ai-surface: rgba(255, 255, 255, 0.95);
+  --ai-surface-strong: rgba(255, 255, 255, 0.98);
+  --ai-border: rgba(15, 23, 42, 0.12);
+  --ai-shadow: 0 18px 42px rgba(15, 23, 42, 0.16);
+  --ai-radius: 18px;
 }
 
 #ai-saas-toggle {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 52px;
-  height: 52px;
-  padding: 0 16px;
-  background: ${a.colorToggleBg};
-  color: ${a.colorToggleText};
+  min-width: 56px;
+  height: 54px;
+  padding: 0 18px;
+  background: var(--ai-toggle-bg);
+  color: var(--ai-toggle-text);
   border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(15, 23, 42, 0.16);
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
-  gap: 8px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  gap: 10px;
   font-weight: 600;
   font-size: 13px;
-  letter-spacing: 0.01em;
-  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  letter-spacing: 0.02em;
+  transition: transform 0.16s ease, box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+#ai-saas-toggle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.28), transparent 55%),
+    radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.2), transparent 60%);
+  opacity: 0.8;
+  pointer-events: none;
 }
 
 #ai-saas-toggle:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
-  border-color: rgba(15, 23, 42, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.2);
+  border-color: rgba(15, 23, 42, 0.22);
+}
+
+#ai-saas-toggle:focus-visible {
+  outline: 2px solid var(--ai-accent);
+  outline-offset: 3px;
 }
 
 #ai-saas-toggle .ai-saas-icon {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  background: transparent;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  font-weight: 600;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
 }
 
 #ai-saas-toggle .ai-saas-icon svg {
@@ -81,26 +125,48 @@ export function renderStyles(a: WidgetAppearance) {
   max-width: min(540px, calc(100vw - 48px));
   height: clamp(480px, 62vh, 720px);
   max-height: min(78vh, 820px);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), #ffffff);
-  border-radius: 16px;
+  background:
+    linear-gradient(180deg, var(--ai-surface-strong), var(--ai-surface)),
+    radial-gradient(circle at 10% 0%, rgba(255, 255, 255, 0.6), transparent 45%),
+    radial-gradient(circle at 100% 0%, var(--ai-accent-light), transparent 50%);
+  border-radius: var(--ai-radius);
   overflow: hidden;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.14);
+  border: 1px solid var(--ai-border);
+  box-shadow: var(--ai-shadow);
   display: flex;
   flex-direction: column;
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(16px) scale(0.98);
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.22s ease, box-shadow 0.22s ease;
   position: absolute;
   bottom: 88px;
   ${a.position === "left" ? "left: 0;" : "right: 0;"}
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+#ai-saas-widget::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.35), transparent 45%),
+    linear-gradient(120deg, rgba(15, 23, 42, 0.04), transparent 45%);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+#ai-saas-widget > * {
+  position: relative;
+  z-index: 1;
 }
 
 #ai-saas-anchor.open #ai-saas-widget {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
   pointer-events: auto;
+  animation: widgetPop 0.24s ease;
 }
   /* Laptops con poca altura (ej: 768px o menos) */
 @media (max-height: 800px) {
@@ -114,12 +180,13 @@ export function renderStyles(a: WidgetAppearance) {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
-  background: ${a.colorHeaderBg};
-  background-image: linear-gradient(120deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.08));
-  color: ${a.colorHeaderText};
-  height: 54px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 10px 16px;
+  background: var(--ai-header-bg);
+  background-image: linear-gradient(120deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.22));
+  color: var(--ai-header-text);
+  height: 56px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
 }
 
 .ai-saas-brand {
@@ -130,17 +197,18 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 .ai-saas-brand-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  background: transparent;
-  color: ${a.colorHeaderText};
-  border: 1px solid rgba(15, 23, 42, 0.12);
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--ai-header-text);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.06);
 }
 
 .ai-saas-brand-text {
@@ -160,9 +228,9 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 #ai-saas-close {
-  background: transparent;
-  color: ${a.colorHeaderText};
-  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: var(--ai-close-bg);
+  color: var(--ai-header-text);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   width: 32px;
   height: 32px;
   border-radius: 10px;
@@ -171,10 +239,18 @@ export function renderStyles(a: WidgetAppearance) {
   justify-content: center;
   cursor: pointer;
   padding: 0;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 #ai-saas-close:hover {
-  background: rgba(15, 23, 42, 0.06);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+  filter: brightness(1.05);
+}
+
+#ai-saas-close:focus-visible {
+  outline: 2px solid var(--ai-accent);
+  outline-offset: 2px;
 }
 
 #ai-saas-chat-box {
@@ -182,10 +258,11 @@ export function renderStyles(a: WidgetAppearance) {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: ${a.colorChatBg};
+  background-color: var(--ai-chat-bg);
   background-image:
-    radial-gradient(circle at 15% 20%, ${a.accentLight}, transparent 60%),
-    radial-gradient(circle at 85% 0%, rgba(15, 23, 42, 0.06), transparent 45%);
+    radial-gradient(circle at 12% 18%, var(--ai-accent-light), transparent 55%),
+    radial-gradient(circle at 88% 8%, rgba(15, 23, 42, 0.08), transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 45%);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -198,7 +275,7 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 #ai-saas-chat-box::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(15, 23, 42, 0.24);
   border-radius: 3px;
 }
 
@@ -207,32 +284,38 @@ export function renderStyles(a: WidgetAppearance) {
   max-width: 82%;
   padding: 10px 14px;
   margin-bottom: 0;
-  border-radius: 14px;
+  border-radius: 16px;
   font-size: 14px;
   line-height: 1.5;
-  color: #0f172a;
+  color: var(--ai-bot-text);
+  background: var(--ai-bot-bg);
   border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
+.ai-saas-enter {
+  animation: bubbleIn 0.24s ease both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
 .ai-saas-bubble.user {
   margin-left: auto;
   align-self: flex-end;
-  background: ${a.colorUserBubbleBg};
-  color: ${a.colorUserBubbleText};
+  background: var(--ai-user-bg);
+  color: var(--ai-user-text);
   border-color: transparent;
   border-bottom-right-radius: 6px;
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.12);
 }
 
 .ai-saas-bubble.bot {
   margin-right: auto;
   align-self: flex-start;
-  background: ${a.colorBotBubbleBg};
-  color: ${a.colorBotBubbleText};
+  background: var(--ai-bot-bg);
+  color: var(--ai-bot-text);
   border-bottom-left-radius: 6px;
   box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
 }
@@ -241,14 +324,16 @@ export function renderStyles(a: WidgetAppearance) {
   max-width: 100%;
   width: 100%;
   padding: 12px 12px 14px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--ai-surface-strong);
+  border-color: rgba(15, 23, 42, 0.06);
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
 .ai-saas-bubble.typing {
-  background: #ffffff;
+  background: var(--ai-surface-strong);
+  border: 1px solid rgba(15, 23, 42, 0.08);
   width: clamp(180px, 60%, 260px);
   min-width: 180px;
   display: grid;
@@ -304,14 +389,44 @@ export function renderStyles(a: WidgetAppearance) {
   100% { background-position: -200% 0; }
 }
 
+#ai-saas-widget,
+.ai-saas-bubble,
+.ai-saas-product-card {
+  transform-origin: center bottom;
+}
+
+@keyframes widgetPop {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bubbleIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 #ai-saas-form {
   padding: 12px 14px;
-  background: #ffffff;
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  border-top: 1px solid rgba(15, 23, 42, 0.1);
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 -10px 22px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 -10px 22px rgba(15, 23, 42, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .ai-saas-input-wrapper {
@@ -319,11 +434,17 @@ export function renderStyles(a: WidgetAppearance) {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #f8fafc;
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 12px;
   padding: 8px 10px;
-  border: 1px solid rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(15, 23, 42, 0.14);
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ai-saas-input-wrapper:focus-within {
+  border-color: var(--ai-accent);
+  box-shadow: 0 0 0 3px var(--ai-accent-light);
 }
 
 .ai-saas-input-wrapper input {
@@ -335,6 +456,7 @@ export function renderStyles(a: WidgetAppearance) {
   background: transparent;
   color: #0f172a;
   padding: 4px 0;
+  line-height: 1.4;
 }
 
 .ai-saas-input-wrapper input::placeholder {
@@ -342,30 +464,44 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 .ai-saas-input-wrapper button {
-  background: ${a.accent};
+  background: var(--ai-accent-gradient);
   border: none;
   cursor: pointer;
-  color: ${a.accentContrast};
-  padding: 6px 10px;
-  display: flex;
+  color: var(--ai-accent-contrast);
+  padding: 6px 12px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  gap: 6px;
+  min-height: 32px;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
   border-radius: 10px;
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
-  box-shadow: 0 6px 14px ${a.accentShadow};
+  box-shadow: 0 8px 18px var(--ai-accent-shadow);
 }
 
 .ai-saas-input-wrapper button:hover {
   transform: translateY(-1px);
+  filter: brightness(1.04);
+}
+
+.ai-saas-input-wrapper button:focus-visible {
+  outline: 2px solid var(--ai-accent);
+  outline-offset: 2px;
 }
 
 .ai-saas-input-wrapper button:disabled {
   opacity: 0.65;
   cursor: default;
   box-shadow: none;
+}
+
+.ai-saas-send-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
 }
 
 /* Fallback/Error Styles in Bubble */
@@ -382,14 +518,18 @@ export function renderStyles(a: WidgetAppearance) {
   margin-top: 4px;
   font-size: 12px;
   font-weight: 600;
-  color: ${a.accent};
+  color: var(--ai-accent);
   text-decoration: none;
   padding: 8px 12px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 .ai-saas-fallback:hover {
   text-decoration: underline;
+  background: rgba(15, 23, 42, 0.1);
+  transform: translateY(-1px);
 }
 
 .ai-saas-fallback svg {
@@ -398,17 +538,29 @@ export function renderStyles(a: WidgetAppearance) {
 }
 
 .ai-saas-product-list-header {
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-weight: 700;
   color: #64748b;
   margin-bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-saas-product-list-header::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--ai-accent);
+  opacity: 0.6;
 }
 
 .ai-saas-product-list-grid {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
@@ -418,16 +570,17 @@ export function renderStyles(a: WidgetAppearance) {
   gap: 10px;
   align-items: center;
   padding: 10px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid rgba(15, 23, 42, 0.08);
-  background: #f8fafc;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .ai-saas-product-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.14);
+  border-color: rgba(15, 23, 42, 0.14);
 }
 
 .ai-saas-product-thumb {
@@ -435,7 +588,7 @@ export function renderStyles(a: WidgetAppearance) {
   height: 64px;
   border-radius: 12px;
   overflow: hidden;
-  background: ${a.accentLight};
+  background: var(--ai-accent-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -455,8 +608,8 @@ export function renderStyles(a: WidgetAppearance) {
   justify-content: center;
   font-size: 20px;
   font-weight: 600;
-  color: ${a.accentContrast};
-  background: ${a.accentGradient};
+  color: var(--ai-accent-contrast);
+  background: var(--ai-accent-gradient);
 }
 
 .ai-saas-product-body {
@@ -498,7 +651,7 @@ export function renderStyles(a: WidgetAppearance) {
 .ai-saas-product-link {
   font-size: 12px;
   font-weight: 600;
-  color: ${a.accent};
+  color: var(--ai-accent);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -509,22 +662,38 @@ export function renderStyles(a: WidgetAppearance) {
   text-decoration: underline;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  #ai-saas-widget,
+  #ai-saas-toggle,
+  .ai-saas-bubble,
+  .ai-saas-product-card,
+  .ai-saas-enter {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .ai-saas-typing span,
+  .ai-saas-skeleton-line {
+    animation: none !important;
+  }
+}
+
 @media (max-width: 640px) {
   #ai-saas-widget {
     position: fixed;
     left: 12px;
     right: 12px;
     width: auto;
-    height: min(60vh, 320px);
-    max-height: calc(100vh - 100px);
+    height: min(68vh, 420px);
+    max-height: calc(100vh - 110px);
     bottom: calc(70px + env(safe-area-inset-bottom, 0px));
-    border-radius: 16px;
-    transform: translateY(0) scale(0.98);
+    border-radius: var(--ai-radius);
+    transform: translateY(0) scale(0.99);
   }
 
   #ai-saas-toggle {
     width: 100%;
-    min-height: 54px;
+    min-height: 56px;
     justify-content: center;
     padding: 0 16px;
   }
