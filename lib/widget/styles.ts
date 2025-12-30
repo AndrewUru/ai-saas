@@ -684,11 +684,15 @@ export function renderStyles(a: WidgetAppearance) {
     left: 12px;
     right: 12px;
     width: auto;
-    height: min(68vh, 420px);
-    max-height: calc(100vh - 110px);
-    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+
+    /* ✅ casi full-screen en móvil (mejor UX) */
+    top: calc(12px + env(safe-area-inset-top, 0px));
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    height: auto;
+    max-height: none;
+
     border-radius: var(--ai-radius);
-    transform: translateY(0) scale(0.99);
+    transform: translateY(0) scale(1);
   }
 
   #ai-saas-toggle {
