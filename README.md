@@ -1,5 +1,7 @@
 AI Commerce Agents – SaaS Dashboard & Widget
 
+![alt text](public/logo.svg)
+
 AI Commerce Agents is a multi-tenant SaaS platform for creating AI-powered shopping assistants for e-commerce stores.
 
 It provides:
@@ -191,20 +193,33 @@ Safe re-syncs without duplication
 
 Create a .env.local file (do not commit):
 
-NEXT_PUBLIC_SITE_URL=https://ai-saas-nine-omega.vercel.app
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL=
+SITE_URL=
 
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...
+# Front (para SDK JS de PayPal en el navegador)
 
-OPENAI_API_KEY=...
-OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=
 
-NEXT_PUBLIC_PAYPAL_CLIENT_ID=...
-PAYPAL_CLIENT_SECRET=...
+# Server (rutas Next.js)
 
-INTEGRATIONS_SYNC_SECRET=...
-INTEGRATIONS_RECONCILE_SECRET=...
+PAYPAL_CLIENT_ID=
+PAYPAL_SECRET=
+PAYPAL_ENV=live # o sandbox ""
+
+# Supabase (server-side para webhooks)
+
+SUPABASE_URL=
+SUPABASE_SERVICES_ROLE_KEY=
+
+OPENAI_API_KEY=
+
+CRED_ENC_KEY=
+
+SUPABASE_GOOGLE_CLIENT_ID=
+SUPABASE_GOOGLE_CLIENT_SECRET=
 
 ⚠️ If you change the production domain, update NEXT_PUBLIC_SITE_URL so widget snippets and webhooks point to the correct host.
 
