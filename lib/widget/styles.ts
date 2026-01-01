@@ -686,7 +686,7 @@ export function renderStyles(a: WidgetAppearance) {
     width: auto;
 
     /* ✅ casi full-screen en móvil (mejor UX) */
-    top: calc(12px + env(safe-area-inset-top, 0px));
+    top: calc(44px + env(safe-area-inset-top, 0px));
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     height: auto;
     max-height: none;
