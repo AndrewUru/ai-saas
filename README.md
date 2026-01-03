@@ -1,5 +1,10 @@
 # AI Commerce Agents
 
+<p align="center">
+  <img src="public/logo.svg" alt="AICommerce logo" width="420" />
+</p>
+
+
 AI Commerce Agents is a **multi-tenant SaaS platform** for building **AI-powered shopping assistants** for e-commerce stores.
 
 It combines a **dashboard** for managing agents and integrations with a **lightweight embeddable chat widget** that works on any site via a single script.
