@@ -61,7 +61,7 @@ export async function GET(req: Request) {
     return clearStateCookie(redirectWithError(req.url, "invalid"));
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const signedState = cookieStore.get(STATE_COOKIE)?.value ?? "";
   const statePayload = parseShopifyState(signedState, apiSecret);
 
