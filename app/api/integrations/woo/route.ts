@@ -1,3 +1,4 @@
+//C:\ai-saas\app\api\integrations\woo\route.ts
 import { NextResponse } from "next/server";
 import { createServer } from "@/lib/supabase/server";
 import { encrypt } from "@/lib/crypto";
@@ -94,7 +95,7 @@ export async function POST(req: Request) {
   const nextPosition =
     typeof position === "number" && !Number.isNaN(position)
       ? position
-      : (count ?? 0);
+      : count ?? 0;
 
   const { error: insertError, data } = await supabase
     .from("integrations_woocommerce")
@@ -139,9 +140,7 @@ export async function PATCH(req: Request) {
     position,
     is_active,
   } = parsed.data;
-  const normalizedStoreUrl = store_url
-    ? normalizeWooStoreUrl(store_url)
-    : null;
+  const normalizedStoreUrl = store_url ? normalizeWooStoreUrl(store_url) : null;
   if (store_url && !normalizedStoreUrl) {
     return error("Payload invalido");
   }
