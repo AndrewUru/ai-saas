@@ -4,39 +4,40 @@ export default function ContactPage() {
       <section className="mx-auto max-w-4xl px-6 py-20 sm:px-10 lg:px-16">
         <header className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300">
-            Soporte a agencias
+            Agency Support
           </p>
           <h1 className="text-3xl font-semibold sm:text-4xl">
-            Hablemos de tu implementación
+            Let’s talk about your implementation
           </h1>
           <p className="text-sm text-slate-300 sm:text-base">
-            Escríbenos para resolver dudas técnicas, preparar demos para tus
-            clientes o solicitar un plan empresarial.
+            Reach out to resolve technical questions, prepare client demos, or
+            discuss enterprise plans tailored to your needs.
           </p>
         </header>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
           <article className="space-y-3 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur">
-            <h2 className="text-lg font-semibold text-white">Correo</h2>
+            <h2 className="text-lg font-semibold text-white">Email support</h2>
             <p className="text-sm text-slate-300">
-              Envía tus consultas a{" "}
+              Send your inquiry to{" "}
               <a
                 href="mailto:atobio459@gmail.com"
                 className="text-emerald-300 hover:text-emerald-200"
               >
                 atobio459@gmail.com
               </a>{" "}
-              indicando la tienda y el número de agentes que necesitas.
+              including the store URL and the number of agents you plan to
+              deploy.
             </p>
           </article>
 
           <article className="space-y-3 rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-emerald-100 shadow-lg shadow-emerald-500/20 backdrop-blur">
             <h2 className="text-lg font-semibold text-white">
-              Agenda una sesión
+              Book a strategy session
             </h2>
             <p className="text-sm">
-              Coordinamos workshops de integración y auditoría de prompts con tu
-              equipo. Solicítalo desde el panel o vía correo.
+              We run integration workshops and prompt audits with your team.
+              Request a session from the dashboard or via email.
             </p>
           </article>
         </div>
