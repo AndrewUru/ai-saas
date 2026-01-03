@@ -1,15 +1,13 @@
-//C:\ai-saas\app\integrations\woo\page.tsx
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/requireUser";
-import { getSiteUrl } from "@/lib/site";
 import SyncControls from "./SyncControls";
 import {
-  createWooIntegration,
-  deleteWooIntegration,
-  setWooIntegrationState,
-  syncWooIntegration,
-  testWooIntegration,
-  updateWooIntegration,
+  createShopifyIntegration,
+  deleteShopifyIntegration,
+  setShopifyIntegrationState,
+  syncShopifyIntegration,
+  testShopifyIntegration,
+  updateShopifyIntegration,
 } from "./actions";
 
 export const runtime = "nodejs";
@@ -48,39 +46,28 @@ function errorMessage(
     const details = detailParts.length ? ` (${detailParts.join(", ")})` : "";
 
     if (status === 401) {
-      return (
-        "Credenciales invalidas o sin permisos. Regenera la API key en Woo (Read)." +
-        details
-      );
+      return "Token invalid or revoked. Reconnect the store." + details;
     }
     if (status === 403) {
-      return (
-        "Bloqueado por seguridad/WAF. Permite /wp-json/wc/v3 desde Vercel." +
-        details
-      );
+      return "Missing access scope. Update scopes and reconnect." + details;
     }
-    if (status === 404 || code === "rest_no_route") {
-      return (
-        "Ruta Woo REST no disponible. Revisa permalinks y WooCommerce." +
-        details
-      );
+    if (status === 404) {
+      return "Shop not found or invalid domain." + details;
     }
     if (status === 429) {
-      return "Rate limit. Reintenta en unos minutos." + details;
+      return "Rate limit. Retry in a few minutes." + details;
     }
     if (status && status >= 500) {
-      return "Error del servidor de la tienda." + details;
+      return "Shopify returned a server error." + details;
     }
-    return (
-      "Sync failed. Please verify the credentials and try again." + details
-    );
+    return "Sync failed. Please verify the connection and try again." + details;
   }
 
   switch (error) {
     case "invalid":
       return "Check the fields: there is invalid data.";
     case "db":
-      return "We couldn??Tt save the changes. Please try again.";
+      return "We could not save the changes. Please try again.";
     case "unexpected":
       return "An unexpected error occurred while processing the integration.";
     default:
@@ -96,7 +83,7 @@ function formatSyncDate(value: string | null) {
   }).format(new Date(value));
 }
 
-export default async function WooIntegrationPage({
+export default async function ShopifyIntegrationPage({
   searchParams,
 }: {
   searchParams: SearchParams;
@@ -117,9 +104,9 @@ export default async function WooIntegrationPage({
       : null;
 
   const { data: integrations, error } = await supabase
-    .from("integrations_woocommerce")
+    .from("integrations_shopify")
     .select(
-      "id, label, store_url, is_active, position, created_at, updated_at, last_sync_at, last_sync_status, last_sync_error, products_indexed_count, webhook_token"
+      "id, label, shop_domain, is_active, position, created_at, updated_at, last_sync_at, last_sync_status, last_sync_error, products_indexed_count, webhook_token"
     )
     .eq("user_id", user.id)
     .order("position", { ascending: true })
@@ -140,11 +127,11 @@ export default async function WooIntegrationPage({
             Integrations
           </p>
           <h1 className="text-3xl font-semibold sm:text-4xl">
-            Manage your WooCommerce connections
+            Manage your Shopify connections
           </h1>
           <p className="text-sm text-slate-300 sm:text-base">
-            Store each shop’s credentials so your agents can reply with
-            real-time stock, orders, and customer data.
+            Store each shop token so your agents can answer with real-time
+            catalog data and availability.
           </p>
         </header>
 
@@ -169,7 +156,7 @@ export default async function WooIntegrationPage({
               Register new store
             </h2>
             <p className="text-sm text-slate-300">
-              The key and secret fields are encrypted with your{" "}
+              Shopify OAuth tokens are encrypted with your{" "}
               <code className="rounded bg-slate-800 px-1 py-0.5 text-xs">
                 CRED_ENC_KEY
               </code>{" "}
@@ -177,7 +164,7 @@ export default async function WooIntegrationPage({
             </p>
 
             <form
-              action={createWooIntegration}
+              action={createShopifyIntegration}
               className="mt-6 space-y-5 text-sm"
             >
               <div className="grid gap-4 sm:grid-cols-2">
@@ -189,44 +176,19 @@ export default async function WooIntegrationPage({
                     name="label"
                     required
                     maxLength={80}
-                    placeholder="Main WooCommerce"
+                    placeholder="Main Shopify"
                     className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
                   />
                 </label>
                 <label className="space-y-2">
                   <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                    Store URL
+                    Shop domain
                   </span>
                   <input
-                    name="site_url"
-                    type="url"
+                    name="shop_domain"
+                    type="text"
                     required
-                    placeholder="https://store.com"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                  />
-                </label>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="space-y-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                    Consumer key
-                  </span>
-                  <input
-                    name="consumer_key"
-                    required
-                    placeholder="ck_..."
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                  />
-                </label>
-                <label className="space-y-2">
-                  <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                    Consumer secret
-                  </span>
-                  <input
-                    name="consumer_secret"
-                    required
-                    placeholder="cs_..."
+                    placeholder="mystore.myshopify.com"
                     className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
                   />
                 </label>
@@ -246,23 +208,20 @@ export default async function WooIntegrationPage({
                 type="submit"
                 className="inline-flex w-full items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto"
               >
-                Save integration
+                Connect Shopify
               </button>
             </form>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4 text-xs text-slate-400">
               <p className="font-semibold text-slate-200">
-                Where do I get the key?
+                How does OAuth work?
               </p>
               <ol className="mt-2 list-decimal space-y-1 pl-5">
+                <li>Enter the shop domain and click Connect Shopify.</li>
+                <li>You will be redirected to Shopify to approve access.</li>
                 <li>
-                  In WordPress, go to WooCommerce → Settings → Advanced → REST
-                  API.
+                  After approval, the connection appears on the right list.
                 </li>
-                <li>
-                  Create a key with read permissions and copy the key/secret.
-                </li>
-                <li>Paste the values here to connect the store.</li>
               </ol>
             </div>
           </section>
@@ -276,7 +235,7 @@ export default async function WooIntegrationPage({
                   </h2>
                   <p className="mt-1 text-sm text-slate-300">
                     Assign these connections from the agent detail page to
-                    enable WooCommerce data.
+                    enable Shopify data.
                   </p>
                 </div>
                 <Link
@@ -300,7 +259,7 @@ export default async function WooIntegrationPage({
                             {integration.label}
                           </p>
                           <p className="text-xs text-slate-400">
-                            {integration.store_url}
+                            {integration.shop_domain}
                           </p>
                         </div>
                         <span
@@ -320,7 +279,7 @@ export default async function WooIntegrationPage({
                           Edit integration
                         </summary>
                         <form
-                          action={updateWooIntegration}
+                          action={updateShopifyIntegration}
                           className="mt-4 space-y-4 text-sm"
                         >
                           <input
@@ -343,36 +302,13 @@ export default async function WooIntegrationPage({
                             </label>
                             <label className="space-y-2">
                               <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                                Store URL
+                                Shop domain (reauth if changed)
                               </span>
                               <input
-                                name="site_url"
-                                type="url"
-                                defaultValue={integration.store_url ?? ""}
+                                name="shop_domain"
+                                type="text"
+                                defaultValue={integration.shop_domain ?? ""}
                                 required
-                                className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                              />
-                            </label>
-                          </div>
-
-                          <div className="grid gap-3 sm:grid-cols-2">
-                            <label className="space-y-2">
-                              <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                                Consumer key (leave empty to keep)
-                              </span>
-                              <input
-                                name="consumer_key"
-                                placeholder="ck_..."
-                                className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                              />
-                            </label>
-                            <label className="space-y-2">
-                              <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                                Consumer secret (leave empty to keep)
-                              </span>
-                              <input
-                                name="consumer_secret"
-                                placeholder="cs_..."
                                 className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
                               />
                             </label>
@@ -398,6 +334,7 @@ export default async function WooIntegrationPage({
                           </div>
                         </form>
                       </details>
+
                       <SyncControls
                         integration={{
                           id: integration.id,
@@ -412,20 +349,14 @@ export default async function WooIntegrationPage({
                         formattedLastSync={formatSyncDate(
                           integration.last_sync_at ?? null
                         )}
-                        webhookUrl={
-                          integration.webhook_token
-                            ? `${getSiteUrl()}/api/integrations/woocommerce/webhook?integration_id=${
-                                integration.id
-                              }&token=${integration.webhook_token}`
-                            : null
-                        }
+                        webhookUrl={null}
                         statusParam={statusParam}
                         errorParam={errorParam}
                         syncTargetId={syncTargetId}
-                        onToggle={setWooIntegrationState}
-                        onSync={syncWooIntegration}
-                        onTest={testWooIntegration}
-                        onDelete={deleteWooIntegration}
+                        onToggle={setShopifyIntegrationState}
+                        onSync={syncShopifyIntegration}
+                        onTest={testShopifyIntegration}
+                        onDelete={deleteShopifyIntegration}
                       />
                     </li>
                   ))}
@@ -433,7 +364,7 @@ export default async function WooIntegrationPage({
               ) : (
                 <div className="mt-6 space-y-3 rounded-2xl border border-dashed border-slate-700 bg-slate-950/50 p-6 text-sm text-slate-300">
                   <p className="font-medium text-white">
-                    You haven’t connected any store yet.
+                    You have not connected any store yet.
                   </p>
                   <p>
                     Create your first integration using the steps on the left,

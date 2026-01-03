@@ -7,6 +7,7 @@ import {
 import { buildAppearance, buildConfig } from "@/lib/widget/appearance";
 import { renderStyles } from "@/lib/widget/styles";
 import { renderWidgetScript } from "@/lib/widget/clientScript";
+import { createAdmin } from "@/lib/supabase/admin";
 
 type StatusError = Error & { status?: number };
 
@@ -28,7 +29,42 @@ export async function GET(req: Request) {
     ensureDomainAllowed(agent, host, isPreview, isSameSite, siteHost);
 
     const appearance = buildAppearance(agent, url.searchParams);
-    const config = buildConfig(key, `${url.origin}/api/agent/chat`, appearance);
+
+    let chatEndpoint = `${url.origin}/api/agent/chat`;
+
+    try {
+      const supabase = createAdmin();
+      const { data: agentMeta } = await supabase
+        .from("agents")
+        .select("shopify_integration_id")
+        .eq("api_key", key)
+        .maybeSingle();
+
+      const shopifyIntegrationId =
+        typeof agentMeta?.shopify_integration_id === "string"
+          ? agentMeta.shopify_integration_id
+          : null;
+
+      if (shopifyIntegrationId) {
+        const { data: shopify } = await supabase
+          .from("integrations_shopify")
+          .select("id, is_active, currency")
+          .eq("id", shopifyIntegrationId)
+          .maybeSingle();
+
+        if (shopify?.is_active) {
+          const params = new URLSearchParams({ catalog: "shopify" });
+          if (shopify.currency) {
+            params.set("currency", shopify.currency);
+          }
+          chatEndpoint = `${chatEndpoint}?${params.toString()}`;
+        }
+      }
+    } catch (err) {
+      console.error("[AI SaaS] Widget integration lookup failed:", err);
+    }
+
+    const config = buildConfig(key, chatEndpoint, appearance);
     const js = renderWidgetScript(config, renderStyles(appearance));
 
     return new NextResponse(js, {

@@ -6,12 +6,16 @@ const AGENT_MODEL = process.env.OPENAI_AGENT_MODEL ?? FALLBACK_AGENT_MODEL;
 
 export async function POST(req: Request) {
   try {
+    const url = new URL(req.url);
+    const catalog = url.searchParams.get("catalog") ?? null;
+    const currency = url.searchParams.get("currency") ?? null;
+
     const body = await req.json().catch(() => ({}));
     const apiKey = String(body.api_key || "").trim();
     const message = String(body.message || "").trim();
 
     const result = await chatWithAgent(
-      { apiKey, message },
+      { apiKey, message, catalog: catalog ?? undefined, currency: currency ?? undefined },
       {
         supabase: createAdmin(),
         openaiApiKey: process.env.OPENAI_API_KEY ?? "",

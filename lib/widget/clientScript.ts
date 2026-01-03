@@ -174,15 +174,24 @@ ready(() => {
     const name = typeof item.name === "string" ? item.name.trim() : "";
     if (!name) return null;
     const price = typeof item.price === "string" ? item.price.trim() : "";
+    const currency = typeof item.currency === "string" ? item.currency.trim() : "";
     const stock = typeof item.stock_status === "string" ? item.stock_status : "";
     return {
       id: item.id,
       name,
       price: price || null,
+      currency: currency || null,
       permalink: normalizeUrl(item.permalink),
       image: normalizeUrl(item.image),
       stock_status: stock || null,
     };
+  }
+
+  function formatPrice(price, currency){
+    if (!price) return "Consult price";
+    if (!currency) return price;
+    const hasLetters = /[A-Za-z]/.test(currency);
+    return hasLetters ? price + " " + currency : currency + price;
   }
 
   function parseProductListPayload(text){
@@ -230,7 +239,7 @@ ready(() => {
 
     const price = document.createElement("span");
     price.className = "ai-saas-product-price";
-    price.textContent = item.price ? item.price : "Consult price";
+    price.textContent = formatPrice(item.price, item.currency);
 
     const stock = document.createElement("span");
     stock.className = "ai-saas-product-stock";

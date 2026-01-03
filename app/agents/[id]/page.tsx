@@ -58,7 +58,10 @@ async function updateIntegrationAndDomains(formData: FormData) {
   const { supabase, user } = await requireUser();
 
   const agentId = String(formData.get("agent_id") ?? "");
-  const integrationId = String(formData.get("integration_id") ?? "");
+  const wooIntegrationRaw = String(formData.get("woo_integration_id") ?? "");
+  const shopifyIntegrationRaw = String(
+    formData.get("shopify_integration_id") ?? ""
+  );
   const domainsRaw = String(formData.get("allowed_domains") ?? "");
   const promptSystemRaw = String(formData.get("prompt_system") ?? "");
   const languageRaw = String(formData.get("language") ?? "");
@@ -66,7 +69,13 @@ async function updateIntegrationAndDomains(formData: FormData) {
 
   const allowedDomains = normalizeDomainList(domainsRaw);
   const wooIntegrationId =
-    integrationId && integrationId !== "none" ? integrationId : null;
+    wooIntegrationRaw && wooIntegrationRaw !== "none"
+      ? wooIntegrationRaw
+      : null;
+  const shopifyIntegrationId =
+    shopifyIntegrationRaw && shopifyIntegrationRaw !== "none"
+      ? shopifyIntegrationRaw
+      : null;
   const promptSystem = promptSystemRaw.trim() || null;
   const language =
     languageRaw && languageRaw !== "auto" ? languageRaw.trim() : null;
@@ -104,10 +113,26 @@ async function updateIntegrationAndDomains(formData: FormData) {
     }
   }
 
+  if (shopifyIntegrationId) {
+    const { data: integration, error } = await supabase
+      .from("integrations_shopify")
+      .select("id, user_id, is_active")
+      .eq("id", shopifyIntegrationId)
+      .single();
+
+    if (error || !integration || integration.user_id !== user.id) {
+      redirect(`/agents/${agentId}?error=integration`);
+    }
+    if (integration && integration.is_active === false) {
+      redirect(`/agents/${agentId}?error=integration_inactive`);
+    }
+  }
+
   const { error: updateError } = await supabase
     .from("agents")
     .update({
       woo_integration_id: wooIntegrationId,
+      shopify_integration_id: shopifyIntegrationId,
       allowed_domains: allowedDomains.length ? allowedDomains : null,
       prompt_system: promptSystem,
       language,
@@ -216,7 +241,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text"
+      "id, user_id, name, api_key, woo_integration_id, shopify_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -224,10 +249,18 @@ export default async function AgentDetailPage({
 
   if (agentError || !agent) return notFound();
 
-  const { data: integrations } = await supabase
+  const { data: wooIntegrations } = await supabase
     .from("integrations_woocommerce")
     .select(
       "id, label, store_url, is_active, created_at, last_sync_status, products_indexed_count"
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  const { data: shopifyIntegrations } = await supabase
+    .from("integrations_shopify")
+    .select(
+      "id, label, shop_domain, is_active, created_at, last_sync_status, products_indexed_count"
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
@@ -303,8 +336,8 @@ export default async function AgentDetailPage({
                 </span>
               </div>
               <p className="max-w-2xl text-sm text-slate-300 sm:text-base">
-                Use this view to connect WooCommerce, control which domains can
-                load the widget, and copy the agent API key.
+                Use this view to connect WooCommerce or Shopify, control which
+                domains can load the widget, and copy the agent API key.
               </p>
             </div>
             <Link
@@ -379,8 +412,8 @@ export default async function AgentDetailPage({
               Integration and allowed domains
             </h2>
             <p className="mt-1 text-sm text-slate-300">
-              Select the WooCommerce integration this agent should use and
-              define which domains can embed the widget.
+              Select the WooCommerce or Shopify integrations this agent should
+              use and define which domains can embed the widget.
             </p>
 
             {/* Keep the entire form exactly as it is */}
@@ -392,19 +425,19 @@ export default async function AgentDetailPage({
 
               <div className="space-y-2">
                 <label
-                  htmlFor="integration"
+                  htmlFor="woo-integration"
                   className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                 >
                   WooCommerce integration
                 </label>
                 <select
-                  id="integration"
-                  name="integration_id"
+                  id="woo-integration"
+                  name="woo_integration_id"
                   defaultValue={agent.woo_integration_id || "none"}
                   className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
                 >
                   <option value="none">No integration</option>
-                  {(integrations ?? []).map((integration) => {
+                  {(wooIntegrations ?? []).map((integration) => {
                     const label =
                       integration.label?.trim() || integration.store_url;
                     const indexedCount =
@@ -423,9 +456,53 @@ export default async function AgentDetailPage({
                   })}
                 </select>
                 <p className="text-xs text-slate-500">
-                  Manage your credentials and connected sites from{" "}
+                  Manage your WooCommerce credentials from{" "}
                   <Link
                     href="/integrations/woo"
+                    className="text-emerald-300 hover:text-emerald-200"
+                  >
+                    Integrations
+                  </Link>
+                  .
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="shopify-integration"
+                  className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                >
+                  Shopify integration
+                </label>
+                <select
+                  id="shopify-integration"
+                  name="shopify_integration_id"
+                  defaultValue={agent.shopify_integration_id || "none"}
+                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                >
+                  <option value="none">No integration</option>
+                  {(shopifyIntegrations ?? []).map((integration) => {
+                    const label =
+                      integration.label?.trim() || integration.shop_domain;
+                    const indexedCount =
+                      integration.products_indexed_count ?? 0;
+                    const syncLabel =
+                      integration.last_sync_status === "success" &&
+                      indexedCount > 0
+                        ? `indexed ${indexedCount}`
+                        : "not indexed";
+                    return (
+                      <option key={integration.id} value={integration.id}>
+                        {label} - {syncLabel}{" "}
+                        {integration.is_active ? "" : "(inactive)"}
+                      </option>
+                    );
+                  })}
+                </select>
+                <p className="text-xs text-slate-500">
+                  Manage your Shopify credentials from{" "}
+                  <Link
+                    href="/integrations/shopify"
                     className="text-emerald-300 hover:text-emerald-200"
                   >
                     Integrations

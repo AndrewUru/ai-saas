@@ -5,6 +5,7 @@ import {
   type AgentRecord,
 } from "@/lib/contracts/agent";
 import { wooSearchProductsByApiKey } from "@/lib/tools/woo";
+import { shopifySearchProductsByApiKey } from "@/lib/tools/shopify";
 
 export const FALLBACK_AGENT_MODEL = "gpt-4o-mini";
 const DEFAULT_SYSTEM_PROMPT =
@@ -23,9 +24,10 @@ type AgentMessageRecord = {
 };
 
 type ProductSearchItem = {
-  woo_product_id: number;
+  id: string | number;
   name: string;
   price: string | null;
+  currency: string | null;
   stock_status: string | null;
   permalink: string | null;
   image: string | null;
@@ -127,9 +129,10 @@ function buildProductListReply(
     type: "product_list",
     title: buildProductListTitle(language, query),
     items: items.map((item) => ({
-      id: item.woo_product_id,
+      id: item.id,
       name: item.name,
       price: item.price,
+      currency: item.currency,
       permalink: item.permalink,
       image: item.image,
       stock_status: item.stock_status,
@@ -173,7 +176,12 @@ function buildHistory(
 }
 
 export async function chatWithAgent(
-  params: { apiKey: string; message: string },
+  params: {
+    apiKey: string;
+    message: string;
+    catalog?: string;
+    currency?: string;
+  },
   deps: AgentChatDeps
 ): Promise<AgentChatResult> {
   const logger = deps.logger ?? console;
@@ -260,6 +268,8 @@ export async function chatWithAgent(
     .limit(6);
 
   const history = buildHistory(recentMessages).reverse();
+  const useShopify = params.catalog === "shopify";
+  const preferredCurrency = params.currency ?? null;
 
   // Initial messages payload
   const messages: ChatHistoryItem[] = [
@@ -328,11 +338,42 @@ export async function chatWithAgent(
           if (typeof args?.query === "string") {
             productQuery = args.query;
           }
-          const products = await wooSearchProductsByApiKey(apiKey, args, {
-            openaiApiKey: deps.openaiApiKey,
-          });
-          const resultStr = JSON.stringify(products);
-          productResults = products;
+          let normalizedResults: ProductSearchItem[] = [];
+
+          if (useShopify) {
+            const products = await shopifySearchProductsByApiKey(apiKey, args, {
+              openaiApiKey: deps.openaiApiKey,
+            });
+
+            normalizedResults = products.map((item) => ({
+              id: item.shopify_product_id,
+              name: item.name,
+              price: item.price ?? null,
+              currency: item.currency ?? preferredCurrency ?? null,
+              stock_status: item.stock_status ?? null,
+              permalink: item.permalink ?? null,
+              image: item.image ?? null,
+              score: item.score ?? null,
+            }));
+          } else {
+            const products = await wooSearchProductsByApiKey(apiKey, args, {
+              openaiApiKey: deps.openaiApiKey,
+            });
+
+            normalizedResults = products.map((item) => ({
+              id: item.woo_product_id,
+              name: item.name,
+              price: item.price ?? null,
+              currency: null,
+              stock_status: item.stock_status ?? null,
+              permalink: item.permalink ?? null,
+              image: item.image ?? null,
+              score: item.score ?? null,
+            }));
+          }
+
+          const resultStr = JSON.stringify(normalizedResults);
+          productResults = normalizedResults;
 
           messages.push({
             role: "tool",
@@ -357,23 +398,23 @@ export async function chatWithAgent(
         productQuery
       );
     } else {
-    // 2nd Round Trip (with tool results)
-    response = await fetchOpenAI(messages);
-    if (!response.ok) {
-      // If 2nd call fails, we just return what we have or generic error
-      // Ideally we fallback or just return the tool output if possible, but let's error gracefully
-      return {
-        ok: false,
-        status: 502,
-        error: "The model could not process tool results.",
-        fallbackUrl: validAgent.fallback_url ?? null,
-      };
-    }
+      // 2nd Round Trip (with tool results)
+      response = await fetchOpenAI(messages);
+      if (!response.ok) {
+        // If 2nd call fails, we just return what we have or generic error
+        // Ideally we fallback or just return the tool output if possible, but let's error gracefully
+        return {
+          ok: false,
+          status: 502,
+          error: "The model could not process tool results.",
+          fallbackUrl: validAgent.fallback_url ?? null,
+        };
+      }
 
-    completion = await response.json();
-    reply =
-      completion.choices?.[0]?.message?.content?.trim() ||
-      "Sorry, I couldn't generate a final response.";
+      completion = await response.json();
+      reply =
+        completion.choices?.[0]?.message?.content?.trim() ||
+        "Sorry, I couldn't generate a final response.";
     }
   }
 
