@@ -1,6 +1,6 @@
 export default function DocsPage() {
   return (
-    <main className="bg-slate-950 text-slate-100">
+    <main className="text-slate-100">
       <section className="mx-auto max-w-5xl px-6 py-24 sm:px-10 lg:px-16">
         {/* HEADER */}
         <header className="space-y-4 text-center sm:text-left">
@@ -59,21 +59,24 @@ export default function DocsPage() {
           </h2>
 
           <p className="mt-3 text-sm text-slate-300">
-            The embed script is designed for standard HTML environments.
-            Choose the correct installation method depending on your stack.
+            The embed script is designed for standard HTML environments. Choose
+            the correct installation method depending on your stack.
           </p>
 
           <ul className="mt-6 space-y-4 text-sm text-slate-300">
             <li>
-              <strong className="text-white">WordPress / Shopify / Webflow</strong>
+              <strong className="text-white">
+                WordPress / Shopify / Webflow
+              </strong>
               <br />
-              Paste the full script into the site footer, custom HTML block,
-              or a plugin like “Insert Headers and Footers”.
+              Paste the full script into the site footer, custom HTML block, or
+              a plugin like “Insert Headers and Footers”.
             </li>
             <li>
               <strong className="text-white">Static HTML sites</strong>
               <br />
-              Paste the script right before the closing <code>&lt;/body&gt;</code> tag.
+              Paste the script right before the closing{" "}
+              <code>&lt;/body&gt;</code> tag.
             </li>
             <li>
               <strong className="text-white">React / Next.js projects</strong>
@@ -97,14 +100,16 @@ export default function DocsPage() {
           <ul className="mt-6 space-y-3 text-sm text-slate-300">
             <li>
               • <strong className="text-white">elsaltoweb.es</strong> is not the
-              same as <strong className="text-white">agentes.elsaltoweb.es</strong>
+              same as{" "}
+              <strong className="text-white">agentes.elsaltoweb.es</strong>
             </li>
             <li>
-              • If you see a <code>403</code> error, the current domain is not authorized
+              • If you see a <code>403</code> error, the current domain is not
+              authorized
             </li>
             <li>
-              • Add all required domains or subdomains, or use a wildcard
-              like <code>*.example.com</code>
+              • Add all required domains or subdomains, or use a wildcard like{" "}
+              <code>*.example.com</code>
             </li>
           </ul>
 
