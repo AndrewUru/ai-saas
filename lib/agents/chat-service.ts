@@ -6,6 +6,8 @@ import {
 } from "@/lib/contracts/agent";
 import { wooSearchProductsByApiKey } from "@/lib/tools/woo";
 import { shopifySearchProductsByApiKey } from "@/lib/tools/shopify";
+import { embedTexts } from "@/lib/knowledge/embed";
+import { toPgVector } from "@/lib/woo/embeddings";
 
 export const FALLBACK_AGENT_MODEL = "gpt-4o-mini";
 const DEFAULT_SYSTEM_PROMPT =
@@ -50,6 +52,10 @@ type ChatHistoryItem =
   | { role: "assistant"; content: string; tool_calls?: OpenAIToolCall[] }
   | { role: "system"; content: string }
   | { role: "tool"; tool_call_id: string; content: string };
+
+type AgentChunkMatch = {
+  content: string | null;
+};
 
 export type AgentChatDeps = {
   supabase: SupabaseClient;
@@ -175,6 +181,24 @@ function buildHistory(
   });
 }
 
+function buildKnowledgeContext(
+  matches: AgentChunkMatch[] | null | undefined,
+  maxChars: number
+) {
+  const chunks = (matches ?? [])
+    .map((row) => row.content?.trim())
+    .filter(Boolean) as string[];
+
+  if (!chunks.length) return null;
+
+  let context = chunks.join("\n\n");
+  if (context.length > maxChars) {
+    context = context.slice(0, maxChars);
+  }
+
+  return context;
+}
+
 export async function chatWithAgent(
   params: {
     apiKey: string;
@@ -270,10 +294,31 @@ export async function chatWithAgent(
   const history = buildHistory(recentMessages).reverse();
   const useShopify = params.catalog === "shopify";
   const preferredCurrency = params.currency ?? null;
+  let knowledgeContext: string | null = null;
+
+  try {
+    const [embedding] = await embedTexts(deps.openaiApiKey, [message]);
+    const { data } = await deps.supabase.rpc("match_agent_chunks", {
+      p_agent_id: validAgent.id,
+      p_query_embedding: toPgVector(embedding),
+      p_match_count: 8,
+    });
+
+    knowledgeContext = buildKnowledgeContext(
+      data as AgentChunkMatch[] | null | undefined,
+      8000
+    );
+  } catch (err) {
+    logger.error("[AI SaaS] Knowledge lookup error:", err);
+  }
 
   // Initial messages payload
+  const contextMessage = knowledgeContext
+    ? `CONTEXT (merchant documents):\n${knowledgeContext}\n\nUse only if relevant. If insufficient, say you don't know.`
+    : null;
   const messages: ChatHistoryItem[] = [
     { role: "system", content: buildSystemPrompt(validAgent) },
+    ...(contextMessage ? [{ role: "system", content: contextMessage }] : []),
     ...history,
     { role: "user", content: message },
   ];

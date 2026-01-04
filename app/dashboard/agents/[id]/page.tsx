@@ -5,6 +5,7 @@ import { getSiteUrl } from "@/lib/site";
 import WidgetDesigner from "./WidgetDesigner";
 import EmbedSnippet from "./EmbedSnippet";
 import SubmitButton from "@/components/SubmitButton";
+import KnowledgeSection from "./KnowledgeSection";
 
 import {
   widgetLimits,
@@ -653,6 +654,8 @@ export default async function AgentDetailPage({
               </ul>
             </article>
           </aside>
+
+          <KnowledgeSection agentId={agent.id} />
 
           {/* FILA INFERIOR: ancho completo */}
           <article className="lg:col-span-2 w-full min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">

@@ -1,3 +1,4 @@
+//C:\ai-saas\app\api\agent\chat\route.ts
 import { NextResponse } from "next/server";
 import { chatWithAgent, FALLBACK_AGENT_MODEL } from "@/lib/agents/chat-service";
 import { createAdmin } from "@/lib/supabase/admin";
@@ -15,7 +16,12 @@ export async function POST(req: Request) {
     const message = String(body.message || "").trim();
 
     const result = await chatWithAgent(
-      { apiKey, message, catalog: catalog ?? undefined, currency: currency ?? undefined },
+      {
+        apiKey,
+        message,
+        catalog: catalog ?? undefined,
+        currency: currency ?? undefined,
+      },
       {
         supabase: createAdmin(),
         openaiApiKey: process.env.OPENAI_API_KEY ?? "",
