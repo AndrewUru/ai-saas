@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useAgents } from "./hooks/useAgents";
 
-
 type Props = {
   planLimitLabel: string;
 };
@@ -25,8 +24,8 @@ export default function AgentsSection({ planLimitLabel }: Props) {
             isLoading
               ? "Loading..."
               : totalAgents === 0
-                ? "No agents yet"
-                : "Ready in WooCommerce"
+              ? "No agents yet"
+              : "Ready in WooCommerce"
           }
         />
 
@@ -37,8 +36,8 @@ export default function AgentsSection({ planLimitLabel }: Props) {
             isLoading
               ? "Checking..."
               : activeAgents === totalAgents
-                ? "All active"
-                : "Some are paused"
+              ? "All active"
+              : "Some are paused"
           }
         />
 
@@ -125,7 +124,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                         </div>
                       </div>
                       <Link
-                        href={`/agents/${agent.id}`}
+                        href={`/dashboard/agents/${agent.id}`}
                         className="ui-button ui-button--subtle py-1.5 px-3 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         Configure

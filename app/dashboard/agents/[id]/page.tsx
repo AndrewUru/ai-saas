@@ -620,7 +620,7 @@ export default async function AgentDetailPage({
                   Save changes
                 </button>
                 <Link
-                  href={`/agents/${agent.id}`}
+                  href={`/dashboard/agents/${agent.id}`}
                   className="inline-flex w-full items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:w-auto"
                 >
                   Cancel

@@ -229,7 +229,7 @@ export default async function AgentsPage(props: {
 
                       <div className="flex items-center gap-2 pt-4 sm:pt-0 border-t sm:border-t-0 border-border/50 mt-2 sm:mt-0">
                         <Link
-                          href={`/agents/${agent.id}`}
+                          href={`/dashboard/agents/${agent.id}`}
                           className="ui-button ui-button--secondary text-xs"
                         >
                           Configure
