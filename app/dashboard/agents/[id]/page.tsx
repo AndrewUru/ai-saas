@@ -315,11 +315,11 @@ export default async function AgentDetailPage({
     : "Unknown date";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_60%)]" />
+    <main className="relative min-h-screen overflow-hidden  text-slate-100">
+      <div className="pointer-events-none absolute inset-0" />
 
-      <section className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col gap-12 px-6 py-16 md:px-10 lg:px-16">
-        <header className="space-y-4 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur">
+      <section className="relative z-10 mx-auto flex min-h-screen flex-col">
+        <header className="space-y-4 rounded-3xl border border-slate-800/60  p-8 shadow-xl shadow-emerald-500/10 backdrop-blur">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="space-y-3">
               <p className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">
