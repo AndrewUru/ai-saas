@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   deleteAgentFile,
   listAgentFiles,
@@ -8,15 +8,8 @@ import {
   uploadAgentFile,
 } from "./actions";
 
-type AgentFileItem = {
-  id: string;
-  filename: string;
-  mime_type: string | null;
-  size_bytes: number | null;
-  status: string | null;
-  created_at: string | null;
-  error: string | null;
-};
+type ListFilesResult = Awaited<ReturnType<typeof listAgentFiles>>;
+type AgentFileItem = Extract<ListFilesResult, { ok: true }>["files"][number];
 
 type Notice = {
   type: "success" | "error";
@@ -67,20 +60,23 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
   const [deleting, setDeleting] = useState<Record<string, boolean>>({});
   const [notice, setNotice] = useState<Notice | null>(null);
 
-  const refreshFiles = async (silent = false) => {
-    if (!silent) setLoading(true);
-    const result = await listAgentFiles(agentId);
-    if (result.ok) {
-      setFiles(result.files as AgentFileItem[]);
-    } else {
-      setNotice({ type: "error", message: result.error });
-    }
-    if (!silent) setLoading(false);
-  };
+  const refreshFiles = useCallback(
+    async (silent = false) => {
+      if (!silent) setLoading(true);
+      const result = await listAgentFiles(agentId);
+      if (result.ok) {
+        setFiles(result.files);
+      } else {
+        setNotice({ type: "error", message: result.error });
+      }
+      if (!silent) setLoading(false);
+    },
+    [agentId]
+  );
 
   useEffect(() => {
-    refreshFiles();
-  }, [agentId]);
+    void refreshFiles();
+  }, [refreshFiles]);
 
   const handleUpload = async () => {
     const file = fileInputRef.current?.files?.[0];

@@ -11,9 +11,6 @@ export default async function AgentsPage(props: {
   const currentError = searchParams.error;
   const { supabase, user } = await requireUser();
 
-  const email = user.email ?? "";
-  const username = email.split("@")[0];
-
   const { data: agents } = await supabase
     .from("agents")
     .select("id, name, api_key, is_active, messages_limit, created_at")

@@ -10,6 +10,28 @@ import { toPgVector } from "@/lib/woo/embeddings";
 // opcional: import { revalidatePath } from "next/cache";
 // opcional: import { redirect } from "next/navigation";
 
+export type ActionError = {
+  ok: false;
+  error: string;
+  issues?: z.ZodFlattenedError<unknown>;
+};
+
+export type ActionSuccess<T extends object = {}> = { ok: true } & T;
+
+export type ActionResult<T extends object = {}> =
+  | ActionSuccess<T>
+  | ActionError;
+
+export type AgentFileResponse = {
+  id: string;
+  filename: string;
+  mime_type: string | null;
+  size_bytes: number | null;
+  status: string | null;
+  created_at: string | null;
+  error: string | null;
+};
+
 const Schema = z.object({
   id: z.string().uuid(),
   integration_woocommerce: z.string().min(1).optional(), // "none"|"basic"|...
@@ -25,21 +47,14 @@ const MIN_CHUNK_SIZE = 50;
 const FILE_SELECT =
   "id, filename, mime_type, size_bytes, status, created_at, error";
 
-type AgentFileRow = {
-  id: string;
-  filename: string;
-  mime_type: string | null;
-  size_bytes: number | null;
-  status: string | null;
-  created_at: string | null;
-  error: string | null;
-};
+type AgentFileRow = AgentFileResponse;
+type OwnedAgentRow = { id: string; user_id: string };
 
 async function getOwnedAgent(
   supabase: Awaited<ReturnType<typeof createServer>>,
   agentId: string,
   userId: string
-) {
+): Promise<ActionResult<{ agent: OwnedAgentRow }>> {
   const { data: agent, error } = await supabase
     .from("agents")
     .select("id,user_id")
@@ -64,7 +79,7 @@ function isAllowedFileType(file: File) {
   return { isPdf, isCsv, ok: isPdf || isCsv };
 }
 
-function toSafeFileResponse(row: AgentFileRow) {
+function toSafeFileResponse(row: AgentFileRow): AgentFileResponse {
   return {
     id: row.id,
     filename: row.filename,
@@ -76,7 +91,9 @@ function toSafeFileResponse(row: AgentFileRow) {
   };
 }
 
-export async function saveAgentSettings(formData: FormData) {
+export async function saveAgentSettings(
+  formData: FormData
+): Promise<ActionResult> {
   try {
     const supabase = await createServer();
 
@@ -147,7 +164,9 @@ export async function saveAgentSettings(formData: FormData) {
   }
 }
 
-export async function listAgentFiles(agentId: string) {
+export async function listAgentFiles(
+  agentId: string
+): Promise<ActionResult<{ files: AgentFileResponse[] }>> {
   try {
     const supabase = await createServer();
     const {
@@ -179,7 +198,10 @@ export async function listAgentFiles(agentId: string) {
   }
 }
 
-export async function uploadAgentFile(agentId: string, formData: FormData) {
+export async function uploadAgentFile(
+  agentId: string,
+  formData: FormData
+): Promise<ActionResult<{ file: AgentFileResponse }>> {
   try {
     const supabase = await createServer();
     const {
@@ -265,7 +287,10 @@ export async function uploadAgentFile(agentId: string, formData: FormData) {
   }
 }
 
-export async function processAgentFile(agentId: string, fileId: string) {
+export async function processAgentFile(
+  agentId: string,
+  fileId: string
+): Promise<ActionResult> {
   const supabase = await createServer();
   const {
     data: { user },
@@ -414,7 +439,10 @@ export async function processAgentFile(agentId: string, fileId: string) {
   }
 }
 
-export async function deleteAgentFile(agentId: string, fileId: string) {
+export async function deleteAgentFile(
+  agentId: string,
+  fileId: string
+): Promise<ActionResult> {
   try {
     const supabase = await createServer();
     const {
