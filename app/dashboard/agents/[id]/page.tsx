@@ -51,6 +51,9 @@ function normalizeWidgetText(value: string, max: number): string | null {
   return trimmed.slice(0, max);
 }
 
+// Centralized route base to avoid future hardcoded path issues
+const AGENTS_BASE = "/dashboard/agents";
+
 // --- Server action ---------------------------------------------------------
 async function updateIntegrationAndDomains(formData: FormData) {
   "use server";
@@ -106,10 +109,10 @@ async function updateIntegrationAndDomains(formData: FormData) {
       .single();
 
     if (error || !integration || integration.user_id !== user.id) {
-      redirect(`/agents/${agentId}?error=integration`);
+      redirect(`${AGENTS_BASE}/${agentId}?error=integration`);
     }
     if (integration && integration.is_active === false) {
-      redirect(`/agents/${agentId}?error=integration_inactive`);
+      redirect(`${AGENTS_BASE}/${agentId}?error=integration_inactive`);
     }
   }
 
@@ -121,10 +124,10 @@ async function updateIntegrationAndDomains(formData: FormData) {
       .single();
 
     if (error || !integration || integration.user_id !== user.id) {
-      redirect(`/agents/${agentId}?error=integration`);
+      redirect(`${AGENTS_BASE}/${agentId}?error=integration`);
     }
     if (integration && integration.is_active === false) {
-      redirect(`/agents/${agentId}?error=integration_inactive`);
+      redirect(`${AGENTS_BASE}/${agentId}?error=integration_inactive`);
     }
   }
 
@@ -143,10 +146,10 @@ async function updateIntegrationAndDomains(formData: FormData) {
     .eq("user_id", user.id);
 
   if (updateError) {
-    redirect(`/agents/${agentId}?error=save`);
+    redirect(`${AGENTS_BASE}/${agentId}?error=save`);
   }
 
-  redirect(`/agents/${agentId}?saved=1`);
+  redirect(`${AGENTS_BASE}/${agentId}?saved=1`);
 }
 
 async function updateWidgetBranding(formData: FormData) {
@@ -155,7 +158,7 @@ async function updateWidgetBranding(formData: FormData) {
   const { supabase, user } = await requireUser();
 
   const agentId = String(formData.get("agent_id") ?? "");
-  if (!agentId) redirect("/agents");
+  if (!agentId) redirect(AGENTS_BASE);
 
   const accentRaw = String(formData.get("widget_accent") ?? "");
   const brandRaw = String(formData.get("widget_brand") ?? "");
@@ -218,10 +221,10 @@ async function updateWidgetBranding(formData: FormData) {
     .eq("user_id", user.id);
 
   if (updateError) {
-    redirect(`/agents/${agentId}?error=widget`);
+    redirect(`${AGENTS_BASE}/${agentId}?error=widget`);
   }
 
-  redirect(`/agents/${agentId}?widget_saved=1`);
+  redirect(`${AGENTS_BASE}/${agentId}?widget_saved=1`);
 }
 
 type AgentDetailPageProps = {
@@ -331,7 +334,6 @@ export default async function AgentDetailPage({
                 </h1>
                 <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-300">
                   <span className={`h-2.5 w-2.5 rounded-full ${statusColor}`} />
-
                   {statusLabel}
                 </span>
               </div>
@@ -341,7 +343,7 @@ export default async function AgentDetailPage({
               </p>
             </div>
             <Link
-              href="/agents"
+              href={AGENTS_BASE}
               className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
             >
               Back to agents
@@ -620,7 +622,7 @@ export default async function AgentDetailPage({
                   Save changes
                 </button>
                 <Link
-                  href={`/dashboard/agents/${agent.id}`}
+                  href={`${AGENTS_BASE}/${agent.id}`}
                   className="inline-flex w-full items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:w-auto"
                 >
                   Cancel
