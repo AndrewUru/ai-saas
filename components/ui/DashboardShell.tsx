@@ -117,29 +117,6 @@ export default function DashboardShell({
 
         {/* Main column */}
         <div className="min-w-0">
-          {/* Desktop header */}
-          <header className="hidden lg:block sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
-              <div className="flex items-center gap-2">
-                <span className="ml-2 rounded-full border border-border bg-surface px-2 py-0.5 text-[14px] uppercase font-semibold text-[var(--foreground-muted)]">
-                  Board
-                </span>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <Link
-                  href="/docs"
-                  className="text-sm font-medium text-[var(--foreground-muted)] hover:text-foreground transition-colors"
-                >
-                  Documentation
-                </Link>
-                <div className="h-8 w-8 rounded-full bg-surface-strong border border-border flex items-center justify-center text-xs font-bold">
-                  A
-                </div>
-              </div>
-            </div>
-          </header>
-
           {/* Page content */}
           <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
             {children}
