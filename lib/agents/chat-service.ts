@@ -318,7 +318,7 @@ export async function chatWithAgent(
     : null;
   const messages: ChatHistoryItem[] = [
     { role: "system", content: buildSystemPrompt(validAgent) },
-    ...(contextMessage ? [{ role: "system", content: contextMessage }] : []),
+    ...(contextMessage ? ([{ role: "system", content: contextMessage }] as ChatHistoryItem[]) : []),
     ...history,
     { role: "user", content: message },
   ];
