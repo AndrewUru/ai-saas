@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { getSiteUrl } from "@/lib/site";
 import WidgetDesigner from "./WidgetDesigner";
 import EmbedSnippet from "./EmbedSnippet";
+import SubmitButton from "@/components/SubmitButton";
 
 import {
   widgetLimits,
@@ -615,15 +616,10 @@ export default async function AgentDetailPage({
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <button
-                  type="submit"
-                  className="inline-flex w-full items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto"
-                >
-                  Save changes
-                </button>
+                <SubmitButton label="Save changes" />
                 <Link
                   href={`${AGENTS_BASE}/${agent.id}`}
-                  className="inline-flex w-full items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:w-auto"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 active:scale-[0.98] sm:w-auto"
                 >
                   Cancel
                 </Link>
