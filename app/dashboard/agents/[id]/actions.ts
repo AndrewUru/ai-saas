@@ -16,9 +16,13 @@ export type ActionError = {
   issues?: z.ZodFlattenedError<unknown>;
 };
 
-export type ActionSuccess<T extends object = {}> = { ok: true } & T;
+export type ActionSuccess<
+  T extends Record<string, unknown> = Record<string, never>
+> = { ok: true } & T;
 
-export type ActionResult<T extends object = {}> =
+export type ActionResult<
+  T extends Record<string, unknown> = Record<string, never>
+> =
   | ActionSuccess<T>
   | ActionError;
 
