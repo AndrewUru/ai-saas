@@ -280,7 +280,7 @@ export default async function WooIntegrationPage({
                   </p>
                 </div>
                 <Link
-                  href="/agents"
+                  href="/dashboard/agents"
                   className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200 transition hover:bg-emerald-500/20"
                 >
                   View agents
