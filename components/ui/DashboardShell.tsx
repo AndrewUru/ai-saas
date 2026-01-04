@@ -14,7 +14,7 @@ const NAV: NavItem[] = [
   { label: "Agents", href: "/dashboard/agents" },
   { label: "Integrations", href: "/dashboard/integrations" },
   { label: "Billing", href: "/dashboard/billing" },
-  { label: "Docs", href: "/docs" },
+  { label: "Docs", href: "/dashboard/docs" },
 ];
 
 function cx(...cls: Array<string | false | undefined | null>) {
@@ -105,7 +105,7 @@ export default function DashboardShell({
                   Need human support?
                 </div>
                 <Link
-                  href="/support"
+                  href="/contact"
                   className="mt-2 inline-flex w-full justify-center ui-button ui-button--secondary"
                 >
                   Contact
