@@ -53,9 +53,7 @@ const NAV_LINKS: NavLink[] = [
   { href: "/academy", label: "Academy" },
   { href: "/pricing", label: "Pricing" },
   { href: "/contact", label: "Contact" },
-  { href: "/agents", label: "Agents", requiresAuth: true },
   { href: "/dashboard", label: "Dashboard", requiresAuth: true },
-  { href: "/billing", label: "Billing", requiresAuth: true },
 ];
 
 export default function Navbar() {
@@ -95,7 +93,7 @@ export default function Navbar() {
       (_event, session) => {
         if (!isMounted) return;
         setUserEmail(session?.user?.email ?? null);
-      },
+      }
     );
 
     return () => {
@@ -128,20 +126,19 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-md supports-[backdrop-filter]:bg-slate-950/60">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6 lg:px-8">
         {/* LOGO AREA */}
-<Link
-  href="/"
-  className="group flex items-center transition-opacity hover:opacity-90"
->
-  <Image
-    src="/logo.svg"
-    alt="AICommerce"
-    width={120}        // controla aquí el tamaño
-    height={32}        // proporcional al SVG original
-    className="object-contain"
-    priority
-  />
-</Link>
-
+        <Link
+          href="/"
+          className="group flex items-center transition-opacity hover:opacity-90"
+        >
+          <Image
+            src="/logo.svg"
+            alt="AICommerce"
+            width={120} // controla aquí el tamaño
+            height={32} // proporcional al SVG original
+            className="object-contain"
+            priority
+          />
+        </Link>
 
         {/* DESKTOP NAVIGATION */}
         <div className="hidden items-center gap-1 rounded-full bg-slate-900/40 px-2 py-1.5 shadow-inner shadow-white/5 md:flex">
