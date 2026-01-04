@@ -10,21 +10,18 @@ import { toPgVector } from "@/lib/woo/embeddings";
 // opcional: import { revalidatePath } from "next/cache";
 // opcional: import { redirect } from "next/navigation";
 
-export type ActionError = {
+export type ActionError<E = unknown> = {
   ok: false;
   error: string;
-  issues?: z.ZodFlattenedError<unknown>;
+  issues?: E;
 };
 
-export type ActionSuccess<
-  T extends Record<string, unknown> = Record<string, never>
-> = { ok: true } & T;
+export type ActionSuccess<T extends object = Record<string, never>> =
+  T extends Record<string, never> ? { ok: true } : { ok: true } & T;
 
-export type ActionResult<
-  T extends Record<string, unknown> = Record<string, never>
-> =
+export type ActionResult<T extends object = Record<string, never>, E = unknown> =
   | ActionSuccess<T>
-  | ActionError;
+  | ActionError<E>;
 
 export type AgentFileResponse = {
   id: string;
