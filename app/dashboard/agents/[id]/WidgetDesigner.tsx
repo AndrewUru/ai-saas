@@ -328,7 +328,7 @@ export default function WidgetDesigner({
     >
       <form
         action={formAction}
-        className="space-y-6 rounded-3xl border border-slate-800/70 bg-gradient-to-br from-slate-950/75 via-slate-950/65 to-slate-900/60 p-6 shadow-xl shadow-slate-950/40"
+        className="space-y-4  p-3 shadow-xl shadow-slate-950/40"
       >
         <input type="hidden" name="agent_id" value={agentId} />
 
