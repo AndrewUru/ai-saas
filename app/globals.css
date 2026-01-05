@@ -223,6 +223,43 @@ a:focus-visible {
   outline: none;
 }
 
+/* Alerts */
+.ui-alert {
+  border-radius: var(--card-radius);
+  padding: 16px 20px;
+  font-size: 0.875rem;
+  border: 1px solid transparent;
+  backdrop-filter: blur(8px);
+}
+
+.ui-alert--success {
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.3);
+  color: #a7f3d0; /* emerald-100 */
+  box-shadow: var(--shadow-glow);
+}
+
+.ui-alert--error {
+  background: rgba(244, 63, 94, 0.1); /* rose-500 */
+  border-color: rgba(244, 63, 94, 0.3);
+  color: #ffe4e6; /* rose-100 */
+}
+
+/* Status Dots */
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.dot--active {
+  background-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+.dot--paused {
+  background-color: var(--foreground-muted);
+}
+
 /* Animations */
 @keyframes gradient-x {
   0% {

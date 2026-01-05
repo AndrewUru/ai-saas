@@ -21,8 +21,8 @@ export default function SubmitButton({ label, className }: SubmitButtonProps) {
       aria-disabled={pending}
       aria-busy={pending}
       className={cx(
-        "inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 active:scale-[0.98] sm:w-auto",
-        "disabled:cursor-not-allowed disabled:bg-emerald-400/60 disabled:text-slate-950/60 disabled:hover:bg-emerald-400/60",
+        "ui-button ui-button--primary w-full sm:w-auto",
+        "disabled:cursor-not-allowed disabled:opacity-60",
         className
       )}
     >

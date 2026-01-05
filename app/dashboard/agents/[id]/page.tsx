@@ -320,22 +320,24 @@ export default async function AgentDetailPage({
     : "Unknown date";
 
   return (
-    <main className="relative min-h-screen overflow-hidden  text-slate-100">
+
+    <main className="relative min-h-screen overflow-hidden text-slate-100">
       <div className="pointer-events-none absolute inset-0" />
 
       <section className="relative z-10 mx-auto flex min-h-screen flex-col">
-        <header className="space-y-4 rounded-3xl border border-slate-800/60  p-8 shadow-xl shadow-emerald-500/10 backdrop-blur">
+        {/* Header */}
+        <header className="space-y-4 ui-card--strong p-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="space-y-3">
-              <p className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">
+              <p className="ui-badge">
                 Agent profile
               </p>
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
                   {agent.name}
                 </h1>
-                <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-300">
-                  <span className={`h-2.5 w-2.5 rounded-full ${statusColor}`} />
+                <span className="ui-badge border-slate-700 text-slate-300 bg-transparent">
+                  <span className={`dot ${agent.is_active ? 'dot--active' : 'dot--paused'}`} />
                   {statusLabel}
                 </span>
               </div>
@@ -346,14 +348,14 @@ export default async function AgentDetailPage({
             </div>
             <Link
               href={AGENTS_BASE}
-              className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
+              className="ui-button ui-button--ghost"
             >
               Back to agents
             </Link>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300">
+            <div className="ui-card p-4 text-sm text-slate-300">
               <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
                 API Key
               </p>
@@ -361,7 +363,7 @@ export default async function AgentDetailPage({
                 {agent.api_key}
               </p>
             </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300">
+            <div className="ui-card p-4 text-sm text-slate-300">
               <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
                 Message limit
               </p>
@@ -372,7 +374,7 @@ export default async function AgentDetailPage({
                 Adjust this value from the database or soon from your plan.
               </p>
             </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-sm text-slate-300">
+            <div className="ui-card p-4 text-sm text-slate-300">
               <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
                 Created on
               </p>
@@ -386,32 +388,33 @@ export default async function AgentDetailPage({
           </div>
         </header>
 
+        {/* Alerts */}
         {saved && (
-          <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/20">
+          <div className="ui-alert ui-alert--success items-center mt-6">
             Changes saved successfully.
           </div>
         )}
         {widgetSaved && (
-          <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-4 text-sm text-emerald-100 shadow-lg shadow-emerald-500/20">
+          <div className="ui-alert ui-alert--success mt-6">
             Widget customization saved.
           </div>
         )}
         {errorKey && (
-          <div className="rounded-3xl border border-rose-500/30 bg-rose-500/10 px-5 py-4 text-sm text-rose-100 shadow-lg shadow-rose-500/20">
+          <div className="ui-alert ui-alert--error mt-6">
             {errorMessages[errorKey] ?? "An unexpected error occurred."}
           </div>
         )}
 
         <div
           className="
-            grid gap-10
+            mt-10 grid gap-10
             lg:grid-cols-[minmax(0,1.6fr)_minmax(340px,1fr)]
             xl:grid-cols-[minmax(0,1.85fr)_minmax(380px,1fr)]
             2xl:grid-cols-[minmax(0,2fr)_minmax(420px,1fr)]
           "
         >
           {/* LEFT COLUMN TOP: Integration + domains */}
-          <article className="min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">
+          <article className="min-w-0 ui-card glass-pane p-7">
             <h2 className="text-xl font-semibold text-white">
               Integration and allowed domains
             </h2>
@@ -420,7 +423,6 @@ export default async function AgentDetailPage({
               use and define which domains can embed the widget.
             </p>
 
-            {/* Keep the entire form exactly as it is */}
             <form
               action={updateIntegrationAndDomains}
               className="mt-6 space-y-6"
@@ -438,7 +440,7 @@ export default async function AgentDetailPage({
                   id="woo-integration"
                   name="woo_integration_id"
                   defaultValue={agent.woo_integration_id || "none"}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                  className="ui-input"
                 >
                   <option value="none">No integration</option>
                   {(wooIntegrations ?? []).map((integration) => {
@@ -482,7 +484,7 @@ export default async function AgentDetailPage({
                   id="shopify-integration"
                   name="shopify_integration_id"
                   defaultValue={agent.shopify_integration_id || "none"}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                  className="ui-input"
                 >
                   <option value="none">No integration</option>
                   {(shopifyIntegrations ?? []).map((integration) => {
@@ -531,7 +533,7 @@ export default async function AgentDetailPage({
                     "Describe tone, policies, and objectives for the agent."
                   }
                   rows={5}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                  className="ui-input"
                 />
 
                 <p className="text-xs text-slate-500">
@@ -551,7 +553,7 @@ export default async function AgentDetailPage({
                   id="language"
                   name="language"
                   defaultValue={languageValue}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                  className="ui-input"
                 >
                   {LANGUAGE_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -579,7 +581,7 @@ export default async function AgentDetailPage({
                   inputMode="url"
                   defaultValue={fallbackUrlValue}
                   placeholder="https://your-agency.com/contact"
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                  className="ui-input"
                 />
 
                 <p className="text-xs text-slate-500">
@@ -599,7 +601,7 @@ export default async function AgentDetailPage({
                   name="allowed_domains"
                   placeholder="myshop.com, store.com"
                   defaultValue={allowedDomains.join(", ")}
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                  className="ui-input"
                 />
 
                 <p className="text-xs text-slate-500">
@@ -620,7 +622,7 @@ export default async function AgentDetailPage({
                 <SubmitButton label="Save changes" />
                 <Link
                   href={`${AGENTS_BASE}/${agent.id}`}
-                  className="inline-flex w-full items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 active:scale-[0.98] sm:w-auto"
+                  className="ui-button ui-button--ghost w-full sm:w-auto"
                 >
                   Cancel
                 </Link>
@@ -630,11 +632,14 @@ export default async function AgentDetailPage({
 
           {/* RIGHT COLUMN TOP: snippet + best practices */}
           <aside className="space-y-6 min-w-0">
-            <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur">
+            <article className="ui-card--strong glass-pane backdrop-blur relative overflow-hidden">
+               {/* EmbedSnippet component usually has its own internal card but here we wrap it or let it handle its own styles? 
+                   The user said "No cambies el contenido de los componentes hijos". 
+                   The previous code had this wrapper, so I keep the wrapper but use ui-card. 
+               */}
               <EmbedSnippet widgetScriptUrl={widgetScriptUrl} />
             </article>
-
-            <article className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 text-sm text-slate-300 shadow-lg shadow-slate-900/40 backdrop-blur">
+            <article className="ui-card glass-pane p-6 text-sm text-slate-300">
               <h3 className="text-lg font-semibold text-white">
                 Best practices
               </h3>
@@ -658,7 +663,7 @@ export default async function AgentDetailPage({
           <KnowledgeSection agentId={agent.id} />
 
           {/* FILA INFERIOR: ancho completo */}
-          <article className="lg:col-span-2 w-full min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur">
+          <article className="lg:col-span-2 w-full min-w-0 ui-card glass-pane p-7">
             <h2 className="text-xl font-semibold text-white">
               Customize the embeddable widget
             </h2>
