@@ -238,20 +238,25 @@ export async function uploadAgentFile(
         filename: safeName,
         mime_type: file.type || fallbackType,
         size_bytes: file.size,
-        status: "uploaded",
+        status: "uploading", // 1) Initial status
       })
       .select(FILE_SELECT)
       .single();
 
     if (insertError || !inserted) {
       console.error("Supabase insert file error:", insertError);
-      return { ok: false, error: "Could not save file record." };
+      return { ok: false, error: insertError?.message ?? "Insert failed" };
     }
 
+    // 2) Deterministic path
     const storagePath = `user/${user.id}/agent/${agentId}/${inserted.id}-${safeName}`;
+
+    // 3) Use bytes
+    const bytes = new Uint8Array(await file.arrayBuffer());
+
     const { error: uploadError } = await supabase.storage
       .from("agent-files")
-      .upload(storagePath, file, {
+      .upload(storagePath, bytes, {
         upsert: true,
         contentType: file.type || fallbackType,
       });
@@ -266,9 +271,10 @@ export async function uploadAgentFile(
       return { ok: false, error: uploadError.message };
     }
 
+    // 4) Success -> uploaded
     const { data: updated, error: updateError } = await supabase
       .from("agent_files")
-      .update({ storage_path: storagePath })
+      .update({ storage_path: storagePath, status: "uploaded" })
       .eq("id", inserted.id)
       .eq("agent_id", agentId)
       .select(FILE_SELECT)
@@ -276,7 +282,8 @@ export async function uploadAgentFile(
 
     if (updateError || !updated) {
       console.error("Supabase update file error:", updateError);
-      return { ok: false, error: "File uploaded, but update failed." };
+      // Return the real error message if possible
+      return { ok: false, error: updateError.message || "File uploaded, but update failed." };
     }
 
     return { ok: true, file: toSafeFileResponse(updated as AgentFileRow) };
