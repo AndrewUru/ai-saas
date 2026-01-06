@@ -227,23 +227,40 @@ export function renderWidgetScript(
 
         // Send to API
         try {
-          const resp = await fetch(fullConfig.chatEndpoint, {
+          const agentKey = fullConfig.key || CONFIG_KEY;
+          const chatBase = fullConfig.chatEndpoint || \`\${API_BASE}/api/agent/chat\`;
+          const chatUrl = new URL(chatBase, API_BASE);
+          if (agentKey && !chatUrl.searchParams.has("key")) {
+            chatUrl.searchParams.set("key", agentKey);
+          }
+
+          const payload = {
+            message: text,
+            messages: [{ role: "user", content: text }],
+          };
+          if (agentKey) payload.api_key = agentKey;
+
+          const resp = await fetch(chatUrl.toString(), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: text }),
+            body: JSON.stringify(payload),
           });
 
           chatBox.removeChild(typingDiv);
           input.disabled = false;
           input.focus();
 
-          if (!resp.ok) throw new Error("API Error");
+          if (!resp.ok) {
+            const errorText = await resp.text().catch(() => "");
+            console.error("AI Widget: API error", errorText || resp.status);
+            throw new Error("API Error");
+          }
           const data = await resp.json();
 
           // Bot Message
           const botDiv = document.createElement("div");
           botDiv.className = "ai-saas-bubble bot ai-saas-enter";
-          botDiv.innerText = data.text || "Sorry, I didn't understand that.";
+          botDiv.innerText = data.reply || "Sorry, I didn't understand that.";
           chatBox.appendChild(botDiv);
           chatBox.scrollTop = chatBox.scrollHeight;
 

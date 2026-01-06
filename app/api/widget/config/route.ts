@@ -34,7 +34,10 @@ export async function GET(req: Request) {
   // The original route had logic to check for shopify integration.
   // Let's do a quick check for shopify integration if active.
   
-  let chatEndpoint = `${url.origin}/api/agent/chat`;
+  const chatUrl = new URL(`${url.origin}/api/agent/chat`);
+  if (agent.api_key) {
+    chatUrl.searchParams.set("key", agent.api_key);
+  }
 
   if (agent.shopify_integration_id) {
      const { data: shopify } = await supabase
@@ -44,11 +47,13 @@ export async function GET(req: Request) {
       .maybeSingle();
       
       if (shopify?.is_active) {
-        const params = new URLSearchParams({ catalog: "shopify" });
-        if (shopify.currency) params.set("currency", shopify.currency);
-        chatEndpoint = `${chatEndpoint}?${params.toString()}`;
+        chatUrl.searchParams.set("catalog", "shopify");
+        if (shopify.currency) {
+          chatUrl.searchParams.set("currency", shopify.currency);
+        }
       }
   }
+  const chatEndpoint = chatUrl.toString();
 
   const config: WidgetConfig = {
     key: agent.api_key,
