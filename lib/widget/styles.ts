@@ -1,4 +1,4 @@
-import type { WidgetAppearance } from "./types";
+
 
 export const STATIC_STYLES = `
 #ai-saas-anchor {

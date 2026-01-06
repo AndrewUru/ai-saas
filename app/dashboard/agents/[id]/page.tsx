@@ -271,7 +271,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, shopify_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text, avatar_type, avatar_bubble_style, avatar_bubble_colors"
+      "id, user_id, name, api_key, woo_integration_id, shopify_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text, avatar_type, avatar_bubble_style, avatar_bubble_colors"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -313,7 +313,7 @@ export default async function AgentDetailPage({
   const languageValue = agent.language ?? "auto";
   const fallbackUrlValue = agent.fallback_url ?? "";
   const descriptionFallback = agent.description ?? "";
-  const statusColor = agent.is_active ? "bg-emerald-400" : "bg-slate-500";
+
   const widgetPositionValue =
     agent.widget_position === "left" || agent.widget_position === "right"
       ? agent.widget_position
@@ -706,6 +706,7 @@ export default async function AgentDetailPage({
               initialBrand={agent.widget_brand}
               initialLabel={agent.widget_label}
               initialGreeting={agent.widget_greeting}
+              initialHumanSupportText={agent.widget_human_support_text}
               initialPosition={widgetPositionValue}
               initialColorHeaderBg={agent.widget_color_header_bg}
               initialColorHeaderText={agent.widget_color_header_text}

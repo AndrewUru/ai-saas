@@ -812,7 +812,7 @@ export default function WidgetDesigner({
             </button>
           </div>
           <p className="text-xs text-slate-500">
-            This snippet is stable. You don't need to update it when changing settings.
+            This snippet is stable. You don&apos;t need to update it when changing settings.
           </p>
         </div>
       </div>

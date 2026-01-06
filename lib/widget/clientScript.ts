@@ -68,7 +68,7 @@ export function renderWidgetScript(
       // We rely on STATIC_STYLES which uses variables.
       // We prepend a style tag.
       const styleTag = document.createElement("style");
-      styleTag.innerHTML = \`\${STATIC_STYLES}\`;
+      styleTag.innerHTML = \`${STATIC_STYLES}\`;
       document.head.appendChild(styleTag);
 
       // 4. Create Root Elements

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdmin } from "@/lib/supabase/admin";
 import { WidgetConfig } from "@/lib/widget/types";
-import { widgetDefaults, avatarDefaults, AVATAR_TYPES, BUBBLE_STYLES, AvatarType, BubbleStyle } from "@/lib/widget/defaults";
+import { widgetDefaults, avatarDefaults, AvatarType, BubbleStyle } from "@/lib/widget/defaults";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
