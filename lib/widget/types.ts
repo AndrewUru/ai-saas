@@ -60,6 +60,7 @@ export interface AgentRecord {
   widget_brand: string | null;
   widget_label: string | null;
   widget_greeting: string | null;
+  widget_human_support_text: string | null;
   widget_position: WidgetPosition | null;
   widget_color_header_bg: string | null;
   widget_color_header_text: string | null;

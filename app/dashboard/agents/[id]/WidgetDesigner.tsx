@@ -22,6 +22,8 @@ type WidgetDesignerProps = {
   initialBrand: string | null;
   initialLabel: string | null;
   initialGreeting: string | null;
+
+  initialHumanSupportText: string | null;
   initialPosition: WidgetPosition | null;
   // New props
   initialColorHeaderBg: string | null;
@@ -124,7 +126,9 @@ export default function WidgetDesigner({
   initialAccent,
   initialBrand,
   initialLabel,
+
   initialGreeting,
+  initialHumanSupportText,
   initialPosition,
   initialColorHeaderBg,
   initialColorHeaderText,
@@ -143,6 +147,7 @@ export default function WidgetDesigner({
   const [brandInput, setBrandInput] = useState(initialBrand ?? "");
   const [labelInput, setLabelInput] = useState(initialLabel ?? "");
   const [greetingInput, setGreetingInput] = useState(initialGreeting ?? "");
+  const [humanSupportTextInput, setHumanSupportTextInput] = useState(initialHumanSupportText ?? "");
   const [position, setPosition] = useState<WidgetPosition>(
     initialPosition ?? widgetDefaults.position,
   );
@@ -210,6 +215,9 @@ export default function WidgetDesigner({
     const greeting = trimmedOrNull(greetingInput, widgetLimits.greeting);
     if (greeting) params.set("greeting", greeting);
 
+    const humanSupport = trimmedOrNull(humanSupportTextInput, widgetLimits.greeting);
+    if (humanSupport) params.set("humanSupportText", humanSupport);
+
     if (position !== widgetDefaults.position) {
       params.set("position", position);
     }
@@ -253,6 +261,7 @@ export default function WidgetDesigner({
     apiKey,
     brandInput,
     greetingInput,
+    humanSupportTextInput,
     labelInput,
     position,
     siteUrl,
@@ -343,6 +352,7 @@ export default function WidgetDesigner({
     setBrandInput("");
     setLabelInput("");
     setGreetingInput("");
+    setHumanSupportTextInput("");
     setPosition(widgetDefaults.position);
     setColorHeaderBg("");
     setColorHeaderText("");
@@ -583,6 +593,27 @@ export default function WidgetDesigner({
           </p>
         </div>
 
+        <div className="space-y-2">
+          <label
+            htmlFor="widget-human-support"
+            className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+          >
+           Human Support Text
+          </label>
+          <input
+            id="widget-human-support"
+            name="widget_human_support_text"
+            maxLength={widgetLimits.greeting}
+            placeholder={widgetDefaults.humanSupportText}
+            value={humanSupportTextInput}
+            onChange={(event) => setHumanSupportTextInput(event.target.value)}
+            className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+          />
+           <p className="text-xs text-slate-500">
+            Empty = uses &quot;{widgetDefaults.humanSupportText}&quot;.
+          </p>
+        </div>
+
         <fieldset className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
           <legend className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
             Screen position
@@ -746,11 +777,7 @@ export default function WidgetDesigner({
               Live preview
             </p>
             <p className="text-sm text-slate-300">
-              We use the real script against{" "}
-              <code className="rounded bg-slate-900 px-2 py-0.5 text-xs text-emerald-200">
-                /api/widget
-              </code>
-              .
+               Changes are shown instantly.
             </p>
           </div>
           <span className="rounded-full border border-slate-800 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-400">
@@ -766,11 +793,27 @@ export default function WidgetDesigner({
         </div>
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-            Generated URL
+            Installation Code - Place before &lt;/body&gt;
           </p>
-          <code className="block max-h-28 overflow-auto rounded-xl border border-slate-800 bg-slate-950/80 p-3 text-[11px] text-emerald-200 overflow-x-auto break-all">
-            {previewUrl}
-          </code>
+          <div className="relative group">
+             <code className="block rounded-xl border border-slate-800 bg-slate-950/80 p-4 text-[11px] text-emerald-200 overflow-x-auto break-all font-mono">
+               &lt;script async src=&quot;{siteUrl}/api/widget?key={apiKey}&quot;&gt;&lt;/script&gt;
+            </code>
+             <button
+              type="button"
+              onClick={() => {
+                const code = `<script async src="${siteUrl}/api/widget?key=${apiKey}"></script>`;
+                navigator.clipboard.writeText(code);
+                // Could show toast here
+              }}
+              className="absolute top-2 right-2 rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 opacity-0 transition group-hover:opacity-100 hover:border-emerald-500 hover:text-emerald-400"
+            >
+              Copy
+            </button>
+          </div>
+          <p className="text-xs text-slate-500">
+            This snippet is stable. You don't need to update it when changing settings.
+          </p>
         </div>
       </div>
     </div>

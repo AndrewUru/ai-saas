@@ -5,6 +5,7 @@ export const widgetDefaults = {
   brand: "AI Widget",
   label: "Chatea con nosotros",
   greeting: "¿En qué puedo ayudarte hoy?",
+  humanSupportText: "Hablar con un humano",
   position: "right" as WidgetPosition,
 } as const;
 
@@ -12,6 +13,7 @@ export const widgetLimits = {
   brand: 40,
   label: 48,
   greeting: 48,
+  humanSupportText: 32,
 } as const;
 
 export const widgetPositions: WidgetPosition[] = ["left", "right"];

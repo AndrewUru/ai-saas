@@ -210,6 +210,10 @@ async function updateWidgetBranding(formData: FormData) {
       widget_brand: normalizeWidgetText(brandRaw, widgetLimits.brand),
       widget_label: normalizeWidgetText(labelRaw, widgetLimits.label),
       widget_greeting: normalizeWidgetText(greetingRaw, widgetLimits.greeting),
+      widget_human_support_text: normalizeWidgetText(
+        String(formData.get("widget_human_support_text") ?? ""),
+        widgetLimits.greeting
+      ),
       widget_position: positionRaw.trim()
         ? sanitizePosition(positionRaw)
         : null,

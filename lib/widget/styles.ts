@@ -1,46 +1,31 @@
 import type { WidgetAppearance } from "./types";
 
-export function renderStyles(a: WidgetAppearance) {
-  return `
-
+export const STATIC_STYLES = `
 #ai-saas-anchor {
   position: fixed;
   bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-  ${
-    a.position === "left"
-      ? "left: 18px; right: auto;"
-      : "right: 18px; left: auto;"
-  }
   display: flex;
   flex-direction: column;
-  align-items: ${a.position === "left" ? "flex-start" : "flex-end"};
   gap: 12px;
   z-index: 2147483000;
   font-family: "Space Grotesk", "Sora", "Avenir Next", "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  --ai-accent: ${a.accent};
-  --ai-accent-contrast: ${a.accentContrast};
-  --ai-accent-shadow: ${a.accentShadow};
-  --ai-accent-light: ${a.accentLight};
-  --ai-accent-gradient: ${a.accentGradient};
-  --ai-header-bg: ${a.colorHeaderBg};
-  --ai-header-text: ${a.colorHeaderText};
-  --ai-chat-bg: ${a.colorChatBg};
-  --ai-user-bg: ${a.colorUserBubbleBg};
-  --ai-user-text: ${a.colorUserBubbleText};
-  --ai-bot-bg: ${a.colorBotBubbleBg};
-  --ai-bot-text: ${a.colorBotBubbleText};
-  --ai-toggle-bg: ${a.colorToggleBg};
-  --ai-toggle-text: ${a.colorToggleText};
-  --ai-close-bg: ${a.closeBg};
-  --ai-close-text: ${a.closeColor};
-  --ai-surface: rgba(255, 255, 255, 0.95);
-  --ai-surface-strong: rgba(255, 255, 255, 0.98);
-  --ai-border: rgba(15, 23, 42, 0.12);
-  --ai-shadow: 0 18px 42px rgba(15, 23, 42, 0.16);
-  --ai-radius: 18px;
 }
+
+#ai-saas-anchor.ai-pos-right {
+  right: 18px;
+  left: auto;
+  align-items: flex-end;
+}
+
+#ai-saas-anchor.ai-pos-left {
+  left: 18px;
+  right: auto;
+  align-items: flex-start;
+}
+
+/* CSS Variables are set on element via JS */
 
 #ai-saas-toggle {
   position: relative;
@@ -141,9 +126,15 @@ export function renderStyles(a: WidgetAppearance) {
   transition: opacity 0.2s ease, transform 0.22s ease, box-shadow 0.22s ease;
   position: absolute;
   bottom: 88px;
-  ${a.position === "left" ? "left: 0;" : "right: 0;"}
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+}
+
+#ai-saas-anchor.ai-pos-right #ai-saas-widget {
+    right: 0;
+}
+#ai-saas-anchor.ai-pos-left #ai-saas-widget {
+    left: 0;
 }
 
 #ai-saas-widget::before {
@@ -723,4 +714,4 @@ export function renderStyles(a: WidgetAppearance) {
   }
 }
 `;
-}
+
