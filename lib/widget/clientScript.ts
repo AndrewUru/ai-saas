@@ -27,7 +27,35 @@ ready(() => {
   toggle.setAttribute("aria-label", "Open chat");
   toggle.setAttribute("aria-expanded", "false");
   toggle.setAttribute("aria-controls", "ai-saas-widget");
-  toggle.innerHTML = '<span class="ai-saas-icon">' + CONFIG.brandInitial + '</span><span class="ai-saas-label">' + CONFIG.collapsedLabel + '</span>';
+  toggle.setAttribute("aria-controls", "ai-saas-widget");
+  
+  const escapeHtml = (text) => {
+    if(!text) return "";
+    return text.replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  };
+
+  const getBubbleColors = () => {
+    if(CONFIG.avatarType === "bubble" && CONFIG.bubbleColors && CONFIG.bubbleColors.length === 3) {
+      return CONFIG.bubbleColors;
+    }
+    return ["#5eead4", "#818cf8", "#f472b6"]; // Defaults
+  };
+
+  const renderBrandIcon = () => {
+    if (CONFIG.avatarType === "bubble") {
+      const [c1, c2, c3] = getBubbleColors();
+      const style = "background: linear-gradient(135deg, " + c1 + ", " + c2 + ", " + c3 + "); --c1: " + c1 + "; --c2: " + c2 + "; --c3: " + c3;
+      const bubbleClass = "ai-saas-brand-icon ai-avatar-bubble ai-avatar-bubble--" + (CONFIG.bubbleStyle || "default");
+      return '<span class="' + bubbleClass + '" style="' + style + '" aria-hidden="true"></span>';
+    }
+    return '<span class="ai-saas-brand-icon">' + escapeHtml(CONFIG.brandInitial) + '</span>';
+  };
+
+  toggle.innerHTML = renderBrandIcon() + '<span class="ai-saas-label">' + escapeHtml(CONFIG.collapsedLabel) + '</span>';
   anchor.appendChild(toggle);
 
   const widget = document.createElement("section");
@@ -38,8 +66,9 @@ ready(() => {
   widget.innerHTML =
     '<header id="ai-saas-header">' +
       '<div class="ai-saas-brand">' +
-        '<span class="ai-saas-brand-icon">' + CONFIG.brandInitial + '</span>' +
-        '<div class="ai-saas-brand-text"><strong>' + CONFIG.brandName + '</strong><span>' + CONFIG.greeting + '</span></div>' +
+      '<div class="ai-saas-brand">' +
+        renderBrandIcon() +
+        '<div class="ai-saas-brand-text"><strong>' + escapeHtml(CONFIG.brandName) + '</strong><span>' + escapeHtml(CONFIG.greeting) + '</span></div>' +
       '</div>' +
       '<button type="button" id="ai-saas-close" aria-label="Minimize">' +
         '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 6 8 8m0-8-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' +
@@ -97,6 +126,16 @@ ready(() => {
         anchor.classList.add("open");
         toggle.setAttribute("aria-expanded", "true");
         widget.setAttribute("aria-hidden", "false");
+        
+        // Trigger pulse
+        const bubbles = document.querySelectorAll(".ai-avatar-bubble");
+        bubbles.forEach(b => {
+            b.classList.remove("is-active");
+            void b.offsetWidth; // force reflow
+            b.classList.add("is-active");
+            setTimeout(() => b.classList.remove("is-active"), 600);
+        });
+
         focusInput();
       });
     } else {
@@ -365,6 +404,70 @@ ready(() => {
     open: openWidget,
     close: closeWidget,
   };
+  // ADDING CSS FOR BUBBLE
+  const styleEl = document.getElementById("ai-saas-style");
+  if(styleEl && !styleEl.innerHTML.includes(".ai-avatar-bubble")) {
+      styleEl.innerHTML += \`
+        .ai-avatar-bubble {
+            width: 34px;
+            height: 34px;
+            border-radius: 9999px;
+            background-size: 200% 200%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: inline-block;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            animation: gradientMove 6s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Pulse Animation */
+        .ai-avatar-bubble.is-active {
+            animation: bubblePulse 0.4s cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        @keyframes bubblePulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+            70% { transform: scale(1.15); box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+        /* Energy Style - Spin */
+        .ai-avatar-bubble--energy::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            background: conic-gradient(from 0deg, transparent 0deg, var(--c2) 360deg);
+            animation: bubbleSpin 3s linear infinite;
+            opacity: 0.3;
+            border-radius: 999px;
+        }
+        @keyframes bubbleSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Calm Style - Float */
+        .ai-avatar-bubble--calm {
+            animation: gradientMove 10s ease infinite, bubbleFloat 4s ease-in-out infinite;
+        }
+        @keyframes bubbleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ai-avatar-bubble, .ai-avatar-bubble::before, .ai-avatar-bubble.is-active {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+      \`;
+  }
 });
 `;
 

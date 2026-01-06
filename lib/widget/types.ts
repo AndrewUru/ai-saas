@@ -45,6 +45,10 @@ export interface WidgetConfig {
     colorToggleBg: string;
     colorToggleText: string;
   };
+  // Avatar
+  avatarType: "initial" | "bubble" | "image";
+  bubbleStyle: "default" | "energy" | "calm";
+  bubbleColors: string[];
 }
 
 export interface AgentRecord {
@@ -65,4 +69,8 @@ export interface AgentRecord {
   widget_color_bot_bubble_text: string | null;
   widget_color_toggle_bg: string | null;
   widget_color_toggle_text: string | null;
+  // Avatar fields
+  avatar_type: string | null;
+  avatar_bubble_style: string | null;
+  avatar_bubble_colors: string[] | null;
 }
