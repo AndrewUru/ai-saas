@@ -97,7 +97,7 @@ export default async function AgentsPage(props: {
         {/* Stats Rack */}
         <div className="mb-8 grid gap-4 sm:grid-cols-4">
           <div className="ui-card p-4 flex flex-col justify-between">
-            <span className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">
+            <span className="text-[10px] uppercase tracking-wider text-(--foreground-muted)">
               Agents Created
             </span>
             <div className="flex items-center gap-2 mt-1">

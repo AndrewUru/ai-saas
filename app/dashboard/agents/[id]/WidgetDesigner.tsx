@@ -770,7 +770,7 @@ export default function WidgetDesigner({
         </div>
       </form>
 
-      <div className="space-y-5 rounded-3xl border border-slate-800/70 bg-gradient-to-br from-slate-950/75 via-slate-950/60 to-slate-900/60 p-6 shadow-xl shadow-slate-950/40">
+      <div className="space-y-5 rounded-3xl border border-slate-800/70 bg-linear-to-br from-slate-950/75 via-slate-950/60 to-slate-900/60 p-6 shadow-xl shadow-slate-950/40">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
