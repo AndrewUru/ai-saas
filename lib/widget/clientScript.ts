@@ -1,4 +1,3 @@
-
 import { WidgetConfig } from "./types"; // We use types for type safety in the generator, but the client script is a string.
 import { STATIC_STYLES } from "./styles";
 
@@ -154,10 +153,7 @@ export function renderWidgetScript(
            </div>
            
            <div id="ai-saas-chat-box">
-             <!-- Chat history goes here -->
-             <div class="ai-saas-bubble bot">
-               \${escapeHtml(greeting)}
-             </div>
+                     <!-- Chat history goes here -->
            </div>
 
            <form id="ai-saas-form">
