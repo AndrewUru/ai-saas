@@ -110,36 +110,8 @@ export function renderWidgetScript(
       setVar("--ai-accent-gradient", appearance.accentGradient, "linear-gradient(135deg,#34d399,#8b5cf6)");
 
       
-      // Avatar Bubble Logic for Toggle
-      // If type is bubble, we render the bubble HTML in the toggle icon
-      // Else, we render initial letter or legacy icon
-      
       const renderBrandIcon = () => {
-         // Simplified logic mimicking the React side or previous script
-         // For now, sticking to standard initial or simple icon unless bubble is active
-         if (fullConfig.avatarType === 'bubble') {
-             // ... bubble logic from previous steps ...
-             // We need to reimplement the bubble markup here or keep it simple.
-             // Given the complexity of the previous update, I will assume we want to preserve the bubble rendering.
-             // But adding 100 lines of js to render the bubble might be much.
-             // Let's render the basic "Initial" first and support bubble if feasible or leave as TODO override.
-             
-             // Check if we have bubble colors
-             const colors = fullConfig.bubbleColors || ["#FF0080", "#7928CA", "#FF0080"];
-             const style = fullConfig.bubbleStyle || "default";
-             
-             // Construct bubble css/html
-             // This requires generating dynamic keyframes if not existing? 
-             // STATIC_STYLES doesn't have the bubble keyframes injected dynamically?
-             // Actually, the previous implementation injected specific CSS for the bubble.
-             // For this stable snippet, we might need to inject that specific CSS too if it depends on specific colors.
-             // However, gradients are vars? No, arrays of colors.
-             // Let's defer full bubble animation complexity and stick to the "Initial" avatar for now to ensure stable refactor first.
-             // Or, better:
-             return \`<div class="ai-saas-icon"><span>\${escapeHtml(brandInitial)}</span></div>\`;
-         } else {
-             return \`<div class="ai-saas-icon"><span>\${escapeHtml(brandInitial)}</span></div>\`;
-         }
+        return \`<div class="ai-saas-icon"><span>\${escapeHtml(brandInitial)}</span></div>\`;
       };
 
       // 6. Build DOM

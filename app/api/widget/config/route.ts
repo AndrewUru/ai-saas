@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdmin } from "@/lib/supabase/admin";
 import { WidgetConfig } from "@/lib/widget/types";
-import { widgetDefaults, avatarDefaults, AvatarType, BubbleStyle } from "@/lib/widget/defaults";
+import { widgetDefaults } from "@/lib/widget/defaults";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -28,12 +28,12 @@ export async function GET(req: Request) {
     );
   }
 
-  // Determine chat endpoint (integrate with Shopify logic if needed, 
+  // Determine chat endpoint (integrate with Shopify logic if needed,
   // currently mimicking the existing logic simplistically or pointing to main chat)
   // For now, we can replicate the logic or just point to the standard endpoint.
   // The original route had logic to check for shopify integration.
   // Let's do a quick check for shopify integration if active.
-  
+
   const chatUrl = new URL(`${url.origin}/api/agent/chat`);
   if (agent.api_key) {
     chatUrl.searchParams.set("key", agent.api_key);
@@ -76,9 +76,6 @@ export async function GET(req: Request) {
         colorToggleBg: agent.widget_color_toggle_bg || "#25D366",
         colorToggleText: agent.widget_color_toggle_text || "#ffffff",
     },
-    avatarType: (agent.avatar_type as AvatarType) || avatarDefaults.type,
-    bubbleStyle: (agent.avatar_bubble_style as BubbleStyle) || avatarDefaults.style,
-    bubbleColors: (agent.avatar_bubble_colors as string[]) || avatarDefaults.bubbleColors,
   };
 
   return NextResponse.json(config, {

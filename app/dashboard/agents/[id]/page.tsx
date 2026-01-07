@@ -7,13 +7,7 @@ import EmbedSnippet from "./EmbedSnippet";
 import SubmitButton from "@/components/SubmitButton";
 import KnowledgeSection from "./KnowledgeSection";
 
-import {
-  widgetLimits,
-  sanitizeHex,
-  sanitizePosition,
-  sanitizeAvatarType,
-  sanitizeBubbleStyle,
-} from "@/lib/widget/defaults";
+import { widgetLimits, sanitizeHex, sanitizePosition } from "@/lib/widget/defaults";
 
 const LANGUAGE_OPTIONS = [
   { value: "auto", label: "Automatic detection" },
@@ -188,21 +182,6 @@ async function updateWidgetBranding(formData: FormData) {
     formData.get("widget_color_bot_bubble_text") ?? ""
   );
 
-  const avatarTypeRaw = String(formData.get("avatar_type") ?? "");
-  const bubbleStyleRaw = String(formData.get("avatar_bubble_style") ?? "");
-  const bubbleColorsRaw = formData.getAll("avatar_bubble_colors");
-
-  // Validate colors array (expecting exactly 3 hex codes or empty)
-  let validBubbleColors: string[] | null = null;
-  const rawColors = bubbleColorsRaw.map(String).filter((c) => c.trim() !== "");
-  if (rawColors.length === 3) {
-    const sanitized = rawColors.map((c) => sanitizeHex(c));
-    // check if all valid
-    if (sanitized.every((c) => c.startsWith("#"))) {
-      validBubbleColors = sanitized;
-    }
-  }
-
   const { error: updateError } = await supabase
     .from("agents")
     .update({
@@ -238,10 +217,6 @@ async function updateWidgetBranding(formData: FormData) {
       widget_color_bot_bubble_text: colorBotBubbleTextRaw.trim()
         ? sanitizeHex(colorBotBubbleTextRaw)
         : null,
-
-      avatar_type: sanitizeAvatarType(avatarTypeRaw),
-      avatar_bubble_style: sanitizeBubbleStyle(bubbleStyleRaw),
-      avatar_bubble_colors: validBubbleColors,
       updated_at: new Date().toISOString(),
     })
     .eq("id", agentId)
@@ -271,7 +246,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, shopify_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text, avatar_type, avatar_bubble_style, avatar_bubble_colors"
+      "id, user_id, name, api_key, woo_integration_id, shopify_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text"
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -662,7 +637,7 @@ export default async function AgentDetailPage({
                    The user said "No cambies el contenido de los componentes hijos". 
                    The previous code had this wrapper, so I keep the wrapper but use ui-card. 
                */}
-              <EmbedSnippet widgetScriptUrl={widgetScriptUrl} />
+              <EmbedSnippet apiKey={agent.api_key} />
             </article>
             <article className="ui-card glass-pane p-6 text-sm text-slate-300">
               <h3 className="text-lg font-semibold text-white">
@@ -717,10 +692,6 @@ export default async function AgentDetailPage({
               initialColorBotBubbleText={agent.widget_color_bot_bubble_text}
               initialColorToggleBg={agent.widget_color_toggle_bg}
               initialColorToggleText={agent.widget_color_toggle_text}
-              // Avatar
-              initialAvatarType={agent.avatar_type}
-              initialBubbleStyle={agent.avatar_bubble_style}
-              initialBubbleColors={agent.avatar_bubble_colors}
             />
           </article>
         </div>
@@ -728,3 +699,4 @@ export default async function AgentDetailPage({
     </main>
   );
 }
+

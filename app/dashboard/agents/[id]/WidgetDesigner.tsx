@@ -6,11 +6,6 @@ import {
   widgetLimits,
   widgetPositions,
   WidgetPosition,
-  AvatarType,
-  BubbleStyle,
-  avatarDefaults,
-  AVATAR_TYPES,
-  BUBBLE_STYLES,
 } from "@/lib/widget/defaults";
 
 type WidgetDesignerProps = {
@@ -35,10 +30,6 @@ type WidgetDesignerProps = {
   initialColorBotBubbleText: string | null;
   initialColorToggleBg: string | null;
   initialColorToggleText: string | null;
-  // Avatar
-  initialAvatarType: string | null;
-  initialBubbleStyle: string | null;
-  initialBubbleColors: string[] | null;
 };
 
 // Start Helper Component for Color Input
@@ -139,9 +130,6 @@ export default function WidgetDesigner({
   initialColorBotBubbleText,
   initialColorToggleBg,
   initialColorToggleText,
-  initialAvatarType,
-  initialBubbleStyle,
-  initialBubbleColors,
 }: WidgetDesignerProps) {
   const [accentInput, setAccentInput] = useState(initialAccent ?? "");
   const [brandInput, setBrandInput] = useState(initialBrand ?? "");
@@ -177,19 +165,6 @@ export default function WidgetDesigner({
   );
   const [colorToggleText, setColorToggleText] = useState(
     initialColorToggleText ?? "",
-  );
-
-  // Avatar States
-  const [avatarType, setAvatarType] = useState<AvatarType>(
-    (initialAvatarType as AvatarType) || avatarDefaults.type,
-  );
-  const [bubbleStyle, setBubbleStyle] = useState<BubbleStyle>(
-    (initialBubbleStyle as BubbleStyle) || avatarDefaults.style,
-  );
-  const [bubbleColors, setBubbleColors] = useState<string[]>(
-    initialBubbleColors && initialBubbleColors.length === 3
-      ? initialBubbleColors
-      : avatarDefaults.bubbleColors,
   );
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -242,17 +217,6 @@ export default function WidgetDesigner({
     if (toParamHex(colorToggleText))
       params.set("colorToggleText", toParamHex(colorToggleText)!);
 
-    // Avatar params
-    if (avatarType !== "initial") params.set("avatarType", avatarType);
-    if (avatarType === "bubble") {
-      params.set("bubbleStyle", bubbleStyle);
-      const hexColors = bubbleColors
-        .map(toParamHex)
-        .filter(Boolean)
-        .join(",");
-      if (hexColors) params.set("bubbleColors", hexColors);
-    }
-
     params.set("preview", "1");
 
     return `${siteUrl}/api/widget?${params.toString()}`;
@@ -274,9 +238,6 @@ export default function WidgetDesigner({
     colorBotBubbleText,
     colorToggleBg,
     colorToggleText,
-    avatarType,
-    bubbleStyle,
-    bubbleColors,
   ]);
 
   useEffect(() => {
@@ -363,15 +324,6 @@ export default function WidgetDesigner({
     setColorBotBubbleText("");
     setColorToggleBg("");
     setColorToggleText("");
-    setAvatarType(avatarDefaults.type);
-    setBubbleStyle(avatarDefaults.style);
-    setBubbleColors(avatarDefaults.bubbleColors);
-  }
-
-  const updateBubbleColor = (index: number, val: string) => {
-    const next = [...bubbleColors];
-    next[index] = val;
-    setBubbleColors(next);
   };
 
   return (
@@ -663,111 +615,6 @@ export default function WidgetDesigner({
           Empty values automatically use the widget&apos;s default texts and
           colors.
         </p>
-
-        {/* AVATAR SECTION */}
-        <div className="space-y-4 rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
-              Avatar Branding
-            </p>
-            <p className="text-xs text-slate-400">
-              Choose how the agent appears in the widget header.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-4">
-            {AVATAR_TYPES.map((t) => {
-              if (t === "image") return null; // Pending implementation
-              return (
-                <label
-                  key={t}
-                  className={`inline-flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold capitalize transition-all ${
-                    avatarType === t
-                      ? "border-emerald-500 bg-emerald-500/10 text-emerald-200"
-                      : "border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="avatar_type"
-                    value={t}
-                    checked={avatarType === t}
-                    onChange={() => setAvatarType(t)}
-                    className="sr-only"
-                  />
-                  {t}
-                </label>
-              );
-            })}
-          </div>
-
-          {avatarType === "bubble" && (
-            <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                  Animation Style
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {BUBBLE_STYLES.map((s) => (
-                    <label
-                      key={s}
-                      className={`inline-flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium capitalize transition-all ${
-                        bubbleStyle === s
-                          ? "border-emerald-500 bg-emerald-500/10 text-emerald-200"
-                          : "border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="avatar_bubble_style"
-                        value={s}
-                        checked={bubbleStyle === s}
-                        onChange={() => setBubbleStyle(s)}
-                        className="sr-only"
-                      />
-                      {s}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-                  Gradient Colors (3)
-                </label>
-                <div className="flex gap-2">
-                  {bubbleColors.map((col, idx) => (
-                    <div key={idx} className="relative">
-                      <input
-                        type="color"
-                        value={normalizeHex(col) ?? "#000000"}
-                        onChange={(e) => updateBubbleColor(idx, e.target.value)}
-                        className="h-10 w-12 cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-0"
-                      />
-                      <input
-                        type="hidden"
-                        name="avatar_bubble_colors"
-                        value={col}
-                      />
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setBubbleColors(avatarDefaults.bubbleColors)
-                    }
-                    className="ml-auto text-xs text-slate-500 hover:text-white"
-                  >
-                    Reset Colors
-                  </button>
-                </div>
-                <p className="text-xs text-slate-500">
-                  The bubble animates using these 3 colors.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
       </form>
 
       <div className="space-y-5 rounded-3xl border border-slate-800/70 bg-linear-to-br from-slate-950/75 via-slate-950/60 to-slate-900/60 p-6 shadow-xl shadow-slate-950/40">
