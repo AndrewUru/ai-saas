@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   widgetDefaults,
   widgetLimits,
@@ -171,7 +171,6 @@ export default function WidgetDesigner({
   );
 
   const embedSnippet = getEmbedSnippet(apiKey);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const accentPickerValue = normalizeHex(accentInput) ?? widgetDefaults.accent;
   const accentError =
@@ -179,7 +178,7 @@ export default function WidgetDesigner({
       ? "Use a 3- or 6-character hex value."
       : null;
 
-  const previewUrl = useMemo(() => {
+  const previewPageUrl = useMemo(() => {
     const params = new URLSearchParams({ key: apiKey });
 
     const normalizedAccent = toParamHex(accentInput);
@@ -226,7 +225,7 @@ export default function WidgetDesigner({
 
     params.set("preview", "1");
 
-    return `${siteUrl}/api/widget?${params.toString()}`;
+    return `${siteUrl}/widget/preview?${params.toString()}`;
   }, [
     accentInput,
     apiKey,
@@ -246,74 +245,6 @@ export default function WidgetDesigner({
     colorToggleBg,
     colorToggleText,
   ]);
-
-  useEffect(() => {
-    if (!apiKey) return;
-    const frame = iframeRef.current;
-    if (!frame) return;
-    const doc = frame.contentDocument;
-    if (!doc) return;
-
-    doc.open();
-    doc.write(`<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <style>
-      body {
-        margin: 0;
-        min-height: 100vh;
-        background: #020617;
-        color: #e2e8f0;
-        font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .preview-hint {
-        position: absolute;
-        top: 18px;
-        left: 18px;
-        font-size: 12px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: rgba(226, 232, 240, 0.7);
-      }
-    </style>
-  </head>
-  <body>
-    <span class="preview-hint">Preview</span>
-  </body>
-</html>`);
-    doc.close();
-
-    const loader = doc.createElement("div");
-    loader.textContent = "Loading widget...";
-    loader.style.position = "absolute";
-    loader.style.bottom = "18px";
-    loader.style.left = "50%";
-    loader.style.transform = "translateX(-50%)";
-    loader.style.fontSize = "13px";
-    loader.style.letterSpacing = "0.05em";
-    loader.style.color = "rgba(226,232,240,0.7)";
-    doc.body.appendChild(loader);
-
-    const script = doc.createElement("script");
-    script.src = previewUrl;
-    script.defer = true;
-    script.referrerPolicy = "strict-origin-when-cross-origin";
-    script.onload = () => loader.remove();
-    script.onerror = () => {
-      loader.textContent = "We couldn't load the preview.";
-    };
-
-    doc.body.appendChild(script);
-
-    return () => {
-      doc.body.innerHTML = "";
-    };
-  }, [apiKey, previewUrl]);
 
   function handleReset() {
     setAccentInput("");
@@ -619,8 +550,8 @@ export default function WidgetDesigner({
         </div>
         <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80">
           <iframe
-            ref={iframeRef}
             title="Widget preview"
+            src={previewPageUrl}
             className="h-[460px] w-full border-0 bg-slate-950"
           />
         </div>
