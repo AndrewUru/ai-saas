@@ -119,7 +119,6 @@ export function renderWidgetScript(
         }
       };
 
-      const { appearance, greeting, brandName, brandInitial, collapsedLabel, humanSupportText } = fullConfig;
 
       // 3. Inject CSS
       // We rely on STATIC_STYLES which uses variables.
@@ -199,7 +198,6 @@ export function renderWidgetScript(
                <div class="ai-saas-brand-icon">\${escapeHtml(brandInitial)}</div>
                <div class="ai-saas-brand-text">
                  <strong>\${escapeHtml(brandName)}</strong>
-                 <span>\${escapeHtml(humanSupportText || "Support Agent")}</span>
                </div>
              </div>
              <button id="ai-saas-close" aria-label="Close chat">

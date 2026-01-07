@@ -18,8 +18,6 @@ type WidgetDesignerProps = {
   initialBrand: string | null;
   initialLabel: string | null;
   initialGreeting: string | null;
-
-  initialHumanSupportText: string | null;
   initialPosition: WidgetPosition | null;
   // New props
   initialColorHeaderBg: string | null;
@@ -120,7 +118,6 @@ export default function WidgetDesigner({
   initialLabel,
 
   initialGreeting,
-  initialHumanSupportText,
   initialPosition,
   initialColorHeaderBg,
   initialColorHeaderText,
@@ -136,9 +133,6 @@ export default function WidgetDesigner({
   const [brandInput, setBrandInput] = useState(initialBrand ?? "");
   const [labelInput, setLabelInput] = useState(initialLabel ?? "");
   const [greetingInput, setGreetingInput] = useState(initialGreeting ?? "");
-  const [humanSupportTextInput, setHumanSupportTextInput] = useState(
-    initialHumanSupportText ?? ""
-  );
   const [position, setPosition] = useState<WidgetPosition>(
     initialPosition ?? widgetDefaults.position
   );
@@ -194,12 +188,6 @@ export default function WidgetDesigner({
     const greeting = trimmedOrNull(greetingInput, widgetLimits.greeting);
     if (greeting) params.set("greeting", greeting);
 
-    const humanSupport = trimmedOrNull(
-      humanSupportTextInput,
-      widgetLimits.greeting
-    );
-    if (humanSupport) params.set("humanSupportText", humanSupport);
-
     if (position !== widgetDefaults.position) {
       params.set("position", position);
     }
@@ -232,7 +220,6 @@ export default function WidgetDesigner({
     apiKey,
     brandInput,
     greetingInput,
-    humanSupportTextInput,
     labelInput,
     position,
     siteUrl,
@@ -320,7 +307,6 @@ export default function WidgetDesigner({
     setBrandInput("");
     setLabelInput("");
     setGreetingInput("");
-    setHumanSupportTextInput("");
     setPosition(widgetDefaults.position);
     setColorHeaderBg("");
     setColorHeaderText("");

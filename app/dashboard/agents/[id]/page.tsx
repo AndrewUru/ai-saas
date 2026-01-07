@@ -665,7 +665,6 @@ export default async function AgentDetailPage({
               initialBrand={agent.widget_brand}
               initialLabel={agent.widget_label}
               initialGreeting={agent.widget_greeting}
-              initialHumanSupportText={agent.widget_human_support_text}
               initialPosition={widgetPositionValue}
               initialColorHeaderBg={agent.widget_color_header_bg}
               initialColorHeaderText={agent.widget_color_header_text}

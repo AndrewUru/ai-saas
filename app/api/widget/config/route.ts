@@ -8,10 +8,7 @@ export async function GET(req: Request) {
   const key = url.searchParams.get("key");
 
   if (!key) {
-    return NextResponse.json(
-      { error: "Missing key" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Missing key" }, { status: 400 });
   }
 
   const supabase = createAdmin();
@@ -22,10 +19,7 @@ export async function GET(req: Request) {
     .maybeSingle();
 
   if (error || !agent) {
-    return NextResponse.json(
-      { error: "Agent not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Agent not found" }, { status: 404 });
   }
 
   // Determine chat endpoint (integrate with Shopify logic if needed,
@@ -40,18 +34,18 @@ export async function GET(req: Request) {
   }
 
   if (agent.shopify_integration_id) {
-     const { data: shopify } = await supabase
+    const { data: shopify } = await supabase
       .from("integrations_shopify")
       .select("id, is_active, currency")
       .eq("id", agent.shopify_integration_id)
       .maybeSingle();
-      
-      if (shopify?.is_active) {
-        chatUrl.searchParams.set("catalog", "shopify");
-        if (shopify.currency) {
-          chatUrl.searchParams.set("currency", shopify.currency);
-        }
+
+    if (shopify?.is_active) {
+      chatUrl.searchParams.set("catalog", "shopify");
+      if (shopify.currency) {
+        chatUrl.searchParams.set("currency", shopify.currency);
       }
+    }
   }
   const chatEndpoint = chatUrl.toString();
 
@@ -60,21 +54,22 @@ export async function GET(req: Request) {
     chatEndpoint: chatEndpoint,
     accent: agent.widget_accent || widgetDefaults.accent,
     brandName: agent.widget_brand || widgetDefaults.brand,
-    brandInitial: (agent.widget_brand || widgetDefaults.brand).charAt(0).toUpperCase(),
+    brandInitial: (agent.widget_brand || widgetDefaults.brand)
+      .charAt(0)
+      .toUpperCase(),
     collapsedLabel: agent.widget_label || widgetDefaults.label,
     greeting: agent.widget_greeting || widgetDefaults.greeting,
-    humanSupportText: agent.widget_human_support_text || widgetDefaults.humanSupportText,
     position: agent.widget_position || widgetDefaults.position,
     appearance: {
-        colorHeaderBg: agent.widget_color_header_bg || "#008069",
-        colorHeaderText: agent.widget_color_header_text || "#ffffff",
-        colorChatBg: agent.widget_color_chat_bg || "#efe7dd",
-        colorUserBubbleBg: agent.widget_color_user_bubble_bg || "#d9fdd3",
-        colorUserBubbleText: agent.widget_color_user_bubble_text || "#111b21",
-        colorBotBubbleBg: agent.widget_color_bot_bubble_bg || "#ffffff",
-        colorBotBubbleText: agent.widget_color_bot_bubble_text || "#111b21",
-        colorToggleBg: agent.widget_color_toggle_bg || "#25D366",
-        colorToggleText: agent.widget_color_toggle_text || "#ffffff",
+      colorHeaderBg: agent.widget_color_header_bg || "#008069",
+      colorHeaderText: agent.widget_color_header_text || "#ffffff",
+      colorChatBg: agent.widget_color_chat_bg || "#efe7dd",
+      colorUserBubbleBg: agent.widget_color_user_bubble_bg || "#d9fdd3",
+      colorUserBubbleText: agent.widget_color_user_bubble_text || "#111b21",
+      colorBotBubbleBg: agent.widget_color_bot_bubble_bg || "#ffffff",
+      colorBotBubbleText: agent.widget_color_bot_bubble_text || "#111b21",
+      colorToggleBg: agent.widget_color_toggle_bg || "#25D366",
+      colorToggleText: agent.widget_color_toggle_text || "#ffffff",
     },
   };
 

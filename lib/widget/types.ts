@@ -33,7 +33,6 @@ export interface WidgetConfig {
   brandInitial: string;
   collapsedLabel: string;
   greeting: string;
-  humanSupportText?: string;
   position: WidgetPosition;
   appearance: {
     colorHeaderBg: string;
