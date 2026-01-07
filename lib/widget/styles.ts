@@ -456,13 +456,12 @@ export const STATIC_STYLES = `
 }
 
 .ai-saas-input-wrapper button {
-
   background: var(--ai-accent-gradient, linear-gradient(135deg, #34d399, #8b5cf6));
   color: var(--ai-accent-contrast, #0b1220);
   box-shadow: 0 8px 18px var(--ai-accent-shadow, rgba(52, 211, 153, 0.25));
+
   border: none;
   cursor: pointer;
-  color: var(--ai-accent-contrast);
   padding: 6px 12px;
   display: inline-flex;
   align-items: center;
@@ -474,8 +473,8 @@ export const STATIC_STYLES = `
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
-  box-shadow: 0 8px 18px var(--ai-accent-shadow);
 }
+
 
 .ai-saas-input-wrapper button:hover {
   transform: translateY(-1px);
