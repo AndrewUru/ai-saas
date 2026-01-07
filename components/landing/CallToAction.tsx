@@ -16,7 +16,7 @@ export function CallToAction() {
           <a href="/signup" className="ui-button ui-button--primary">
             Create free account
           </a>
-          <a href="/billing" className="ui-button ui-button--ghost">
+          <a href="/pricing" className="ui-button ui-button--ghost">
             View plans
           </a>
         </div>

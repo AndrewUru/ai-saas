@@ -67,7 +67,7 @@ export default async function AgentsPage(props: {
       messages_limit: defaultMessagesLimit,
     });
 
-    redirect("/agents");
+    redirect("/dashboard/agents");
   }
 
   async function deleteAgent(formData: FormData) {
@@ -80,7 +80,7 @@ export default async function AgentsPage(props: {
 
     await supabase.from("agents").delete().eq("id", id).eq("user_id", user.id);
 
-    redirect("/agents");
+    redirect("/dashboard/agents");
   }
 
   return (

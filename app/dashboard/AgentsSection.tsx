@@ -79,7 +79,10 @@ export default function AgentsSection({ planLimitLabel }: Props) {
               Create your first agent to connect WooCommerce and start replying
               to chats automatically.
             </p>
-            <Link href="/agents" className="mt-6 ui-button ui-button--primary">
+            <Link
+              href="/dashboard/agents"
+              className="mt-6 ui-button ui-button--primary"
+            >
               Create agent
             </Link>
           </div>

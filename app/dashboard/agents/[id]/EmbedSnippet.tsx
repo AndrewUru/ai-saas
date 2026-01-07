@@ -53,7 +53,7 @@ export default function EmbedSnippet({ apiKey }: Props) {
         Do not paste this script directly inside React components. Use the
         official integration method described in the{" "}
         <Link
-          href="/dashboard/docs/nextjs"
+          href="/dashboard/docs"
           className="underline font-semibold hover:text-amber-100"
         >
           documentation

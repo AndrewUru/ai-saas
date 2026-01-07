@@ -5,8 +5,8 @@ const navigation = [
     title: "Product",
     links: [
       { label: "Features", href: "/#features" },
-      { label: "Agents", href: "/agents" },
-      { label: "Pricing", href: "/billing" },
+      { label: "Agents", href: "/dashboard/agents" },
+      { label: "Pricing", href: "/pricing" },
     ],
   },
   {

@@ -95,7 +95,9 @@ export function renderWidgetScript(
       // 1. Fetch Config
       let config = null;
       try {
-        const res = await fetch(\`\${API_BASE}/api/widget/config?key=\${CONFIG_KEY}\`);
+        const configUrl = new URL("/api/widget/config", API_BASE);
+        configUrl.searchParams.set("key", CONFIG_KEY);
+        const res = await fetch(configUrl.toString());
         if (!res.ok) throw new Error("Failed to load widget config");
         config = await res.json();
       } catch (err) {
