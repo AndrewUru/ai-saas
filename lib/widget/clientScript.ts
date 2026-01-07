@@ -32,6 +32,64 @@ export function renderWidgetScript(
       .replace(/'/g, "&#039;");
   };
 
+  const safeJsonParse = (raw) => {
+    if (typeof raw !== "string") return null;
+    const trimmed = raw.trim();
+    if (!trimmed || (trimmed[0] !== "{" && trimmed[0] !== "[")) return null;
+    try {
+      return JSON.parse(trimmed);
+    } catch (err) {
+      return null;
+    }
+  };
+
+  const isProductList = (obj) => {
+    return !!obj && obj.type === "product_list" && Array.isArray(obj.items);
+  };
+
+  const sanitizeUrl = (url) => {
+    if (!url || typeof url !== "string") return null;
+    try {
+      const parsed = new URL(url, API_BASE);
+      if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+        return parsed.toString();
+      }
+    } catch (err) {
+      return null;
+    }
+    return null;
+  };
+
+  const renderProductListHtml = (pl) => {
+    const title = pl && pl.title ? \`<div class="ai-pl-title">\${escapeHtml(pl.title)}</div>\` : "";
+    const items = Array.isArray(pl?.items) ? pl.items : [];
+    const cards = items
+      .map((item) => {
+        const name = escapeHtml(item?.name || "");
+        const price = item?.price !== undefined && item?.price !== null ? escapeHtml(String(item.price)) : "";
+        const currency = item?.currency ? escapeHtml(String(item.currency)) : "";
+        const priceText = [price, currency].filter(Boolean).join(" ");
+        const permalink = sanitizeUrl(item?.permalink);
+        const imageUrl = sanitizeUrl(item?.image);
+        const stockBadge =
+          item?.stock_status === "instock"
+            ? '<span class="ai-pl-cta">En stock</span>'
+            : "";
+        const media = imageUrl
+          ? \`<div class="ai-pl-media"><img class="ai-pl-img" src="\${imageUrl}" alt="\${name}" loading="lazy" /></div>\`
+          : '<div class="ai-pl-media"></div>';
+        const meta = \`<div class="ai-pl-meta"><div class="ai-pl-name">\${name}</div>\${priceText ? \`<div class="ai-pl-sub">\${priceText}</div>\` : ""}\${stockBadge}</div>\`;
+        const content = \`<div class="ai-pl-item">\${media}\${meta}</div>\`;
+        if (permalink) {
+          return \`<a class="ai-pl-link" href="\${permalink}" target="_blank" rel="noopener noreferrer">\${content}</a>\`;
+        }
+        return \`<div class="ai-pl-link">\${content}</div>\`;
+      })
+      .join("");
+
+    return \`<div class="ai-pl">\${title}<div class="ai-pl-grid">\${cards}</div></div>\`;
+  };
+
   async function init() {
     try {
       // 1. Fetch Config
@@ -69,6 +127,21 @@ export function renderWidgetScript(
       const styleTag = document.createElement("style");
       styleTag.innerHTML = \`${STATIC_STYLES}\`;
       document.head.appendChild(styleTag);
+      const plStyleTag = document.createElement("style");
+      plStyleTag.innerHTML = \`
+        .ai-pl { display: flex; flex-direction: column; gap: 8px; }
+        .ai-pl-title { font-size: 12px; font-weight: 600; color: var(--ai-bot-text, #111); }
+        .ai-pl-grid { display: grid; gap: 8px; }
+        .ai-pl-link { display: block; text-decoration: none; color: inherit; }
+        .ai-pl-item { display: grid; grid-template-columns: 44px 1fr; gap: 8px; align-items: center; padding: 8px; border-radius: 10px; background: rgba(15, 23, 42, 0.08); border: 1px solid rgba(148, 163, 184, 0.15); }
+        .ai-pl-media { width: 44px; height: 44px; border-radius: 8px; overflow: hidden; background: rgba(15, 23, 42, 0.12); display: flex; align-items: center; justify-content: center; }
+        .ai-pl-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .ai-pl-meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .ai-pl-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ai-pl-sub { font-size: 11px; opacity: 0.7; }
+        .ai-pl-cta { margin-top: 2px; font-size: 10px; font-weight: 600; color: #16a34a; }
+      \`;
+      document.head.appendChild(plStyleTag);
 
       // 4. Create Root Elements
       const anchor = document.createElement("div");
@@ -240,7 +313,13 @@ export function renderWidgetScript(
           // Bot Message
           const botDiv = document.createElement("div");
           botDiv.className = "ai-saas-bubble bot ai-saas-enter";
-          botDiv.innerText = data.reply || "Sorry, I didn't understand that.";
+          const replyRaw = data.reply || "Sorry, I didn't understand that.";
+          const parsed = safeJsonParse(replyRaw);
+          if (isProductList(parsed)) {
+            botDiv.innerHTML = renderProductListHtml(parsed);
+          } else {
+            botDiv.innerText = replyRaw;
+          }
           chatBox.appendChild(botDiv);
           chatBox.scrollTop = chatBox.scrollHeight;
 
