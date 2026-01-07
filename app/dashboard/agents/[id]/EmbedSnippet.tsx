@@ -38,7 +38,9 @@ export default function EmbedSnippet({ apiKey }: Props) {
         The snippet stays the same even when you update settings.
       </p>
 
-      <pre className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200 whitespace-pre-wrap">{snippet}</pre>
+      <pre className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200 whitespace-pre-wrap">
+        {snippet}
+      </pre>
 
       <p className="mt-3 text-xs text-slate-500">
         The widget checks your active plan and usage limits before loading.
@@ -51,7 +53,7 @@ export default function EmbedSnippet({ apiKey }: Props) {
         Do not paste this script directly inside React components. Use the
         official integration method described in the{" "}
         <Link
-          href="/docs/nextjs"
+          href="/dashboard/docs/nextjs"
           className="underline font-semibold hover:text-amber-100"
         >
           documentation

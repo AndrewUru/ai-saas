@@ -117,6 +117,7 @@ export const STATIC_STYLES = `
     radial-gradient(circle at 100% 0%, var(--ai-accent-light), transparent 50%);
   border-radius: var(--ai-radius);
   overflow: hidden;
+  overflow: clip;
   border: 1px solid var(--ai-border);
   box-shadow: var(--ai-shadow);
   display: flex;
@@ -129,6 +130,21 @@ export const STATIC_STYLES = `
   bottom: 88px;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translate3d(0, 16px, 0) scale(0.98);
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    visibility 0s linear 0.22s;
+
+  will-change: transform, opacity;
+  contain: layout paint style;
+  isolation: isolate;
 }
 
 #ai-saas-anchor.ai-pos-right #ai-saas-widget {
@@ -154,11 +170,18 @@ export const STATIC_STYLES = `
   z-index: 1;
 }
 
+
 #ai-saas-anchor.open #ai-saas-widget {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  visibility: visible;
   pointer-events: auto;
-  animation: widgetPop 0.24s ease;
+  transform: translate3d(0, 0, 0) scale(1);
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    visibility 0s linear 0s;
 }
   /* Laptops con poca altura (ej: 768px o menos) */
 @media (max-height: 800px) {

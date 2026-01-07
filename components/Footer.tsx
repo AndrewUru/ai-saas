@@ -12,7 +12,7 @@ const navigation = [
   {
     title: "Resources",
     links: [
-      { label: "Documentation", href: "/docs" },
+      { label: "Documentation", href: "/dashboard/docs" },
       { label: "Academy", href: "/academy" },
       { label: "Changelog", href: "/changelog" },
     ],
