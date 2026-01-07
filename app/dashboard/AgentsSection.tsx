@@ -58,7 +58,10 @@ export default function AgentsSection({ planLimitLabel }: Props) {
               Manage integrations and performance
             </p>
           </div>
-          <Link href="/agents" className="ui-button ui-button--ghost text-xs">
+          <Link
+            href="/dashboard/agents"
+            className="ui-button ui-button--ghost text-xs"
+          >
             View all agents
           </Link>
         </div>

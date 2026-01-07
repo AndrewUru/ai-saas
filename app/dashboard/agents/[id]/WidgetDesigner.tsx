@@ -7,6 +7,7 @@ import {
   widgetPositions,
   WidgetPosition,
 } from "@/lib/widget/defaults";
+import { getEmbedSnippet } from "@/lib/widget/embedSnippet";
 
 type WidgetDesignerProps = {
   formAction: (formData: FormData) => void;
@@ -167,6 +168,7 @@ export default function WidgetDesigner({
     initialColorToggleText ?? "",
   );
 
+  const embedSnippet = getEmbedSnippet(apiKey);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const accentPickerValue = normalizeHex(accentInput) ?? widgetDefaults.accent;
@@ -643,14 +645,11 @@ export default function WidgetDesigner({
             Installation Code - Place before &lt;/body&gt;
           </p>
           <div className="relative group">
-             <code className="block rounded-xl border border-slate-800 bg-slate-950/80 p-4 text-[11px] text-emerald-200 overflow-x-auto break-all font-mono">
-               &lt;script async src=&quot;{siteUrl}/api/widget?key={apiKey}&quot;&gt;&lt;/script&gt;
-            </code>
+            <code className="block rounded-xl border border-slate-800 bg-slate-950/80 p-4 text-[11px] text-emerald-200 overflow-x-auto break-all font-mono">{embedSnippet}</code>
              <button
               type="button"
               onClick={() => {
-                const code = `<script async src="${siteUrl}/api/widget?key=${apiKey}"></script>`;
-                navigator.clipboard.writeText(code);
+                navigator.clipboard.writeText(embedSnippet);
                 // Could show toast here
               }}
               className="absolute top-2 right-2 rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 opacity-0 transition group-hover:opacity-100 hover:border-emerald-500 hover:text-emerald-400"

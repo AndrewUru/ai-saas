@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-
-const ORIGIN = "https://agentes.elsaltoweb.es";
+import { getEmbedSnippet } from "@/lib/widget/embedSnippet";
 
 type Props = {
   apiKey: string;
@@ -12,8 +11,7 @@ type Props = {
 export default function EmbedSnippet({ apiKey }: Props) {
   const [copied, setCopied] = useState(false);
 
-  const src = `${ORIGIN}/api/widget?key=${encodeURIComponent(apiKey)}`;
-  const snippet = `<script async src="${src}"></script>`;
+  const snippet = getEmbedSnippet(apiKey);
 
   const copy = async () => {
     await navigator.clipboard.writeText(snippet);
@@ -31,7 +29,7 @@ export default function EmbedSnippet({ apiKey }: Props) {
           onClick={copy}
           className="rounded-full bg-emerald-400 px-4 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-emerald-300"
         >
-          {copied ? "Copied ✓" : "Copy code"}
+          {copied ? "Copied" : "Copy code"}
         </button>
       </div>
 
@@ -40,15 +38,13 @@ export default function EmbedSnippet({ apiKey }: Props) {
         The snippet stays the same even when you update settings.
       </p>
 
-      <pre className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200 whitespace-pre-wrap">
-        {snippet}
-      </pre>
+      <pre className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200 whitespace-pre-wrap">{snippet}</pre>
 
       <p className="mt-3 text-xs text-slate-500">
         The widget checks your active plan and usage limits before loading.
       </p>
 
-      {/* ⚠️ NEXT / REACT NOTICE */}
+      {/* NEXT / REACT NOTICE */}
       <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 text-xs text-amber-200">
         <strong>React / Next.js:</strong>
         <br />
