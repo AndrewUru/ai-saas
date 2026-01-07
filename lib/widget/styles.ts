@@ -115,7 +115,7 @@ export const STATIC_STYLES = `
     linear-gradient(180deg, var(--ai-surface-strong), var(--ai-surface)),
     radial-gradient(circle at 10% 0%, rgba(255, 255, 255, 0.6), transparent 45%),
     radial-gradient(circle at 100% 0%, var(--ai-accent-light), transparent 50%);
-  border-radius: var(--ai-radius);
+  border-radius: 15px;
   overflow: hidden;
   overflow: clip;
   border: 1px solid var(--ai-border);
@@ -176,7 +176,7 @@ export const STATIC_STYLES = `
   visibility: visible;
   pointer-events: auto;
   transform: translate3d(0, 0, 0) scale(1);
-
+  border-radius: 20px;
   transition:
     opacity 0.2s ease,
     transform 0.22s ease,
@@ -700,17 +700,17 @@ export const STATIC_STYLES = `
     position: fixed;
     left: 12px;
     right: 12px;
+
+    /* ✅ Compacto: anclado abajo */
+    top: auto;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px)); /* 76-88 según tu botón */
+    height: clamp(420px, 70dvh, 620px);
+    max-height: calc(100dvh - 120px); /* margen extra para no invadir */
     width: auto;
 
-    /* ✅ casi full-screen en móvil (mejor UX) */
-    top: calc(44px + env(safe-area-inset-top, 0px));
-    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-    height: auto;
-    max-height: none;
-
-    border-radius: var(--ai-radius);
-    transform: translateY(0) scale(1);
+    border-radius: 15px;
   }
+}
 
   #ai-saas-toggle {
     width: 100%;
