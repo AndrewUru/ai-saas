@@ -295,22 +295,6 @@ export default async function AgentDetailPage({
       : null;
   const siteUrl = getSiteUrl();
 
-  const widgetUrlParams = new URLSearchParams({ key: agent.api_key });
-  if (agent.widget_accent) {
-    widgetUrlParams.set("accent", agent.widget_accent.replace(/^#/, ""));
-  }
-  const widgetBrand = agent.widget_brand?.trim();
-  if (widgetBrand) widgetUrlParams.set("brand", widgetBrand);
-
-  const widgetLabel = agent.widget_label?.trim();
-  if (widgetLabel) widgetUrlParams.set("label", widgetLabel);
-
-  const widgetGreeting = agent.widget_greeting?.trim();
-  if (widgetGreeting) widgetUrlParams.set("greeting", widgetGreeting);
-
-  if (widgetPositionValue) widgetUrlParams.set("position", widgetPositionValue);
-  const widgetScriptUrl = `${siteUrl}/api/widget?${widgetUrlParams.toString()}`;
-
   const createdAt = agent.created_at
     ? new Intl.DateTimeFormat("en-US", {
         day: "2-digit",
@@ -699,4 +683,6 @@ export default async function AgentDetailPage({
     </main>
   );
 }
+
+
 

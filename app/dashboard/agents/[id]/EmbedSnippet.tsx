@@ -1,40 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
+
+const ORIGIN = "https://agentes.elsaltoweb.es";
 
 type Props = {
   apiKey: string;
-  // opcional: por si algún día quieres mostrar el origin en UI,
-  // pero por defecto mantenemos el snippet estable con prod.
-  siteUrl?: string;
 };
 
 export default function EmbedSnippet({ apiKey }: Props) {
   const [copied, setCopied] = useState(false);
 
-  const snippet = useMemo(() => {
-    // ✅ Keep this stable for customers (do NOT use localhost/staging here)
-    const WIDGET_ORIGIN = "https://agentes.elsaltoweb.es";
-    const widgetSrc = `${WIDGET_ORIGIN}/api/widget?key=${encodeURIComponent(
-      apiKey
-    )}`;
-
-    return `
-<script>
-(function () {
-  var s = document.createElement("script");
-  s.src = "${widgetSrc}";
-  s.async = true;
-  s.defer = true;
-  s.onerror = function () {
-    console.error("[AI Commerce] Widget failed to load");
-  };
-  document.head.appendChild(s);
-})();
-</script>
-    `.trim();
-  }, [apiKey]);
+  const src = `${ORIGIN}/api/widget?key=${encodeURIComponent(apiKey)}`;
+  const snippet = `<script async src="${src}"></script>`;
 
   const copy = async () => {
     await navigator.clipboard.writeText(snippet);
@@ -58,8 +37,7 @@ export default function EmbedSnippet({ apiKey }: Props) {
 
       <p className="mt-2 text-sm text-slate-300">
         Copy and paste this script into your WordPress (footer or HTML widget).
-        This snippet is stable: you don&apos;t need to update it when you change
-        settings.
+        The snippet stays the same even when you update settings.
       </p>
 
       <pre className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200 whitespace-pre-wrap">

@@ -19,32 +19,32 @@
 
 :root {
   color-scheme: dark;
-  
+
   /* Modern Black Palette */
-  --background: #050505;       /* Deepest Black */
-  --foreground: #fafafa;       /* Zinc 50 */
+  --background: #050505; /* Deepest Black */
+  --foreground: #fafafa; /* Zinc 50 */
   --foreground-muted: #a1a1aa; /* Zinc 400 */
-  
+
   /* Borders */
   --border: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.15);
-  
+
   /* Rings & Focus */
   --ring: rgba(52, 211, 153, 0.5); /* Emerald 400 with opacity */
-  
+
   /* Accents */
-  --accent: #34d399;           /* Emerald 400 - Electric Green */
-  --accent-strong: #10b981;    /* Emerald 500 */
+  --accent: #34d399; /* Emerald 400 - Electric Green */
+  --accent-strong: #10b981; /* Emerald 500 */
   --accent-secondary: #8b5cf6; /* Violet 500 - Cyber styling */
-  
+
   /* Surfaces */
   --surface: rgba(10, 10, 10, 0.6);
-  --surface-strong: rgba(20, 20, 20, 0.85);
-  
+
+
   /* Design Tokens */
   --card-radius: 20px;
   --pill-radius: 9999px;
-  
+
   /* Shadows */
   --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
   --shadow-glow: 0 0 20px rgba(52, 211, 153, 0.15);
@@ -66,9 +66,16 @@ body {
   margin: 0;
   padding: 0;
   /* Complex modern background with dual glow points */
-  background: 
-    radial-gradient(circle at 50% 0%, rgba(52, 211, 153, 0.08), transparent 40%),
-    radial-gradient(circle at 80% 10%, rgba(139, 92, 246, 0.08), transparent 30%),
+  background: radial-gradient(
+      circle at 50% 0%,
+      rgba(52, 211, 153, 0.08),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 80% 10%,
+      rgba(139, 92, 246, 0.08),
+      transparent 30%
+    ),
     var(--background);
   color: var(--foreground);
   display: flex;
