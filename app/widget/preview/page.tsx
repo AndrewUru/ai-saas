@@ -1,13 +1,14 @@
-type WidgetPreviewPageProps = {
-  searchParams: Record<string, string | string[] | undefined>;
-};
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-export default function WidgetPreviewPage({
+export default async function WidgetPreviewPage({
   searchParams,
-}: WidgetPreviewPageProps) {
+}: {
+  searchParams: SearchParams;
+}) {
+  const resolvedSearchParams = await searchParams;
   const params = new URLSearchParams();
 
-  Object.entries(searchParams).forEach(([key, value]) => {
+  Object.entries(resolvedSearchParams).forEach(([key, value]) => {
     if (Array.isArray(value)) {
       value.forEach((entry) => {
         params.append(key, entry);
