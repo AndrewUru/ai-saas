@@ -77,9 +77,15 @@ export function renderWidgetScript(
       anchor.classList.add(fullConfig.position === "left" ? "ai-pos-left" : "ai-pos-right");
       
       // 5. Apply Variables
-      const setVar = (name, val) => {
-        if (val) anchor.style.setProperty(name, val);
-      };
+      const setVar = (name, val, fallback) => {
+  const v = typeof val === "string" ? val.trim() : val;
+  if (v !== undefined && v !== null && v !== "") {
+    anchor.style.setProperty(name, String(v));
+  } else if (fallback !== undefined) {
+    anchor.style.setProperty(name, String(fallback));
+  }
+};
+
 
       setVar("--ai-accent", appearance.accent);
       setVar("--ai-accent-contrast", appearance.accentContrast);
@@ -97,6 +103,12 @@ export function renderWidgetScript(
       setVar("--ai-toggle-text", appearance.colorToggleText);
       setVar("--ai-close-bg", appearance.closeBg);
       setVar("--ai-close-text", appearance.closeColor);
+      setVar("--ai-accent", appearance.accent, "#34d399");
+      setVar("--ai-accent-contrast", appearance.accentContrast, "#0b1220");
+      setVar("--ai-accent-shadow", appearance.accentShadow, "rgba(52,211,153,.25)");
+      setVar("--ai-accent-light", appearance.accentLight, "rgba(52,211,153,.18)");
+      setVar("--ai-accent-gradient", appearance.accentGradient, "linear-gradient(135deg,#34d399,#8b5cf6)");
+
       
       // Avatar Bubble Logic for Toggle
       // If type is bubble, we render the bubble HTML in the toggle icon

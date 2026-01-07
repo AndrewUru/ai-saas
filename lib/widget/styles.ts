@@ -1,7 +1,8 @@
-
-
 export const STATIC_STYLES = `
 #ai-saas-anchor {
+  --ai-accent-gradient: linear-gradient(135deg, #34d399, #8b5cf6);
+  --ai-accent-contrast: #0b1220;
+  --ai-accent-shadow: rgba(52, 211, 153, 0.25);
   position: fixed;
   bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   display: flex;
@@ -455,7 +456,10 @@ export const STATIC_STYLES = `
 }
 
 .ai-saas-input-wrapper button {
-  background: var(--ai-accent-gradient);
+
+  background: var(--ai-accent-gradient, linear-gradient(135deg, #34d399, #8b5cf6));
+  color: var(--ai-accent-contrast, #0b1220);
+  box-shadow: 0 8px 18px var(--ai-accent-shadow, rgba(52, 211, 153, 0.25));
   border: none;
   cursor: pointer;
   color: var(--ai-accent-contrast);
@@ -714,4 +718,3 @@ export const STATIC_STYLES = `
   }
 }
 `;
-
