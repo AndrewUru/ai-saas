@@ -10,8 +10,6 @@ import {
 import { getEmbedSnippet } from "@/lib/widget/embedSnippet";
 
 type WidgetDesignerProps = {
-  formAction: (formData: FormData) => void;
-  agentId: string;
   apiKey: string;
   siteUrl: string;
   initialAccent: string | null;
@@ -111,8 +109,6 @@ function trimmedOrNull(value: string, max: number): string | null {
 }
 
 export default function WidgetDesigner({
-  formAction,
-  agentId,
   apiKey,
   siteUrl,
   initialAccent,
@@ -262,11 +258,7 @@ export default function WidgetDesigner({
         w-full min-w-0
       "
     >
-      <form
-        action={formAction}
-        className="space-y-4  p-3 shadow-xl shadow-slate-950/40"
-      >
-        <input type="hidden" name="agent_id" value={agentId} />
+      <div className="space-y-4 p-3 shadow-xl shadow-slate-950/40">
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="space-y-1">
@@ -525,12 +517,6 @@ export default function WidgetDesigner({
 
         <div className="flex flex-wrap gap-3">
           <button
-            type="submit"
-            className="inline-flex flex-1 items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:flex-none"
-          >
-            Save customization
-          </button>
-          <button
             type="button"
             onClick={handleReset}
             className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:flex-none"
@@ -543,7 +529,7 @@ export default function WidgetDesigner({
           Empty values automatically use the widget&apos;s default texts and
           colors.
         </p>
-      </form>
+      </div>
 
       <div className="space-y-5 rounded-3xl border border-slate-800/70 bg-linear-to-br from-slate-950/75 via-slate-950/60 to-slate-900/60 p-6 shadow-xl shadow-slate-950/40">
         <div className="flex items-start justify-between gap-3">
