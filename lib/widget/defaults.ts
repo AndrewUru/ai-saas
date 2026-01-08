@@ -3,9 +3,10 @@ export type WidgetPosition = "left" | "right";
 export const widgetDefaults = {
   accent: "#2563eb",
   brand: "AI Widget",
-  label: "Chatea con nosotros",
-  greeting: "¿En qué puedo ayudarte hoy?",
-  humanSupportText: "Hablar con un humano",
+  label: "Chat with us",
+  greeting: "How can I help you today?",
+  humanSupportText: "Talk to a human",
+
   position: "right" as WidgetPosition,
 } as const;
 
