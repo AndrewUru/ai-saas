@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import QueryProvider from "./query-provider";
+import PreviewGuard from "@/components/PreviewGuard";
 
 export const metadata: Metadata = {
   title: "AI SaaS",
@@ -19,15 +20,21 @@ export default function RootLayout({
     <html lang="es">
       <body className="flex min-h-screen flex-col">
         <QueryProvider>
-          <Navbar />
+          <PreviewGuard>
+            <Navbar />
+          </PreviewGuard>
           {children}
-          <Footer />
+          <PreviewGuard>
+            <Footer />
+          </PreviewGuard>
         </QueryProvider>
 
-        <script
-          async
-          src="https://agentes.elsaltoweb.es/api/widget?key=agt_419oweh9oi6mjswq07p"
-        ></script>
+        <PreviewGuard>
+          <script
+            async
+            src="https://agentes.elsaltoweb.es/api/widget?key=agt_419oweh9oi6mjswq07p"
+          ></script>
+        </PreviewGuard>
       </body>
     </html>
   );
