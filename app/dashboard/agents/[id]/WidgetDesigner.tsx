@@ -199,7 +199,7 @@ export default function WidgetDesigner({
     );
     params.set(
       "humanSupportText",
-      trimmedOrNull(humanSupportTextInput, widgetLimits.greeting) ?? ""
+      trimmedOrNull(humanSupportTextInput, widgetLimits.humanSupportText) ?? ""
     );
     params.set("position", position);
 
@@ -468,6 +468,29 @@ export default function WidgetDesigner({
           <p className="text-xs text-slate-500">
             Max {widgetLimits.greeting} characters. Empty = uses &quot;
             {widgetDefaults.greeting}&quot;.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="widget-human-support"
+            className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+          >
+            Header subtitle
+          </label>
+          <input
+            id="widget-human-support"
+            name="widget_human_support_text"
+            maxLength={widgetLimits.humanSupportText}
+            placeholder={widgetDefaults.humanSupportText}
+            value={humanSupportTextInput}
+            onChange={(event) => setHumanSupportTextInput(event.target.value)}
+            className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+          />
+
+          <p className="text-xs text-slate-500">
+            Max {widgetLimits.humanSupportText} characters. Empty = uses &quot;
+            {widgetDefaults.humanSupportText}&quot;.
           </p>
         </div>
 

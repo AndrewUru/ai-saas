@@ -100,7 +100,7 @@ function buildPreviewOverrides(
     overrides.humanSupportText = sanitizeText(
       humanSupportParam,
       widgetDefaults.humanSupportText,
-      widgetLimits.greeting
+      widgetLimits.humanSupportText
     );
   }
 

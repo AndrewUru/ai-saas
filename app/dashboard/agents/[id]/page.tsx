@@ -181,6 +181,10 @@ async function updateWidgetBranding(formData: FormData) {
   const colorBotBubbleTextRaw = String(
     formData.get("widget_color_bot_bubble_text") ?? ""
   );
+  const colorToggleBgRaw = String(formData.get("widget_color_toggle_bg") ?? "");
+  const colorToggleTextRaw = String(
+    formData.get("widget_color_toggle_text") ?? ""
+  );
 
   const { error: updateError } = await supabase
     .from("agents")
@@ -191,7 +195,7 @@ async function updateWidgetBranding(formData: FormData) {
       widget_greeting: normalizeWidgetText(greetingRaw, widgetLimits.greeting),
       widget_human_support_text: normalizeWidgetText(
         String(formData.get("widget_human_support_text") ?? ""),
-        widgetLimits.greeting
+        widgetLimits.humanSupportText
       ),
       widget_position: positionRaw.trim()
         ? sanitizePosition(positionRaw)
@@ -216,6 +220,12 @@ async function updateWidgetBranding(formData: FormData) {
         : null,
       widget_color_bot_bubble_text: colorBotBubbleTextRaw.trim()
         ? sanitizeHex(colorBotBubbleTextRaw)
+        : null,
+      widget_color_toggle_bg: colorToggleBgRaw.trim()
+        ? sanitizeHex(colorToggleBgRaw)
+        : null,
+      widget_color_toggle_text: colorToggleTextRaw.trim()
+        ? sanitizeHex(colorToggleTextRaw)
         : null,
       updated_at: new Date().toISOString(),
     })

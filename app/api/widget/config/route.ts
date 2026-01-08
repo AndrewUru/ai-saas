@@ -183,7 +183,7 @@ export async function GET(req: Request) {
       config.humanSupportText = sanitizeText(
         humanSupportParam,
         widgetDefaults.humanSupportText,
-        widgetLimits.greeting
+        widgetLimits.humanSupportText
       );
     }
 
