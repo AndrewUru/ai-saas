@@ -179,51 +179,39 @@ export default function WidgetDesigner({
       : null;
 
   const previewPageUrl = useMemo(() => {
-    const params = new URLSearchParams({ key: apiKey });
-
-    const normalizedAccent = toParamHex(accentInput);
-    if (normalizedAccent) params.set("accent", normalizedAccent);
-
-    const brand = trimmedOrNull(brandInput, widgetLimits.brand);
-    if (brand) params.set("brand", brand);
-
-    const label = trimmedOrNull(labelInput, widgetLimits.label);
-    if (label) params.set("label", label);
-
-    const greeting = trimmedOrNull(greetingInput, widgetLimits.greeting);
-    if (greeting) params.set("greeting", greeting);
-
-    const humanSupport = trimmedOrNull(
-      humanSupportTextInput,
-      widgetLimits.greeting
-    );
-    if (humanSupport) params.set("humanSupportText", humanSupport);
-
-    if (position !== widgetDefaults.position) {
-      params.set("position", position);
-    }
-
-    // New Params
-    if (toParamHex(colorHeaderBg))
-      params.set("colorHeaderBg", toParamHex(colorHeaderBg)!);
-    if (toParamHex(colorHeaderText))
-      params.set("colorHeaderText", toParamHex(colorHeaderText)!);
-    if (toParamHex(colorChatBg))
-      params.set("colorChatBg", toParamHex(colorChatBg)!);
-    if (toParamHex(colorUserBubbleBg))
-      params.set("colorUserBubbleBg", toParamHex(colorUserBubbleBg)!);
-    if (toParamHex(colorUserBubbleText))
-      params.set("colorUserBubbleText", toParamHex(colorUserBubbleText)!);
-    if (toParamHex(colorBotBubbleBg))
-      params.set("colorBotBubbleBg", toParamHex(colorBotBubbleBg)!);
-    if (toParamHex(colorBotBubbleText))
-      params.set("colorBotBubbleText", toParamHex(colorBotBubbleText)!);
-    if (toParamHex(colorToggleBg))
-      params.set("colorToggleBg", toParamHex(colorToggleBg)!);
-    if (toParamHex(colorToggleText))
-      params.set("colorToggleText", toParamHex(colorToggleText)!);
-
+    const params = new URLSearchParams();
+    params.set("key", apiKey);
     params.set("preview", "1");
+    params.set("v", Date.now().toString());
+
+    params.set("accent", toParamHex(accentInput) ?? "");
+    params.set(
+      "brandName",
+      trimmedOrNull(brandInput, widgetLimits.brand) ?? ""
+    );
+    params.set(
+      "collapsedLabel",
+      trimmedOrNull(labelInput, widgetLimits.label) ?? ""
+    );
+    params.set(
+      "greeting",
+      trimmedOrNull(greetingInput, widgetLimits.greeting) ?? ""
+    );
+    params.set(
+      "humanSupportText",
+      trimmedOrNull(humanSupportTextInput, widgetLimits.greeting) ?? ""
+    );
+    params.set("position", position);
+
+    params.set("colorHeaderBg", toParamHex(colorHeaderBg) ?? "");
+    params.set("colorHeaderText", toParamHex(colorHeaderText) ?? "");
+    params.set("colorChatBg", toParamHex(colorChatBg) ?? "");
+    params.set("colorUserBubbleBg", toParamHex(colorUserBubbleBg) ?? "");
+    params.set("colorUserBubbleText", toParamHex(colorUserBubbleText) ?? "");
+    params.set("colorBotBubbleBg", toParamHex(colorBotBubbleBg) ?? "");
+    params.set("colorBotBubbleText", toParamHex(colorBotBubbleText) ?? "");
+    params.set("colorToggleBg", toParamHex(colorToggleBg) ?? "");
+    params.set("colorToggleText", toParamHex(colorToggleText) ?? "");
 
     return `${siteUrl}/widget/preview?${params.toString()}`;
   }, [
@@ -550,8 +538,10 @@ export default function WidgetDesigner({
         </div>
         <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80">
           <iframe
+            key={previewPageUrl}
             title="Widget preview"
             src={previewPageUrl}
+            sandbox="allow-scripts allow-same-origin"
             className="h-[460px] w-full border-0 bg-slate-950"
           />
         </div>

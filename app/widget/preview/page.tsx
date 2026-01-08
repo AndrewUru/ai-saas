@@ -1,3 +1,4 @@
+//C:\ai-saas\app\widget\preview\page.tsx
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export default async function WidgetPreviewPage({
@@ -32,7 +33,7 @@ export default async function WidgetPreviewPage({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontFamily: "\"Inter\", \"Helvetica Neue\", Arial, sans-serif",
+        fontFamily: '"Inter", "Helvetica Neue", Arial, sans-serif',
       }}
     >
       <script async src={src}></script>
