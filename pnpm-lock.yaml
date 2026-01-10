@@ -26,6 +26,9 @@ importers:
       langchain:
         specifier: ^0.3.35
         version: 0.3.36(@langchain/core@0.3.79(openai@4.104.0(ws@8.18.3)(zod@4.1.13)))(openai@4.104.0(ws@8.18.3)(zod@4.1.13))(ws@8.18.3)
+      lucide-react:
+        specifier: ^0.263.0
+        version: 0.263.1(react@19.1.0)
       next:
         specifier: ^15.5.7
         version: 15.5.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -1615,6 +1618,11 @@ packages:
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
+
+  lucide-react@0.263.1:
+    resolution: {integrity: sha512-keqxAx97PlaEN89PXZ6ki1N8nRjGWtDa4021GFYLNj0RgruM5odbpl8GHTExj0hhPq3sF6Up0gnxt6TSHu+ovw==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -3780,6 +3788,10 @@ snapshots:
   loose-envify@1.4.0:
     dependencies:
       js-tokens: 4.0.0
+
+  lucide-react@0.263.1(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   magic-string@0.30.21:
     dependencies:
