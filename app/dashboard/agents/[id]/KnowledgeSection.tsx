@@ -104,36 +104,36 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
     if (!notice) {
       setNoticeVisible(false);
       if (noticeTimerRef.current) {
-        window.clearTimeout(noticeTimerRef.current);
+        clearTimeout(noticeTimerRef.current);
       }
       if (noticeDismissRef.current) {
-        window.clearTimeout(noticeDismissRef.current);
+        clearTimeout(noticeDismissRef.current);
       }
       return;
     }
 
     setNoticeVisible(false);
-    const showTimer = window.setTimeout(() => {
+    const showTimer = setTimeout(() => {
       setNoticeVisible(true);
     }, 10);
 
     if (noticeTimerRef.current) {
-      window.clearTimeout(noticeTimerRef.current);
+      clearTimeout(noticeTimerRef.current);
     }
     if (noticeDismissRef.current) {
-      window.clearTimeout(noticeDismissRef.current);
+      clearTimeout(noticeDismissRef.current);
     }
 
     if (notice.type === "success") {
-      noticeTimerRef.current = window.setTimeout(() => {
+      noticeTimerRef.current = setTimeout(() => {
         setNoticeVisible(false);
-        noticeDismissRef.current = window.setTimeout(() => {
+        noticeDismissRef.current = setTimeout(() => {
           setNotice(null);
         }, 200);
       }, 3500);
     }
 
-    return () => window.clearTimeout(showTimer);
+    return () => clearTimeout(showTimer);
   }, [notice]);
 
   useEffect(() => {
@@ -153,12 +153,12 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
   const dismissNotice = useCallback(() => {
     setNoticeVisible(false);
     if (noticeDismissRef.current) {
-      window.clearTimeout(noticeDismissRef.current);
+      clearTimeout(noticeDismissRef.current);
     }
     if (noticeTimerRef.current) {
-      window.clearTimeout(noticeTimerRef.current);
+      clearTimeout(noticeTimerRef.current);
     }
-    noticeDismissRef.current = window.setTimeout(() => {
+    noticeDismissRef.current = setTimeout(() => {
       setNotice(null);
     }, 200);
   }, []);
