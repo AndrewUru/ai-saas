@@ -45,7 +45,7 @@ export default function ChangelogPage() {
           {entries.map((entry) => (
             <article
               key={entry.date}
-              className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur"
+              className="rounded-3xl border border-slate-800/60 p-6 shadow-lg shadow-slate-900/40 backdrop-blur"
             >
               <header className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-lg font-semibold text-white">

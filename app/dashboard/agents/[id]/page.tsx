@@ -7,7 +7,11 @@ import EmbedSnippet from "./EmbedSnippet";
 import SubmitButton from "@/components/SubmitButton";
 import KnowledgeSection from "./KnowledgeSection";
 
-import { widgetLimits, sanitizeHex, sanitizePosition } from "@/lib/widget/defaults";
+import {
+  widgetLimits,
+  sanitizeHex,
+  sanitizePosition,
+} from "@/lib/widget/defaults";
 
 const LANGUAGE_OPTIONS = [
   { value: "auto", label: "Automatic detection" },
@@ -294,7 +298,6 @@ export default async function AgentDetailPage({
     : "Unknown date";
 
   return (
-
     <main className="relative min-h-screen overflow-hidden text-slate-100">
       <div className="pointer-events-none absolute inset-0" />
 
@@ -303,15 +306,17 @@ export default async function AgentDetailPage({
         <header className="space-y-4 ui-card--strong p-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="space-y-3">
-              <p className="ui-badge">
-                Agent profile
-              </p>
+              <p className="ui-badge">Agent profile</p>
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
                   {agent.name}
                 </h1>
                 <span className="ui-badge border-slate-700 text-slate-300 bg-transparent">
-                  <span className={`dot ${agent.is_active ? 'dot--active' : 'dot--paused'}`} />
+                  <span
+                    className={`dot ${
+                      agent.is_active ? "dot--active" : "dot--paused"
+                    }`}
+                  />
                   {statusLabel}
                 </span>
               </div>
@@ -320,10 +325,7 @@ export default async function AgentDetailPage({
                 domains can load the widget, and copy the agent API key.
               </p>
             </div>
-            <Link
-              href={AGENTS_BASE}
-              className="ui-button ui-button--ghost"
-            >
+            <Link href={AGENTS_BASE} className="ui-button ui-button--ghost">
               Back to agents
             </Link>
           </div>
@@ -619,7 +621,7 @@ export default async function AgentDetailPage({
             <KnowledgeSection agentId={agent.id} />
 
             {/* FILA INFERIOR: ancho completo */}
-            <article className="lg:col-span-2 w-full min-w-0 ui-card glass-pane p-7">
+            <article className="lg:col-span-2 w-full min-w-0 ui-card glass-pane p-2">
               <h2 className="text-xl font-semibold text-white">
                 Customize the embeddable widget
               </h2>
@@ -666,6 +668,3 @@ export default async function AgentDetailPage({
     </main>
   );
 }
-
-
-
