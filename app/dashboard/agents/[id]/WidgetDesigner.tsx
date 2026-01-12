@@ -1,7 +1,7 @@
 //C:\ai-saas\app\dashboard\agents\[id]\WidgetDesigner.tsx
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   widgetDefaults,
   widgetLimits,
@@ -9,6 +9,17 @@ import {
   WidgetPosition,
 } from "@/lib/widget/defaults";
 import { getEmbedSnippet } from "@/lib/widget/embedSnippet";
+
+function useDebouncedValue<T>(value: T, delay = 300) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timeoutId);
+  }, [value, delay]);
+
+  return debounced;
+}
 
 type WidgetDesignerProps = {
   apiKey: string;
@@ -109,24 +120,6 @@ function trimmedOrNull(value: string, max: number): string | null {
   return trimmed.slice(0, max);
 }
 
-type AppliedPreviewState = {
-  accentInput: string;
-  brandInput: string;
-  labelInput: string;
-  greetingInput: string;
-  humanSupportTextInput: string;
-  position: WidgetPosition;
-  colorHeaderBg: string;
-  colorHeaderText: string;
-  colorChatBg: string;
-  colorUserBubbleBg: string;
-  colorUserBubbleText: string;
-  colorBotBubbleBg: string;
-  colorBotBubbleText: string;
-  colorToggleBg: string;
-  colorToggleText: string;
-};
-
 export default function WidgetDesigner({
   apiKey,
   siteUrl,
@@ -185,24 +178,6 @@ export default function WidgetDesigner({
     initialColorToggleText ?? ""
   );
 
-  const [applied, setApplied] = useState<AppliedPreviewState>(() => ({
-    accentInput: initialAccent ?? "",
-    brandInput: initialBrand ?? "",
-    labelInput: initialLabel ?? "",
-    greetingInput: initialGreeting ?? "",
-    humanSupportTextInput: initialHumanSupportText ?? "",
-    position: initialPosition ?? widgetDefaults.position,
-    colorHeaderBg: initialColorHeaderBg ?? "",
-    colorHeaderText: initialColorHeaderText ?? "",
-    colorChatBg: initialColorChatBg ?? "",
-    colorUserBubbleBg: initialColorUserBubbleBg ?? "",
-    colorUserBubbleText: initialColorUserBubbleText ?? "",
-    colorBotBubbleBg: initialColorBotBubbleBg ?? "",
-    colorBotBubbleText: initialColorBotBubbleText ?? "",
-    colorToggleBg: initialColorToggleBg ?? "",
-    colorToggleText: initialColorToggleText ?? "",
-  }));
-
   const embedSnippet = getEmbedSnippet(apiKey);
 
   const accentPickerValue = normalizeHex(accentInput) ?? widgetDefaults.accent;
@@ -211,8 +186,10 @@ export default function WidgetDesigner({
       ? "Use a 3- or 6-character hex value."
       : null;
 
-  const applyPreview = () => {
-    setApplied({
+  const liveStateInput = useMemo(
+    () => ({
+      apiKey,
+      siteUrl,
       accentInput,
       brandInput,
       labelInput,
@@ -228,75 +205,80 @@ export default function WidgetDesigner({
       colorBotBubbleText,
       colorToggleBg,
       colorToggleText,
-    });
-  };
+    }),
+    [
+      apiKey,
+      siteUrl,
+      accentInput,
+      brandInput,
+      labelInput,
+      greetingInput,
+      humanSupportTextInput,
+      position,
+      colorHeaderBg,
+      colorHeaderText,
+      colorChatBg,
+      colorUserBubbleBg,
+      colorUserBubbleText,
+      colorBotBubbleBg,
+      colorBotBubbleText,
+      colorToggleBg,
+      colorToggleText,
+    ]
+  );
 
-  const isDirty =
-    applied.accentInput !== accentInput ||
-    applied.brandInput !== brandInput ||
-    applied.labelInput !== labelInput ||
-    applied.greetingInput !== greetingInput ||
-    applied.humanSupportTextInput !== humanSupportTextInput ||
-    applied.position !== position ||
-    applied.colorHeaderBg !== colorHeaderBg ||
-    applied.colorHeaderText !== colorHeaderText ||
-    applied.colorChatBg !== colorChatBg ||
-    applied.colorUserBubbleBg !== colorUserBubbleBg ||
-    applied.colorUserBubbleText !== colorUserBubbleText ||
-    applied.colorBotBubbleBg !== colorBotBubbleBg ||
-    applied.colorBotBubbleText !== colorBotBubbleText ||
-    applied.colorToggleBg !== colorToggleBg ||
-    applied.colorToggleText !== colorToggleText;
+  const liveState = useDebouncedValue(liveStateInput, 300);
 
   const previewPageUrl = useMemo(() => {
     const params = new URLSearchParams();
-    params.set("key", apiKey);
+    params.set("key", liveState.apiKey);
     params.set("preview", "1");
-    params.set("v", Date.now().toString());
-
-    params.set("accent", toParamHex(applied.accentInput) ?? "");
+    params.set("accent", toParamHex(liveState.accentInput) ?? "");
     params.set(
       "brandName",
-      trimmedOrNull(applied.brandInput, widgetLimits.brand) ?? ""
+      trimmedOrNull(liveState.brandInput, widgetLimits.brand) ?? ""
     );
     params.set(
       "collapsedLabel",
-      trimmedOrNull(applied.labelInput, widgetLimits.label) ?? ""
+      trimmedOrNull(liveState.labelInput, widgetLimits.label) ?? ""
     );
     params.set(
       "greeting",
-      trimmedOrNull(applied.greetingInput, widgetLimits.greeting) ?? ""
+      trimmedOrNull(liveState.greetingInput, widgetLimits.greeting) ?? ""
     );
     params.set(
       "humanSupportText",
       trimmedOrNull(
-        applied.humanSupportTextInput,
+        liveState.humanSupportTextInput,
         widgetLimits.humanSupportText
       ) ?? ""
     );
-    params.set("position", applied.position);
+    params.set("position", liveState.position);
 
-    params.set("colorHeaderBg", toParamHex(applied.colorHeaderBg) ?? "");
-    params.set("colorHeaderText", toParamHex(applied.colorHeaderText) ?? "");
-    params.set("colorChatBg", toParamHex(applied.colorChatBg) ?? "");
+    params.set("colorHeaderBg", toParamHex(liveState.colorHeaderBg) ?? "");
+    params.set("colorHeaderText", toParamHex(liveState.colorHeaderText) ?? "");
+    params.set("colorChatBg", toParamHex(liveState.colorChatBg) ?? "");
     params.set(
       "colorUserBubbleBg",
-      toParamHex(applied.colorUserBubbleBg) ?? ""
+      toParamHex(liveState.colorUserBubbleBg) ?? ""
     );
     params.set(
       "colorUserBubbleText",
-      toParamHex(applied.colorUserBubbleText) ?? ""
+      toParamHex(liveState.colorUserBubbleText) ?? ""
     );
-    params.set("colorBotBubbleBg", toParamHex(applied.colorBotBubbleBg) ?? "");
+    params.set(
+      "colorBotBubbleBg",
+      toParamHex(liveState.colorBotBubbleBg) ?? ""
+    );
     params.set(
       "colorBotBubbleText",
-      toParamHex(applied.colorBotBubbleText) ?? ""
+      toParamHex(liveState.colorBotBubbleText) ?? ""
     );
-    params.set("colorToggleBg", toParamHex(applied.colorToggleBg) ?? "");
-    params.set("colorToggleText", toParamHex(applied.colorToggleText) ?? "");
+    params.set("colorToggleBg", toParamHex(liveState.colorToggleBg) ?? "");
+    params.set("colorToggleText", toParamHex(liveState.colorToggleText) ?? "");
 
-    return `${siteUrl}/widget/preview?${params.toString()}`;
-  }, [apiKey, applied, siteUrl]);
+    return `${liveState.siteUrl}/widget/preview?${params.toString()}`;
+  }, [liveState]);
 
   function handleReset() {
     setAccentInput("");
@@ -605,27 +587,8 @@ export default function WidgetDesigner({
               Preview
             </p>
             <p className="text-sm text-slate-300">
-              Click Update preview to refresh.
+              Updates automatically as you edit.
             </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={`rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.2em] ${
-                isDirty
-                  ? "border-amber-500/40 text-amber-200"
-                  : "border-emerald-500/40 text-emerald-200"
-              }`}
-            >
-              {isDirty ? "Changes not applied" : "Up to date"}
-            </span>
-            <button
-              type="button"
-              onClick={applyPreview}
-              disabled={!isDirty}
-              className="inline-flex items-center justify-center rounded-full border border-slate-700 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 disabled:hover:border-slate-800 disabled:hover:text-slate-500"
-            >
-              Update preview
-            </button>
           </div>
         </div>
         {/* Preview canvas */}
@@ -638,7 +601,6 @@ export default function WidgetDesigner({
 
               {/* Screen */}
               <iframe
-                key={previewPageUrl}
                 title="Widget preview"
                 src={previewPageUrl}
                 sandbox="allow-scripts allow-same-origin"
