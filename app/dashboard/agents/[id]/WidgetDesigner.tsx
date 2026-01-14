@@ -592,27 +592,26 @@ export default function WidgetDesigner({
           </div>
         </div>
         {/* Preview canvas */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4">
-          <div className="mx-auto w-[320px] max-w-full">
-            {/* Device frame */}
-            <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-black shadow-[0_24px_70px_rgba(0,0,0,.55)]">
-              {/* Notch */}
-              <div className="absolute left-1/2 top-2 z-10 h-6 w-28 -translate-x-1/2 rounded-full bg-black/70 border border-white/10" />
 
-              {/* Screen */}
-              <iframe
-                title="Widget preview"
-                src={previewPageUrl}
-                sandbox="allow-scripts allow-same-origin"
-                className="block h-[640px] w-full border-0"
-              />
-            </div>
+        <div className="mx-auto w-[320px] max-w-full">
+          {/* Device frame */}
+          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-black shadow-[0_24px_70px_rgba(0,0,0,.55)]">
+            {/* Notch */}
+            <div className="absolute left-1/2 top-2 z-10 h-6 w-28 -translate-x-1/2 rounded-full bg-black/70 border border-white/10" />
 
-            {/* Helper line */}
-            <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Mobile preview</span>
-              <span className="text-slate-500">320 × 640</span>
-            </div>
+            {/* Screen */}
+            <iframe
+              title="Widget preview"
+              src={previewPageUrl}
+              sandbox="allow-scripts allow-same-origin"
+              className="block h-[640px] w-full border-0"
+            />
+          </div>
+
+          {/* Helper line */}
+          <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400">
+            <span>Mobile preview</span>
+            <span className="text-slate-500">320 × 640</span>
           </div>
         </div>
 
