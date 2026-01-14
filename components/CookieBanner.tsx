@@ -176,7 +176,7 @@ function Row({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+    <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-800 bg-slate-950/40 p-3 z-99">
       <div>
         <p className="text-sm font-medium text-slate-100">{title}</p>
         <p className="text-sm text-slate-300">{desc}</p>
