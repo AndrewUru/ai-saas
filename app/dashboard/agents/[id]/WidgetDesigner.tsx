@@ -31,7 +31,7 @@ type WidgetDesignerProps = {
 
   initialHumanSupportText: string | null;
   initialPosition: WidgetPosition | null;
-  // New props
+
   initialColorHeaderBg: string | null;
   initialColorHeaderText: string | null;
   initialColorChatBg: string | null;
@@ -42,55 +42,6 @@ type WidgetDesignerProps = {
   initialColorToggleBg: string | null;
   initialColorToggleText: string | null;
 };
-
-// Start Helper Component for Color Input
-function ColorInput({
-  label,
-  name,
-  value,
-  onChange,
-  defaultValue,
-}: {
-  label: string;
-  name: string;
-  value: string;
-  onChange: (val: string) => void;
-  defaultValue: string;
-}) {
-  const pickerValue = normalizeHex(value) ?? defaultValue;
-  return (
-    <div className="space-y-1">
-      <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-        {label}
-      </label>
-      <div className="flex items-center gap-2">
-        <input
-          type="color"
-          className="h-9 w-9 cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-0"
-          value={pickerValue}
-          onChange={(e) => onChange(e.target.value)}
-        />
-
-        <input
-          name={name}
-          placeholder={defaultValue}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-2 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-        />
-
-        <button
-          type="button"
-          onClick={() => onChange("")}
-          className="text-xs uppercase text-slate-500 hover:text-emerald-300"
-        >
-          Reset
-        </button>
-      </div>
-    </div>
-  );
-}
-// End Helper Component
 
 function normalizeHex(value: string): string | null {
   const trimmed = value.trim();
@@ -120,13 +71,62 @@ function trimmedOrNull(value: string, max: number): string | null {
   return trimmed.slice(0, max);
 }
 
+// Mobile-first ColorInput: wrap + min-w-0 everywhere + reset button no-wrap
+function ColorInput({
+  label,
+  name,
+  value,
+  onChange,
+  defaultValue,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (val: string) => void;
+  defaultValue: string;
+}) {
+  const pickerValue = normalizeHex(value) ?? defaultValue;
+
+  return (
+    <div className="space-y-1 min-w-0">
+      <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+        {label}
+      </label>
+
+      <div className="flex flex-wrap items-center gap-2 min-w-0">
+        <input
+          type="color"
+          className="h-9 w-9 shrink-0 cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-0"
+          value={pickerValue}
+          onChange={(e) => onChange(e.target.value)}
+        />
+
+        <input
+          name={name}
+          placeholder={defaultValue}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="min-w-0 flex-1 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-2 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+        />
+
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          className="shrink-0 whitespace-nowrap text-xs uppercase text-slate-500 hover:text-emerald-300"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function WidgetDesigner({
   apiKey,
   siteUrl,
   initialAccent,
   initialBrand,
   initialLabel,
-
   initialGreeting,
   initialHumanSupportText,
   initialPosition,
@@ -151,7 +151,6 @@ export default function WidgetDesigner({
     initialPosition ?? widgetDefaults.position
   );
 
-  // New States
   const [colorHeaderBg, setColorHeaderBg] = useState(
     initialColorHeaderBg ?? ""
   );
@@ -280,6 +279,26 @@ export default function WidgetDesigner({
     return `${liveState.siteUrl}/widget/preview?${params.toString()}`;
   }, [liveState]);
 
+  const iframeKey = useMemo(() => {
+    return [
+      liveState.colorHeaderBg,
+      liveState.colorHeaderText,
+      liveState.colorChatBg,
+      liveState.colorUserBubbleBg,
+      liveState.colorUserBubbleText,
+      liveState.colorBotBubbleBg,
+      liveState.colorBotBubbleText,
+      liveState.colorToggleBg,
+      liveState.colorToggleText,
+      liveState.accentInput,
+      liveState.brandInput,
+      liveState.labelInput,
+      liveState.greetingInput,
+      liveState.humanSupportTextInput,
+      liveState.position,
+    ].join("|");
+  }, [liveState]);
+
   function handleReset() {
     setAccentInput("");
     setBrandInput("");
@@ -301,80 +320,86 @@ export default function WidgetDesigner({
   return (
     <div
       className="
-        mt-8 grid gap-8
+        mt-6 grid grid-cols-1 gap-6
         lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,1fr)]
         xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,1fr)]
         2xl:grid-cols-[minmax(0,1.35fr)_minmax(420px,1fr)]
         w-full min-w-0
       "
     >
-      <div className="space-y-4 p-3 shadow-xl shadow-slate-950/40">
+      {/* Left column */}
+      <div className="space-y-4 min-w-0">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="space-y-1">
+          <div className="space-y-1 min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
               Branding & UX
             </p>
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-base sm:text-lg font-semibold text-white">
               Adjust appearance and visible texts
             </h3>
           </div>
+
           <button
             type="button"
-            className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300 transition hover:text-emerald-200"
+            className="shrink-0 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300 transition hover:text-emerald-200"
             onClick={handleReset}
           >
             Clear fields
           </button>
         </div>
 
-        <div className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0">
+          <div className="flex flex-wrap items-center gap-3 min-w-0">
             <label
               htmlFor="widget-accent"
               className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
             >
               Main Accent Color
             </label>
+
             <input
               type="color"
               aria-label="Color picker"
-              className="h-9 w-9 cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-0"
+              className="h-9 w-9 shrink-0 cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-0"
               value={accentPickerValue}
               onChange={(event) => setAccentInput(event.target.value)}
             />
 
             <button
               type="button"
-              className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300 transition hover:text-emerald-200"
+              className="shrink-0 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300 transition hover:text-emerald-200"
               onClick={() => setAccentInput("")}
             >
               Reset
             </button>
           </div>
+
           <input
             id="widget-accent"
             name="widget_accent"
             placeholder={widgetDefaults.accent}
             value={accentInput}
             onChange={(event) => setAccentInput(event.target.value)}
-            className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+            className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
           />
 
           <p className="text-xs text-slate-500">
             Accepts #RRGGBB or RRGGBB formats. Empty = default color (
             {widgetDefaults.accent}).
           </p>
+
           {accentError && (
             <p className="text-xs text-rose-300">{accentError}</p>
           )}
         </div>
 
         {/* Detailed Color Customization */}
-        <div className="space-y-4 rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+        <div className="space-y-4 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-200">
             Advanced Colors
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
             <ColorInput
               label="Header BG"
               name="widget_color_header_bg"
@@ -396,7 +421,10 @@ export default function WidgetDesigner({
               onChange={setColorChatBg}
               defaultValue="#efe7dd"
             />
-            <div /> {/* Spacer */}
+
+            {/* Spacer only on >= sm */}
+            <div className="hidden sm:block" />
+
             <ColorInput
               label="User Bubble BG"
               name="widget_color_user_bubble_bg"
@@ -425,7 +453,9 @@ export default function WidgetDesigner({
               onChange={setColorBotBubbleText}
               defaultValue="#111b21"
             />
-            <div /> {/* Spacer */}
+
+            <div className="hidden sm:block" />
+
             <ColorInput
               label="Toggle Button BG"
               name="widget_color_toggle_bg"
@@ -443,7 +473,7 @@ export default function WidgetDesigner({
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 min-w-0">
           <label
             htmlFor="widget-brand"
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
@@ -457,16 +487,15 @@ export default function WidgetDesigner({
             placeholder={widgetDefaults.brand}
             value={brandInput}
             onChange={(event) => setBrandInput(event.target.value)}
-            className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+            className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
           />
-
           <p className="text-xs text-slate-500">
             Max {widgetLimits.brand} characters. Empty = uses &quot;
             {widgetDefaults.brand}&quot;.
           </p>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 min-w-0">
           <label
             htmlFor="widget-label"
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
@@ -480,16 +509,15 @@ export default function WidgetDesigner({
             placeholder={widgetDefaults.label}
             value={labelInput}
             onChange={(event) => setLabelInput(event.target.value)}
-            className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+            className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
           />
-
           <p className="text-xs text-slate-500">
             Max {widgetLimits.label} characters. Empty = uses &quot;
             {widgetDefaults.label}&quot;.
           </p>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 min-w-0">
           <label
             htmlFor="widget-greeting"
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
@@ -503,16 +531,15 @@ export default function WidgetDesigner({
             placeholder={widgetDefaults.greeting}
             value={greetingInput}
             onChange={(event) => setGreetingInput(event.target.value)}
-            className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+            className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
           />
-
           <p className="text-xs text-slate-500">
             Max {widgetLimits.greeting} characters. Empty = uses &quot;
             {widgetDefaults.greeting}&quot;.
           </p>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 min-w-0">
           <label
             htmlFor="widget-human-support"
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
@@ -526,16 +553,15 @@ export default function WidgetDesigner({
             placeholder={widgetDefaults.humanSupportText}
             value={humanSupportTextInput}
             onChange={(event) => setHumanSupportTextInput(event.target.value)}
-            className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+            className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
           />
-
           <p className="text-xs text-slate-500">
             Max {widgetLimits.humanSupportText} characters. Empty = uses &quot;
             {widgetDefaults.humanSupportText}&quot;.
           </p>
         </div>
 
-        <fieldset className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+        <fieldset className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0">
           <legend className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
             Screen position
           </legend>
@@ -557,7 +583,6 @@ export default function WidgetDesigner({
                   onChange={() => setPosition(option)}
                   className="sr-only"
                 />
-
                 {option === "right" ? "Right" : "Left"}
               </label>
             ))}
@@ -580,7 +605,8 @@ export default function WidgetDesigner({
         </p>
       </div>
 
-      <div className="space-y-5 rounded-3xl border border-slate-800/70 bg-linear-to-br from-slate-950/75 via-slate-950/60 to-slate-900/60 p-6 shadow-xl shadow-slate-950/40">
+      {/* Right column */}
+      <div className="space-y-5 rounded-3xl border border-slate-800/70 bg-linear-to-br from-slate-950/75 via-slate-950/60 to-slate-900/60 p-4 sm:p-6 shadow-xl shadow-slate-950/40 min-w-0 overflow-x-hidden">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
@@ -591,16 +617,13 @@ export default function WidgetDesigner({
             </p>
           </div>
         </div>
-        {/* Preview canvas */}
 
-        <div className="mx-auto w-[320px] max-w-full">
-          {/* Device frame */}
+        {/* Preview canvas (mobile-first) */}
+        <div className="mx-auto w-[320px] max-w-[calc(100vw-24px)] sm:w-[360px] lg:w-[390px]">
           <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-black shadow-[0_24px_70px_rgba(0,0,0,.55)]">
-            {/* Notch */}
             <div className="absolute left-1/2 top-2 z-10 h-6 w-28 -translate-x-1/2 rounded-full bg-black/70 border border-white/10" />
-
-            {/* Screen */}
             <iframe
+              key={iframeKey}
               title="Widget preview"
               src={previewPageUrl}
               sandbox="allow-scripts allow-same-origin"
@@ -608,32 +631,33 @@ export default function WidgetDesigner({
             />
           </div>
 
-          {/* Helper line */}
           <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400">
             <span>Mobile preview</span>
             <span className="text-slate-500">320 × 640</span>
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
             Installation Code - Place before &lt;/body&gt;
           </p>
-          <div className="relative group">
+
+          <div className="relative group min-w-0">
             <code className="block rounded-xl border border-slate-800 bg-slate-950/80 p-4 text-[11px] text-emerald-200 overflow-x-auto break-all font-mono">
               {embedSnippet}
             </code>
+
             <button
               type="button"
               onClick={() => {
                 navigator.clipboard.writeText(embedSnippet);
-                // Could show toast here
               }}
               className="absolute top-2 right-2 rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 opacity-0 transition group-hover:opacity-100 hover:border-emerald-500 hover:text-emerald-400"
             >
               Copy
             </button>
           </div>
+
           <p className="text-xs text-slate-500">
             This snippet is stable. You don&apos;t need to update it when
             changing settings.

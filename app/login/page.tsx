@@ -96,9 +96,13 @@ export default function LoginPage() {
   // --- GOOGLE OAUTH --------------------------------------------------------
   const signInGoogle = async () => {
     setStatus({ intent: "info", message: "Redirecting to Google..." });
-    const redirectUrl = `${
-      process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
-    }/auth/callback?next=/dashboard`;
+
+    const origin =
+      typeof window !== "undefined"
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+    const redirectUrl = `${origin}/auth/callback?next=/dashboard`;
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",

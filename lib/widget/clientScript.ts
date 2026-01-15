@@ -60,6 +60,148 @@ export function renderWidgetScript(
     return null;
   };
 
+  const normalizeHex = (value) => {
+    if (typeof value !== "string") return null;
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+
+    let hex = trimmed.startsWith("#") ? trimmed.slice(1) : trimmed;
+    if (/^[0-9a-f]{3}$/i.test(hex)) {
+      hex = hex
+        .split("")
+        .map((char) => char + char)
+        .join("");
+    }
+
+    if (!/^[0-9a-f]{6}$/i.test(hex)) return null;
+    return \`#\${hex.toLowerCase()}\`;
+  };
+
+  const hexToRgb = (hex) => {
+    const value = parseInt(hex.slice(1), 16);
+    return {
+      r: (value >> 16) & 255,
+      g: (value >> 8) & 255,
+      b: value & 255,
+    };
+  };
+
+  const rgba = (hex, alpha) => {
+    const { r, g, b } = hexToRgb(hex);
+    return \`rgba(\${r}, \${g}, \${b}, \${alpha})\`;
+  };
+
+  const relativeLuminance = (hex) => {
+    const { r, g, b } = hexToRgb(hex);
+    const channel = (value) => {
+      const v = value / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    const R = channel(r);
+    const G = channel(g);
+    const B = channel(b);
+    return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+  };
+
+  const buildAccentVars = (accent) => {
+    const baseAccent = normalizeHex(accent) || "#34d399";
+    const luminance = relativeLuminance(baseAccent);
+    const accentContrast = luminance > 0.55 ? "#0f172a" : "#f8fafc";
+    const accentShadow = rgba(baseAccent, 0.32);
+    const accentLight = rgba(baseAccent, 0.16);
+    const accentGradient =
+      "linear-gradient(135deg, " +
+      rgba(baseAccent, 0.18) +
+      ", " +
+      rgba(baseAccent, 0.4) +
+      ")";
+    const closeColor = luminance > 0.8 ? "#0f172a" : "#fff";
+    const closeBg =
+      luminance > 0.8 ? "rgba(15,23,42,.12)" : "rgba(255,255,255,.24)";
+    return {
+      accent: baseAccent,
+      accentContrast,
+      accentShadow,
+      accentLight,
+      accentGradient,
+      closeColor,
+      closeBg,
+    };
+  };
+
+  const setVar = (root, name, val, fallback) => {
+    const v = typeof val === "string" ? val.trim() : val;
+    if (v !== undefined && v !== null && v !== "") {
+      root.style.setProperty(name, String(v));
+    } else if (fallback !== undefined) {
+      root.style.setProperty(name, String(fallback));
+    }
+  };
+
+  const mergeConfig = (config) => {
+    return {
+      ...config,
+      ...OVERRIDES,
+      appearance: {
+        ...(config?.appearance || {}),
+        ...(OVERRIDES?.appearance || {}),
+      },
+    };
+  };
+
+  const fetchConfig = async (key) => {
+    const configUrl = new URL("/api/widget/config", API_BASE);
+    configUrl.searchParams.set("key", key);
+    configUrl.searchParams.set("t", String(Date.now()));
+    const res = await fetch(configUrl.toString(), { cache: "no-store" });
+    if (!res.ok) throw new Error("Config fetch failed");
+    return res.json();
+  };
+
+  const applyTheme = (root, cfg) => {
+    if (!root || !cfg) return;
+    const appearance = cfg.appearance || {};
+    const accentVars = buildAccentVars(cfg.accent || appearance.accent);
+
+    setVar(root, "--ai-accent", accentVars.accent, "#34d399");
+    setVar(root, "--ai-accent-contrast", accentVars.accentContrast, "#0b1220");
+    setVar(
+      root,
+      "--ai-accent-shadow",
+      accentVars.accentShadow,
+      "rgba(52,211,153,.25)"
+    );
+    setVar(
+      root,
+      "--ai-accent-light",
+      accentVars.accentLight,
+      "rgba(52,211,153,.18)"
+    );
+    setVar(
+      root,
+      "--ai-accent-gradient",
+      accentVars.accentGradient,
+      "linear-gradient(135deg,#34d399,#8b5cf6)"
+    );
+    setVar(root, "--ai-close-bg", accentVars.closeBg);
+    setVar(root, "--ai-close-text", accentVars.closeColor);
+
+    setVar(root, "--ai-header-bg", appearance.colorHeaderBg);
+    setVar(root, "--ai-header-text", appearance.colorHeaderText);
+    setVar(root, "--ai-chat-bg", appearance.colorChatBg);
+    setVar(root, "--ai-user-bg", appearance.colorUserBubbleBg);
+    setVar(root, "--ai-user-text", appearance.colorUserBubbleText);
+    setVar(root, "--ai-bot-bg", appearance.colorBotBubbleBg);
+    setVar(root, "--ai-bot-text", appearance.colorBotBubbleText);
+    setVar(root, "--ai-toggle-bg", appearance.colorToggleBg);
+    setVar(root, "--ai-toggle-text", appearance.colorToggleText);
+  };
+
+  const applyPosition = (root, position) => {
+    root.classList.remove("ai-pos-left", "ai-pos-right");
+    root.classList.add(position === "left" ? "ai-pos-left" : "ai-pos-right");
+  };
+
   const renderProductListHtml = (pl) => {
     const title = pl && pl.title ? \`<div class="ai-pl-title">\${escapeHtml(pl.title)}</div>\` : "";
     const items = Array.isArray(pl?.items) ? pl.items : [];
@@ -95,11 +237,7 @@ export function renderWidgetScript(
       // 1. Fetch Config
       let config = null;
       try {
-        const configUrl = new URL("/api/widget/config", API_BASE);
-        configUrl.searchParams.set("key", CONFIG_KEY);
-        const res = await fetch(configUrl.toString());
-        if (!res.ok) throw new Error("Failed to load widget config");
-        config = await res.json();
+        config = await fetchConfig(CONFIG_KEY);
       } catch (err) {
         console.warn("AI Widget: Could not load config, using defaults or overrides.", err);
         // We could implement hardcoded defaults here if fetch fails, 
@@ -112,16 +250,10 @@ export function renderWidgetScript(
 
       // 2. Merge Overrides (Preview mode takes precedence)
       // We do a shallow merge of the top level, and deep merge of appearance
-      const fullConfig = {
-        ...config,
-        ...OVERRIDES,
-        appearance: {
-          ...(config?.appearance || {}),
-          ...(OVERRIDES?.appearance || {})
-        }
-      };
+      let fullConfig = mergeConfig(config || {});
 
-      const { appearance, greeting, brandName, brandInitial, collapsedLabel, humanSupportText } = fullConfig;
+      const { brandName, brandInitial, collapsedLabel, humanSupportText } =
+        fullConfig;
 
       // 3. Inject CSS
       // We rely on STATIC_STYLES which uses variables.
@@ -148,41 +280,8 @@ export function renderWidgetScript(
       // 4. Create Root Elements
       const anchor = document.createElement("div");
       anchor.id = "ai-saas-anchor";
-      // Position class
-      anchor.classList.add(fullConfig.position === "left" ? "ai-pos-left" : "ai-pos-right");
-      
-      // 5. Apply Variables
-      const setVar = (name, val, fallback) => {
-  const v = typeof val === "string" ? val.trim() : val;
-  if (v !== undefined && v !== null && v !== "") {
-    anchor.style.setProperty(name, String(v));
-  } else if (fallback !== undefined) {
-    anchor.style.setProperty(name, String(fallback));
-  }
-};
-
-
-      setVar("--ai-accent", appearance.accent);
-      setVar("--ai-accent-contrast", appearance.accentContrast);
-      setVar("--ai-accent-shadow", appearance.accentShadow);
-      setVar("--ai-accent-light", appearance.accentLight);
-      setVar("--ai-accent-gradient", appearance.accentGradient);
-      setVar("--ai-header-bg", appearance.colorHeaderBg);
-      setVar("--ai-header-text", appearance.colorHeaderText);
-      setVar("--ai-chat-bg", appearance.colorChatBg);
-      setVar("--ai-user-bg", appearance.colorUserBubbleBg);
-      setVar("--ai-user-text", appearance.colorUserBubbleText);
-      setVar("--ai-bot-bg", appearance.colorBotBubbleBg);
-      setVar("--ai-bot-text", appearance.colorBotBubbleText);
-      setVar("--ai-toggle-bg", appearance.colorToggleBg);
-      setVar("--ai-toggle-text", appearance.colorToggleText);
-      setVar("--ai-close-bg", appearance.closeBg);
-      setVar("--ai-close-text", appearance.closeColor);
-      setVar("--ai-accent", appearance.accent, "#34d399");
-      setVar("--ai-accent-contrast", appearance.accentContrast, "#0b1220");
-      setVar("--ai-accent-shadow", appearance.accentShadow, "rgba(52,211,153,.25)");
-      setVar("--ai-accent-light", appearance.accentLight, "rgba(52,211,153,.18)");
-      setVar("--ai-accent-gradient", appearance.accentGradient, "linear-gradient(135deg,#34d399,#8b5cf6)");
+      applyPosition(anchor, fullConfig.position);
+      applyTheme(anchor, fullConfig);
 
       
       const renderBrandIcon = () => {
@@ -235,6 +334,16 @@ export function renderWidgetScript(
 
       document.body.appendChild(anchor);
 
+      const refreshTheme = async () => {
+        try {
+          const freshConfig = await fetchConfig(CONFIG_KEY);
+          fullConfig = mergeConfig(freshConfig || {});
+          applyTheme(anchor, fullConfig);
+        } catch (err) {
+          console.warn("Widget theme refresh failed");
+        }
+      };
+
       // 7. Event Listeners
       const toggleBtn = document.getElementById("ai-saas-toggle");
       const closeBtn = document.getElementById("ai-saas-close");
@@ -247,6 +356,7 @@ export function renderWidgetScript(
       const setOpen = (state) => {
         isOpen = state;
         if (state) {
+          refreshTheme();
           anchor.classList.add("open");
           widget.setAttribute("aria-hidden", "false");
           input.focus();

@@ -21,10 +21,7 @@ const appearanceDefaults = {
   colorToggleText: "#ffffff",
 } as const;
 
-function getParam(
-  params: URLSearchParams,
-  ...names: string[]
-): string | null {
+function getParam(params: URLSearchParams, ...names: string[]): string | null {
   for (const name of names) {
     const value = params.get(name);
     if (value !== null) return value;
@@ -49,7 +46,9 @@ function normalizeHex(value: string | null, fallback: string) {
 }
 
 function sanitizeText(value: string | null, fallback: string, max: number) {
-  const cleaned = String(value ?? "").replace(/[<>]/g, "").trim();
+  const cleaned = String(value ?? "")
+    .replace(/[<>]/g, "")
+    .trim();
   if (!cleaned) return fallback;
   return cleaned.slice(0, max);
 }
@@ -266,9 +265,12 @@ export async function GET(req: Request) {
   return NextResponse.json(config, {
     headers: {
       "Access-Control-Allow-Origin": "*",
-      "Cache-Control": isPreview
-        ? "no-store, max-age=0"
-        : "public, max-age=60, stale-while-revalidate=300",
+      // ✅ Evita cache en navegador + CDN (Vercel)
+      "Cache-Control":
+        "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+      "CDN-Cache-Control": "no-store",
+      Pragma: "no-cache",
+      Expires: "0",
     },
   });
 }
