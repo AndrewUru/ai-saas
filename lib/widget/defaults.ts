@@ -1,3 +1,4 @@
+//C:\ai-saas\lib\widget\defaults.ts
 export type WidgetPosition = "left" | "right";
 
 export const widgetDefaults = {

@@ -100,41 +100,78 @@ export async function GET(req: Request) {
   }
   const chatEndpoint = chatUrl.toString();
 
+  const baseAccent = normalizeHex(agent.widget_accent, widgetDefaults.accent);
+  const baseBrandName = sanitizeText(
+    agent.widget_brand,
+    widgetDefaults.brand,
+    widgetLimits.brand
+  );
+  const baseLabel = sanitizeText(
+    agent.widget_label,
+    widgetDefaults.label,
+    widgetLimits.label
+  );
+  const baseGreeting = sanitizeText(
+    agent.widget_greeting,
+    widgetDefaults.greeting,
+    widgetLimits.greeting
+  );
+  const baseHumanSupportText = sanitizeText(
+    agent.widget_human_support_text,
+    widgetDefaults.humanSupportText,
+    widgetLimits.humanSupportText
+  );
+  const basePosition = sanitizePosition(agent.widget_position);
+  const baseAppearance = {
+    colorHeaderBg: normalizeHex(
+      agent.widget_color_header_bg,
+      appearanceDefaults.colorHeaderBg
+    ),
+    colorHeaderText: normalizeHex(
+      agent.widget_color_header_text,
+      appearanceDefaults.colorHeaderText
+    ),
+    colorChatBg: normalizeHex(
+      agent.widget_color_chat_bg,
+      appearanceDefaults.colorChatBg
+    ),
+    colorUserBubbleBg: normalizeHex(
+      agent.widget_color_user_bubble_bg,
+      appearanceDefaults.colorUserBubbleBg
+    ),
+    colorUserBubbleText: normalizeHex(
+      agent.widget_color_user_bubble_text,
+      appearanceDefaults.colorUserBubbleText
+    ),
+    colorBotBubbleBg: normalizeHex(
+      agent.widget_color_bot_bubble_bg,
+      appearanceDefaults.colorBotBubbleBg
+    ),
+    colorBotBubbleText: normalizeHex(
+      agent.widget_color_bot_bubble_text,
+      appearanceDefaults.colorBotBubbleText
+    ),
+    colorToggleBg: normalizeHex(
+      agent.widget_color_toggle_bg,
+      appearanceDefaults.colorToggleBg
+    ),
+    colorToggleText: normalizeHex(
+      agent.widget_color_toggle_text,
+      appearanceDefaults.colorToggleText
+    ),
+  };
+
   const config: WidgetConfig = {
     key: agent.api_key,
-    chatEndpoint: chatEndpoint,
-    accent: agent.widget_accent || widgetDefaults.accent,
-    brandName: agent.widget_brand || widgetDefaults.brand,
-    brandInitial: (agent.widget_brand || widgetDefaults.brand)
-      .charAt(0)
-      .toUpperCase(),
-    collapsedLabel: agent.widget_label || widgetDefaults.label,
-    greeting: agent.widget_greeting || widgetDefaults.greeting,
-    humanSupportText:
-      agent.widget_human_support_text || widgetDefaults.humanSupportText,
-    position: agent.widget_position || widgetDefaults.position,
-    appearance: {
-      colorHeaderBg:
-        agent.widget_color_header_bg || appearanceDefaults.colorHeaderBg,
-      colorHeaderText:
-        agent.widget_color_header_text || appearanceDefaults.colorHeaderText,
-      colorChatBg: agent.widget_color_chat_bg || appearanceDefaults.colorChatBg,
-      colorUserBubbleBg:
-        agent.widget_color_user_bubble_bg ||
-        appearanceDefaults.colorUserBubbleBg,
-      colorUserBubbleText:
-        agent.widget_color_user_bubble_text ||
-        appearanceDefaults.colorUserBubbleText,
-      colorBotBubbleBg:
-        agent.widget_color_bot_bubble_bg || appearanceDefaults.colorBotBubbleBg,
-      colorBotBubbleText:
-        agent.widget_color_bot_bubble_text ||
-        appearanceDefaults.colorBotBubbleText,
-      colorToggleBg:
-        agent.widget_color_toggle_bg || appearanceDefaults.colorToggleBg,
-      colorToggleText:
-        agent.widget_color_toggle_text || appearanceDefaults.colorToggleText,
-    },
+    chatEndpoint,
+    accent: baseAccent,
+    brandName: baseBrandName,
+    brandInitial: (baseBrandName.charAt(0).toUpperCase() || "A").slice(0, 1),
+    collapsedLabel: baseLabel,
+    greeting: baseGreeting,
+    humanSupportText: baseHumanSupportText,
+    position: basePosition,
+    appearance: baseAppearance,
   };
 
   if (isPreview) {
@@ -142,14 +179,14 @@ export async function GET(req: Request) {
 
     const accentParam = getParam(params, "accent");
     if (accentParam !== null) {
-      config.accent = normalizeHex(accentParam, widgetDefaults.accent);
+      config.accent = normalizeHex(accentParam, config.accent);
     }
 
     const brandParam = getParam(params, "brandName", "brand");
     if (brandParam !== null) {
       const brandName = sanitizeText(
         brandParam,
-        widgetDefaults.brand,
+        config.brandName,
         widgetLimits.brand
       );
       config.brandName = brandName;
@@ -163,7 +200,7 @@ export async function GET(req: Request) {
     if (labelParam !== null) {
       config.collapsedLabel = sanitizeText(
         labelParam,
-        widgetDefaults.label,
+        config.collapsedLabel,
         widgetLimits.label
       );
     }
@@ -172,7 +209,7 @@ export async function GET(req: Request) {
     if (greetingParam !== null) {
       config.greeting = sanitizeText(
         greetingParam,
-        widgetDefaults.greeting,
+        config.greeting,
         widgetLimits.greeting
       );
     }
@@ -181,14 +218,17 @@ export async function GET(req: Request) {
     if (humanSupportParam !== null) {
       config.humanSupportText = sanitizeText(
         humanSupportParam,
-        widgetDefaults.humanSupportText,
+        config.humanSupportText ?? widgetDefaults.humanSupportText,
         widgetLimits.humanSupportText
       );
     }
 
     const positionParam = getParam(params, "position");
     if (positionParam !== null) {
-      config.position = sanitizePosition(positionParam);
+      config.position =
+        positionParam === "left" || positionParam === "right"
+          ? positionParam
+          : config.position;
     }
 
     const appearanceOverrides: Partial<WidgetConfig["appearance"]> = {};
@@ -196,63 +236,63 @@ export async function GET(req: Request) {
     if (colorHeaderBg !== null) {
       appearanceOverrides.colorHeaderBg = normalizeHex(
         colorHeaderBg,
-        appearanceDefaults.colorHeaderBg
+        config.appearance.colorHeaderBg
       );
     }
     const colorHeaderText = getParam(params, "colorHeaderText");
     if (colorHeaderText !== null) {
       appearanceOverrides.colorHeaderText = normalizeHex(
         colorHeaderText,
-        appearanceDefaults.colorHeaderText
+        config.appearance.colorHeaderText
       );
     }
     const colorChatBg = getParam(params, "colorChatBg");
     if (colorChatBg !== null) {
       appearanceOverrides.colorChatBg = normalizeHex(
         colorChatBg,
-        appearanceDefaults.colorChatBg
+        config.appearance.colorChatBg
       );
     }
     const colorUserBubbleBg = getParam(params, "colorUserBubbleBg");
     if (colorUserBubbleBg !== null) {
       appearanceOverrides.colorUserBubbleBg = normalizeHex(
         colorUserBubbleBg,
-        appearanceDefaults.colorUserBubbleBg
+        config.appearance.colorUserBubbleBg
       );
     }
     const colorUserBubbleText = getParam(params, "colorUserBubbleText");
     if (colorUserBubbleText !== null) {
       appearanceOverrides.colorUserBubbleText = normalizeHex(
         colorUserBubbleText,
-        appearanceDefaults.colorUserBubbleText
+        config.appearance.colorUserBubbleText
       );
     }
     const colorBotBubbleBg = getParam(params, "colorBotBubbleBg");
     if (colorBotBubbleBg !== null) {
       appearanceOverrides.colorBotBubbleBg = normalizeHex(
         colorBotBubbleBg,
-        appearanceDefaults.colorBotBubbleBg
+        config.appearance.colorBotBubbleBg
       );
     }
     const colorBotBubbleText = getParam(params, "colorBotBubbleText");
     if (colorBotBubbleText !== null) {
       appearanceOverrides.colorBotBubbleText = normalizeHex(
         colorBotBubbleText,
-        appearanceDefaults.colorBotBubbleText
+        config.appearance.colorBotBubbleText
       );
     }
     const colorToggleBg = getParam(params, "colorToggleBg");
     if (colorToggleBg !== null) {
       appearanceOverrides.colorToggleBg = normalizeHex(
         colorToggleBg,
-        appearanceDefaults.colorToggleBg
+        config.appearance.colorToggleBg
       );
     }
     const colorToggleText = getParam(params, "colorToggleText");
     if (colorToggleText !== null) {
       appearanceOverrides.colorToggleText = normalizeHex(
         colorToggleText,
-        appearanceDefaults.colorToggleText
+        config.appearance.colorToggleText
       );
     }
 

@@ -145,36 +145,36 @@ export default function WidgetDesigner({
   const [labelInput, setLabelInput] = useState(initialLabel ?? "");
   const [greetingInput, setGreetingInput] = useState(initialGreeting ?? "");
   const [humanSupportTextInput, setHumanSupportTextInput] = useState(
-    initialHumanSupportText ?? ""
+    initialHumanSupportText ?? "",
   );
   const [position, setPosition] = useState<WidgetPosition>(
-    initialPosition ?? widgetDefaults.position
+    initialPosition ?? widgetDefaults.position,
   );
 
   const [colorHeaderBg, setColorHeaderBg] = useState(
-    initialColorHeaderBg ?? ""
+    initialColorHeaderBg ?? "",
   );
   const [colorHeaderText, setColorHeaderText] = useState(
-    initialColorHeaderText ?? ""
+    initialColorHeaderText ?? "",
   );
   const [colorChatBg, setColorChatBg] = useState(initialColorChatBg ?? "");
   const [colorUserBubbleBg, setColorUserBubbleBg] = useState(
-    initialColorUserBubbleBg ?? ""
+    initialColorUserBubbleBg ?? "",
   );
   const [colorUserBubbleText, setColorUserBubbleText] = useState(
-    initialColorUserBubbleText ?? ""
+    initialColorUserBubbleText ?? "",
   );
   const [colorBotBubbleBg, setColorBotBubbleBg] = useState(
-    initialColorBotBubbleBg ?? ""
+    initialColorBotBubbleBg ?? "",
   );
   const [colorBotBubbleText, setColorBotBubbleText] = useState(
-    initialColorBotBubbleText ?? ""
+    initialColorBotBubbleText ?? "",
   );
   const [colorToggleBg, setColorToggleBg] = useState(
-    initialColorToggleBg ?? ""
+    initialColorToggleBg ?? "",
   );
   const [colorToggleText, setColorToggleText] = useState(
-    initialColorToggleText ?? ""
+    initialColorToggleText ?? "",
   );
 
   const embedSnippet = getEmbedSnippet(apiKey);
@@ -223,7 +223,7 @@ export default function WidgetDesigner({
       colorBotBubbleText,
       colorToggleBg,
       colorToggleText,
-    ]
+    ],
   );
 
   const liveState = useDebouncedValue(liveStateInput, 300);
@@ -235,22 +235,22 @@ export default function WidgetDesigner({
     params.set("accent", toParamHex(liveState.accentInput) ?? "");
     params.set(
       "brandName",
-      trimmedOrNull(liveState.brandInput, widgetLimits.brand) ?? ""
+      trimmedOrNull(liveState.brandInput, widgetLimits.brand) ?? "",
     );
     params.set(
       "collapsedLabel",
-      trimmedOrNull(liveState.labelInput, widgetLimits.label) ?? ""
+      trimmedOrNull(liveState.labelInput, widgetLimits.label) ?? "",
     );
     params.set(
       "greeting",
-      trimmedOrNull(liveState.greetingInput, widgetLimits.greeting) ?? ""
+      trimmedOrNull(liveState.greetingInput, widgetLimits.greeting) ?? "",
     );
     params.set(
       "humanSupportText",
       trimmedOrNull(
         liveState.humanSupportTextInput,
-        widgetLimits.humanSupportText
-      ) ?? ""
+        widgetLimits.humanSupportText,
+      ) ?? "",
     );
     params.set("position", liveState.position);
 
@@ -259,24 +259,24 @@ export default function WidgetDesigner({
     params.set("colorChatBg", toParamHex(liveState.colorChatBg) ?? "");
     params.set(
       "colorUserBubbleBg",
-      toParamHex(liveState.colorUserBubbleBg) ?? ""
+      toParamHex(liveState.colorUserBubbleBg) ?? "",
     );
     params.set(
       "colorUserBubbleText",
-      toParamHex(liveState.colorUserBubbleText) ?? ""
+      toParamHex(liveState.colorUserBubbleText) ?? "",
     );
     params.set(
       "colorBotBubbleBg",
-      toParamHex(liveState.colorBotBubbleBg) ?? ""
+      toParamHex(liveState.colorBotBubbleBg) ?? "",
     );
     params.set(
       "colorBotBubbleText",
-      toParamHex(liveState.colorBotBubbleText) ?? ""
+      toParamHex(liveState.colorBotBubbleText) ?? "",
     );
     params.set("colorToggleBg", toParamHex(liveState.colorToggleBg) ?? "");
     params.set("colorToggleText", toParamHex(liveState.colorToggleText) ?? "");
 
-    return `${liveState.siteUrl}/widget/preview?${params.toString()}`;
+    return `/widget/preview?${params.toString()}`;
   }, [liveState]);
 
   const iframeKey = useMemo(() => {

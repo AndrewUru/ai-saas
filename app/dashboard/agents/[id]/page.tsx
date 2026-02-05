@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { requireUser } from "@/lib/auth/requireUser";
-import { getSiteUrl } from "@/lib/site";
+import { getSiteUrlFromHeaders } from "@/lib/site";
 import WidgetDesigner from "./WidgetDesigner";
 import EmbedSnippet from "./EmbedSnippet";
 import SubmitButton from "@/components/SubmitButton";
@@ -67,7 +68,7 @@ async function updateAgentAndWidget(formData: FormData) {
 
   const wooIntegrationRaw = String(formData.get("woo_integration_id") ?? "");
   const shopifyIntegrationRaw = String(
-    formData.get("shopify_integration_id") ?? ""
+    formData.get("shopify_integration_id") ?? "",
   );
   const domainsRaw = String(formData.get("allowed_domains") ?? "");
   const promptSystemRaw = String(formData.get("prompt_system") ?? "");
@@ -80,29 +81,29 @@ async function updateAgentAndWidget(formData: FormData) {
   const greetingRaw = String(formData.get("widget_greeting") ?? "");
   const positionRaw = String(formData.get("widget_position") ?? "");
   const humanSupportRaw = String(
-    formData.get("widget_human_support_text") ?? ""
+    formData.get("widget_human_support_text") ?? "",
   );
 
   const colorHeaderBgRaw = String(formData.get("widget_color_header_bg") ?? "");
   const colorHeaderTextRaw = String(
-    formData.get("widget_color_header_text") ?? ""
+    formData.get("widget_color_header_text") ?? "",
   );
   const colorChatBgRaw = String(formData.get("widget_color_chat_bg") ?? "");
   const colorUserBubbleBgRaw = String(
-    formData.get("widget_color_user_bubble_bg") ?? ""
+    formData.get("widget_color_user_bubble_bg") ?? "",
   );
   const colorUserBubbleTextRaw = String(
-    formData.get("widget_color_user_bubble_text") ?? ""
+    formData.get("widget_color_user_bubble_text") ?? "",
   );
   const colorBotBubbleBgRaw = String(
-    formData.get("widget_color_bot_bubble_bg") ?? ""
+    formData.get("widget_color_bot_bubble_bg") ?? "",
   );
   const colorBotBubbleTextRaw = String(
-    formData.get("widget_color_bot_bubble_text") ?? ""
+    formData.get("widget_color_bot_bubble_text") ?? "",
   );
   const colorToggleBgRaw = String(formData.get("widget_color_toggle_bg") ?? "");
   const colorToggleTextRaw = String(
-    formData.get("widget_color_toggle_text") ?? ""
+    formData.get("widget_color_toggle_text") ?? "",
   );
 
   const allowedDomains = normalizeDomainList(domainsRaw);
@@ -125,7 +126,7 @@ async function updateAgentAndWidget(formData: FormData) {
         fallbackUrlRaw,
         fallbackUrlRaw.startsWith("http")
           ? undefined
-          : "https://placeholder.local"
+          : "https://placeholder.local",
       );
       fallbackUrl =
         url.origin === "https://placeholder.local"
@@ -181,7 +182,7 @@ async function updateAgentAndWidget(formData: FormData) {
       widget_greeting: normalizeWidgetText(greetingRaw, widgetLimits.greeting),
       widget_human_support_text: normalizeWidgetText(
         humanSupportRaw,
-        widgetLimits.humanSupportText
+        widgetLimits.humanSupportText,
       ),
       widget_position: positionRaw.trim()
         ? sanitizePosition(positionRaw)
@@ -242,7 +243,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, shopify_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text"
+      "id, user_id, name, api_key, woo_integration_id, shopify_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -253,7 +254,7 @@ export default async function AgentDetailPage({
   const { data: wooIntegrations } = await supabase
     .from("integrations_woocommerce")
     .select(
-      "id, label, store_url, is_active, created_at, last_sync_status, products_indexed_count"
+      "id, label, store_url, is_active, created_at, last_sync_status, products_indexed_count",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
@@ -261,7 +262,7 @@ export default async function AgentDetailPage({
   const { data: shopifyIntegrations } = await supabase
     .from("integrations_shopify")
     .select(
-      "id, label, shop_domain, is_active, created_at, last_sync_status, products_indexed_count"
+      "id, label, shop_domain, is_active, created_at, last_sync_status, products_indexed_count",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
@@ -287,7 +288,8 @@ export default async function AgentDetailPage({
     agent.widget_position === "left" || agent.widget_position === "right"
       ? agent.widget_position
       : null;
-  const siteUrl = getSiteUrl();
+  const headersList = await headers();
+  const siteUrl = getSiteUrlFromHeaders(headersList);
 
   const createdAt = agent.created_at
     ? new Intl.DateTimeFormat("en-US", {
