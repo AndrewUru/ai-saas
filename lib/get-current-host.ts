@@ -1,7 +1,7 @@
 // C:\ai-saas\lib\get-current-host.ts
-import type { ReadonlyHeaders } from "next/headers";
+export type HeaderGetter = { get(name: string): string | null };
 
-export function getCurrentHost(headersList: ReadonlyHeaders) {
+export function getCurrentHost(headersList: HeaderGetter) {
   return (
     headersList.get("x-forwarded-host") ??
     headersList.get("host") ??
