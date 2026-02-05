@@ -1,4 +1,4 @@
-import { getSiteHost, getSiteUrl } from "@/lib/site";
+import { getSiteHostFromHeaders } from "@/lib/site";
 import type { AgentRecord } from "./types";
 
 type StatusError = Error & { status: number };
@@ -18,8 +18,8 @@ function makeStatusError(message: string, status: number): StatusError {
   return err;
 }
 
-function resolveSiteHost(): string | null {
-  const host = getSiteHost(getSiteUrl());
+function resolveSiteHost(req: Request): string | null {
+  const host = getSiteHostFromHeaders(req.headers);
   return host || null;
 }
 
@@ -27,7 +27,7 @@ export function resolveHost(req: Request, isPreview: boolean) {
   const origin = req.headers.get("origin");
   const referer = req.headers.get("referer");
   const fetchSite = req.headers.get("sec-fetch-site");
-  const siteHost = resolveSiteHost();
+  const siteHost = resolveSiteHost(req);
 
   const isSameSite =
     fetchSite === null ||
