@@ -13,20 +13,20 @@ const plans = [
     headline: "Start building agents",
     price: "0",
     period: "forever",
-    description: "Perfect to test the dashboard and launch your first agent.",
-    features: ["1 agent", "Standard support", "Basic customization"],
+    description: "Perfect to test the dashboard and launch up to five agents.",
+    features: ["Up to 5 agents", "Standard support", "Basic customization"],
     highlight: false,
     badge: "Free forever",
   },
   {
     id: "pro",
     name: "Pro",
-    headline: "Create more chat-bots",
+    headline: "Scale with confidence",
     price: "22",
     period: "one-time",
     description:
-      "Unlock multiple agents. All plans can use AI — PRO increases how many agents you can create.",
-    features: ["Up to 5 agents", "Removed branding", "Priority support"],
+      "Remove branding, get priority support, and unlock higher limits.",
+    features: ["Removed branding", "Priority support", "Higher limits & early access"],
     highlight: true,
     badge: "Best value",
   },
@@ -218,3 +218,4 @@ export default function PricingCards({ clientId }: { clientId: string }) {
     </PayPalScriptProvider>
   );
 }
+

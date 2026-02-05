@@ -1,0 +1,37 @@
+---
+title: "Launching Your First Widget"
+description: "A practical checklist to go from agent setup to a live widget on a client site."
+date: "2025-11-18"
+tags: ["widget", "launch", "checklist"]
+level: "beginner"
+draft: false
+---
+
+# Launching Your First Widget
+
+Use this checklist when you want to ship quickly without missing the basics.
+
+## What you need
+
+- A live agent API key
+- The domain(s) where the widget will be embedded
+- A short greeting and brand label
+
+## Checklist
+
+1. Add your domain to **Allowed domains**.
+2. Copy the install snippet and place it before `</body>`.
+3. Test the preview with a greeting and brand name.
+4. Switch the agent to **Active** and validate the widget loads.
+
+## Example snippet
+
+```html
+<script async src="https://yourdomain.com/api/widget?key=agt_xxx"></script>
+```
+
+## Common pitfalls
+
+- Missing domain allowance.
+- Blocking CSP rules that prevent the script from loading.
+- Invalid API key (copy it from the agent detail page).

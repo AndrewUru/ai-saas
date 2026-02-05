@@ -19,9 +19,9 @@ const PLAN_CARDS: PlanCard[] = [
     price: "$0",
     cycle: "per month",
     limit: "Up to 1,000 messages/month",
-    blurb: "Perfect to test the dashboard and launch your first agent.",
+    blurb: "Perfect to test the dashboard and launch up to five agents.",
     features: [
-      "1 active agent with embeddable widget",
+      "Up to 5 active agents with embeddable widget",
       "Allowed domains validation",
       "Customizable prompts and branding",
       "Email support with basic SLA",

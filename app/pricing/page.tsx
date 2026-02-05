@@ -16,12 +16,12 @@ export default function PricingPage() {
           </p>
 
           <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
-            Free AI for everyone. Upgrade to create more chat-bots.
+            Free AI for everyone. Upgrade for higher limits and priority support.
           </h1>
 
           <p className="mx-auto max-w-2xl text-sm text-slate-300 sm:text-base">
-            All users can chat with AI. The difference is how many agents you
-            can create and manage. Start free and upgrade anytime.
+            All users can chat with AI. The difference is branding removal,
+            support, and higher limits. Start free and upgrade anytime.
           </p>
         </div>
 
@@ -41,10 +41,10 @@ export default function PricingPage() {
           <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-300">
             <p className="text-sm font-semibold text-white">Free plan</p>
             <p className="mt-2 text-xs text-slate-400">
-              Ideal to test the widget and run a single agent.
+              Ideal to test the widget and run up to five agents.
             </p>
             <p className="mt-3 text-xs text-slate-400">
-              • 1 agent • Basic limits • Community support
+              • Up to 5 agents • Basic limits • Community support
             </p>
           </div>
 
@@ -54,7 +54,7 @@ export default function PricingPage() {
               For creators & agencies managing multiple stores/clients.
             </p>
             <p className="mt-3 text-xs text-emerald-100/80">
-              • Multiple agents • Higher limits • Priority support
+              • Removed branding • Priority support • Higher limits
             </p>
           </div>
         </div>

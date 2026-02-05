@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/requireUser";
+import { getAgentLimit } from "@/lib/plans";
 
 const defaultMessagesLimit = 1000;
 
@@ -35,13 +36,7 @@ export default async function AgentsPage(props: {
     const currentPlan = (profile?.plan ?? "free").toLowerCase();
 
     // 2. Define limits
-    const PLAN_LIMITS_AGENTS: Record<string, number> = {
-      free: 1,
-      basic: 5,
-      pro: Infinity,
-    };
-
-    const maxAgents = PLAN_LIMITS_AGENTS[currentPlan] ?? 1;
+    const maxAgents = getAgentLimit(currentPlan);
 
     // 3. Count existing agents
     const { count: currentCount } = await supabase

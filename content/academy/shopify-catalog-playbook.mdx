@@ -1,0 +1,31 @@
+---
+title: "Shopify Catalog Playbook"
+description: "Connect a Shopify integration and optimize product replies with price, stock, and images."
+date: "2025-12-05"
+tags: ["shopify", "catalog", "commerce"]
+level: "intermediate"
+draft: false
+---
+
+# Shopify Catalog Playbook
+
+Use Shopify data to enrich responses with products, prices, and inventory.
+
+## Preparation
+
+- Confirm the store owner accepted the OAuth connection.
+- Ensure the integration is **Active**.
+- Run an initial sync to build the product index.
+
+## Recommended prompts
+
+```text
+When a user asks about products, answer briefly and suggest 3 relevant items.
+Include price, currency, and stock status when available.
+```
+
+## Validation steps
+
+1. Ask the widget for "best sellers".
+2. Confirm product cards render in the widget.
+3. Verify the currency matches the store settings.
