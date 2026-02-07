@@ -28,7 +28,7 @@ function renderPreviewHtml(scriptSrc: string) {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #0b0f19;
+        background: #e9e9e9;
         overflow: hidden;
       }
       #preview-viewport {
@@ -36,7 +36,7 @@ function renderPreviewHtml(scriptSrc: string) {
         height: 100%;
         position: relative;
         overflow: hidden;
-        background: #0b0f19;
+        background: #dfdfdf;
       }
     </style>
   </head>
