@@ -88,7 +88,7 @@ export default function DashboardShell({
                     "flex items-center justify-between rounded-xl px-3 py-2 text-sm transition",
                     active(item.href)
                       ? "bg-accent/10 border border-accent/20 text-foreground"
-                      : "hover:bg-surface-strong/50 text-[var(--foreground-muted)]"
+                      : "hover:bg-surface-strong/50 text-[var(--foreground-muted)]",
                   )}
                 >
                   <span className="font-medium">{item.label}</span>
@@ -131,6 +131,7 @@ export default function DashboardShell({
             className="absolute inset-0 bg-black/50"
             onClick={() => setOpen(false)}
           />
+
           <div className="absolute left-0 top-0 h-full w-[82%] max-w-[320px] border-r border-border bg-background p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -158,7 +159,7 @@ export default function DashboardShell({
                     "flex items-center justify-between rounded-xl px-3 py-2 text-sm transition",
                     active(item.href)
                       ? "bg-accent/10 border border-accent/20 text-foreground"
-                      : "hover:bg-surface-strong/50 text-[var(--foreground-muted)]"
+                      : "hover:bg-surface-strong/50 text-[var(--foreground-muted)]",
                   )}
                 >
                   <span className="font-medium">{item.label}</span>

@@ -46,6 +46,7 @@ function Spinner({ className }: { className?: string }) {
         .filter(Boolean)
         .join(" ")}
       aria-hidden="true"
+      data-oid="w3yqbme"
     />
   );
 }
@@ -69,10 +70,11 @@ function PendingButton({
       className={className}
       disabled={disabled || pending}
       aria-disabled={disabled || pending}
+      data-oid="70vn1v-"
     >
-      <span className="inline-flex items-center gap-2">
-        {pending && <Spinner />}
-        {pending ? pendingLabel ?? label : label}
+      <span className="inline-flex items-center gap-2" data-oid="fra2xod">
+        {pending && <Spinner data-oid="gvkthcv" />}
+        {pending ? (pendingLabel ?? label) : label}
       </span>
     </button>
   );
@@ -118,7 +120,9 @@ export default function SyncControls({
       : "border-rose-500/40 bg-rose-500/10 text-rose-100";
 
   const syncLabel =
-    integration.last_sync_status === "failed" ? "Retry sync" : "Sync products now";
+    integration.last_sync_status === "failed"
+      ? "Retry sync"
+      : "Sync products now";
 
   useEffect(() => {
     if (!isSyncing) return;
@@ -160,39 +164,68 @@ export default function SyncControls({
         className="grid gap-3 rounded-xl border border-slate-800/60 bg-slate-900/40 p-4 text-xs text-slate-300"
         aria-busy={isSyncing}
         aria-live="polite"
+        data-oid="0phrvrs"
       >
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-xs uppercase tracking-[0.22em] text-slate-400">
+        <div
+          className="flex flex-wrap items-center justify-between gap-2"
+          data-oid="sy7y78w"
+        >
+          <span
+            className="text-xs uppercase tracking-[0.22em] text-slate-400"
+            data-oid="a:6u8ex"
+          >
             Sync status
           </span>
-          <span className="text-xs font-semibold text-white">
+          <span className="text-xs font-semibold text-white" data-oid="e_o8s29">
             {syncStatusLabel}
           </span>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-xs uppercase tracking-[0.22em] text-slate-400">
+        <div
+          className="flex flex-wrap items-center justify-between gap-2"
+          data-oid="t64yohx"
+        >
+          <span
+            className="text-xs uppercase tracking-[0.22em] text-slate-400"
+            data-oid="wie0nh:"
+          >
             Products indexed
           </span>
-          <span className="text-xs font-semibold text-white">
+          <span className="text-xs font-semibold text-white" data-oid="lu3bayh">
             {integration.products_indexed_count ?? 0}
           </span>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-xs uppercase tracking-[0.22em] text-slate-400">
+        <div
+          className="flex flex-wrap items-center justify-between gap-2"
+          data-oid="7j3ws9h"
+        >
+          <span
+            className="text-xs uppercase tracking-[0.22em] text-slate-400"
+            data-oid="7ptb0br"
+          >
             Last sync
           </span>
-          <span className="text-xs font-semibold text-white">
+          <span className="text-xs font-semibold text-white" data-oid="5rkx.xp">
             {formattedLastSync}
           </span>
         </div>
 
         {isSyncing && (
-          <div className="space-y-2" role="status" aria-live="polite">
-            <div className="flex items-center gap-2 text-emerald-200">
-              <Spinner />
-              <span className="text-xs font-semibold">Sincronizando...</span>
+          <div
+            className="space-y-2"
+            role="status"
+            aria-live="polite"
+            data-oid="hm92n8n"
+          >
+            <div
+              className="flex items-center gap-2 text-emerald-200"
+              data-oid="zwx2w89"
+            >
+              <Spinner data-oid="uwv561v" />
+              <span className="text-xs font-semibold" data-oid="7td7_yy">
+                Sincronizando...
+              </span>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-400" data-oid="__qbamp">
               Importando productos desde WooCommerce a Supabase. Esto puede
               tardar unos minutos.
             </p>
@@ -200,14 +233,18 @@ export default function SyncControls({
         )}
 
         {progressVisible && (
-          <div className="space-y-2">
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800/80">
+          <div className="space-y-2" data-oid="186:_p6">
+            <div
+              className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800/80"
+              data-oid="7zf_olh"
+            >
               <div
                 className="h-full rounded-full bg-emerald-400 transition-all duration-500"
                 style={{ width: `${progress}%` }}
+                data-oid="zlnv410"
               />
             </div>
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-slate-500" data-oid="7fbq50-">
               Progreso estimado {Math.round(progress)}%
             </p>
           </div>
@@ -220,6 +257,7 @@ export default function SyncControls({
               toastTone,
             ].join(" ")}
             role="status"
+            data-oid="iiuuq-b"
           >
             {toastText}
           </div>
@@ -229,66 +267,109 @@ export default function SyncControls({
           <p
             className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200"
             role="alert"
+            data-oid="c23kuft"
           >
             {integration.last_sync_error}
           </p>
         )}
 
         {webhookUrl && (
-          <div className="rounded-lg border border-slate-800/60 bg-slate-950/60 px-3 py-2">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+          <div
+            className="rounded-lg border border-slate-800/60 bg-slate-950/60 px-3 py-2"
+            data-oid="1a7invq"
+          >
+            <p
+              className="text-[10px] uppercase tracking-[0.2em] text-slate-500"
+              data-oid="x9uin1r"
+            >
               Webhook URL
             </p>
-            <p className="mt-1 break-all font-mono text-[11px] text-emerald-200">
+            <p
+              className="mt-1 break-all font-mono text-[11px] text-emerald-200"
+              data-oid="zn7lcjv"
+            >
               {webhookUrl}
             </p>
           </div>
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 text-xs">
-        <form action={onToggle}>
-          <input type="hidden" name="integration_id" value={integration.id} />
+      <div
+        className="flex flex-wrap items-center gap-3 text-xs"
+        data-oid="nx3xrok"
+      >
+        <form action={onToggle} data-oid="38g5jtm">
+          <input
+            type="hidden"
+            name="integration_id"
+            value={integration.id}
+            data-oid="w2rda2w"
+          />
+
           <input
             type="hidden"
             name="state"
             value={integration.is_active ? "deactivate" : "activate"}
+            data-oid="-.r2p6-"
           />
+
           <PendingButton
             label={integration.is_active ? "Pause" : "Activate"}
             disabled={globalDisabled}
             className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+            data-oid="z8pornb"
           />
         </form>
 
-        <form action={onTest}>
-          <input type="hidden" name="integration_id" value={integration.id} />
+        <form action={onTest} data-oid="pmu0_6j">
+          <input
+            type="hidden"
+            name="integration_id"
+            value={integration.id}
+            data-oid="s89ol9a"
+          />
+
           <PendingButton
             label="Test connection"
             pendingLabel="Testing..."
             disabled={globalDisabled}
             onPendingChange={setIsTesting}
             className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+            data-oid="c8ur9as"
           />
         </form>
 
-        <form action={onSync}>
-          <input type="hidden" name="integration_id" value={integration.id} />
+        <form action={onSync} data-oid=":lptmja">
+          <input
+            type="hidden"
+            name="integration_id"
+            value={integration.id}
+            data-oid="vzx:2ey"
+          />
+
           <PendingButton
             label={syncLabel}
             pendingLabel="Syncing..."
             disabled={globalDisabled}
             onPendingChange={setIsSyncing}
             className="inline-flex items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 font-semibold text-emerald-200 transition hover:border-emerald-400/70 hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+            data-oid="mgzs5in"
           />
         </form>
 
-        <form action={onDelete}>
-          <input type="hidden" name="integration_id" value={integration.id} />
+        <form action={onDelete} data-oid="iw.ov.i">
+          <input
+            type="hidden"
+            name="integration_id"
+            value={integration.id}
+            data-oid="p:obtnn"
+          />
+
           <PendingButton
             label="Delete"
             disabled={globalDisabled}
             className="inline-flex items-center justify-center rounded-full border border-rose-500/40 px-4 py-2 font-semibold text-rose-200 transition hover:border-rose-400 hover:text-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
+            data-oid="g78wbo6"
           />
         </form>
       </div>

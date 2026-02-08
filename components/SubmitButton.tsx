@@ -23,16 +23,18 @@ export default function SubmitButton({ label, className }: SubmitButtonProps) {
       className={cx(
         "ui-button ui-button--primary w-full sm:w-auto",
         "disabled:cursor-not-allowed disabled:opacity-60",
-        className
+        className,
       )}
+      data-oid="fj3-1bw"
     >
       {pending && (
         <span
           className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900/30 border-t-slate-900"
           aria-hidden="true"
+          data-oid="96rc:ol"
         />
       )}
-      <span>{pending ? "Saving\u2026" : label}</span>
+      <span data-oid=":8wy4dg">{pending ? "Saving\u2026" : label}</span>
     </button>
   );
 }

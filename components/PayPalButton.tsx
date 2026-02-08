@@ -21,10 +21,16 @@ export function PayPalUpgradeButton({
   const [isProcessing, setIsProcessing] = useState(false);
 
   return (
-    <div className="relative z-0 w-full">
+    <div className="relative z-0 w-full" data-oid="kscp631">
       {isProcessing && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-slate-900/50 backdrop-blur-sm">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
+        <div
+          className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-slate-900/50 backdrop-blur-sm"
+          data-oid="k:jhztc"
+        >
+          <div
+            className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent"
+            data-oid="8s2t3ka"
+          />
         </div>
       )}
 
@@ -82,6 +88,7 @@ export function PayPalUpgradeButton({
           setIsProcessing(false);
         }}
         onCancel={() => setIsProcessing(false)}
+        data-oid="x0sblea"
       />
     </div>
   );

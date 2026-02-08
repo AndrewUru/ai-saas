@@ -40,6 +40,7 @@ export function Workflow() {
               ].map((item) => (
                 <li key={item.label} className="group flex items-start gap-4">
                   <div className="mt-1.5 h-1 w-6 rounded-full bg-zinc-800 transition-all group-hover:w-8 group-hover:bg-accent" />
+
                   <p className="text-sm text-zinc-400 group-hover:text-zinc-200 transition-colors">
                     <strong className="text-white font-medium">
                       {item.label}:
@@ -75,7 +76,9 @@ export function Workflow() {
                 </h3>
                 <div className="flex gap-1.5">
                   <div className="h-2 w-2 rounded-full bg-white/10" />
+
                   <div className="h-2 w-2 rounded-full bg-white/10" />
+
                   <div className="h-2 w-2 rounded-full bg-white/10" />
                 </div>
               </div>

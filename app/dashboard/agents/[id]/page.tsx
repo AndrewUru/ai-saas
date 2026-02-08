@@ -300,66 +300,125 @@ export default async function AgentDetailPage({
     : "Unknown date";
 
   return (
-    <main className="relative min-h-screen overflow-hidden text-slate-100">
-      <div className="pointer-events-none absolute inset-0" />
+    <main
+      className="relative min-h-screen overflow-hidden text-slate-100"
+      data-oid="9z-ztr5"
+    >
+      <div
+        className="pointer-events-none absolute inset-0"
+        data-oid="mbzx0jj"
+      />
 
-      <section className="relative z-10 mx-auto flex min-h-screen flex-col">
+      <section
+        className="relative z-10 mx-auto flex min-h-screen flex-col"
+        data-oid="zpn9_yd"
+      >
         {/* Header */}
-        <header className="space-y-4 ui-card--strong p-8">
-          <div className="flex flex-wrap items-start justify-between gap-6">
-            <div className="space-y-3">
-              <p className="ui-badge">Agent profile</p>
-              <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
+        <header className="space-y-4 ui-card--strong p-8" data-oid="r.1rhe:">
+          <div
+            className="flex flex-wrap items-start justify-between gap-6"
+            data-oid=".wh4hdg"
+          >
+            <div className="space-y-3" data-oid="jzx-z02">
+              <p className="ui-badge" data-oid="h3259kg">
+                Agent profile
+              </p>
+              <div
+                className="flex flex-wrap items-center gap-3"
+                data-oid="73ouqi_"
+              >
+                <h1
+                  className="text-3xl font-semibold leading-tight sm:text-4xl"
+                  data-oid="1.pma0j"
+                >
                   {agent.name}
                 </h1>
-                <span className="ui-badge border-slate-700 text-slate-300 bg-transparent">
+                <span
+                  className="ui-badge border-slate-700 text-slate-300 bg-transparent"
+                  data-oid="r6at1a."
+                >
                   <span
                     className={`dot ${
                       agent.is_active ? "dot--active" : "dot--paused"
                     }`}
+                    data-oid="ogvvkd:"
                   />
+
                   {statusLabel}
                 </span>
               </div>
-              <p className="max-w-2xl text-sm text-slate-300 sm:text-base">
+              <p
+                className="max-w-2xl text-sm text-slate-300 sm:text-base"
+                data-oid="sjx7ds9"
+              >
                 Use this view to connect WooCommerce or Shopify, control which
                 domains can load the widget, and copy the agent API key.
               </p>
             </div>
-            <Link href={AGENTS_BASE} className="ui-button ui-button--ghost">
+            <Link
+              href={AGENTS_BASE}
+              className="ui-button ui-button--ghost"
+              data-oid="hrr377v"
+            >
               Back to agents
             </Link>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="ui-card p-4 text-sm text-slate-300">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+          <div className="grid gap-4 md:grid-cols-3" data-oid="1m33wnc">
+            <div
+              className="ui-card p-4 text-sm text-slate-300"
+              data-oid="gm52otv"
+            >
+              <p
+                className="text-xs uppercase tracking-[0.24em] text-slate-400"
+                data-oid="1u34ezc"
+              >
                 API Key
               </p>
-              <p className="mt-2 break-all font-mono text-emerald-200">
+              <p
+                className="mt-2 break-all font-mono text-emerald-200"
+                data-oid="_6sbwyq"
+              >
                 {agent.api_key}
               </p>
             </div>
-            <div className="ui-card p-4 text-sm text-slate-300">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+            <div
+              className="ui-card p-4 text-sm text-slate-300"
+              data-oid="fkuqatb"
+            >
+              <p
+                className="text-xs uppercase tracking-[0.24em] text-slate-400"
+                data-oid="i8p6s6."
+              >
                 Message limit
               </p>
-              <p className="mt-2 text-lg font-semibold text-white">
+              <p
+                className="mt-2 text-lg font-semibold text-white"
+                data-oid="rv4idq3"
+              >
                 {agent.messages_limit?.toLocaleString("en-US") ?? "Not set"}
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500" data-oid=":al.eqo">
                 Adjust this value from the database or soon from your plan.
               </p>
             </div>
-            <div className="ui-card p-4 text-sm text-slate-300">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+            <div
+              className="ui-card p-4 text-sm text-slate-300"
+              data-oid="g62-hjr"
+            >
+              <p
+                className="text-xs uppercase tracking-[0.24em] text-slate-400"
+                data-oid="fw63bci"
+              >
                 Created on
               </p>
-              <p className="mt-2 text-lg font-semibold text-white">
+              <p
+                className="mt-2 text-lg font-semibold text-white"
+                data-oid="50.n9yh"
+              >
                 {createdAt}
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500" data-oid="k3ecoys">
                 Keeps a full activity log and allowed domains.
               </p>
             </div>
@@ -368,18 +427,27 @@ export default async function AgentDetailPage({
 
         {/* Alerts */}
         {saved && (
-          <div className="ui-alert ui-alert--success items-center mt-6">
+          <div
+            className="ui-alert ui-alert--success items-center mt-6"
+            data-oid="qai4ugb"
+          >
             Changes saved successfully.
           </div>
         )}
         {errorKey && (
-          <div className="ui-alert ui-alert--error mt-6">
+          <div className="ui-alert ui-alert--error mt-6" data-oid="iiw:3dy">
             {errorMessages[errorKey] ?? "An unexpected error occurred."}
           </div>
         )}
 
-        <form action={updateAgentAndWidget}>
-          <input type="hidden" name="agent_id" value={agent.id} />
+        <form action={updateAgentAndWidget} data-oid="6_2z8c2">
+          <input
+            type="hidden"
+            name="agent_id"
+            value={agent.id}
+            data-oid="761fhl8"
+          />
+
           <div
             className="
               mt-10 grid gap-10
@@ -387,22 +455,30 @@ export default async function AgentDetailPage({
               xl:grid-cols-[minmax(0,1.85fr)_minmax(380px,1fr)]
               2xl:grid-cols-[minmax(0,2fr)_minmax(420px,1fr)]
             "
+            data-oid="imdvyb:"
           >
             {/* LEFT COLUMN TOP: Integration + domains */}
-            <article className="min-w-0 ui-card glass-pane p-7">
-              <h2 className="text-xl font-semibold text-white">
+            <article
+              className="min-w-0 ui-card glass-pane p-7"
+              data-oid="_cmxgf2"
+            >
+              <h2
+                className="text-xl font-semibold text-white"
+                data-oid="885swbs"
+              >
                 Integration and allowed domains
               </h2>
-              <p className="mt-1 text-sm text-slate-300">
+              <p className="mt-1 text-sm text-slate-300" data-oid="ce_kpcv">
                 Select the WooCommerce or Shopify integrations this agent should
                 use and define which domains can embed the widget.
               </p>
 
-              <div className="mt-6 space-y-6">
-                <div className="space-y-2">
+              <div className="mt-6 space-y-6" data-oid="l4:ji3-">
+                <div className="space-y-2" data-oid="1:fz-w-">
                   <label
                     htmlFor="woo-integration"
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                    data-oid="3pgz8dj"
                   >
                     WooCommerce integration
                   </label>
@@ -411,8 +487,11 @@ export default async function AgentDetailPage({
                     name="woo_integration_id"
                     defaultValue={agent.woo_integration_id || "none"}
                     className="ui-input"
+                    data-oid="xwo.-f7"
                   >
-                    <option value="none">No integration</option>
+                    <option value="none" data-oid="0v5v70x">
+                      No integration
+                    </option>
                     {(wooIntegrations ?? []).map((integration) => {
                       const label =
                         integration.label?.trim() || integration.store_url;
@@ -424,18 +503,23 @@ export default async function AgentDetailPage({
                           ? `indexed ${indexedCount}`
                           : "not indexed";
                       return (
-                        <option key={integration.id} value={integration.id}>
+                        <option
+                          key={integration.id}
+                          value={integration.id}
+                          data-oid="pkj188g"
+                        >
                           {label} - {syncLabel}{" "}
                           {integration.is_active ? "" : "(inactive)"}
                         </option>
                       );
                     })}
                   </select>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500" data-oid="ec9k2tu">
                     Manage your WooCommerce credentials from{" "}
                     <Link
                       href="/integrations/woo"
                       className="text-emerald-300 hover:text-emerald-200"
+                      data-oid="7.y9isq"
                     >
                       Integrations
                     </Link>
@@ -443,10 +527,11 @@ export default async function AgentDetailPage({
                   </p>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2" data-oid="-ej-3kp">
                   <label
                     htmlFor="shopify-integration"
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                    data-oid="dm1pc3c"
                   >
                     Shopify integration
                   </label>
@@ -455,8 +540,11 @@ export default async function AgentDetailPage({
                     name="shopify_integration_id"
                     defaultValue={agent.shopify_integration_id || "none"}
                     className="ui-input"
+                    data-oid=":.mz4qy"
                   >
-                    <option value="none">No integration</option>
+                    <option value="none" data-oid="b_zx3c_">
+                      No integration
+                    </option>
                     {(shopifyIntegrations ?? []).map((integration) => {
                       const label =
                         integration.label?.trim() || integration.shop_domain;
@@ -468,18 +556,23 @@ export default async function AgentDetailPage({
                           ? `indexed ${indexedCount}`
                           : "not indexed";
                       return (
-                        <option key={integration.id} value={integration.id}>
+                        <option
+                          key={integration.id}
+                          value={integration.id}
+                          data-oid="6paed6w"
+                        >
                           {label} - {syncLabel}{" "}
                           {integration.is_active ? "" : "(inactive)"}
                         </option>
                       );
                     })}
                   </select>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500" data-oid="ww_uvw9">
                     Manage your Shopify credentials from{" "}
                     <Link
                       href="/integrations/shopify"
                       className="text-emerald-300 hover:text-emerald-200"
+                      data-oid="ce3adea"
                     >
                       Integrations
                     </Link>
@@ -487,10 +580,11 @@ export default async function AgentDetailPage({
                   </p>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2" data-oid="5ad85fa">
                   <label
                     htmlFor="prompt-system"
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                    data-oid="ons7xg4"
                   >
                     Agent instructions (prompt)
                   </label>
@@ -504,18 +598,20 @@ export default async function AgentDetailPage({
                     }
                     rows={5}
                     className="ui-input"
+                    data-oid="uof1i.u"
                   />
 
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500" data-oid=".msit-m">
                     This text is sent as the system prompt to the model. Use
                     variables, the desired tone, and brand guardrails.
                   </p>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2" data-oid="jrflppd">
                   <label
                     htmlFor="language"
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                    data-oid="yjzbpy_"
                   >
                     Preferred response language
                   </label>
@@ -524,23 +620,29 @@ export default async function AgentDetailPage({
                     name="language"
                     defaultValue={languageValue}
                     className="ui-input"
+                    data-oid="rugrt2_"
                   >
                     {LANGUAGE_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
+                      <option
+                        key={option.value}
+                        value={option.value}
+                        data-oid="m-avm:b"
+                      >
                         {option.label}
                       </option>
                     ))}
                   </select>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500" data-oid="0q.y24n">
                     With automatic detection, the model adapts the response to
                     the customer&apos;s language.
                   </p>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2" data-oid=".cijqtn">
                   <label
                     htmlFor="fallback-url"
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                    data-oid="an8t:z9"
                   >
                     Fallback URL (optional)
                   </label>
@@ -552,17 +654,19 @@ export default async function AgentDetailPage({
                     defaultValue={fallbackUrlValue}
                     placeholder="https://your-agency.com/contact"
                     className="ui-input"
+                    data-oid="c-aq-hb"
                   />
 
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500" data-oid="2nyqjet">
                     Sent to the widget to escalate to humans when necessary.
                   </p>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2" data-oid="_ix9:2o">
                   <label
                     htmlFor="allowed-domains"
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+                    data-oid="ds0xspz"
                   >
                     Allowed domains (optional)
                   </label>
@@ -572,16 +676,20 @@ export default async function AgentDetailPage({
                     placeholder="myshop.com, store.com"
                     defaultValue={allowedDomains.join(", ")}
                     className="ui-input"
+                    data-oid="7mads1i"
                   />
 
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500" data-oid="vmqk_:.">
                     Separate each domain with commas. If left empty, the widget
                     can load from any origin.
                   </p>
                   {!!allowedDomains.length && (
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-400" data-oid="c8jvf_7">
                       Current domains:{" "}
-                      <span className="font-mono text-emerald-200">
+                      <span
+                        className="font-mono text-emerald-200"
+                        data-oid="s7mgxhf"
+                      >
                         {allowedDomains.join(", ")}
                       </span>
                     </p>
@@ -591,28 +699,40 @@ export default async function AgentDetailPage({
             </article>
 
             {/* RIGHT COLUMN TOP: snippet + best practices */}
-            <aside className="space-y-6 min-w-0">
-              <article className="ui-card--strong glass-pane backdrop-blur relative overflow-hidden">
+            <aside className="space-y-6 min-w-0" data-oid="1sn3crl">
+              <article
+                className="ui-card--strong glass-pane backdrop-blur relative overflow-hidden"
+                data-oid="907rges"
+              >
                 {/* EmbedSnippet component usually has its own internal card but here we wrap it or let it handle its own styles? 
-                    The user said "No cambies el contenido de los componentes hijos". 
-                    The previous code had this wrapper, so I keep the wrapper but use ui-card. 
-                */}
-                <EmbedSnippet apiKey={agent.api_key} />
+                       The user said "No cambies el contenido de los componentes hijos". 
+                       The previous code had this wrapper, so I keep the wrapper but use ui-card. 
+                    */}
+                <EmbedSnippet apiKey={agent.api_key} data-oid="__4rke1" />
               </article>
-              <article className="ui-card glass-pane p-6 text-sm text-slate-300">
-                <h3 className="text-lg font-semibold text-white">
+              <article
+                className="ui-card glass-pane p-6 text-sm text-slate-300"
+                data-oid="n.i41pq"
+              >
+                <h3
+                  className="text-lg font-semibold text-white"
+                  data-oid="qdyz.rq"
+                >
                   Best practices
                 </h3>
-                <ul className="mt-3 space-y-2 text-xs text-slate-400">
-                  <li>
+                <ul
+                  className="mt-3 space-y-2 text-xs text-slate-400"
+                  data-oid="1bssyr8"
+                >
+                  <li data-oid="2p245ji">
                     - Use one agent per store or language to keep responses
                     aligned with your catalog.
                   </li>
-                  <li>
+                  <li data-oid="9gbhe.j">
                     - If the API key is compromised, create a new agent and
                     deactivate this one to revoke access.
                   </li>
-                  <li>
+                  <li data-oid=":zlmrzb">
                     - Enable message limit alerts from your billing panel to
                     avoid interruptions.
                   </li>
@@ -620,14 +740,20 @@ export default async function AgentDetailPage({
               </article>
             </aside>
 
-            <KnowledgeSection agentId={agent.id} />
+            <KnowledgeSection agentId={agent.id} data-oid="_hxpw0u" />
 
             {/* FILA INFERIOR: ancho completo */}
-            <article className="lg:col-span-2 w-full min-w-0 ui-card glass-pane p-2">
-              <h2 className="text-xl font-semibold text-white">
+            <article
+              className="lg:col-span-2 w-full min-w-0 ui-card glass-pane p-2"
+              data-oid="w4rdr2m"
+            >
+              <h2
+                className="text-xl font-semibold text-white"
+                data-oid="4d_xl04"
+              >
                 Customize the embeddable widget
               </h2>
-              <p className="mt-1 text-sm text-slate-300">
+              <p className="mt-1 text-sm text-slate-300" data-oid="su8wq5o">
                 Adjust color, text, and position and preview the result in real
                 time before copying the script.
               </p>
@@ -650,16 +776,21 @@ export default async function AgentDetailPage({
                 initialColorBotBubbleText={agent.widget_color_bot_bubble_text}
                 initialColorToggleBg={agent.widget_color_toggle_bg}
                 initialColorToggleText={agent.widget_color_toggle_text}
+                data-oid=".2z0p3q"
               />
             </article>
           </div>
 
-          <div className="sticky bottom-6 z-20 mt-10">
-            <div className="ui-card--strong glass-pane flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-end">
-              <SubmitButton label="Save changes" />
+          <div className="sticky bottom-6 z-20 mt-10" data-oid="eaj.k4d">
+            <div
+              className="ui-card--strong glass-pane flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-end"
+              data-oid="7f9q1ma"
+            >
+              <SubmitButton label="Save changes" data-oid="ew1c.ap" />
               <Link
                 href={`${AGENTS_BASE}/${agent.id}`}
                 className="ui-button ui-button--ghost w-full sm:w-auto"
+                data-oid="g2dq6yg"
               >
                 Cancel
               </Link>

@@ -20,8 +20,10 @@ export default function QueryProvider({ children, state }: Props) {
   const [queryClient] = useState(createQueryClient);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <HydrationBoundary state={state}>{children}</HydrationBoundary>
+    <QueryClientProvider client={queryClient} data-oid="tklwp5j">
+      <HydrationBoundary state={state} data-oid=":1jm449">
+        {children}
+      </HydrationBoundary>
     </QueryClientProvider>
   );
 }

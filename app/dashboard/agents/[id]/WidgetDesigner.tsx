@@ -88,17 +88,24 @@ function ColorInput({
   const pickerValue = normalizeHex(value) ?? defaultValue;
 
   return (
-    <div className="space-y-1 min-w-0">
-      <label className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+    <div className="space-y-1 min-w-0" data-oid="3fvi0b8">
+      <label
+        className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+        data-oid="w_yx1ax"
+      >
         {label}
       </label>
 
-      <div className="flex flex-wrap items-center gap-2 min-w-0">
+      <div
+        className="flex flex-wrap items-center gap-2 min-w-0"
+        data-oid="z4zrd3n"
+      >
         <input
           type="color"
           className="h-9 w-9 shrink-0 cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-0"
           value={pickerValue}
           onChange={(e) => onChange(e.target.value)}
+          data-oid="umxgg7:"
         />
 
         <input
@@ -107,12 +114,14 @@ function ColorInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="min-w-0 flex-1 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-2 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+          data-oid="npde-3i"
         />
 
         <button
           type="button"
           onClick={() => onChange("")}
           className="shrink-0 whitespace-nowrap text-xs uppercase text-slate-500 hover:text-emerald-300"
+          data-oid="8-dur2t"
         >
           Reset
         </button>
@@ -326,15 +335,25 @@ export default function WidgetDesigner({
         2xl:grid-cols-[minmax(0,1.35fr)_minmax(420px,1fr)]
         w-full min-w-0
       "
+      data-oid="0l98r5_"
     >
       {/* Left column */}
-      <div className="space-y-4 min-w-0">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="space-y-1 min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
+      <div className="space-y-4 min-w-0" data-oid=":jg9qap">
+        <div
+          className="flex flex-wrap items-center justify-between gap-3"
+          data-oid="cm6q09d"
+        >
+          <div className="space-y-1 min-w-0" data-oid="r-i6cm_">
+            <p
+              className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200"
+              data-oid="6jb0d7n"
+            >
               Branding & UX
             </p>
-            <h3 className="text-base sm:text-lg font-semibold text-white">
+            <h3
+              className="text-base sm:text-lg font-semibold text-white"
+              data-oid="l1ht4d8"
+            >
               Adjust appearance and visible texts
             </h3>
           </div>
@@ -343,16 +362,24 @@ export default function WidgetDesigner({
             type="button"
             className="shrink-0 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300 transition hover:text-emerald-200"
             onClick={handleReset}
+            data-oid="qs3b0sa"
           >
             Clear fields
           </button>
         </div>
 
-        <div className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0">
-          <div className="flex flex-wrap items-center gap-3 min-w-0">
+        <div
+          className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0"
+          data-oid="5fl-ybt"
+        >
+          <div
+            className="flex flex-wrap items-center gap-3 min-w-0"
+            data-oid="0uzx4c-"
+          >
             <label
               htmlFor="widget-accent"
               className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+              data-oid="n19gled"
             >
               Main Accent Color
             </label>
@@ -363,12 +390,14 @@ export default function WidgetDesigner({
               className="h-9 w-9 shrink-0 cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-0"
               value={accentPickerValue}
               onChange={(event) => setAccentInput(event.target.value)}
+              data-oid="oa-nkik"
             />
 
             <button
               type="button"
               className="shrink-0 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300 transition hover:text-emerald-200"
               onClick={() => setAccentInput("")}
+              data-oid="rd0w1m4"
             >
               Reset
             </button>
@@ -381,49 +410,66 @@ export default function WidgetDesigner({
             value={accentInput}
             onChange={(event) => setAccentInput(event.target.value)}
             className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+            data-oid="ub-ypt-"
           />
 
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500" data-oid="6iwtdca">
             Accepts #RRGGBB or RRGGBB formats. Empty = default color (
             {widgetDefaults.accent}).
           </p>
 
           {accentError && (
-            <p className="text-xs text-rose-300">{accentError}</p>
+            <p className="text-xs text-rose-300" data-oid="48vbmz1">
+              {accentError}
+            </p>
           )}
         </div>
 
         {/* Detailed Color Customization */}
-        <div className="space-y-4 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-200">
+        <div
+          className="space-y-4 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0"
+          data-oid="2n7sres"
+        >
+          <p
+            className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-200"
+            data-oid="cgsutxn"
+          >
             Advanced Colors
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0"
+            data-oid="_jmncbn"
+          >
             <ColorInput
               label="Header BG"
               name="widget_color_header_bg"
               value={colorHeaderBg}
               onChange={setColorHeaderBg}
               defaultValue="#008069"
+              data-oid="6cj2tyc"
             />
+
             <ColorInput
               label="Header Text"
               name="widget_color_header_text"
               value={colorHeaderText}
               onChange={setColorHeaderText}
               defaultValue="#ffffff"
+              data-oid="rboi65u"
             />
+
             <ColorInput
               label="Chat Background"
               name="widget_color_chat_bg"
               value={colorChatBg}
               onChange={setColorChatBg}
               defaultValue="#efe7dd"
+              data-oid="uv-ya1e"
             />
 
             {/* Spacer only on >= sm */}
-            <div className="hidden sm:block" />
+            <div className="hidden sm:block" data-oid="tzuc109" />
 
             <ColorInput
               label="User Bubble BG"
@@ -431,30 +477,37 @@ export default function WidgetDesigner({
               value={colorUserBubbleBg}
               onChange={setColorUserBubbleBg}
               defaultValue="#d9fdd3"
+              data-oid="k44gotl"
             />
+
             <ColorInput
               label="User Bubble Text"
               name="widget_color_user_bubble_text"
               value={colorUserBubbleText}
               onChange={setColorUserBubbleText}
               defaultValue="#111b21"
+              data-oid="dnhykuo"
             />
+
             <ColorInput
               label="Bot Bubble BG"
               name="widget_color_bot_bubble_bg"
               value={colorBotBubbleBg}
               onChange={setColorBotBubbleBg}
               defaultValue="#ffffff"
+              data-oid="pr.rcf0"
             />
+
             <ColorInput
               label="Bot Bubble Text"
               name="widget_color_bot_bubble_text"
               value={colorBotBubbleText}
               onChange={setColorBotBubbleText}
               defaultValue="#111b21"
+              data-oid="p2r.w:h"
             />
 
-            <div className="hidden sm:block" />
+            <div className="hidden sm:block" data-oid="s6.4ssk" />
 
             <ColorInput
               label="Toggle Button BG"
@@ -462,21 +515,25 @@ export default function WidgetDesigner({
               value={colorToggleBg}
               onChange={setColorToggleBg}
               defaultValue="#25D366"
+              data-oid="dmzwni3"
             />
+
             <ColorInput
               label="Toggle Button Icon"
               name="widget_color_toggle_text"
               value={colorToggleText}
               onChange={setColorToggleText}
               defaultValue="#ffffff"
+              data-oid="y.wxa._"
             />
           </div>
         </div>
 
-        <div className="space-y-2 min-w-0">
+        <div className="space-y-2 min-w-0" data-oid="x50fbx9">
           <label
             htmlFor="widget-brand"
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+            data-oid="h-7kjtx"
           >
             Visible name
           </label>
@@ -488,17 +545,20 @@ export default function WidgetDesigner({
             value={brandInput}
             onChange={(event) => setBrandInput(event.target.value)}
             className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+            data-oid="d78.put"
           />
-          <p className="text-xs text-slate-500">
+
+          <p className="text-xs text-slate-500" data-oid="6z:i1jk">
             Max {widgetLimits.brand} characters. Empty = uses &quot;
             {widgetDefaults.brand}&quot;.
           </p>
         </div>
 
-        <div className="space-y-2 min-w-0">
+        <div className="space-y-2 min-w-0" data-oid="hlfz._a">
           <label
             htmlFor="widget-label"
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+            data-oid="2:5udzr"
           >
             Button text
           </label>
@@ -510,17 +570,20 @@ export default function WidgetDesigner({
             value={labelInput}
             onChange={(event) => setLabelInput(event.target.value)}
             className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+            data-oid="ppy.u98"
           />
-          <p className="text-xs text-slate-500">
+
+          <p className="text-xs text-slate-500" data-oid=".gp1eu_">
             Max {widgetLimits.label} characters. Empty = uses &quot;
             {widgetDefaults.label}&quot;.
           </p>
         </div>
 
-        <div className="space-y-2 min-w-0">
+        <div className="space-y-2 min-w-0" data-oid="moi.o8_">
           <label
             htmlFor="widget-greeting"
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+            data-oid="l.qv5bn"
           >
             Initial message
           </label>
@@ -532,17 +595,20 @@ export default function WidgetDesigner({
             value={greetingInput}
             onChange={(event) => setGreetingInput(event.target.value)}
             className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+            data-oid="klpv9lg"
           />
-          <p className="text-xs text-slate-500">
+
+          <p className="text-xs text-slate-500" data-oid="1viqapu">
             Max {widgetLimits.greeting} characters. Empty = uses &quot;
             {widgetDefaults.greeting}&quot;.
           </p>
         </div>
 
-        <div className="space-y-2 min-w-0">
+        <div className="space-y-2 min-w-0" data-oid="kce0r5o">
           <label
             htmlFor="widget-human-support"
             className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+            data-oid="s_q8rr4"
           >
             Header subtitle
           </label>
@@ -554,18 +620,26 @@ export default function WidgetDesigner({
             value={humanSupportTextInput}
             onChange={(event) => setHumanSupportTextInput(event.target.value)}
             className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+            data-oid=".y_y3.4"
           />
-          <p className="text-xs text-slate-500">
+
+          <p className="text-xs text-slate-500" data-oid="3:-64jy">
             Max {widgetLimits.humanSupportText} characters. Empty = uses &quot;
             {widgetDefaults.humanSupportText}&quot;.
           </p>
         </div>
 
-        <fieldset className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0">
-          <legend className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+        <fieldset
+          className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0"
+          data-oid="kk.-txs"
+        >
+          <legend
+            className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+            data-oid="o-jy09:"
+          >
             Screen position
           </legend>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3" data-oid="r_cx7nx">
             {widgetPositions.map((option) => (
               <label
                 key={option}
@@ -574,6 +648,7 @@ export default function WidgetDesigner({
                     ? "border-emerald-400 text-emerald-200"
                     : "border-slate-700 text-slate-300"
                 }`}
+                data-oid="tkk.q31"
               >
                 <input
                   type="radio"
@@ -582,68 +657,102 @@ export default function WidgetDesigner({
                   checked={position === option}
                   onChange={() => setPosition(option)}
                   className="sr-only"
+                  data-oid="tcxq_2-"
                 />
+
                 {option === "right" ? "Right" : "Left"}
               </label>
             ))}
           </div>
         </fieldset>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3" data-oid="8y8je0-">
           <button
             type="button"
             onClick={handleReset}
             className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:flex-none"
+            data-oid="5kzsuwe"
           >
             Default values
           </button>
         </div>
 
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-500" data-oid="twtwhdf">
           Empty values automatically use the widget&apos;s default texts and
           colors.
         </p>
       </div>
 
       {/* Right column */}
-      <div className="space-y-5 rounded-3xl border border-slate-800/70 bg-linear-to-br from-slate-950/75 via-slate-950/60 to-slate-900/60 p-4 sm:p-6 shadow-xl shadow-slate-950/40 min-w-0 overflow-x-hidden">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
+      <div
+        className="space-y-5 rounded-3xl border border-slate-800/70 bg-linear-to-br from-slate-950/75 via-slate-950/60 to-slate-900/60 p-4 sm:p-6 shadow-xl shadow-slate-950/40 min-w-0 overflow-x-hidden"
+        data-oid="p-o81-s"
+      >
+        <div
+          className="flex flex-wrap items-start justify-between gap-3"
+          data-oid=".:gzju-"
+        >
+          <div className="space-y-1" data-oid="seqoi.d">
+            <p
+              className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200"
+              data-oid="kg.cb2h"
+            >
               Preview
             </p>
-            <p className="text-sm text-slate-300">
+            <p className="text-sm text-slate-300" data-oid="lw55c4f">
               Updates automatically as you edit.
             </p>
           </div>
         </div>
 
         {/* Preview canvas (mobile-first) */}
-        <div className="mx-auto w-[320px] max-w-[calc(100vw-24px)] sm:w-[360px] lg:w-[390px]">
-          <div className="relative overflow-hidden rounded-[34px] border border-white/10 bg-black shadow-[0_24px_70px_rgba(0,0,0,.55)]">
-            <div className="absolute left-1/2 top-2 z-10 h-6 w-28 -translate-x-1/2 rounded-full bg-black/70 border border-white/10" />
+        <div
+          className="mx-auto w-[320px] max-w-[calc(100vw-24px)] sm:w-[360px] lg:w-[390px]"
+          data-oid="ms7_rkv"
+        >
+          <div
+            className="relative overflow-hidden rounded-[34px] border border-white/10 bg-black shadow-[0_24px_70px_rgba(0,0,0,.55)]"
+            data-oid="-oxjv36"
+          >
+            <div
+              className="absolute left-1/2 top-2 z-10 h-6 w-28 -translate-x-1/2 rounded-full bg-black/70 border border-white/10"
+              data-oid="o4yx4a8"
+            />
+
             <iframe
               key={iframeKey}
               title="Widget preview"
               src={previewPageUrl}
               sandbox="allow-scripts allow-same-origin"
               className="block h-[640px] w-full border-0"
+              data-oid="svxitrx"
             />
           </div>
 
-          <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400">
-            <span>Mobile preview</span>
-            <span className="text-slate-500">320 × 640</span>
+          <div
+            className="mt-3 flex items-center justify-between text-[11px] text-slate-400"
+            data-oid="c7del-j"
+          >
+            <span data-oid="2vm99im">Mobile preview</span>
+            <span className="text-slate-500" data-oid="ssp7ti9">
+              320 × 640
+            </span>
           </div>
         </div>
 
-        <div className="space-y-2 min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+        <div className="space-y-2 min-w-0" data-oid="q07ffv4">
+          <p
+            className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
+            data-oid="pxpuo1y"
+          >
             Installation Code - Place before &lt;/body&gt;
           </p>
 
-          <div className="relative group min-w-0">
-            <code className="block rounded-xl border border-slate-800 bg-slate-950/80 p-4 text-[11px] text-emerald-200 overflow-x-auto break-all font-mono">
+          <div className="relative group min-w-0" data-oid="ijuq6.z">
+            <code
+              className="block rounded-xl border border-slate-800 bg-slate-950/80 p-4 text-[11px] text-emerald-200 overflow-x-auto break-all font-mono"
+              data-oid="yl0nfz2"
+            >
               {embedSnippet}
             </code>
 
@@ -653,12 +762,13 @@ export default function WidgetDesigner({
                 navigator.clipboard.writeText(embedSnippet);
               }}
               className="absolute top-2 right-2 rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 opacity-0 transition group-hover:opacity-100 hover:border-emerald-500 hover:text-emerald-400"
+              data-oid="vx3uu2d"
             >
               Copy
             </button>
           </div>
 
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500" data-oid="cot769u">
             This snippet is stable. You don&apos;t need to update it when
             changing settings.
           </p>

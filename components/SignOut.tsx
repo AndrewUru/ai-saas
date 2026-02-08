@@ -10,6 +10,7 @@ export function SignOutButton() {
         await supabase.auth.signOut();
         window.location.href = "/login";
       }}
+      data-oid=":u5wqnx"
     >
       Sign Out
     </button>

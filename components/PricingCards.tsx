@@ -26,7 +26,12 @@ const plans = [
     period: "one-time",
     description:
       "Remove branding, get priority support, and unlock higher limits.",
-    features: ["Removed branding", "Priority support", "Higher limits & early access"],
+    features: [
+      "Removed branding",
+      "Priority support",
+      "Higher limits & early access",
+    ],
+
     highlight: true,
     badge: "Best value",
   },
@@ -39,7 +44,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
 
   if (!clientId) {
     return (
-      <div className="text-center text-rose-400">
+      <div className="text-center text-rose-400" data-oid=":d_4325">
         Error: PayPal Client ID not configured.
       </div>
     );
@@ -53,19 +58,29 @@ export default function PricingCards({ clientId }: { clientId: string }) {
         intent: "capture",
         components: "buttons",
       }}
+      data-oid="ubknz:s"
     >
       {successMsg && (
-        <div className="fixed top-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-emerald-500/50 bg-emerald-950/90 px-6 py-3 text-emerald-200 backdrop-blur-md">
+        <div
+          className="fixed top-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-emerald-500/50 bg-emerald-950/90 px-6 py-3 text-emerald-200 backdrop-blur-md"
+          data-oid="vyfnbff"
+        >
           {successMsg}
         </div>
       )}
       {errorMsg && (
-        <div className="fixed top-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-rose-500/50 bg-rose-950/90 px-6 py-3 text-rose-200 backdrop-blur-md">
+        <div
+          className="fixed top-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-rose-500/50 bg-rose-950/90 px-6 py-3 text-rose-200 backdrop-blur-md"
+          data-oid="37cb6ox"
+        >
           {errorMsg}
         </div>
       )}
 
-      <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-2">
+      <div
+        className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-2"
+        data-oid="g4g-.6t"
+      >
         {plans.map((plan) => (
           <article
             key={plan.id}
@@ -74,6 +89,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                 ? "border-emerald-400/60 bg-gradient-to-b from-emerald-500/10 via-slate-900/80 to-slate-900/90 shadow-emerald-500/10"
                 : "border-slate-800 shadow-slate-900/50"
             }`}
+            data-oid="4skg4:f"
           >
             {plan.badge && (
               <span
@@ -82,66 +98,97 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                     ? "border-emerald-400/40 bg-emerald-500/20 text-emerald-200"
                     : "border-slate-700 bg-slate-800 text-slate-300"
                 }`}
+                data-oid="snvlud6"
               >
                 {plan.badge}
               </span>
             )}
 
-            <div className="space-y-1">
+            <div className="space-y-1" data-oid="6qr2l26">
               <p
                 className={`text-xs uppercase tracking-[0.22em] ${
                   plan.highlight ? "text-emerald-300" : "text-slate-400"
                 }`}
+                data-oid="2qaxa._"
               >
                 {plan.headline}
               </p>
-              <h2 className="text-3xl font-bold text-white">{plan.name}</h2>
-              <p className="text-sm leading-relaxed text-slate-300">
+              <h2 className="text-3xl font-bold text-white" data-oid="i-y9g9j">
+                {plan.name}
+              </h2>
+              <p
+                className="text-sm leading-relaxed text-slate-300"
+                data-oid="tmyzvgk"
+              >
                 {plan.description}
               </p>
             </div>
 
-            <div className="flex items-baseline gap-2">
+            <div className="flex items-baseline gap-2" data-oid="uw.-jgu">
               {plan.price === "0" ? (
-                <span className="text-4xl font-bold text-white">€0</span>
+                <span
+                  className="text-4xl font-bold text-white"
+                  data-oid="evcyp2i"
+                >
+                  €0
+                </span>
               ) : (
                 <>
-                  <span className="text-4xl font-bold text-white">
+                  <span
+                    className="text-4xl font-bold text-white"
+                    data-oid=".v2n31t"
+                  >
                     €{plan.price}
                   </span>
-                  <span className="text-sm font-medium text-slate-400">
+                  <span
+                    className="text-sm font-medium text-slate-400"
+                    data-oid="tg8mfk0"
+                  >
                     one-time
                   </span>
                 </>
               )}
             </div>
 
-            <div className="border-t border-slate-800 pt-4">
-              <ul className="space-y-3 text-sm text-slate-300">
+            <div className="border-t border-slate-800 pt-4" data-oid=":bw9r4v">
+              <ul
+                className="space-y-3 text-sm text-slate-300"
+                data-oid="nlyqrpd"
+              >
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3">
+                  <li
+                    key={feature}
+                    className="flex items-start gap-3"
+                    data-oid="gu-frue"
+                  >
                     <span
                       className={`mt-1.5 h-1.5 w-1.5 rounded-full ${
                         plan.highlight ? "bg-emerald-400" : "bg-slate-500"
                       }`}
+                      data-oid="s1wpqgw"
                     />
-                    <span>{feature}</span>
+
+                    <span data-oid="jb-xad.">{feature}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="mt-auto pt-6">
+            <div className="mt-auto pt-6" data-oid="e11an3d">
               {plan.price === "0" ? (
                 <Link
                   href="/dashboard"
                   className="inline-flex h-12 w-full items-center justify-center rounded-full border border-slate-700 font-semibold text-slate-200 transition hover:border-emerald-400/50 hover:bg-emerald-400/5 hover:text-emerald-200"
+                  data-oid="5acd73u"
                 >
                   Go to Dashboard
                 </Link>
               ) : (
-                <div className="space-y-3">
-                  <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-3">
+                <div className="space-y-3" data-oid="wem7_ni">
+                  <div
+                    className="rounded-2xl border border-slate-800 bg-slate-950/40 p-3"
+                    data-oid="yy693nm"
+                  >
                     <PayPalButtons
                       style={{
                         layout: "vertical",
@@ -163,7 +210,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
 
                         if (!res.ok || !data?.orderId) {
                           throw new Error(
-                            data?.error || "Could not create order"
+                            data?.error || "Could not create order",
                           );
                         }
 
@@ -172,7 +219,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                       onApprove={async (data) => {
                         setErrorMsg("");
                         setSuccessMsg(
-                          "Payment approved. Activating your account…"
+                          "Payment approved. Activating your account…",
                         );
 
                         const res = await fetch("/api/paypal/capture-order", {
@@ -200,13 +247,17 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                       onError={(err) => {
                         setSuccessMsg("");
                         setErrorMsg(
-                          err instanceof Error ? err.message : "PayPal error"
+                          err instanceof Error ? err.message : "PayPal error",
                         );
                       }}
+                      data-oid=":7ev6mt"
                     />
                   </div>
 
-                  <p className="text-center text-xs text-slate-400">
+                  <p
+                    className="text-center text-xs text-slate-400"
+                    data-oid="0t79975"
+                  >
                     Secure checkout powered by PayPal.
                   </p>
                 </div>
@@ -218,4 +269,3 @@ export default function PricingCards({ clientId }: { clientId: string }) {
     </PayPalScriptProvider>
   );
 }
-

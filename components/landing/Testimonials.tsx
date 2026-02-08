@@ -24,75 +24,127 @@ export function Testimonials() {
   ];
 
   return (
-    <section className="relative bg-[#030303] py-24 sm:py-32 overflow-hidden">
+    <section
+      className="relative bg-[#030303] py-24 sm:py-32 overflow-hidden"
+      data-oid="l0jsodo"
+    >
       {/* Luz ambiental sutil en el fondo */}
-      <div className="absolute right-0 top-1/4 h-[500px] w-[500px] bg-accent/5 blur-[150px] rounded-full pointer-events-none" />
+      <div
+        className="absolute right-0 top-1/4 h-[500px] w-[500px] bg-accent/5 blur-[150px] rounded-full pointer-events-none"
+        data-oid="a5y:93v"
+      />
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid gap-16 lg:grid-cols-3 lg:items-start">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8" data-oid="esu.klx">
+        <div
+          className="grid gap-16 lg:grid-cols-3 lg:items-start"
+          data-oid="ov4l4a:"
+        >
           {/* Header de la sección */}
-          <div className="lg:sticky lg:top-32">
-            <h2 className="text-base font-semibold uppercase tracking-[0.2em] text-accent">
+          <div className="lg:sticky lg:top-32" data-oid="swo1c-w">
+            <h2
+              className="text-base font-semibold uppercase tracking-[0.2em] text-accent"
+              data-oid="wusopeu"
+            >
               Success Stories
             </h2>
-            <h3 className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">
-              Agencies <span className="text-zinc-500">trust us.</span>
+            <h3
+              className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl"
+              data-oid="zml-p4."
+            >
+              Agencies{" "}
+              <span className="text-zinc-500" data-oid="4:zclqa">
+                trust us.
+              </span>
             </h3>
-            <p className="mt-6 text-lg leading-relaxed text-zinc-400">
+            <p
+              className="mt-6 text-lg leading-relaxed text-zinc-400"
+              data-oid=".gcmdh8"
+            >
               Retail, subscription, and DTC teams rely on our agents to keep
               support running 24/7.
             </p>
 
             {/* Social Proof extra: Logos minimalistas */}
-            <div className="mt-10 flex flex-wrap gap-8 opacity-30 grayscale contrast-200">
-              <span className="text-xl font-bold text-white tracking-tighter">
+            <div
+              className="mt-10 flex flex-wrap gap-8 opacity-30 grayscale contrast-200"
+              data-oid="0m:clvj"
+            >
+              <span
+                className="text-xl font-bold text-white tracking-tighter"
+                data-oid="twuwxgb"
+              >
                 NORDIA
               </span>
-              <span className="text-xl font-bold text-white tracking-tighter">
+              <span
+                className="text-xl font-bold text-white tracking-tighter"
+                data-oid=":hws0wa"
+              >
                 MODA.
               </span>
-              <span className="text-xl font-bold text-white tracking-tighter">
+              <span
+                className="text-xl font-bold text-white tracking-tighter"
+                data-oid="i8ta8kb"
+              >
                 SUNWAVE
               </span>
             </div>
           </div>
 
           {/* Lista de Testimonios */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-8" data-oid="k92wz3n">
             {testimonials.map((testimonial, idx) => (
               <figure
                 key={testimonial.author}
                 className={`relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/[0.01] p-10 transition-all duration-500 hover:bg-white/[0.03] hover:border-white/10 ${
                   idx % 2 !== 0 ? "lg:translate-x-4" : ""
                 }`}
+                data-oid="asdny_y"
               >
                 {/* Comilla decorativa gigante */}
-                <span className="absolute -top-4 -left-2 text-[12rem] leading-none text-white/[0.02] font-serif pointer-events-none select-none">
+                <span
+                  className="absolute -top-4 -left-2 text-[12rem] leading-none text-white/[0.02] font-serif pointer-events-none select-none"
+                  data-oid="32ke71."
+                >
                   “
                 </span>
 
-                <blockquote className="relative z-10">
-                  <p className="text-xl md:text-2xl font-medium leading-snug text-zinc-200">
+                <blockquote className="relative z-10" data-oid="577nak9">
+                  <p
+                    className="text-xl md:text-2xl font-medium leading-snug text-zinc-200"
+                    data-oid="95ei102"
+                  >
                     &ldquo;{testimonial.quote}&rdquo;
                   </p>
                 </blockquote>
 
-                <figcaption className="relative z-10 mt-10 flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/10 text-xs font-bold text-white">
+                <figcaption
+                  className="relative z-10 mt-10 flex items-center gap-4"
+                  data-oid="ygmdkc9"
+                >
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/10 text-xs font-bold text-white"
+                    data-oid="o_r6s85"
+                  >
                     {testimonial.initials}
                   </div>
-                  <div>
-                    <div className="text-base font-semibold text-white">
+                  <div data-oid="22o2q8e">
+                    <div
+                      className="text-base font-semibold text-white"
+                      data-oid="cdb6:d4"
+                    >
                       {testimonial.author}
                     </div>
-                    <div className="text-sm text-zinc-500">
+                    <div className="text-sm text-zinc-500" data-oid="w4svgql">
                       {testimonial.role}
                     </div>
                   </div>
                 </figcaption>
 
                 {/* Línea de acento sutil al hacer hover */}
-                <div className="absolute bottom-0 left-0 h-1 w-0 bg-accent transition-all duration-500 group-hover:w-full" />
+                <div
+                  className="absolute bottom-0 left-0 h-1 w-0 bg-accent transition-all duration-500 group-hover:w-full"
+                  data-oid=":g7wf.1"
+                />
               </figure>
             ))}
           </div>
