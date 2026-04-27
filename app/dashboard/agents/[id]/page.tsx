@@ -1,6 +1,17 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { headers } from "next/headers";
+import type { ComponentType } from "react";
+import {
+  ArrowLeft,
+  Bot,
+  CheckCircle2,
+  Globe2,
+  KeyRound,
+  MessageSquare,
+  PlugZap,
+  ShieldCheck,
+} from "lucide-react";
 import { requireUser } from "@/lib/auth/requireUser";
 import { getSiteUrlFromHeaders } from "@/lib/site";
 import WidgetDesigner from "./WidgetDesigner";
@@ -56,6 +67,107 @@ function normalizeWidgetText(value: string, max: number): string | null {
 
 // Centralized route base to avoid future hardcoded path issues
 const AGENTS_BASE = "/dashboard/agents";
+
+type StatusTone = "good" | "warn" | "muted";
+
+function toneClasses(tone: StatusTone) {
+  if (tone === "good") {
+    return "border-emerald-400/30 bg-emerald-400/10 text-emerald-200";
+  }
+  if (tone === "warn") {
+    return "border-amber-400/30 bg-amber-400/10 text-amber-200";
+  }
+  return "border-slate-700/70 bg-slate-900/50 text-slate-300";
+}
+
+function SectionHeading({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="space-y-1">
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
+        {eyebrow}
+      </p>
+      <h2 className="text-xl font-semibold text-white">{title}</h2>
+      <p className="max-w-3xl text-sm leading-6 text-slate-300">
+        {description}
+      </p>
+    </div>
+  );
+}
+
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  detail,
+  tone = "muted",
+}: {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  detail: string;
+  tone?: StatusTone;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-800/80 bg-slate-950/45 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
+            {label}
+          </p>
+          <p className="mt-2 truncate text-lg font-semibold text-white">
+            {value}
+          </p>
+        </div>
+        <span
+          className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${toneClasses(
+            tone,
+          )}`}
+        >
+          <Icon className="h-4 w-4" />
+        </span>
+      </div>
+      <p className="mt-3 text-xs leading-5 text-slate-500">{detail}</p>
+    </div>
+  );
+}
+
+function ChecklistItem({
+  done,
+  title,
+  detail,
+}: {
+  done: boolean;
+  title: string;
+  detail: string;
+}) {
+  return (
+    <li className="flex gap-3 rounded-2xl border border-slate-800/70 bg-slate-950/35 p-3">
+      <span
+        className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
+          done
+            ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200"
+            : "border-slate-700 bg-slate-900/60 text-slate-500"
+        }`}
+      >
+        <CheckCircle2 className="h-3.5 w-3.5" />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold text-white">{title}</span>
+        <span className="mt-0.5 block text-xs leading-5 text-slate-400">
+          {detail}
+        </span>
+      </span>
+    </li>
+  );
+}
 
 // --- Server action ---------------------------------------------------------
 async function updateAgentAndWidget(formData: FormData) {
@@ -299,6 +411,54 @@ export default async function AgentDetailPage({
       }).format(new Date(agent.created_at))
     : "Unknown date";
 
+  const selectedWooIntegration = (wooIntegrations ?? []).find(
+    (integration) => integration.id === agent.woo_integration_id,
+  );
+  const selectedShopifyIntegration = (shopifyIntegrations ?? []).find(
+    (integration) => integration.id === agent.shopify_integration_id,
+  );
+  const selectedIntegration =
+    selectedWooIntegration ?? selectedShopifyIntegration ?? null;
+  const selectedIntegrationName = selectedWooIntegration
+    ? selectedWooIntegration.label?.trim() || selectedWooIntegration.store_url
+    : selectedShopifyIntegration
+      ? selectedShopifyIntegration.label?.trim() ||
+        selectedShopifyIntegration.shop_domain
+      : "No catalog connected";
+  const selectedIntegrationActive = selectedIntegration?.is_active ?? false;
+  const indexedProducts = selectedIntegration?.products_indexed_count ?? 0;
+  const hasCatalog = Boolean(selectedIntegration);
+  const hasPrompt = Boolean(promptSystemValue.trim());
+  const hasDomains = allowedDomains.length > 0;
+  const hasWidgetCopy = Boolean(
+    agent.widget_brand?.trim() ||
+      agent.widget_label?.trim() ||
+      agent.widget_greeting?.trim() ||
+      agent.widget_human_support_text?.trim(),
+  );
+  const completionItems = [
+    agent.is_active,
+    hasCatalog && selectedIntegrationActive,
+    hasDomains,
+    hasPrompt,
+    hasWidgetCopy,
+  ];
+  const completionCount = completionItems.filter(Boolean).length;
+  const completionPercent = Math.round(
+    (completionCount / completionItems.length) * 100,
+  );
+  const nextStep = !agent.is_active
+    ? "Activate this agent"
+    : !hasCatalog
+      ? "Connect a catalog"
+      : !hasDomains
+        ? "Add allowed domains"
+        : !hasPrompt
+          ? "Add agent instructions"
+          : !hasWidgetCopy
+            ? "Customize widget copy"
+            : "Install the widget";
+
   return (
     <main
       className="relative min-h-screen overflow-hidden text-slate-100"
@@ -313,22 +473,25 @@ export default async function AgentDetailPage({
         className="relative z-10 mx-auto flex min-h-screen flex-col"
         data-oid="zpn9_yd"
       >
-        {/* Header */}
-        <header className="space-y-4 ui-card--strong p-8" data-oid="r.1rhe:">
+        <header
+          className="ui-card--strong relative overflow-hidden p-6 sm:p-8"
+          data-oid="r.1rhe:"
+        >
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(52,211,153,0.14),transparent_34%),radial-gradient(circle_at_80%_20%,rgba(139,92,246,0.12),transparent_32%)]" />
           <div
-            className="flex flex-wrap items-start justify-between gap-6"
+            className="relative flex flex-wrap items-start justify-between gap-6"
             data-oid=".wh4hdg"
           >
-            <div className="space-y-3" data-oid="jzx-z02">
+            <div className="min-w-0 space-y-4" data-oid="jzx-z02">
               <p className="ui-badge" data-oid="h3259kg">
-                Agent profile
+                Agent command center
               </p>
               <div
                 className="flex flex-wrap items-center gap-3"
                 data-oid="73ouqi_"
               >
                 <h1
-                  className="text-3xl font-semibold leading-tight sm:text-4xl"
+                  className="text-3xl font-semibold leading-tight sm:text-5xl"
                   data-oid="1.pma0j"
                 >
                   {agent.name}
@@ -348,78 +511,114 @@ export default async function AgentDetailPage({
                 </span>
               </div>
               <p
-                className="max-w-2xl text-sm text-slate-300 sm:text-base"
+                className="max-w-3xl text-sm leading-6 text-slate-300 sm:text-base"
                 data-oid="sjx7ds9"
               >
-                Use this view to connect WooCommerce or Shopify, control which
-                domains can load the widget, and copy the agent API key.
+                Configure the agent, connect catalog data, tune the widget, and
+                copy the install script from one focused workspace.
               </p>
+              <div className="flex flex-wrap gap-2 text-xs font-semibold text-slate-300">
+                <a
+                  href="#setup"
+                  className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
+                >
+                  Setup
+                </a>
+                <a
+                  href="#knowledge"
+                  className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
+                >
+                  Knowledge
+                </a>
+                <a
+                  href="#widget"
+                  className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
+                >
+                  Widget
+                </a>
+                <a
+                  href="#install"
+                  className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
+                >
+                  Install
+                </a>
+              </div>
             </div>
             <Link
               href={AGENTS_BASE}
               className="ui-button ui-button--ghost"
               data-oid="hrr377v"
             >
+              <ArrowLeft className="h-4 w-4" />
               Back to agents
             </Link>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3" data-oid="1m33wnc">
-            <div
-              className="ui-card p-4 text-sm text-slate-300"
-              data-oid="gm52otv"
-            >
-              <p
-                className="text-xs uppercase tracking-[0.24em] text-slate-400"
-                data-oid="1u34ezc"
-              >
-                API Key
-              </p>
-              <p
-                className="mt-2 break-all font-mono text-emerald-200"
-                data-oid="_6sbwyq"
-              >
-                {agent.api_key}
-              </p>
+          <div
+            className="relative mt-8 grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]"
+            data-oid="1m33wnc"
+          >
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <MetricCard
+                icon={PlugZap}
+                label="Catalog"
+                value={selectedIntegrationName}
+                detail={
+                  hasCatalog
+                    ? `${indexedProducts.toLocaleString("en-US")} products indexed`
+                    : "Connect WooCommerce or Shopify to answer with catalog context."
+                }
+                tone={
+                  hasCatalog && selectedIntegrationActive
+                    ? "good"
+                    : hasCatalog
+                      ? "warn"
+                      : "muted"
+                }
+              />
+              <MetricCard
+                icon={Globe2}
+                label="Domains"
+                value={hasDomains ? `${allowedDomains.length} allowed` : "Open"}
+                detail={
+                  hasDomains
+                    ? allowedDomains.slice(0, 2).join(", ")
+                    : "Add production domains before publishing."
+                }
+                tone={hasDomains ? "good" : "warn"}
+              />
+              <MetricCard
+                icon={MessageSquare}
+                label="Messages"
+                value={agent.messages_limit?.toLocaleString("en-US") ?? "Not set"}
+                detail="Current monthly usage cap for this agent."
+                tone={agent.messages_limit ? "good" : "muted"}
+              />
+              <MetricCard
+                icon={KeyRound}
+                label="Created"
+                value={createdAt}
+                detail={`Key ending in ${agent.api_key.slice(-6)}`}
+                tone="muted"
+              />
             </div>
-            <div
-              className="ui-card p-4 text-sm text-slate-300"
-              data-oid="fkuqatb"
-            >
-              <p
-                className="text-xs uppercase tracking-[0.24em] text-slate-400"
-                data-oid="i8p6s6."
-              >
-                Message limit
-              </p>
-              <p
-                className="mt-2 text-lg font-semibold text-white"
-                data-oid="rv4idq3"
-              >
-                {agent.messages_limit?.toLocaleString("en-US") ?? "Not set"}
-              </p>
-              <p className="text-xs text-slate-500" data-oid=":al.eqo">
-                Adjust this value from the database or soon from your plan.
-              </p>
-            </div>
-            <div
-              className="ui-card p-4 text-sm text-slate-300"
-              data-oid="g62-hjr"
-            >
-              <p
-                className="text-xs uppercase tracking-[0.24em] text-slate-400"
-                data-oid="fw63bci"
-              >
-                Created on
-              </p>
-              <p
-                className="mt-2 text-lg font-semibold text-white"
-                data-oid="50.n9yh"
-              >
-                {createdAt}
-              </p>
-              <p className="text-xs text-slate-500" data-oid="k3ecoys">
-                Keeps a full activity log and allowed domains.
+            <div className="rounded-2xl border border-emerald-400/20 bg-slate-950/55 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                  Launch readiness
+                </p>
+                <span className="text-2xl font-semibold text-white">
+                  {completionPercent}%
+                </span>
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
+                <div
+                  className="h-full rounded-full bg-emerald-400"
+                  style={{ width: `${completionPercent}%` }}
+                />
+              </div>
+              <p className="mt-3 text-xs leading-5 text-slate-400">
+                Next step: <span className="text-emerald-200">{nextStep}</span>
               </p>
             </div>
           </div>
@@ -457,21 +656,16 @@ export default async function AgentDetailPage({
             "
             data-oid="imdvyb:"
           >
-            {/* LEFT COLUMN TOP: Integration + domains */}
             <article
+              id="setup"
               className="min-w-0 ui-card glass-pane p-7"
               data-oid="_cmxgf2"
             >
-              <h2
-                className="text-xl font-semibold text-white"
-                data-oid="885swbs"
-              >
-                Integration and allowed domains
-              </h2>
-              <p className="mt-1 text-sm text-slate-300" data-oid="ce_kpcv">
-                Select the WooCommerce or Shopify integrations this agent should
-                use and define which domains can embed the widget.
-              </p>
+              <SectionHeading
+                eyebrow="Setup"
+                title="Integration, behavior, and access"
+                description="Connect catalog data, define response behavior, and lock the widget to approved domains."
+              />
 
               <div className="mt-6 space-y-6" data-oid="l4:ji3-">
                 <div className="space-y-2" data-oid="1:fz-w-">
@@ -698,65 +892,124 @@ export default async function AgentDetailPage({
               </div>
             </article>
 
-            {/* RIGHT COLUMN TOP: snippet + best practices */}
             <aside className="space-y-6 min-w-0" data-oid="1sn3crl">
-              <article
-                className="ui-card--strong glass-pane backdrop-blur relative overflow-hidden"
-                data-oid="907rges"
-              >
-                {/* EmbedSnippet component usually has its own internal card but here we wrap it or let it handle its own styles? 
-                       The user said "No cambies el contenido de los componentes hijos". 
-                       The previous code had this wrapper, so I keep the wrapper but use ui-card. 
-                    */}
-                <EmbedSnippet apiKey={agent.api_key} data-oid="__4rke1" />
+              <article className="ui-card glass-pane p-6">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-200">
+                    <ShieldCheck className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <h2 className="text-lg font-semibold text-white">
+                      Publication checklist
+                    </h2>
+                    <p className="text-xs text-slate-400">
+                      {completionCount} of {completionItems.length} complete
+                    </p>
+                  </div>
+                </div>
+                <ol className="mt-4 space-y-2">
+                  <ChecklistItem
+                    done={agent.is_active}
+                    title="Agent active"
+                    detail={
+                      agent.is_active
+                        ? "This agent can respond to widget requests."
+                        : "Activate it before installing on a live store."
+                    }
+                  />
+                  <ChecklistItem
+                    done={hasCatalog && selectedIntegrationActive}
+                    title="Catalog connected"
+                    detail={
+                      hasCatalog
+                        ? selectedIntegrationActive
+                          ? `${indexedProducts.toLocaleString("en-US")} products available.`
+                          : "Selected integration is inactive."
+                        : "Select WooCommerce or Shopify."
+                    }
+                  />
+                  <ChecklistItem
+                    done={hasDomains}
+                    title="Domains allowed"
+                    detail={
+                      hasDomains
+                        ? `${allowedDomains.length} domain${allowedDomains.length === 1 ? "" : "s"} configured.`
+                        : "Add the production storefront domain."
+                    }
+                  />
+                  <ChecklistItem
+                    done={hasPrompt}
+                    title="Instructions set"
+                    detail={
+                      hasPrompt
+                        ? "Tone and policy guidance are configured."
+                        : "Add support rules and brand tone."
+                    }
+                  />
+                  <ChecklistItem
+                    done={hasWidgetCopy}
+                    title="Widget customized"
+                    detail={
+                      hasWidgetCopy
+                        ? "Visible widget text has been adjusted."
+                        : "Tune greeting, label, and subtitle."
+                    }
+                  />
+                </ol>
               </article>
+
+              <div id="install">
+                <EmbedSnippet apiKey={agent.api_key} data-oid="__4rke1" />
+              </div>
+
               <article
                 className="ui-card glass-pane p-6 text-sm text-slate-300"
                 data-oid="n.i41pq"
               >
-                <h3
-                  className="text-lg font-semibold text-white"
-                  data-oid="qdyz.rq"
-                >
-                  Best practices
-                </h3>
-                <ul
-                  className="mt-3 space-y-2 text-xs text-slate-400"
-                  data-oid="1bssyr8"
-                >
-                  <li data-oid="2p245ji">
-                    - Use one agent per store or language to keep responses
-                    aligned with your catalog.
-                  </li>
-                  <li data-oid="9gbhe.j">
-                    - If the API key is compromised, create a new agent and
-                    deactivate this one to revoke access.
-                  </li>
-                  <li data-oid=":zlmrzb">
-                    - Enable message limit alerts from your billing panel to
-                    avoid interruptions.
-                  </li>
-                </ul>
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-700 bg-slate-900/60 text-slate-200">
+                    <Bot className="h-4 w-4" />
+                  </span>
+                  <h3
+                    className="text-lg font-semibold text-white"
+                    data-oid="qdyz.rq"
+                  >
+                    Operating notes
+                  </h3>
+                </div>
+                <div className="mt-4 grid gap-3 text-xs text-slate-400">
+                  <p className="rounded-xl border border-slate-800 bg-slate-950/35 p-3">
+                    One agent per store or language keeps catalog answers and
+                    tone more predictable.
+                  </p>
+                  <p className="rounded-xl border border-slate-800 bg-slate-950/35 p-3">
+                    Rotate the install key by creating a new agent if access is
+                    ever exposed.
+                  </p>
+                  <p className="rounded-xl border border-slate-800 bg-slate-950/35 p-3">
+                    Watch message limits before seasonal campaigns or product
+                    launches.
+                  </p>
+                </div>
               </article>
             </aside>
 
-            <KnowledgeSection agentId={agent.id} data-oid="_hxpw0u" />
+            <div id="knowledge" className="lg:col-span-2">
+              <KnowledgeSection agentId={agent.id} data-oid="_hxpw0u" />
+            </div>
 
-            {/* FILA INFERIOR: ancho completo */}
             <article
+              id="widget"
               className="lg:col-span-2 w-full min-w-0 ui-card glass-pane p-2"
               data-oid="w4rdr2m"
             >
-              <h2
-                className="text-xl font-semibold text-white"
-                data-oid="4d_xl04"
-              >
-                Customize the embeddable widget
-              </h2>
-              <p className="mt-1 text-sm text-slate-300" data-oid="su8wq5o">
-                Adjust color, text, and position and preview the result in real
-                time before copying the script.
-              </p>
+              <div className="p-5 pb-0">
+                <SectionHeading
+                  eyebrow="Widget"
+                  title="Customize the embeddable widget"
+                  description="Adjust colors, visible text, position, and preview behavior before publishing."
+                />
+              </div>
 
               <WidgetDesigner
                 apiKey={agent.api_key}
