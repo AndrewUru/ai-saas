@@ -18,7 +18,7 @@
     "langchain": "^0.3.35",
     "lucide-react": "^0.263.0",
     "next": "^15.5.7",
-    "next-mdx-remote": "^5.0.0",
+    "next-mdx-remote": "^6.0.0",
     "openai": "^4.68.2",
     "papaparse": "^5.4.1",
     "pdf-parse": "^1.1.1",
