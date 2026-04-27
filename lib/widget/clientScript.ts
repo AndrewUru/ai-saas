@@ -227,7 +227,8 @@ export function renderWidgetScript(
           ? \`<div class="ai-pl-media"><img class="ai-pl-img" src="\${imageUrl}" alt="\${name}" loading="lazy" /></div>\`
           : \`<div class="ai-pl-media ai-pl-media-fallback" aria-hidden="true">\${initial}</div>\`;
         const meta = \`<div class="ai-pl-meta"><div class="ai-pl-name">\${name}</div>\${priceText ? \`<div class="ai-pl-sub">\${priceText}</div>\` : ""}\${stockBadge}</div>\`;
-        const content = \`<div class="ai-pl-item">\${media}\${meta}</div>\`;
+        const action = permalink ? '<span class="ai-pl-action" aria-hidden="true">View</span>' : "";
+        const content = \`<div class="ai-pl-item">\${media}\${meta}\${action}</div>\`;
         if (permalink) {
           return \`<a class="ai-pl-link" href="\${permalink}" target="_blank" rel="noopener noreferrer" aria-label="View \${name}">\${content}</a>\`;
         }
@@ -346,6 +347,7 @@ export function renderWidgetScript(
       const input = form.querySelector("input");
       const submitBtn = form.querySelector("button");
       const chatBox = document.getElementById("ai-saas-chat-box");
+      const suggestionLabels = ["Browse products", "Shipping info", "Talk to support"];
 
       const scrollChatToBottom = () => {
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -357,6 +359,34 @@ export function renderWidgetScript(
         botDiv.className = "ai-saas-bubble bot ai-saas-enter";
         botDiv.innerText = text;
         chatBox.appendChild(botDiv);
+        scrollChatToBottom();
+      };
+
+      const removeSuggestions = () => {
+        const suggestions = document.getElementById("ai-saas-suggestions");
+        if (suggestions) suggestions.remove();
+      };
+
+      const appendSuggestions = () => {
+        const suggestions = document.createElement("div");
+        suggestions.id = "ai-saas-suggestions";
+        suggestions.className = "ai-saas-suggestions ai-saas-enter";
+        suggestions.setAttribute("aria-label", "Suggested questions");
+
+        suggestionLabels.forEach((label) => {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = "ai-saas-suggestion-chip";
+          chip.innerText = label;
+          chip.addEventListener("click", () => {
+            input.value = label;
+            setSending(false);
+            input.focus();
+          });
+          suggestions.appendChild(chip);
+        });
+
+        chatBox.appendChild(suggestions);
         scrollChatToBottom();
       };
 
@@ -385,6 +415,7 @@ export function renderWidgetScript(
       };
 
       appendBotMessage(greeting);
+      appendSuggestions();
 
       toggleBtn.addEventListener("click", () => setOpen(true));
       closeBtn.addEventListener("click", () => setOpen(false));
@@ -399,6 +430,7 @@ export function renderWidgetScript(
         e.preventDefault();
         const text = input.value.trim();
         if (!text) return;
+        removeSuggestions();
 
         // User Message
         const userDiv = document.createElement("div");

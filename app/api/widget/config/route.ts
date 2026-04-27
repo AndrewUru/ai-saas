@@ -10,14 +10,14 @@ import {
 } from "@/lib/widget/defaults";
 
 const appearanceDefaults = {
-  colorHeaderBg: "#008069",
+  colorHeaderBg: "#0f172a",
   colorHeaderText: "#ffffff",
-  colorChatBg: "#efe7dd",
-  colorUserBubbleBg: "#d9fdd3",
-  colorUserBubbleText: "#111b21",
+  colorChatBg: "#f1f5f9",
+  colorUserBubbleBg: "#2563eb",
+  colorUserBubbleText: "#ffffff",
   colorBotBubbleBg: "#ffffff",
-  colorBotBubbleText: "#111b21",
-  colorToggleBg: "#25D366",
+  colorBotBubbleText: "#0f172a",
+  colorToggleBg: "#0f172a",
   colorToggleText: "#ffffff",
 } as const;
 
@@ -305,7 +305,7 @@ export async function GET(req: Request) {
   return NextResponse.json(config, {
     headers: {
       "Access-Control-Allow-Origin": "*",
-      // ✅ Evita cache en navegador + CDN (Vercel)
+      // Avoid browser and CDN cache for live widget configuration.
       "Cache-Control":
         "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
       "CDN-Cache-Control": "no-store",

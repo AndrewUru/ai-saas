@@ -9,14 +9,14 @@ import {
 } from "@/lib/widget/defaults";
 
 const appearanceDefaults = {
-  colorHeaderBg: "#008069",
+  colorHeaderBg: "#0f172a",
   colorHeaderText: "#ffffff",
-  colorChatBg: "#efe7dd",
-  colorUserBubbleBg: "#d9fdd3",
-  colorUserBubbleText: "#111b21",
+  colorChatBg: "#f1f5f9",
+  colorUserBubbleBg: "#2563eb",
+  colorUserBubbleText: "#ffffff",
   colorBotBubbleBg: "#ffffff",
-  colorBotBubbleText: "#111b21",
-  colorToggleBg: "#25D366",
+  colorBotBubbleText: "#0f172a",
+  colorToggleBg: "#0f172a",
   colorToggleText: "#ffffff",
 } as const;
 

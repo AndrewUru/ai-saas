@@ -446,7 +446,7 @@ export default function WidgetDesigner({
               name="widget_color_header_bg"
               value={colorHeaderBg}
               onChange={setColorHeaderBg}
-              defaultValue="#008069"
+              defaultValue="#0f172a"
               data-oid="6cj2tyc"
             />
 
@@ -464,7 +464,7 @@ export default function WidgetDesigner({
               name="widget_color_chat_bg"
               value={colorChatBg}
               onChange={setColorChatBg}
-              defaultValue="#efe7dd"
+              defaultValue="#f1f5f9"
               data-oid="uv-ya1e"
             />
 
@@ -476,7 +476,7 @@ export default function WidgetDesigner({
               name="widget_color_user_bubble_bg"
               value={colorUserBubbleBg}
               onChange={setColorUserBubbleBg}
-              defaultValue="#d9fdd3"
+              defaultValue="#2563eb"
               data-oid="k44gotl"
             />
 
@@ -485,7 +485,7 @@ export default function WidgetDesigner({
               name="widget_color_user_bubble_text"
               value={colorUserBubbleText}
               onChange={setColorUserBubbleText}
-              defaultValue="#111b21"
+              defaultValue="#ffffff"
               data-oid="dnhykuo"
             />
 
@@ -503,7 +503,7 @@ export default function WidgetDesigner({
               name="widget_color_bot_bubble_text"
               value={colorBotBubbleText}
               onChange={setColorBotBubbleText}
-              defaultValue="#111b21"
+              defaultValue="#0f172a"
               data-oid="p2r.w:h"
             />
 
@@ -514,7 +514,7 @@ export default function WidgetDesigner({
               name="widget_color_toggle_bg"
               value={colorToggleBg}
               onChange={setColorToggleBg}
-              defaultValue="#25D366"
+              defaultValue="#0f172a"
               data-oid="dmzwni3"
             />
 
@@ -685,7 +685,7 @@ export default function WidgetDesigner({
 
       {/* Right column */}
       <div
-        className="space-y-5 rounded-3xl border border-slate-800/70 bg-linear-to-br from-slate-950/75 via-slate-950/60 to-slate-900/60 p-4 sm:p-6 shadow-xl shadow-slate-950/40 min-w-0 overflow-x-hidden"
+        className="space-y-5 rounded-2xl border border-slate-800/70 bg-linear-to-br from-slate-950/80 via-slate-950/65 to-slate-900/70 p-4 shadow-xl shadow-slate-950/40 min-w-0 overflow-x-hidden sm:p-5"
         data-oid="p-o81-s"
       >
         <div
@@ -711,11 +711,11 @@ export default function WidgetDesigner({
           data-oid="ms7_rkv"
         >
           <div
-            className="relative overflow-hidden rounded-[34px] border border-white/10 bg-black shadow-[0_24px_70px_rgba(0,0,0,.55)]"
+            className="relative overflow-hidden rounded-[28px] border border-white/10 bg-black p-2 shadow-[0_24px_70px_rgba(0,0,0,.55)]"
             data-oid="-oxjv36"
           >
             <div
-              className="absolute left-1/2 top-2 z-10 h-6 w-28 -translate-x-1/2 rounded-full bg-black/70 border border-white/10"
+              className="absolute left-1/2 top-3 z-10 h-5 w-24 -translate-x-1/2 rounded-full border border-white/10 bg-black/70"
               data-oid="o4yx4a8"
             />
 
@@ -724,7 +724,7 @@ export default function WidgetDesigner({
               title="Widget preview"
               src={previewPageUrl}
               sandbox="allow-scripts allow-same-origin"
-              className="block h-[640px] w-full border-0"
+              className="block h-[640px] w-full rounded-[22px] border-0 bg-slate-100"
               data-oid="svxitrx"
             />
           </div>
@@ -735,7 +735,7 @@ export default function WidgetDesigner({
           >
             <span data-oid="2vm99im">Mobile preview</span>
             <span className="text-slate-500" data-oid="ssp7ti9">
-              320 × 640
+              320 x 640
             </span>
           </div>
         </div>

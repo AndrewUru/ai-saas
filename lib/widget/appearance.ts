@@ -115,46 +115,37 @@ export function buildAppearance(
     (brandName.charAt(0).toUpperCase() || "A").slice(0, 1)
   );
 
-  // Custom Colors with Fallbacks
-  // Default Header: WhatsApp Teal (#008069)
+  // Custom colors with modern neutral defaults.
   const colorHeaderBg = sanitizeHex(
-    params.get("colorHeaderBg") ?? agent.widget_color_header_bg ?? "#008069"
+    params.get("colorHeaderBg") ?? agent.widget_color_header_bg ?? "#0f172a"
   );
-  // Default Header Text: White
   const colorHeaderText = sanitizeHex(
     params.get("colorHeaderText") ?? agent.widget_color_header_text ?? "#ffffff"
   );
-  // Default Chat Bg: WhatsApp Beige (#efe7dd)
   const colorChatBg = sanitizeHex(
-    params.get("colorChatBg") ?? agent.widget_color_chat_bg ?? "#efe7dd"
+    params.get("colorChatBg") ?? agent.widget_color_chat_bg ?? "#f1f5f9"
   );
-  // Default User Bubble: WhatsApp Light Green (#d9fdd3)
   const colorUserBubbleBg = sanitizeHex(
     params.get("colorUserBubbleBg") ??
       agent.widget_color_user_bubble_bg ??
-      "#d9fdd3"
+      "#2563eb"
   );
-  // Default User Text: Black
   const colorUserBubbleText = sanitizeHex(
     params.get("colorUserBubbleText") ??
       agent.widget_color_user_bubble_text ??
-      "#111b21"
+      "#ffffff"
   );
-  // Default Bot Bubble: White
   const colorBotBubbleBg = sanitizeHex(
     params.get("colorBotBubbleBg") ?? agent.widget_color_bot_bubble_bg ?? "#ffffff"
   );
-  // Default Bot Text: Black
   const colorBotBubbleText = sanitizeHex(
     params.get("colorBotBubbleText") ??
       agent.widget_color_bot_bubble_text ??
-      "#111b21"
+      "#0f172a"
   );
-  // Default Toggle Bg: WhatsApp Green (#25D366)
   const colorToggleBg = sanitizeHex(
-    params.get("colorToggleBg") ?? agent.widget_color_toggle_bg ?? "#25D366"
+    params.get("colorToggleBg") ?? agent.widget_color_toggle_bg ?? "#0f172a"
   );
-  // Default Toggle Text: White
   const colorToggleText = sanitizeHex(
     params.get("colorToggleText") ?? agent.widget_color_toggle_text ?? "#ffffff"
   );
