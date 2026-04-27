@@ -181,7 +181,7 @@ export function renderWidgetScript(
       root,
       "--ai-accent-gradient",
       accentVars.accentGradient,
-      "linear-gradient(135deg,#34d399,#8b5cf6)"
+      "linear-gradient(135deg,rgba(37,99,235,.18),rgba(37,99,235,.42))"
     );
     setVar(root, "--ai-close-bg", accentVars.closeBg);
     setVar(root, "--ai-close-text", accentVars.closeColor);
@@ -205,25 +205,31 @@ export function renderWidgetScript(
   const renderProductListHtml = (pl) => {
     const title = pl && pl.title ? \`<div class="ai-pl-title">\${escapeHtml(pl.title)}</div>\` : "";
     const items = Array.isArray(pl?.items) ? pl.items : [];
+    if (!items.length) {
+      return '<div class="ai-pl"><div class="ai-pl-empty">No matching products found.</div></div>';
+    }
+
     const cards = items
       .map((item) => {
-        const name = escapeHtml(item?.name || "");
+        const rawName = item?.name ? String(item.name) : "";
+        const name = escapeHtml(rawName);
+        const initial = escapeHtml((rawName.trim().charAt(0).toUpperCase() || "P").slice(0, 1));
         const price = item?.price !== undefined && item?.price !== null ? escapeHtml(String(item.price)) : "";
         const currency = item?.currency ? escapeHtml(String(item.currency)) : "";
         const priceText = [price, currency].filter(Boolean).join(" ");
         const permalink = sanitizeUrl(item?.permalink);
         const imageUrl = sanitizeUrl(item?.image);
-        const stockBadge =
-          item?.stock_status === "instock"
-            ? '<span class="ai-pl-cta">En stock</span>'
-            : "";
+        const stockStatus = item?.stock_status ? String(item.stock_status) : "";
+        const stockBadge = stockStatus
+          ? \`<span class="ai-pl-stock \${stockStatus === "instock" ? "instock" : "muted"}">\${stockStatus === "instock" ? "In stock" : "Check availability"}</span>\`
+          : "";
         const media = imageUrl
           ? \`<div class="ai-pl-media"><img class="ai-pl-img" src="\${imageUrl}" alt="\${name}" loading="lazy" /></div>\`
-          : '<div class="ai-pl-media"></div>';
+          : \`<div class="ai-pl-media ai-pl-media-fallback" aria-hidden="true">\${initial}</div>\`;
         const meta = \`<div class="ai-pl-meta"><div class="ai-pl-name">\${name}</div>\${priceText ? \`<div class="ai-pl-sub">\${priceText}</div>\` : ""}\${stockBadge}</div>\`;
         const content = \`<div class="ai-pl-item">\${media}\${meta}</div>\`;
         if (permalink) {
-          return \`<a class="ai-pl-link" href="\${permalink}" target="_blank" rel="noopener noreferrer">\${content}</a>\`;
+          return \`<a class="ai-pl-link" href="\${permalink}" target="_blank" rel="noopener noreferrer" aria-label="View \${name}">\${content}</a>\`;
         }
         return \`<div class="ai-pl-link">\${content}</div>\`;
       })
@@ -251,9 +257,13 @@ export function renderWidgetScript(
       // 2. Merge Overrides (Preview mode takes precedence)
       // We do a shallow merge of the top level, and deep merge of appearance
       let fullConfig = mergeConfig(config || {});
-
-      const { brandName, brandInitial, collapsedLabel, humanSupportText } =
-        fullConfig;
+      const brandName = fullConfig.brandName || "AI Widget";
+      const brandInitial =
+        fullConfig.brandInitial ||
+        (brandName.charAt(0).toUpperCase() || "A").slice(0, 1);
+      const collapsedLabel = fullConfig.collapsedLabel || "Chat with us";
+      const humanSupportText = fullConfig.humanSupportText || "Support Agent";
+      const greeting = fullConfig.greeting || "How can I help you today?";
 
       // 3. Inject CSS
       // We rely on STATIC_STYLES which uses variables.
@@ -261,21 +271,6 @@ export function renderWidgetScript(
       const styleTag = document.createElement("style");
       styleTag.innerHTML = \`${STATIC_STYLES}\`;
       document.head.appendChild(styleTag);
-      const plStyleTag = document.createElement("style");
-      plStyleTag.innerHTML = \`
-        .ai-pl { display: flex; flex-direction: column; gap: 8px; }
-        .ai-pl-title { font-size: 12px; font-weight: 600; color: var(--ai-bot-text, #111); }
-        .ai-pl-grid { display: grid; gap: 8px; }
-        .ai-pl-link { display: block; text-decoration: none; color: inherit; }
-        .ai-pl-item { display: grid; grid-template-columns: 44px 1fr; gap: 8px; align-items: center; padding: 8px; border-radius: 10px; background: rgba(15, 23, 42, 0.08); border: 1px solid rgba(148, 163, 184, 0.15); }
-        .ai-pl-media { width: 44px; height: 44px; border-radius: 8px; overflow: hidden; background: rgba(15, 23, 42, 0.12); display: flex; align-items: center; justify-content: center; }
-        .ai-pl-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .ai-pl-meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-        .ai-pl-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ai-pl-sub { font-size: 11px; opacity: 0.7; }
-        .ai-pl-cta { margin-top: 2px; font-size: 10px; font-weight: 600; color: #16a34a; }
-      \`;
-      document.head.appendChild(plStyleTag);
 
       // 4. Create Root Elements
       const anchor = document.createElement("div");
@@ -290,46 +285,45 @@ export function renderWidgetScript(
 
       // 6. Build DOM
       anchor.innerHTML = \`
-        <div id="ai-saas-toggle" role="button" tabindex="0" aria-label="Open chat">
+        <button id="ai-saas-toggle" type="button" aria-controls="ai-saas-widget" aria-expanded="false" aria-label="Open chat">
           \${renderBrandIcon()}
-          <div class="ai-saas-label">\${escapeHtml(collapsedLabel)}</div>
-        </div>
-        <div id="ai-saas-widget" aria-hidden="true">
+          <span class="ai-saas-label">\${escapeHtml(collapsedLabel)}</span>
+        </button>
+        <section id="ai-saas-widget" role="dialog" aria-modal="false" aria-labelledby="ai-saas-title" aria-hidden="true">
            <div id="ai-saas-header">
              <div class="ai-saas-brand">
-               <div class="ai-saas-brand-icon">\${escapeHtml(brandInitial)}</div>
+               <div class="ai-saas-brand-icon" aria-hidden="true">\${escapeHtml(brandInitial)}</div>
                <div class="ai-saas-brand-text">
-                 <strong>\${escapeHtml(brandName)}</strong>
-                 <span>\${escapeHtml(humanSupportText || "Support Agent")}</span>
+                 <strong id="ai-saas-title">\${escapeHtml(brandName)}</strong>
+                 <span><span class="ai-saas-status-dot" aria-hidden="true"></span>\${escapeHtml(humanSupportText)}</span>
                </div>
              </div>
-             <button id="ai-saas-close" aria-label="Close chat">
+             <button id="ai-saas-close" type="button" aria-label="Close chat">
                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                </svg>
              </button>
            </div>
            
-           <div id="ai-saas-chat-box">
-                     <!-- Chat history goes here -->
+           <div id="ai-saas-chat-box" role="log" aria-live="polite" aria-relevant="additions">
            </div>
 
            <form id="ai-saas-form">
               <div class="ai-saas-input-wrapper">
-                <input type="text" placeholder="Type a message..." aria-label="Type a message" />
-                <button type="submit" aria-label="Send">
+                <input type="text" placeholder="Type a message..." aria-label="Type a message" autocomplete="off" />
+                <button type="submit" aria-label="Send message" aria-busy="false" disabled>
                   <span class="ai-saas-send-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                   </span>
-                  Send
+                  <span class="ai-saas-send-label">Send</span>
                 </button>
               </div>
            </form>
            
-           <div style="text-align: center; padding: 0 0 10px 0; font-size: 10px; opacity: 0.5;">
-             Powered by <a href="#" target="_blank" style="color: inherit; text-decoration: none; font-weight: bold;">AI SaaS</a>
+           <div class="ai-saas-powered">
+             Powered by <a href="#" target="_blank" rel="noopener noreferrer">AI SaaS</a>
            </div>
-        </div>
+        </section>
       \`;
 
       document.body.appendChild(anchor);
@@ -350,24 +344,56 @@ export function renderWidgetScript(
       const widget = document.getElementById("ai-saas-widget");
       const form = document.getElementById("ai-saas-form");
       const input = form.querySelector("input");
+      const submitBtn = form.querySelector("button");
       const chatBox = document.getElementById("ai-saas-chat-box");
+
+      const scrollChatToBottom = () => {
+        chatBox.scrollTop = chatBox.scrollHeight;
+      };
+
+      const appendBotMessage = (text) => {
+        if (!text) return;
+        const botDiv = document.createElement("div");
+        botDiv.className = "ai-saas-bubble bot ai-saas-enter";
+        botDiv.innerText = text;
+        chatBox.appendChild(botDiv);
+        scrollChatToBottom();
+      };
+
+      const setSending = (sending) => {
+        input.disabled = sending;
+        submitBtn.disabled = sending || !input.value.trim();
+        submitBtn.setAttribute("aria-busy", sending ? "true" : "false");
+        form.classList.toggle("is-sending", sending);
+      };
       
       let isOpen = false;
       const setOpen = (state) => {
         isOpen = state;
+        toggleBtn.setAttribute("aria-expanded", state ? "true" : "false");
+        toggleBtn.setAttribute("aria-label", state ? "Chat open" : "Open chat");
         if (state) {
           refreshTheme();
           anchor.classList.add("open");
           widget.setAttribute("aria-hidden", "false");
-          input.focus();
+          window.setTimeout(() => input.focus(), 0);
         } else {
           anchor.classList.remove("open");
           widget.setAttribute("aria-hidden", "true");
+          toggleBtn.focus();
         }
       };
 
-      toggleBtn.onclick = () => setOpen(true);
-      closeBtn.onclick = () => setOpen(false);
+      appendBotMessage(greeting);
+
+      toggleBtn.addEventListener("click", () => setOpen(true));
+      closeBtn.addEventListener("click", () => setOpen(false));
+      input.addEventListener("input", () => setSending(false));
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && isOpen) {
+          setOpen(false);
+        }
+      });
 
       form.onsubmit = async (e) => {
         e.preventDefault();
@@ -379,16 +405,17 @@ export function renderWidgetScript(
         userDiv.className = "ai-saas-bubble user ai-saas-enter";
         userDiv.innerText = text; // auto-escaped
         chatBox.appendChild(userDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        scrollChatToBottom();
         input.value = "";
-        input.disabled = true;
+        setSending(true);
 
         // Typing indicator
         const typingDiv = document.createElement("div");
         typingDiv.className = "ai-saas-bubble bot typing ai-saas-enter";
-        typingDiv.innerHTML = '<div class="ai-saas-typing"><span></span><span></span><span></span></div>';
+        typingDiv.setAttribute("aria-label", "Assistant is typing");
+        typingDiv.innerHTML = '<span class="ai-saas-sr-only">Assistant is typing</span><div class="ai-saas-typing" aria-hidden="true"><span></span><span></span><span></span></div>';
         chatBox.appendChild(typingDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        scrollChatToBottom();
 
         // Send to API
         try {
@@ -411,8 +438,8 @@ export function renderWidgetScript(
             body: JSON.stringify(payload),
           });
 
-          chatBox.removeChild(typingDiv);
-          input.disabled = false;
+          if (chatBox.contains(typingDiv)) chatBox.removeChild(typingDiv);
+          setSending(false);
           input.focus();
 
           if (!resp.ok) {
@@ -424,25 +451,27 @@ export function renderWidgetScript(
 
           // Bot Message
           const botDiv = document.createElement("div");
-          botDiv.className = "ai-saas-bubble bot ai-saas-enter";
           const replyRaw = data.reply || "Sorry, I didn't understand that.";
           const parsed = safeJsonParse(replyRaw);
           if (isProductList(parsed)) {
+            botDiv.className = "ai-saas-bubble bot product-list ai-saas-enter";
             botDiv.innerHTML = renderProductListHtml(parsed);
           } else {
+            botDiv.className = "ai-saas-bubble bot ai-saas-enter";
             botDiv.innerText = replyRaw;
           }
           chatBox.appendChild(botDiv);
-          chatBox.scrollTop = chatBox.scrollHeight;
+          scrollChatToBottom();
 
         } catch (err) {
           if (chatBox.contains(typingDiv)) chatBox.removeChild(typingDiv);
-          input.disabled = false;
+          setSending(false);
           
           const errDiv = document.createElement("div");
           errDiv.className = "ai-saas-bubble bot ai-saas-error ai-saas-enter";
           errDiv.innerText = "Error sending message. Please try again.";
           chatBox.appendChild(errDiv);
+          scrollChatToBottom();
         }
       };
 
