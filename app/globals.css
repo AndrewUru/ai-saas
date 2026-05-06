@@ -163,6 +163,10 @@ a:focus-visible {
   box-shadow: var(--shadow-soft), var(--shadow-glow);
 }
 
+.ui-card--padded {
+  padding: 24px;
+}
+
 .ui-button {
   display: inline-flex;
   align-items: center;
@@ -199,6 +203,30 @@ a:focus-visible {
 .ui-button--ghost:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ui-button--secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.ui-button--secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-strong);
+}
+
+.ui-button--subtle {
+  background: transparent;
+  border-color: transparent;
+  color: var(--foreground-muted);
+  box-shadow: none;
+}
+
+.ui-button--subtle:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border);
+  color: var(--foreground);
 }
 
 .ui-badge {

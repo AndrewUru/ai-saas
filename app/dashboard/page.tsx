@@ -139,59 +139,59 @@ export default async function DashboardPage() {
             data-oid="b68k574"
           >
             <h3 className="font-semibold text-foreground" data-oid="gld:99c">
-              Platform Status
+              Next steps
             </h3>
 
-            <div className="space-y-3" data-oid="8l6._jb">
-              <div
-                className="flex items-center justify-between text-sm"
-                data-oid="cimt46l"
+            <div className="space-y-3 text-sm" data-oid="8l6._jb">
+              <Link
+                href="/dashboard/agents"
+                className="flex items-center justify-between rounded-xl border border-border bg-surface/40 px-3 py-2 text-foreground transition hover:border-accent/30 hover:bg-surface"
               >
-                <span
-                  className="text-[var(--foreground-muted)]"
-                  data-oid="w7j:dqo"
-                >
-                  API Uptime
-                </span>
-                <span className="text-accent" data-oid="_rqyttb">
-                  99.9%
+                <span>Create or configure agents</span>
+                <span className="text-accent">Open</span>
+              </Link>
+
+              <Link
+                href="/dashboard/integrations"
+                className="flex items-center justify-between rounded-xl border border-border bg-surface/40 px-3 py-2 text-foreground transition hover:border-accent/30 hover:bg-surface"
+              >
+                <span>Connect store data</span>
+                <span className="text-accent">Open</span>
+              </Link>
+
+              <Link
+                href="/dashboard/docs"
+                className="flex items-center justify-between rounded-xl border border-border bg-surface/40 px-3 py-2 text-foreground transition hover:border-accent/30 hover:bg-surface"
+              >
+                <span>Install the widget</span>
+                <span className="text-accent">Docs</span>
+              </Link>
+            </div>
+
+            <div className="space-y-3 border-t border-border pt-4 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--foreground-muted)]">Plan</span>
+                <span className="font-semibold text-foreground">
+                  {planLabel}
                 </span>
               </div>
-
-              <div
-                className="flex items-center justify-between text-sm"
-                data-oid="upi7y:-"
-              >
-                <span
-                  className="text-[var(--foreground-muted)]"
-                  data-oid="0w6z1ld"
-                >
-                  Engine
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--foreground-muted)]">
+                  Monthly limit
                 </span>
-                <span className="text-accent" data-oid="6bce5wq">
-                  v2.4.0
+                <span className="font-semibold text-foreground">
+                  {planLimitLabel}
                 </span>
               </div>
-
-              <div className="h-px bg-border my-2" data-oid="fv62fch" />
-
-              <div
-                className="flex items-center justify-between text-sm"
-                data-oid="qslxn6-"
-              >
-                <span
-                  className="text-[var(--foreground-muted)]"
-                  data-oid="o_9h1ws"
-                >
-                  Response Time
-                </span>
-                <span className="text-foreground" data-oid="-_w-7ja">
-                  120ms
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--foreground-muted)]">Renewal</span>
+                <span className="font-semibold text-foreground">
+                  {activeUntil}
                 </span>
               </div>
             </div>
 
-            <div className="pt-4" data-oid="8d-.i9a">
+            <div className="pt-2" data-oid="8d-.i9a">
               <Link
                 href="/dashboard/billing"
                 className="ui-button ui-button--secondary w-full justify-center"
