@@ -202,39 +202,74 @@ export function renderWidgetScript(
     root.classList.add(position === "left" ? "ai-pos-left" : "ai-pos-right");
   };
 
+  const getStockMeta = (status) => {
+    const normalized = typeof status === "string" ? status.toLowerCase().trim() : "";
+    if (!normalized) return null;
+    if (["instock", "in_stock", "available"].includes(normalized)) {
+      return { label: "In stock", tone: "instock" };
+    }
+    if (["outofstock", "out_of_stock", "soldout", "sold_out"].includes(normalized)) {
+      return { label: "Out of stock", tone: "out" };
+    }
+    if (["onbackorder", "backorder", "preorder", "pre_order"].includes(normalized)) {
+      return { label: "Backorder", tone: "muted" };
+    }
+    return { label: "Check availability", tone: "muted" };
+  };
+
+  const normalizeProductItem = (item) => {
+    const rawName = item?.name ? String(item.name).trim() : "";
+    const name = rawName || "Product";
+    const price = item?.price !== undefined && item?.price !== null ? String(item.price).trim() : "";
+    const currency = item?.currency ? String(item.currency).trim() : "";
+    return {
+      name,
+      initial: (name.charAt(0).toUpperCase() || "P").slice(0, 1),
+      priceText: [price, currency].filter(Boolean).join(" "),
+      permalink: sanitizeUrl(item?.permalink),
+      imageUrl: sanitizeUrl(item?.image),
+      stock: getStockMeta(item?.stock_status),
+    };
+  };
+
+  const renderProductCardHtml = (rawItem) => {
+    const item = normalizeProductItem(rawItem);
+    const name = escapeHtml(item.name);
+    const initial = escapeHtml(item.initial);
+    const imageUrl = item.imageUrl ? escapeHtml(item.imageUrl) : "";
+    const permalink = item.permalink ? escapeHtml(item.permalink) : "";
+    const price = item.priceText ? \`<div class="ai-pl-price">\${escapeHtml(item.priceText)}</div>\` : "";
+    const stock = item.stock
+      ? \`<span class="ai-pl-stock \${item.stock.tone}">\${escapeHtml(item.stock.label)}</span>\`
+      : "";
+    const media = imageUrl
+      ? \`<div class="ai-pl-media"><img class="ai-pl-img" src="\${imageUrl}" alt="\${name}" loading="lazy" onerror="this.closest('.ai-pl-media').classList.add('is-fallback');this.remove();" /><span class="ai-pl-fallback-initial" aria-hidden="true">\${initial}</span></div>\`
+      : \`<div class="ai-pl-media is-fallback" aria-hidden="true"><span class="ai-pl-fallback-initial">\${initial}</span></div>\`;
+    const action = permalink
+      ? '<span class="ai-pl-action" aria-hidden="true">View product</span>'
+      : '<span class="ai-pl-action muted" aria-hidden="true">Details in chat</span>';
+    const meta = \`
+      <div class="ai-pl-meta">
+        <div class="ai-pl-name">\${name}</div>
+        <div class="ai-pl-details">\${price}\${stock}</div>
+      </div>
+    \`;
+    const content = \`<div class="ai-pl-item">\${media}\${meta}\${action}</div>\`;
+
+    if (permalink) {
+      return \`<a class="ai-pl-link" href="\${permalink}" target="_blank" rel="noopener noreferrer" aria-label="View product: \${name}">\${content}</a>\`;
+    }
+    return \`<div class="ai-pl-link" role="group" aria-label="Product: \${name}">\${content}</div>\`;
+  };
+
   const renderProductListHtml = (pl) => {
     const title = pl && pl.title ? \`<div class="ai-pl-title">\${escapeHtml(pl.title)}</div>\` : "";
-    const items = Array.isArray(pl?.items) ? pl.items : [];
+    const items = Array.isArray(pl?.items) ? pl.items.filter(Boolean).slice(0, 6) : [];
     if (!items.length) {
       return '<div class="ai-pl"><div class="ai-pl-empty">No matching products found.</div></div>';
     }
 
-    const cards = items
-      .map((item) => {
-        const rawName = item?.name ? String(item.name) : "";
-        const name = escapeHtml(rawName);
-        const initial = escapeHtml((rawName.trim().charAt(0).toUpperCase() || "P").slice(0, 1));
-        const price = item?.price !== undefined && item?.price !== null ? escapeHtml(String(item.price)) : "";
-        const currency = item?.currency ? escapeHtml(String(item.currency)) : "";
-        const priceText = [price, currency].filter(Boolean).join(" ");
-        const permalink = sanitizeUrl(item?.permalink);
-        const imageUrl = sanitizeUrl(item?.image);
-        const stockStatus = item?.stock_status ? String(item.stock_status) : "";
-        const stockBadge = stockStatus
-          ? \`<span class="ai-pl-stock \${stockStatus === "instock" ? "instock" : "muted"}">\${stockStatus === "instock" ? "In stock" : "Check availability"}</span>\`
-          : "";
-        const media = imageUrl
-          ? \`<div class="ai-pl-media"><img class="ai-pl-img" src="\${imageUrl}" alt="\${name}" loading="lazy" /></div>\`
-          : \`<div class="ai-pl-media ai-pl-media-fallback" aria-hidden="true">\${initial}</div>\`;
-        const meta = \`<div class="ai-pl-meta"><div class="ai-pl-name">\${name}</div>\${priceText ? \`<div class="ai-pl-sub">\${priceText}</div>\` : ""}\${stockBadge}</div>\`;
-        const action = permalink ? '<span class="ai-pl-action" aria-hidden="true">View</span>' : "";
-        const content = \`<div class="ai-pl-item">\${media}\${meta}\${action}</div>\`;
-        if (permalink) {
-          return \`<a class="ai-pl-link" href="\${permalink}" target="_blank" rel="noopener noreferrer" aria-label="View \${name}">\${content}</a>\`;
-        }
-        return \`<div class="ai-pl-link">\${content}</div>\`;
-      })
-      .join("");
+    const cards = items.map(renderProductCardHtml).join("");
 
     return \`<div class="ai-pl">\${title}<div class="ai-pl-grid">\${cards}</div></div>\`;
   };
