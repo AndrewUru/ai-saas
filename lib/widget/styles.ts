@@ -765,6 +765,26 @@ export const STATIC_STYLES = `
   line-height: 1.15;
 }
 
+.ai-pl-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.ai-pl-category {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.05);
+  color: rgba(15, 23, 42, 0.58);
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1;
+}
+
 .ai-pl-stock {
   width: fit-content;
   padding: 4px 8px;

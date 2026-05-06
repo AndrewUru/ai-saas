@@ -222,6 +222,12 @@ export function renderWidgetScript(
     const name = rawName || "Product";
     const price = item?.price !== undefined && item?.price !== null ? String(item.price).trim() : "";
     const currency = item?.currency ? String(item.currency).trim() : "";
+    const categories = Array.isArray(item?.categories)
+      ? item.categories
+          .map((category) => (typeof category === "string" ? category.trim() : ""))
+          .filter(Boolean)
+          .slice(0, 3)
+      : [];
     return {
       name,
       initial: (name.charAt(0).toUpperCase() || "P").slice(0, 1),
@@ -229,6 +235,7 @@ export function renderWidgetScript(
       permalink: sanitizeUrl(item?.permalink),
       imageUrl: sanitizeUrl(item?.image),
       stock: getStockMeta(item?.stock_status),
+      categories,
     };
   };
 
@@ -242,6 +249,11 @@ export function renderWidgetScript(
     const stock = item.stock
       ? \`<span class="ai-pl-stock \${item.stock.tone}">\${escapeHtml(item.stock.label)}</span>\`
       : "";
+    const categories = item.categories.length
+      ? \`<div class="ai-pl-categories" aria-label="Product categories">\${item.categories
+          .map((category) => \`<span class="ai-pl-category">\${escapeHtml(category)}</span>\`)
+          .join("")}</div>\`
+      : "";
     const media = imageUrl
       ? \`<div class="ai-pl-media"><img class="ai-pl-img" src="\${imageUrl}" alt="\${name}" loading="lazy" onerror="this.closest('.ai-pl-media').classList.add('is-fallback');this.remove();" /><span class="ai-pl-fallback-initial" aria-hidden="true">\${initial}</span></div>\`
       : \`<div class="ai-pl-media is-fallback" aria-hidden="true"><span class="ai-pl-fallback-initial">\${initial}</span></div>\`;
@@ -252,6 +264,7 @@ export function renderWidgetScript(
       <div class="ai-pl-meta">
         <div class="ai-pl-name">\${name}</div>
         <div class="ai-pl-details">\${price}\${stock}</div>
+        \${categories}
       </div>
     \`;
     const content = \`<div class="ai-pl-item">\${media}\${meta}\${action}</div>\`;

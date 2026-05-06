@@ -33,6 +33,7 @@ type ProductSearchItem = {
   stock_status: string | null;
   permalink: string | null;
   image: string | null;
+  categories: string[] | null;
   score: number | null;
 };
 
@@ -142,6 +143,7 @@ function buildProductListReply(
       permalink: item.permalink,
       image: item.image,
       stock_status: item.stock_status,
+      categories: item.categories,
     })),
   });
 }
@@ -413,6 +415,7 @@ export async function chatWithAgent(
               stock_status: item.stock_status ?? null,
               permalink: item.permalink ?? null,
               image: item.image ?? null,
+              categories: item.categories ?? null,
               score: item.score ?? null,
             }));
           } else {
@@ -428,6 +431,7 @@ export async function chatWithAgent(
               stock_status: item.stock_status ?? null,
               permalink: item.permalink ?? null,
               image: item.image ?? null,
+              categories: item.categories ?? null,
               score: item.score ?? null,
             }));
           }

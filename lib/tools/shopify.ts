@@ -17,6 +17,8 @@ type ShopifyProductNode = {
   id: string;
   title?: string;
   handle?: string;
+  productType?: string | null;
+  tags?: string[] | null;
   totalInventory?: number | null;
   featuredImage?: { url?: string | null } | null;
   images?: {
@@ -37,12 +39,43 @@ type ShopifySearchResult = {
   stock_status: string | null;
   permalink: string | null;
   image: string | null;
+  categories: string[] | null;
   score: number | null;
+};
+
+type ShopifyIndexedSearchRow = ShopifySearchResult & {
+  product_type?: string | null;
+  tags?: string | null;
+  similarity: number;
 };
 
 function parseShopifyProductId(rawId: string) {
   const match = rawId.match(/\/Product\/(\d+)$/);
   return match?.[1] ?? rawId;
+}
+
+function normalizeCategoryNames(
+  productType?: string | null,
+  tags?: string[] | string | null
+) {
+  const names = new Set<string>();
+  if (typeof productType === "string" && productType.trim()) {
+    names.add(productType.trim());
+  }
+
+  const tagList = Array.isArray(tags)
+    ? tags
+    : typeof tags === "string"
+      ? tags.split(",")
+      : [];
+
+  for (const tag of tagList) {
+    const value = typeof tag === "string" ? tag.trim() : "";
+    if (value) names.add(value);
+  }
+
+  const list = Array.from(names).slice(0, 4);
+  return list.length ? list : null;
 }
 
 function toSearchResult(
@@ -80,6 +113,7 @@ function toSearchResult(
     stock_status,
     permalink,
     image,
+    categories: normalizeCategoryNames(node.productType, node.tags),
     score: null,
   };
 }
@@ -98,6 +132,8 @@ async function searchShopifyProductsLive(
         title
         handle
         totalInventory
+        productType
+        tags
         featuredImage { url }
         images(first: 1) { edges { node { url } } }
         variants(first: 1) { edges { node { price sku } } }
@@ -163,6 +199,7 @@ async function refreshShopifyProduct(
     stock_status,
     permalink: handle ? `https://${creds.shop_domain}/products/${handle}` : null,
     image,
+    categories: normalizeCategoryNames(product.product_type, product.tags),
     score: null,
   } satisfies ShopifySearchResult;
 }
@@ -203,7 +240,7 @@ export async function shopifySearchProductsByApiKey(
     });
 
     results = (data ?? []).map(
-      (row: ShopifySearchResult & { similarity: number }) => ({
+      (row: ShopifyIndexedSearchRow) => ({
         shopify_product_id: row.shopify_product_id,
         name: row.name,
         price: row.price ?? null,
@@ -211,6 +248,7 @@ export async function shopifySearchProductsByApiKey(
         stock_status: row.stock_status ?? null,
         permalink: row.permalink ?? null,
         image: row.image ?? null,
+        categories: normalizeCategoryNames(row.product_type, row.tags),
         score: row.similarity ?? null,
       })
     );

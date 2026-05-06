@@ -24,6 +24,7 @@ type WooProductApi = {
   permalink?: string;
   stock_status?: string;
   images?: Array<{ src: string }>;
+  categories?: Array<{ name?: string | null }>;
 };
 
 type WooSearchResult = {
@@ -33,8 +34,25 @@ type WooSearchResult = {
   stock_status: string | null;
   permalink: string | null;
   image: string | null;
+  categories: string[] | null;
   score: number | null;
 };
+
+function normalizeCategoryNames(
+  categories: unknown
+): string[] | null {
+  if (!Array.isArray(categories)) return null;
+
+  const names = categories
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") return null;
+      const value = (entry as { name?: unknown }).name;
+      return typeof value === "string" ? value.trim() : null;
+    })
+    .filter(Boolean) as string[];
+
+  return names.length ? names.slice(0, 4) : null;
+}
 
 function toSearchResult(
   product: WooProductApi,
@@ -47,6 +65,7 @@ function toSearchResult(
     stock_status: product.stock_status ?? null,
     permalink: product.permalink ?? null,
     image: product.images?.[0]?.src ?? null,
+    categories: normalizeCategoryNames(product.categories),
     score,
   };
 }
@@ -135,6 +154,7 @@ export async function wooSearchProductsByApiKey(
         stock_status: row.stock_status ?? null,
         permalink: row.permalink ?? null,
         image: row.image ?? null,
+        categories: normalizeCategoryNames(row.categories),
         score: row.similarity ?? null,
       })
     );
