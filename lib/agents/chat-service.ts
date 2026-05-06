@@ -275,7 +275,22 @@ export async function chatWithAgent(
     };
   }
 
-  if (validAgent.messages_limit && validAgent.messages_limit <= 0) {
+  const { data: quotaConsumed, error: quotaError } = await deps.supabase.rpc(
+    "consume_agent_message_quota",
+    { p_agent_id: validAgent.id }
+  );
+
+  if (quotaError) {
+    logger.error("[AI SaaS] Message quota consume error:", quotaError);
+    return {
+      ok: false,
+      status: 500,
+      error: "Could not validate message quota.",
+      fallbackUrl: validAgent.fallback_url ?? null,
+    };
+  }
+
+  if (quotaConsumed !== true) {
     return {
       ok: false,
       status: 403,
@@ -470,13 +485,6 @@ export async function chatWithAgent(
     reply,
     created_at: deps.now ? deps.now() : new Date().toISOString(),
   });
-
-  if (validAgent.messages_limit && validAgent.messages_limit > 0) {
-    await deps.supabase
-      .from("agents")
-      .update({ messages_limit: validAgent.messages_limit - 1 })
-      .eq("id", validAgent.id);
-  }
 
   return {
     ok: true,
