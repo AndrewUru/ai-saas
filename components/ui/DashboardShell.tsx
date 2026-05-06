@@ -11,7 +11,7 @@ type NavItem = {
 };
 
 const NAV: NavItem[] = [
-  { label: "Board", href: "/dashboard" },
+  { label: "Copilot", href: "/dashboard" },
   { label: "Agents", href: "/dashboard/agents" },
   { label: "Integrations", href: "/dashboard/integrations" },
   { label: "Billing", href: "/dashboard/billing" },

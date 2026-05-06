@@ -1,4 +1,3 @@
-// C:\ai-saas\app\dashboard\page.tsx
 import Link from "next/link";
 import AgentsSection from "./AgentsSection";
 import { createServer } from "@/lib/supabase/server";
@@ -9,6 +8,101 @@ const PLAN_LIMITS: Record<string, string> = {
   pro: "10,000",
 };
 
+const OBJECTION_TERMS = [
+  "price",
+  "expensive",
+  "discount",
+  "shipping",
+  "return",
+  "refund",
+  "size",
+  "stock",
+  "available",
+  "delivery",
+  "precio",
+  "envio",
+  "devolucion",
+  "talla",
+  "stock",
+];
+
+const HANDOFF_TERMS = [
+  "human",
+  "agent",
+  "support",
+  "complaint",
+  "angry",
+  "cancel",
+  "humano",
+  "soporte",
+  "reclamo",
+  "cancelar",
+];
+
+type AgentRow = {
+  id: string;
+  name: string | null;
+  is_active: boolean | null;
+  messages_limit: number | null;
+};
+
+type MessageRow = {
+  agent_id: string;
+  message: string | null;
+  reply: string | null;
+  created_at: string | null;
+};
+
+function containsAny(text: string, terms: string[]) {
+  const normalized = text.toLowerCase();
+  return terms.some((term) => normalized.includes(term));
+}
+
+function formatDate(value: string | null | undefined) {
+  if (!value) return "No expiry";
+
+  return new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+function buildSuggestedImprovements(messages: MessageRow[]) {
+  const suggestions = [
+    {
+      title: "Add a shipping and returns answer",
+      reason: "Several ecommerce chats usually stall on delivery times, refunds, or exchanges.",
+      action: "Create FAQ",
+    },
+    {
+      title: "Create a product recommendation rule",
+      reason: "Guide the agent to ask budget, use case, and urgency before recommending items.",
+      action: "Add rule",
+    },
+    {
+      title: "Define human handoff triggers",
+      reason: "Escalate complaints, order changes, and refund intent before the customer repeats themselves.",
+      action: "Review",
+    },
+  ];
+
+  if (!messages.length) return suggestions.slice(0, 2);
+
+  const hasObjections = messages.some((row) =>
+    containsAny(`${row.message ?? ""} ${row.reply ?? ""}`, OBJECTION_TERMS),
+  );
+  const hasHandoff = messages.some((row) =>
+    containsAny(`${row.message ?? ""} ${row.reply ?? ""}`, HANDOFF_TERMS),
+  );
+
+  return suggestions.filter((suggestion) => {
+    if (suggestion.action === "Create FAQ") return hasObjections;
+    if (suggestion.action === "Review") return hasHandoff;
+    return true;
+  });
+}
+
 export default async function DashboardPage() {
   const supabase = await createServer();
   const {
@@ -17,192 +111,282 @@ export default async function DashboardPage() {
 
   type Profile = { plan: string | null; active_until: string | null };
 
-  const { data: profile } = user
-    ? await supabase
-        .from("profiles")
-        .select("plan, active_until")
-        .eq("id", user.id)
-        .single<Profile>()
-    : { data: null };
+  const [{ data: profile }, { data: agentsData }] = user
+    ? await Promise.all([
+        supabase
+          .from("profiles")
+          .select("plan, active_until")
+          .eq("id", user.id)
+          .single<Profile>(),
+        supabase
+          .from("agents")
+          .select("id, name, is_active, messages_limit")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .returns<AgentRow[]>(),
+      ])
+    : [{ data: null }, { data: [] }];
 
+  const agents = agentsData ?? [];
+  const agentIds = agents.map((agent) => agent.id);
+
+  const { data: recentMessagesData } = agentIds.length
+    ? await supabase
+        .from("agent_messages")
+        .select("agent_id, message, reply, created_at")
+        .in("agent_id", agentIds)
+        .order("created_at", { ascending: false })
+        .limit(50)
+        .returns<MessageRow[]>()
+    : { data: [] };
+
+  const recentMessages = recentMessagesData ?? [];
   const plan = (profile?.plan ?? "free").toLowerCase();
   const planLabel = plan.toUpperCase();
   const planLimitLabel = PLAN_LIMITS[plan] ?? PLAN_LIMITS.free;
+  const activeUntil = formatDate(profile?.active_until);
+  const activeAgents = agents.filter((agent) => agent.is_active).length;
+  const pausedAgents = agents.length - activeAgents;
+  const objectionSignals = recentMessages.filter((row) =>
+    containsAny(`${row.message ?? ""} ${row.reply ?? ""}`, OBJECTION_TERMS),
+  );
+  const handoffSignals = recentMessages.filter((row) =>
+    containsAny(`${row.message ?? ""} ${row.reply ?? ""}`, HANDOFF_TERMS),
+  );
+  const suggestions = buildSuggestedImprovements(recentMessages);
 
-  const activeUntil = profile?.active_until
-    ? new Intl.DateTimeFormat("en-US", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }).format(new Date(profile.active_until))
-    : "No expiry";
+  const opportunityCards = [
+    {
+      label: "Revenue opportunities",
+      value: objectionSignals.length,
+      helper: "Chats mentioning price, stock, shipping, size, or returns.",
+    },
+    {
+      label: "Training suggestions",
+      value: suggestions.length,
+      helper: "Prompt, FAQ, or workflow improvements ready to review.",
+    },
+    {
+      label: "Human follow-ups",
+      value: handoffSignals.length,
+      helper: "Chats that may need support, retention, or escalation.",
+    },
+    {
+      label: "Active agents",
+      value: `${activeAgents}/${agents.length}`,
+      helper: pausedAgents ? `${pausedAgents} paused` : "All configured agents are active.",
+    },
+  ];
+
+  const playbooks = [
+    {
+      title: "Fashion fit assistant",
+      detail: "Size guidance, returns confidence, outfit pairings, and stock-aware recommendations.",
+    },
+    {
+      title: "Beauty routine advisor",
+      detail: "Skin concerns, ingredient checks, bundles, and repeat-purchase prompts.",
+    },
+    {
+      title: "Electronics compatibility desk",
+      detail: "Model matching, warranty answers, accessory upsells, and setup support.",
+    },
+  ];
+
+  const simulatorScenarios = [
+    "Customer asks if the product fits their use case",
+    "Customer objects to shipping cost",
+    "Customer wants a refund or human support",
+  ];
 
   return (
-    <>
-      {/* Stats Rack / HUD */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-4" data-oid="8f-iagq">
-        <div
-          className="ui-card p-4 flex flex-col justify-between"
-          data-oid="ku2fkpl"
-        >
-          <span
-            className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]"
-            data-oid="gauvn3s"
-          >
-            Current Plan
-          </span>
-          <div className="flex items-center gap-2 mt-1" data-oid="ttj5qg_">
-            <div
-              className="h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_#34d399]"
-              data-oid=":8v49vy"
-            />
-
-            <span className="text-lg font-bold" data-oid="vekm6xm">
-              {planLabel}
-            </span>
+    <div className="space-y-8">
+      <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="ui-card ui-card--strong p-6">
+          <p className="ui-badge">Commerce Copilot</p>
+          <div className="mt-5 max-w-3xl space-y-3">
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              Turn store conversations into sales actions.
+            </h1>
+            <p className="text-sm leading-6 text-[var(--foreground-muted)] sm:text-base">
+              Your agents do more than answer chats. They surface objections,
+              handoff moments, product gaps, and training ideas your team can
+              act on.
+            </p>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/dashboard/agents" className="ui-button ui-button--primary">
+              Configure agents
+            </Link>
+            <Link
+              href="/dashboard/integrations"
+              className="ui-button ui-button--secondary"
+            >
+              Connect catalog
+            </Link>
           </div>
         </div>
 
-        <div
-          className="ui-card p-4 flex flex-col justify-between"
-          data-oid="m66-p7x"
-        >
-          <span
-            className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]"
-            data-oid="bclv8vv"
-          >
-            Status
-          </span>
-          <span className="text-lg font-bold mt-1" data-oid="9seexq0">
-            Active
-          </span>
-        </div>
-
-        <div
-          className="ui-card p-4 flex flex-col justify-between"
-          data-oid="2malhn1"
-        >
-          <span
-            className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]"
-            data-oid="66tp065"
-          >
-            Renewal
-          </span>
-          <span
-            className="text-lg font-bold mt-1 text-[var(--foreground-muted)]"
-            data-oid="qq6guxp"
-          >
-            {activeUntil}
-          </span>
-        </div>
-
-        <div
-          className="ui-card p-4 flex flex-col justify-between bg-accent/10 border-accent/20"
-          data-oid="qz.rxot"
-        >
-          <span
-            className="text-[10px] uppercase tracking-wider text-accent"
-            data-oid="7o-5-ga"
-          >
-            Quick action
-          </span>
+        <aside className="ui-card p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--foreground-muted)]">
+            Plan health
+          </p>
+          <div className="mt-4 space-y-3 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-[var(--foreground-muted)]">Plan</span>
+              <span className="font-semibold">{planLabel}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[var(--foreground-muted)]">Limit</span>
+              <span className="font-semibold">{planLimitLabel}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[var(--foreground-muted)]">Renewal</span>
+              <span className="font-semibold">{activeUntil}</span>
+            </div>
+          </div>
           <Link
-            href="/dashboard/agents"
-            className="text-sm font-semibold text-accent hover:underline decoration-accent/50 underline-offset-4 mt-1"
-            data-oid="zp9j0t_"
+            href="/dashboard/billing"
+            className="ui-button ui-button--secondary mt-5 w-full justify-center"
           >
-            + Deploy new agent
+            Manage subscription
           </Link>
+        </aside>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {opportunityCards.map((item) => (
+          <article key={item.label} className="ui-card p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--foreground-muted)]">
+              {item.label}
+            </p>
+            <p className="mt-3 text-3xl font-semibold tracking-tight">
+              {item.value}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-[var(--foreground-muted)]">
+              {item.helper}
+            </p>
+          </article>
+        ))}
+      </section>
+
+      <section className="grid gap-8 lg:grid-cols-12">
+        <div className="space-y-6 lg:col-span-8 xl:col-span-9">
+          <div className="ui-card p-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                  Opportunity board
+                </p>
+                <h2 className="mt-2 text-xl font-semibold text-foreground">
+                  What the copilot noticed
+                </h2>
+              </div>
+              <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-[var(--foreground-muted)]">
+                Last {recentMessages.length} conversations
+              </span>
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              <SignalColumn
+                title="Sales friction"
+                empty="No pricing, stock, return, or delivery objections detected yet."
+                items={objectionSignals.slice(0, 3).map((row) => row.message)}
+              />
+              <SignalColumn
+                title="Human handoff"
+                empty="No urgent handoff signals detected yet."
+                items={handoffSignals.slice(0, 3).map((row) => row.message)}
+              />
+              <SignalColumn
+                title="Training queue"
+                empty="Start collecting conversations to generate stronger training ideas."
+                items={suggestions.map((item) => item.title)}
+              />
+            </div>
+          </div>
+
+          <AgentsSection planLimitLabel={planLimitLabel} />
         </div>
-      </div>
 
-      {/* Main Board Grid */}
-      <div
-        className="grid grid-cols-1 lg:grid-cols-12 gap-8"
-        data-oid="kd.gvx:"
-      >
-        {/* Canvas - Main Content */}
-        <div
-          className="lg:col-span-8 xl:col-span-9 space-y-6"
-          data-oid="s9-x2t."
-        >
-          <AgentsSection planLimitLabel={planLimitLabel} data-oid="k27wgxa" />
-        </div>
-
-        {/* Sidebar (right) - Quick Actions & Info */}
-        <aside
-          className="lg:col-span-4 xl:col-span-3 space-y-6"
-          data-oid="x013imz"
-        >
-          <div
-            className="ui-card p-6 space-y-4 sticky top-24"
-            data-oid="b68k574"
-          >
-            <h3 className="font-semibold text-foreground" data-oid="gld:99c">
-              Next steps
-            </h3>
-
-            <div className="space-y-3 text-sm" data-oid="8l6._jb">
-              <Link
-                href="/dashboard/agents"
-                className="flex items-center justify-between rounded-xl border border-border bg-surface/40 px-3 py-2 text-foreground transition hover:border-accent/30 hover:bg-surface"
-              >
-                <span>Create or configure agents</span>
-                <span className="text-accent">Open</span>
-              </Link>
-
-              <Link
-                href="/dashboard/integrations"
-                className="flex items-center justify-between rounded-xl border border-border bg-surface/40 px-3 py-2 text-foreground transition hover:border-accent/30 hover:bg-surface"
-              >
-                <span>Connect store data</span>
-                <span className="text-accent">Open</span>
-              </Link>
-
-              <Link
-                href="/dashboard/docs"
-                className="flex items-center justify-between rounded-xl border border-border bg-surface/40 px-3 py-2 text-foreground transition hover:border-accent/30 hover:bg-surface"
-              >
-                <span>Install the widget</span>
-                <span className="text-accent">Docs</span>
-              </Link>
+        <aside className="space-y-6 lg:col-span-4 xl:col-span-3">
+          <div className="ui-card p-6">
+            <h3 className="font-semibold text-foreground">Launch playbooks</h3>
+            <div className="mt-4 space-y-3">
+              {playbooks.map((playbook) => (
+                <article
+                  key={playbook.title}
+                  className="rounded-xl border border-border bg-surface/40 p-3"
+                >
+                  <p className="text-sm font-semibold text-foreground">
+                    {playbook.title}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-[var(--foreground-muted)]">
+                    {playbook.detail}
+                  </p>
+                </article>
+              ))}
             </div>
+          </div>
 
-            <div className="space-y-3 border-t border-border pt-4 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-[var(--foreground-muted)]">Plan</span>
-                <span className="font-semibold text-foreground">
-                  {planLabel}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[var(--foreground-muted)]">
-                  Monthly limit
-                </span>
-                <span className="font-semibold text-foreground">
-                  {planLimitLabel}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[var(--foreground-muted)]">Renewal</span>
-                <span className="font-semibold text-foreground">
-                  {activeUntil}
-                </span>
-              </div>
+          <div className="ui-card p-6">
+            <h3 className="font-semibold text-foreground">Agent simulator</h3>
+            <p className="mt-2 text-sm leading-6 text-[var(--foreground-muted)]">
+              Test common ecommerce moments before publishing a widget.
+            </p>
+            <div className="mt-4 space-y-2">
+              {simulatorScenarios.map((scenario) => (
+                <div
+                  key={scenario}
+                  className="rounded-xl border border-border bg-surface/40 px-3 py-2 text-xs text-foreground"
+                >
+                  {scenario}
+                </div>
+              ))}
             </div>
-
-            <div className="pt-2" data-oid="8d-.i9a">
-              <Link
-                href="/dashboard/billing"
-                className="ui-button ui-button--secondary w-full justify-center"
-                data-oid="agczgj."
-              >
-                Manage Subscription
-              </Link>
-            </div>
+            <Link
+              href="/dashboard/agents"
+              className="ui-button ui-button--secondary mt-5 w-full justify-center"
+            >
+              Open an agent
+            </Link>
           </div>
         </aside>
-      </div>
-    </>
+      </section>
+    </div>
+  );
+}
+
+function SignalColumn({
+  title,
+  items,
+  empty,
+}: {
+  title: string;
+  items: Array<string | null>;
+  empty: string;
+}) {
+  const visibleItems = items.filter(Boolean) as string[];
+
+  return (
+    <div className="rounded-xl border border-border bg-surface/30 p-4">
+      <p className="text-sm font-semibold text-foreground">{title}</p>
+      {visibleItems.length ? (
+        <ul className="mt-3 space-y-2">
+          {visibleItems.map((item, index) => (
+            <li
+              key={`${title}-${index}`}
+              className="line-clamp-3 rounded-lg bg-background/60 p-3 text-xs leading-5 text-[var(--foreground-muted)]"
+            >
+              {item}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 text-xs leading-5 text-[var(--foreground-muted)]">
+          {empty}
+        </p>
+      )}
+    </div>
   );
 }
