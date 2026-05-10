@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { generateAgentApiKey } from "@/lib/agents/keys";
 import { requireUser } from "@/lib/auth/requireUser";
 import { getAgentLimit } from "@/lib/plans";
 
@@ -51,8 +52,7 @@ export default async function AgentsPage(props: {
       );
     }
 
-    const apiKey =
-      "agt_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    const apiKey = generateAgentApiKey();
 
     await supabase.from("agents").insert({
       user_id: user.id,

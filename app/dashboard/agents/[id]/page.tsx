@@ -16,6 +16,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { getSiteUrlFromHeaders } from "@/lib/site";
 import WidgetDesigner from "./WidgetDesigner";
 import EmbedSnippet from "./EmbedSnippet";
+import RotateApiKeyButton from "./RotateApiKeyButton";
 import SubmitButton from "@/components/SubmitButton";
 import KnowledgeSection from "./KnowledgeSection";
 
@@ -960,6 +961,7 @@ export default async function AgentDetailPage({
 
               <div id="install">
                 <EmbedSnippet apiKey={agent.api_key} data-oid="__4rke1" />
+                <RotateApiKeyButton agentId={agent.id} />
               </div>
 
               <article

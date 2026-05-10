@@ -2,6 +2,8 @@
 "use server";
 
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
+import { generateAgentApiKey } from "@/lib/agents/keys";
 import { createServer } from "@/lib/supabase/server";
 import { safeFilename, normalizeText, chunkText } from "@/lib/knowledge/text";
 import { extractTextFromPdf, extractTextFromCsv } from "@/lib/knowledge/extract";
@@ -38,6 +40,7 @@ const Schema = z.object({
   integration_woocommerce: z.string().min(1).optional(), // "none"|"basic"|...
   allowed_domains: z.string().optional(), // "midominio.com,tienda.com"
 });
+const RotateApiKeySchema = z.string().uuid();
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const EMBEDDING_BATCH_SIZE = 50;
@@ -161,6 +164,57 @@ export async function saveAgentSettings(
     console.error(error);
     const message =
       error instanceof Error ? error.message : "Error desconocido";
+    return { ok: false, error: message };
+  }
+}
+
+export async function rotateAgentApiKey(
+  agentId: string
+): Promise<ActionResult<{ apiKeySuffix: string }>> {
+  try {
+    const parsedAgentId = RotateApiKeySchema.safeParse(agentId);
+    if (!parsedAgentId.success) {
+      return { ok: false, error: "Invalid agent id." };
+    }
+
+    const supabase = await createServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { ok: false, error: "Not authenticated." };
+
+    const owned = await getOwnedAgent(supabase, parsedAgentId.data, user.id);
+    if (!owned.ok) return { ok: false, error: owned.error };
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const apiKey = generateAgentApiKey();
+      const { error } = await supabase
+        .from("agents")
+        .update({
+          api_key: apiKey,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", parsedAgentId.data)
+        .eq("user_id", user.id);
+
+      if (!error) {
+        revalidatePath(`/dashboard/agents/${parsedAgentId.data}`);
+        revalidatePath("/dashboard/agents");
+        revalidatePath("/dashboard");
+        return { ok: true, apiKeySuffix: apiKey.slice(-6) };
+      }
+
+      if (error.code !== "23505") {
+        console.error("Supabase rotate key error:", error);
+        return { ok: false, error: error.message || "Could not rotate key." };
+      }
+    }
+
+    return { ok: false, error: "Could not generate a unique key." };
+  } catch (error) {
+    console.error(error);
+    const message =
+      error instanceof Error ? error.message : "Unexpected error.";
     return { ok: false, error: message };
   }
 }
