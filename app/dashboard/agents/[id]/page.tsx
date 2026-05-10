@@ -17,6 +17,7 @@ import { getSiteUrlFromHeaders } from "@/lib/site";
 import WidgetDesigner from "./WidgetDesigner";
 import EmbedSnippet from "./EmbedSnippet";
 import RotateApiKeyButton from "./RotateApiKeyButton";
+import AgentSimulator from "./AgentSimulator";
 import SubmitButton from "@/components/SubmitButton";
 import KnowledgeSection from "./KnowledgeSection";
 
@@ -526,6 +527,12 @@ export default async function AgentDetailPage({
                   Setup
                 </a>
                 <a
+                  href="#simulator"
+                  className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
+                >
+                  Simulator
+                </a>
+                <a
                   href="#knowledge"
                   className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
                 >
@@ -998,6 +1005,10 @@ export default async function AgentDetailPage({
 
             <div id="knowledge" className="lg:col-span-2">
               <KnowledgeSection agentId={agent.id} data-oid="_hxpw0u" />
+            </div>
+
+            <div id="simulator" className="lg:col-span-2">
+              <AgentSimulator agentId={agent.id} />
             </div>
 
             <article

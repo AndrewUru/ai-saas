@@ -212,6 +212,8 @@ export async function chatWithAgent(
     catalog?: string;
     currency?: string;
     requestHost?: RequestHostContext;
+    skipQuota?: boolean;
+    persistConversation?: boolean;
   },
   deps: AgentChatDeps
 ): Promise<AgentChatResult> {
@@ -299,28 +301,30 @@ export async function chatWithAgent(
     };
   }
 
-  const { data: quotaConsumed, error: quotaError } = await deps.supabase.rpc(
-    "consume_agent_message_quota",
-    { p_agent_id: validAgent.id }
-  );
+  if (!params.skipQuota) {
+    const { data: quotaConsumed, error: quotaError } = await deps.supabase.rpc(
+      "consume_agent_message_quota",
+      { p_agent_id: validAgent.id }
+    );
 
-  if (quotaError) {
-    logger.error("[AI SaaS] Message quota consume error:", quotaError);
-    return {
-      ok: false,
-      status: 500,
-      error: "Could not validate message quota.",
-      fallbackUrl: validAgent.fallback_url ?? null,
-    };
-  }
+    if (quotaError) {
+      logger.error("[AI SaaS] Message quota consume error:", quotaError);
+      return {
+        ok: false,
+        status: 500,
+        error: "Could not validate message quota.",
+        fallbackUrl: validAgent.fallback_url ?? null,
+      };
+    }
 
-  if (quotaConsumed !== true) {
-    return {
-      ok: false,
-      status: 403,
-      error: "The message limit for this agent has been reached.",
-      fallbackUrl: validAgent.fallback_url ?? null,
-    };
+    if (quotaConsumed !== true) {
+      return {
+        ok: false,
+        status: 403,
+        error: "The message limit for this agent has been reached.",
+        fallbackUrl: validAgent.fallback_url ?? null,
+      };
+    }
   }
 
   const { data: recentMessages } = await deps.supabase
@@ -504,13 +508,14 @@ export async function chatWithAgent(
     }
   }
 
-  // Save conversation
-  await deps.supabase.from("agent_messages").insert({
-    agent_id: validAgent.id,
-    message,
-    reply,
-    created_at: deps.now ? deps.now() : new Date().toISOString(),
-  });
+  if (params.persistConversation !== false) {
+    await deps.supabase.from("agent_messages").insert({
+      agent_id: validAgent.id,
+      message,
+      reply,
+      created_at: deps.now ? deps.now() : new Date().toISOString(),
+    });
+  }
 
   return {
     ok: true,
