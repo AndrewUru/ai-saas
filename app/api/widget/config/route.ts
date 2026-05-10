@@ -1,6 +1,10 @@
 //C:\ai-saas\app\api\widget\config\route.ts
 
 import { NextResponse } from "next/server";
+import {
+  ensureDomainAllowed,
+  resolveRequestHost,
+} from "@/lib/security/domains";
 import { createAdmin } from "@/lib/supabase/admin";
 import { WidgetConfig } from "@/lib/widget/types";
 import {
@@ -71,6 +75,24 @@ export async function GET(req: Request) {
 
   if (error || !agent) {
     return NextResponse.json({ error: "Agent not found" }, { status: 404 });
+  }
+
+  try {
+    ensureDomainAllowed(
+      agent,
+      resolveRequestHost(req, { allowSameSiteFallback: isPreview }),
+      { allowDashboardPreview: isPreview },
+    );
+  } catch {
+    return NextResponse.json(
+      { error: "This domain is not allowed for this agent." },
+      {
+        status: 403,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      },
+    );
   }
 
   // Determine chat endpoint (integrate with Shopify logic if needed,

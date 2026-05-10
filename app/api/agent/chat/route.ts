@@ -1,6 +1,7 @@
 //C:\ai-saas\app\api\agent\chat\route.ts
 import { NextResponse } from "next/server";
 import { chatWithAgent, FALLBACK_AGENT_MODEL } from "@/lib/agents/chat-service";
+import { resolveRequestHost } from "@/lib/security/domains";
 import { createAdmin } from "@/lib/supabase/admin";
 
 const AGENT_MODEL = process.env.OPENAI_AGENT_MODEL ?? FALLBACK_AGENT_MODEL;
@@ -92,6 +93,7 @@ export async function POST(req: Request) {
         message,
         catalog: catalog ?? undefined,
         currency: currency ?? undefined,
+        requestHost: resolveRequestHost(req),
       },
       {
         supabase: createAdmin(),

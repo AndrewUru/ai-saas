@@ -29,6 +29,7 @@ export const agentRecordSchema = z.object({
   id: z.string(),
   user_id: z.string(),
   is_active: z.boolean(),
+  allowed_domains: z.array(z.string()).nullable(),
   messages_limit: z.number().int().nullable(),
   description: z.string().nullable(),
   prompt_system: z.string().nullable(),

@@ -8,6 +8,10 @@ import { wooSearchProductsByApiKey } from "@/lib/tools/woo";
 import { shopifySearchProductsByApiKey } from "@/lib/tools/shopify";
 import { embedTexts } from "@/lib/knowledge/embed";
 import { toPgVector } from "@/lib/woo/embeddings";
+import {
+  ensureDomainAllowed,
+  type RequestHostContext,
+} from "@/lib/security/domains";
 
 export const FALLBACK_AGENT_MODEL = "gpt-4o-mini";
 const DEFAULT_SYSTEM_PROMPT =
@@ -207,6 +211,7 @@ export async function chatWithAgent(
     message: string;
     catalog?: string;
     currency?: string;
+    requestHost?: RequestHostContext;
   },
   deps: AgentChatDeps
 ): Promise<AgentChatResult> {
@@ -240,7 +245,7 @@ export async function chatWithAgent(
   const { data: agent, error: agentError } = await deps.supabase
     .from("agents")
     .select(
-      "id, user_id, is_active, messages_limit, description, prompt_system, language, fallback_url"
+      "id, user_id, is_active, allowed_domains, messages_limit, description, prompt_system, language, fallback_url"
     )
     .eq("api_key", apiKey)
     .single();
@@ -267,6 +272,23 @@ export async function chatWithAgent(
   }
 
   const validAgent: AgentRecord = agentParse.data;
+
+  if (params.requestHost) {
+    try {
+      ensureDomainAllowed(validAgent, params.requestHost);
+    } catch (err) {
+      const status =
+        err instanceof Error && "status" in err
+          ? Number((err as Error & { status: number }).status)
+          : 403;
+      return {
+        ok: false,
+        status,
+        error: "This domain is not allowed for this agent.",
+        fallbackUrl: validAgent.fallback_url ?? null,
+      };
+    }
+  }
 
   if (!validAgent.is_active) {
     return {
