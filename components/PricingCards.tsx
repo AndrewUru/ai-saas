@@ -1,6 +1,7 @@
 "use client";
 
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
+import { CheckCircle2, CreditCard, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -35,12 +36,13 @@ const plans = [
 export default function PricingCards({ clientId }: { clientId: string }) {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
 
   if (!clientId) {
     return (
-      <div className="text-center text-rose-400">
-        PayPal Client ID is not configured.
+      <div className="ui-alert ui-alert--error mt-8 text-center">
+        PayPal Client ID is not configured. Add it before taking payments.
       </div>
     );
   }
@@ -55,71 +57,70 @@ export default function PricingCards({ clientId }: { clientId: string }) {
       }}
     >
       {successMsg ? (
-        <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-full border border-emerald-500/50 bg-emerald-950/90 px-6 py-3 text-emerald-200 backdrop-blur-md">
+        <div className="ui-alert ui-alert--success fixed left-1/2 top-4 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 text-center">
           {successMsg}
         </div>
       ) : null}
       {errorMsg ? (
-        <div className="fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-full border border-rose-500/50 bg-rose-950/90 px-6 py-3 text-rose-200 backdrop-blur-md">
+        <div className="ui-alert ui-alert--error fixed left-1/2 top-4 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 text-center">
           {errorMsg}
         </div>
       ) : null}
 
-      <div className="mt-12 grid gap-8 md:grid-cols-2">
+      <div className="mt-10 grid gap-5 lg:grid-cols-2">
         {plans.map((plan) => (
           <article
             key={plan.id}
-            className={`relative flex flex-col gap-5 rounded-3xl border bg-slate-900/70 p-6 shadow-xl transition hover:-translate-y-1 hover:shadow-2xl ${
+            className={`ui-card relative flex flex-col gap-6 p-6 transition sm:p-8 ${
               plan.highlight
-                ? "border-emerald-400/60 bg-gradient-to-b from-emerald-500/10 via-slate-900/80 to-slate-900/90 shadow-emerald-500/10"
-                : "border-slate-800 shadow-slate-900/50"
+                ? "border-accent/40 bg-accent/5 shadow-[0_0_30px_rgba(52,211,153,0.06)]"
+                : "bg-surface/30"
             }`}
           >
             {plan.badge ? (
               <span
-                className={`absolute right-4 top-4 inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] ${
+                className={`absolute right-5 top-5 inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] ${
                   plan.highlight
-                    ? "border-emerald-400/40 bg-emerald-500/20 text-emerald-200"
-                    : "border-slate-700 bg-slate-800 text-slate-300"
+                    ? "border-accent/30 bg-accent/10 text-accent"
+                    : "border-border bg-surface text-[var(--foreground-muted)]"
                 }`}
               >
                 {plan.badge}
               </span>
             ) : null}
 
-            <div className="space-y-1">
+            <div className="space-y-2 pr-24">
               <p
-                className={`text-xs uppercase tracking-[0.22em] ${
-                  plan.highlight ? "text-emerald-300" : "text-slate-400"
+                className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${
+                  plan.highlight
+                    ? "text-accent"
+                    : "text-[var(--foreground-muted)]"
                 }`}
               >
                 {plan.headline}
               </p>
-              <h2 className="text-3xl font-bold text-white">{plan.name}</h2>
-              <p className="text-sm leading-relaxed text-slate-300">
+              <h2 className="text-3xl font-bold text-foreground">
+                {plan.name}
+              </h2>
+              <p className="text-sm leading-6 text-[var(--foreground-muted)]">
                 {plan.description}
               </p>
             </div>
 
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-white">
+              <span className="text-4xl font-bold text-foreground">
                 EUR {plan.price}
               </span>
-              <span className="text-sm font-medium text-slate-400">
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--foreground-muted)]">
                 {plan.period}
               </span>
             </div>
 
-            <div className="border-t border-slate-800 pt-4">
-              <ul className="space-y-3 text-sm text-slate-300">
+            <div className="border-t border-border/70 pt-5">
+              <ul className="space-y-3 text-sm text-[var(--foreground-muted)]">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-3">
-                    <span
-                      className={`mt-1.5 h-1.5 w-1.5 rounded-full ${
-                        plan.highlight ? "bg-emerald-400" : "bg-slate-500"
-                      }`}
-                    />
-
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -130,22 +131,44 @@ export default function PricingCards({ clientId }: { clientId: string }) {
               {plan.price === "0" ? (
                 <Link
                   href="/dashboard"
-                  className="inline-flex h-12 w-full items-center justify-center rounded-full border border-slate-700 font-semibold text-slate-200 transition hover:border-emerald-400/50 hover:bg-emerald-400/5 hover:text-emerald-200"
+                  className="ui-button ui-button--secondary h-12 w-full"
                 >
                   Go to Dashboard
                 </Link>
               ) : (
                 <div className="space-y-3">
-                  <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-3">
+                  <div className="rounded-2xl border border-border bg-background/45 p-2 shadow-inner shadow-black/30">
+                    <div className="mb-2 flex items-center justify-between px-2 pt-1 text-xs text-[var(--foreground-muted)]">
+                      <span className="inline-flex items-center gap-2">
+                        {isProcessing ? (
+                          <Loader2
+                            className="h-3.5 w-3.5 animate-spin text-accent"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <CreditCard
+                            className="h-3.5 w-3.5 text-accent"
+                            aria-hidden="true"
+                          />
+                        )}
+                        {isProcessing ? "Processing checkout" : "Pay once"}
+                      </span>
+                      <span>EUR 22</span>
+                    </div>
                     <PayPalButtons
+                      disabled={isProcessing}
                       style={{
-                        layout: "vertical",
+                        color: "black",
+                        height: 48,
                         shape: "pill",
-                        label: "paypal",
+                        label: "pay",
+                        layout: "vertical",
+                        tagline: false,
                       }}
                       createOrder={async () => {
                         setErrorMsg("");
                         setSuccessMsg("");
+                        setIsProcessing(true);
 
                         const res = await fetch("/api/paypal/create-order", {
                           method: "POST",
@@ -156,6 +179,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                         const data = await res.json();
 
                         if (!res.ok || !data?.orderId) {
+                          setIsProcessing(false);
                           throw new Error(
                             data?.error || "Could not create order",
                           );
@@ -180,6 +204,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                         if (!res.ok || !out?.ok) {
                           setSuccessMsg("");
                           setErrorMsg(out?.error || "Payment capture failed");
+                          setIsProcessing(false);
                           return;
                         }
 
@@ -190,18 +215,21 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                       onCancel={() => {
                         setSuccessMsg("");
                         setErrorMsg("");
+                        setIsProcessing(false);
                       }}
                       onError={(err) => {
                         setSuccessMsg("");
                         setErrorMsg(
                           err instanceof Error ? err.message : "PayPal error",
                         );
+                        setIsProcessing(false);
                       }}
                     />
                   </div>
 
-                  <p className="text-center text-xs text-slate-400">
-                    Secure checkout powered by PayPal.
+                  <p className="text-center text-xs text-[var(--foreground-muted)]">
+                    Secure checkout powered by PayPal. Access activates after
+                    approval.
                   </p>
                 </div>
               )}
