@@ -513,7 +513,7 @@ export function renderWidgetScript(
            </form>
            
            <div class="ai-saas-powered">
-             \${escapeHtml(copy.poweredBy)} <a href="#" target="_blank" rel="noopener noreferrer">AI SaaS</a>
+             \${escapeHtml(copy.poweredBy)} <a href="https://agentes.elsaltoweb.es" target="_blank" rel="noopener noreferrer">AI SaaS</a>
            </div>
         </section>
       \`;
