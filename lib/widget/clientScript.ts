@@ -139,9 +139,15 @@ export function renderWidgetScript(
   };
 
   const mergeConfig = (config) => {
+    const overrideLanguage =
+      OVERRIDES?.language === "auto" && config?.language
+        ? config.language
+        : OVERRIDES?.language;
+
     return {
       ...config,
       ...OVERRIDES,
+      language: overrideLanguage ?? config?.language,
       appearance: {
         ...(config?.appearance || {}),
         ...(OVERRIDES?.appearance || {}),
@@ -164,6 +170,7 @@ export function renderWidgetScript(
       assistantTyping: "Assistant is typing",
       suggestionsLabel: "Suggested questions",
       suggestions: ["Browse products", "Shipping info", "Talk to support"],
+      poweredBy: "Powered by",
       errorSending: "Error sending message. Please try again.",
       fallbackReply: "Sorry, I didn't understand that.",
       stockIn: "In stock",
@@ -192,6 +199,7 @@ export function renderWidgetScript(
       assistantTyping: "El asistente esta escribiendo",
       suggestionsLabel: "Preguntas sugeridas",
       suggestions: ["Ver productos", "Informacion de envio", "Hablar con soporte"],
+      poweredBy: "Con tecnologia de",
       errorSending: "Error al enviar el mensaje. Intentalo de nuevo.",
       fallbackReply: "Lo siento, no he entendido eso.",
       stockIn: "En stock",
@@ -220,6 +228,7 @@ export function renderWidgetScript(
       assistantTyping: "O assistente esta digitando",
       suggestionsLabel: "Perguntas sugeridas",
       suggestions: ["Ver produtos", "Informacoes de envio", "Falar com suporte"],
+      poweredBy: "Desenvolvido por",
       errorSending: "Erro ao enviar a mensagem. Tente novamente.",
       fallbackReply: "Desculpe, nao entendi isso.",
       stockIn: "Em estoque",
@@ -248,6 +257,7 @@ export function renderWidgetScript(
       assistantTyping: "L'assistant est en train d'ecrire",
       suggestionsLabel: "Questions suggerees",
       suggestions: ["Voir les produits", "Infos livraison", "Parler au support"],
+      poweredBy: "Propulse par",
       errorSending: "Erreur lors de l'envoi du message. Reessayez.",
       fallbackReply: "Desole, je n'ai pas compris.",
       stockIn: "En stock",
@@ -283,6 +293,8 @@ export function renderWidgetScript(
     const configUrl = new URL("/api/widget/config", API_BASE);
     configUrl.searchParams.set("key", key);
     configUrl.searchParams.set("t", String(Date.now()));
+    const pageLanguage = (document.documentElement.getAttribute("lang") || "").trim();
+    if (pageLanguage) configUrl.searchParams.set("pageLanguage", pageLanguage);
     const res = await fetch(configUrl.toString(), { cache: "no-store" });
     if (!res.ok) throw new Error("Config fetch failed");
     return res.json();
@@ -501,7 +513,7 @@ export function renderWidgetScript(
            </form>
            
            <div class="ai-saas-powered">
-             Powered by <a href="#" target="_blank" rel="noopener noreferrer">AI SaaS</a>
+             \${escapeHtml(copy.poweredBy)} <a href="#" target="_blank" rel="noopener noreferrer">AI SaaS</a>
            </div>
         </section>
       \`;

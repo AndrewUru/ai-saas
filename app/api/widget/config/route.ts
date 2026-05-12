@@ -59,8 +59,17 @@ function sanitizeText(value: string | null, fallback: string, max: number) {
   return cleaned.slice(0, max);
 }
 
-function resolveRequestLanguage(req: Request, configuredLanguage: string) {
+function resolveRequestLanguage(
+  req: Request,
+  configuredLanguage: string,
+  pageLanguage: string | null
+) {
   if (configuredLanguage !== "auto") return configuredLanguage;
+
+  const embeddedPageLanguage = sanitizeWidgetLanguage(
+    pageLanguage?.trim().slice(0, 2)
+  );
+  if (embeddedPageLanguage !== "auto") return embeddedPageLanguage;
 
   const accepted = req.headers.get("accept-language") ?? "";
   for (const part of accepted.split(",")) {
@@ -137,9 +146,12 @@ export async function GET(req: Request) {
   const chatEndpoint = chatUrl.toString();
 
   const baseLanguage = sanitizeWidgetLanguage(agent.language);
-  const copyDefaults = getWidgetCopyDefaults(
-    resolveRequestLanguage(req, baseLanguage)
+  const resolvedLanguage = resolveRequestLanguage(
+    req,
+    baseLanguage,
+    url.searchParams.get("pageLanguage")
   );
+  const copyDefaults = getWidgetCopyDefaults(resolvedLanguage);
   const baseAccent = normalizeHex(agent.widget_accent, widgetDefaults.accent);
   const baseBrandName = sanitizeText(
     agent.widget_brand,
@@ -204,7 +216,7 @@ export async function GET(req: Request) {
   const config: WidgetConfig = {
     key: agent.api_key,
     chatEndpoint,
-    language: baseLanguage,
+    language: resolvedLanguage,
     accent: baseAccent,
     brandName: baseBrandName,
     brandInitial: (baseBrandName.charAt(0).toUpperCase() || "A").slice(0, 1),
