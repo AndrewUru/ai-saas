@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
-import { headers } from "next/headers";
 import type { ComponentType } from "react";
 import {
   ArrowLeft,
@@ -13,13 +12,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/requireUser";
-import { getSiteUrlFromHeaders } from "@/lib/site";
-import WidgetDesigner from "./WidgetDesigner";
-import EmbedSnippet from "./EmbedSnippet";
-import RotateApiKeyButton from "./RotateApiKeyButton";
-import AgentSimulator from "./AgentSimulator";
 import SubmitButton from "@/components/SubmitButton";
-import KnowledgeSection from "./KnowledgeSection";
 
 import {
   widgetLimits,
@@ -290,44 +283,101 @@ async function updateAgentAndWidget(formData: FormData) {
       prompt_system: promptSystem,
       language,
       fallback_url: fallbackUrl,
-      widget_accent: accentRaw.trim() ? sanitizeHex(accentRaw) : null,
-      widget_brand: normalizeWidgetText(brandRaw, widgetLimits.brand),
-      widget_label: normalizeWidgetText(labelRaw, widgetLimits.label),
-      widget_greeting: normalizeWidgetText(greetingRaw, widgetLimits.greeting),
-      widget_human_support_text: normalizeWidgetText(
-        humanSupportRaw,
-        widgetLimits.humanSupportText,
-      ),
-      widget_position: positionRaw.trim()
-        ? sanitizePosition(positionRaw)
-        : null,
-      widget_color_header_bg: colorHeaderBgRaw.trim()
-        ? sanitizeHex(colorHeaderBgRaw)
-        : null,
-      widget_color_header_text: colorHeaderTextRaw.trim()
-        ? sanitizeHex(colorHeaderTextRaw)
-        : null,
-      widget_color_chat_bg: colorChatBgRaw.trim()
-        ? sanitizeHex(colorChatBgRaw)
-        : null,
-      widget_color_user_bubble_bg: colorUserBubbleBgRaw.trim()
-        ? sanitizeHex(colorUserBubbleBgRaw)
-        : null,
-      widget_color_user_bubble_text: colorUserBubbleTextRaw.trim()
-        ? sanitizeHex(colorUserBubbleTextRaw)
-        : null,
-      widget_color_bot_bubble_bg: colorBotBubbleBgRaw.trim()
-        ? sanitizeHex(colorBotBubbleBgRaw)
-        : null,
-      widget_color_bot_bubble_text: colorBotBubbleTextRaw.trim()
-        ? sanitizeHex(colorBotBubbleTextRaw)
-        : null,
-      widget_color_toggle_bg: colorToggleBgRaw.trim()
-        ? sanitizeHex(colorToggleBgRaw)
-        : null,
-      widget_color_toggle_text: colorToggleTextRaw.trim()
-        ? sanitizeHex(colorToggleTextRaw)
-        : null,
+      ...(formData.has("widget_accent")
+        ? { widget_accent: accentRaw.trim() ? sanitizeHex(accentRaw) : null }
+        : {}),
+      ...(formData.has("widget_brand")
+        ? { widget_brand: normalizeWidgetText(brandRaw, widgetLimits.brand) }
+        : {}),
+      ...(formData.has("widget_label")
+        ? { widget_label: normalizeWidgetText(labelRaw, widgetLimits.label) }
+        : {}),
+      ...(formData.has("widget_greeting")
+        ? {
+            widget_greeting: normalizeWidgetText(
+              greetingRaw,
+              widgetLimits.greeting,
+            ),
+          }
+        : {}),
+      ...(formData.has("widget_human_support_text")
+        ? {
+            widget_human_support_text: normalizeWidgetText(
+              humanSupportRaw,
+              widgetLimits.humanSupportText,
+            ),
+          }
+        : {}),
+      ...(formData.has("widget_position")
+        ? {
+            widget_position: positionRaw.trim()
+              ? sanitizePosition(positionRaw)
+              : null,
+          }
+        : {}),
+      ...(formData.has("widget_color_header_bg")
+        ? {
+            widget_color_header_bg: colorHeaderBgRaw.trim()
+              ? sanitizeHex(colorHeaderBgRaw)
+              : null,
+          }
+        : {}),
+      ...(formData.has("widget_color_header_text")
+        ? {
+            widget_color_header_text: colorHeaderTextRaw.trim()
+              ? sanitizeHex(colorHeaderTextRaw)
+              : null,
+          }
+        : {}),
+      ...(formData.has("widget_color_chat_bg")
+        ? {
+            widget_color_chat_bg: colorChatBgRaw.trim()
+              ? sanitizeHex(colorChatBgRaw)
+              : null,
+          }
+        : {}),
+      ...(formData.has("widget_color_user_bubble_bg")
+        ? {
+            widget_color_user_bubble_bg: colorUserBubbleBgRaw.trim()
+              ? sanitizeHex(colorUserBubbleBgRaw)
+              : null,
+          }
+        : {}),
+      ...(formData.has("widget_color_user_bubble_text")
+        ? {
+            widget_color_user_bubble_text: colorUserBubbleTextRaw.trim()
+              ? sanitizeHex(colorUserBubbleTextRaw)
+              : null,
+          }
+        : {}),
+      ...(formData.has("widget_color_bot_bubble_bg")
+        ? {
+            widget_color_bot_bubble_bg: colorBotBubbleBgRaw.trim()
+              ? sanitizeHex(colorBotBubbleBgRaw)
+              : null,
+          }
+        : {}),
+      ...(formData.has("widget_color_bot_bubble_text")
+        ? {
+            widget_color_bot_bubble_text: colorBotBubbleTextRaw.trim()
+              ? sanitizeHex(colorBotBubbleTextRaw)
+              : null,
+          }
+        : {}),
+      ...(formData.has("widget_color_toggle_bg")
+        ? {
+            widget_color_toggle_bg: colorToggleBgRaw.trim()
+              ? sanitizeHex(colorToggleBgRaw)
+              : null,
+          }
+        : {}),
+      ...(formData.has("widget_color_toggle_text")
+        ? {
+            widget_color_toggle_text: colorToggleTextRaw.trim()
+              ? sanitizeHex(colorToggleTextRaw)
+              : null,
+          }
+        : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", agentId)
@@ -397,13 +447,6 @@ export default async function AgentDetailPage({
   const languageValue = agent.language ?? "auto";
   const fallbackUrlValue = agent.fallback_url ?? "";
   const descriptionFallback = agent.description ?? "";
-
-  const widgetPositionValue =
-    agent.widget_position === "left" || agent.widget_position === "right"
-      ? agent.widget_position
-      : null;
-  const headersList = await headers();
-  const siteUrl = getSiteUrlFromHeaders(headersList);
 
   const createdAt = agent.created_at
     ? new Intl.DateTimeFormat("en-US", {
@@ -521,31 +564,31 @@ export default async function AgentDetailPage({
               </p>
               <div className="flex flex-wrap gap-2 text-xs font-semibold text-slate-300">
                 <a
-                  href="#setup"
+                  href={`${AGENTS_BASE}/${agent.id}`}
                   className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
                 >
                   Setup
                 </a>
                 <a
-                  href="#simulator"
+                  href={`${AGENTS_BASE}/${agent.id}/simulator`}
                   className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
                 >
                   Simulator
                 </a>
                 <a
-                  href="#knowledge"
+                  href={`${AGENTS_BASE}/${agent.id}/knowledge`}
                   className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
                 >
                   Knowledge
                 </a>
                 <a
-                  href="#widget"
+                  href={`${AGENTS_BASE}/${agent.id}/widget`}
                   className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
                 >
                   Widget
                 </a>
                 <a
-                  href="#install"
+                  href={`${AGENTS_BASE}/${agent.id}/install`}
                   className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
                 >
                   Install
@@ -562,73 +605,49 @@ export default async function AgentDetailPage({
             </Link>
           </div>
 
-          <div
-            className="relative mt-8 grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]"
-            data-oid="1m33wnc"
-          >
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <MetricCard
-                icon={PlugZap}
-                label="Catalog"
-                value={selectedIntegrationName}
-                detail={
-                  hasCatalog
-                    ? `${indexedProducts.toLocaleString("en-US")} products indexed`
-                    : "Connect WooCommerce or Shopify to answer with catalog context."
-                }
-                tone={
-                  hasCatalog && selectedIntegrationActive
-                    ? "good"
-                    : hasCatalog
-                      ? "warn"
-                      : "muted"
-                }
-              />
-              <MetricCard
-                icon={Globe2}
-                label="Domains"
-                value={hasDomains ? `${allowedDomains.length} allowed` : "Open"}
-                detail={
-                  hasDomains
-                    ? allowedDomains.slice(0, 2).join(", ")
-                    : "Add production domains before publishing."
-                }
-                tone={hasDomains ? "good" : "warn"}
-              />
-              <MetricCard
-                icon={MessageSquare}
-                label="Messages"
-                value={agent.messages_limit?.toLocaleString("en-US") ?? "Not set"}
-                detail="Current monthly usage cap for this agent."
-                tone={agent.messages_limit ? "good" : "muted"}
-              />
-              <MetricCard
-                icon={KeyRound}
-                label="Created"
-                value={createdAt}
-                detail={`Key ending in ${agent.api_key.slice(-6)}`}
-                tone="muted"
-              />
-            </div>
-            <div className="rounded-2xl border border-emerald-400/20 bg-slate-950/55 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-                  Launch readiness
-                </p>
-                <span className="text-2xl font-semibold text-white">
-                  {completionPercent}%
-                </span>
-              </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
-                <div
-                  className="h-full rounded-full bg-emerald-400"
-                  style={{ width: `${completionPercent}%` }}
-                />
-              </div>
-              <p className="mt-3 text-xs leading-5 text-slate-400">
-                Next step: <span className="text-emerald-200">{nextStep}</span>
-              </p>
-            </div>
+          <div className="relative mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <MetricCard
+              icon={PlugZap}
+              label="Catalog"
+              value={selectedIntegrationName}
+              detail={
+                hasCatalog
+                  ? `${indexedProducts.toLocaleString("en-US")} products indexed`
+                  : "Connect WooCommerce or Shopify to answer with catalog context."
+              }
+              tone={
+                hasCatalog && selectedIntegrationActive
+                  ? "good"
+                  : hasCatalog
+                    ? "warn"
+                    : "muted"
+              }
+            />
+            <MetricCard
+              icon={Globe2}
+              label="Domains"
+              value={hasDomains ? `${allowedDomains.length} allowed` : "Open"}
+              detail={
+                hasDomains
+                  ? allowedDomains.slice(0, 2).join(", ")
+                  : "Add production domains before publishing."
+              }
+              tone={hasDomains ? "good" : "warn"}
+            />
+            <MetricCard
+              icon={MessageSquare}
+              label="Messages"
+              value={agent.messages_limit?.toLocaleString("en-US") ?? "Not set"}
+              detail="Current monthly usage cap for this agent."
+              tone={agent.messages_limit ? "good" : "muted"}
+            />
+            <MetricCard
+              icon={KeyRound}
+              label="Created"
+              value={createdAt}
+              detail={`Key ending in ${agent.api_key.slice(-6)}`}
+              tone="muted"
+            />
           </div>
         </header>
 
@@ -655,20 +674,13 @@ export default async function AgentDetailPage({
             data-oid="761fhl8"
           />
 
-          <div
-            className="
-              mt-10 grid gap-10
-              lg:grid-cols-[minmax(0,1.6fr)_minmax(340px,1fr)]
-              xl:grid-cols-[minmax(0,1.85fr)_minmax(380px,1fr)]
-              2xl:grid-cols-[minmax(0,2fr)_minmax(420px,1fr)]
-            "
-            data-oid="imdvyb:"
-          >
-            <article
-              id="setup"
-              className="min-w-0 ui-card glass-pane p-7"
-              data-oid="_cmxgf2"
-            >
+          <div className="mt-8 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_390px]">
+            <div className="min-w-0 space-y-8">
+              <article
+                id="setup"
+                className="min-w-0 ui-card glass-pane p-7"
+                data-oid="_cmxgf2"
+              >
               <SectionHeading
                 eyebrow="Setup"
                 title="Integration, behavior, and access"
@@ -899,9 +911,42 @@ export default async function AgentDetailPage({
                   )}
                 </div>
               </div>
-            </article>
+              </article>
 
-            <aside className="space-y-6 min-w-0" data-oid="1sn3crl">
+            </div>
+
+            <aside className="min-w-0 space-y-5 xl:sticky xl:top-24 xl:max-h-[calc(100dvh-7rem)] xl:overflow-y-auto xl:pr-1" data-oid="1sn3crl">
+              <article className="rounded-2xl border border-emerald-400/20 bg-slate-950/55 p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                    Launch readiness
+                  </p>
+                  <span className="text-2xl font-semibold text-white">
+                    {completionPercent}%
+                  </span>
+                </div>
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
+                  <div
+                    className="h-full rounded-full bg-emerald-400"
+                    style={{ width: `${completionPercent}%` }}
+                  />
+                </div>
+                <p className="mt-3 text-xs leading-5 text-slate-400">
+                  Next step: <span className="text-emerald-200">{nextStep}</span>
+                </p>
+              </article>
+
+              <article className="ui-card--strong glass-pane p-4">
+                <SubmitButton label="Save changes" data-oid="ew1c.ap" />
+                <Link
+                  href={`${AGENTS_BASE}/${agent.id}`}
+                  className="ui-button ui-button--ghost mt-3 w-full justify-center"
+                  data-oid="g2dq6yg"
+                >
+                  Cancel
+                </Link>
+              </article>
+
               <article className="ui-card glass-pane p-6">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-200">
@@ -967,11 +1012,6 @@ export default async function AgentDetailPage({
                 </ol>
               </article>
 
-              <div id="install">
-                <EmbedSnippet apiKey={agent.api_key} data-oid="__4rke1" />
-                <RotateApiKeyButton agentId={agent.id} />
-              </div>
-
               <article
                 className="ui-card glass-pane p-6 text-sm text-slate-300"
                 data-oid="n.i41pq"
@@ -1002,67 +1042,8 @@ export default async function AgentDetailPage({
                   </p>
                 </div>
               </article>
+
             </aside>
-
-            <div id="knowledge" className="lg:col-span-2">
-              <KnowledgeSection agentId={agent.id} data-oid="_hxpw0u" />
-            </div>
-
-            <div id="simulator" className="lg:col-span-2">
-              <AgentSimulator agentId={agent.id} />
-            </div>
-
-            <article
-              id="widget"
-              className="lg:col-span-2 w-full min-w-0 ui-card glass-pane p-2"
-              data-oid="w4rdr2m"
-            >
-              <div className="p-5 pb-0">
-                <SectionHeading
-                  eyebrow="Widget"
-                  title="Customize the embeddable widget"
-                  description="Adjust colors, visible text, position, and preview behavior before publishing."
-                />
-              </div>
-
-              <WidgetDesigner
-                apiKey={agent.api_key}
-                siteUrl={siteUrl}
-                initialAccent={agent.widget_accent}
-                initialBrand={agent.widget_brand}
-                initialLabel={agent.widget_label}
-                initialGreeting={agent.widget_greeting}
-                initialLanguage={languageValue}
-                initialHumanSupportText={agent.widget_human_support_text}
-                initialPosition={widgetPositionValue}
-                initialColorHeaderBg={agent.widget_color_header_bg}
-                initialColorHeaderText={agent.widget_color_header_text}
-                initialColorChatBg={agent.widget_color_chat_bg}
-                initialColorUserBubbleBg={agent.widget_color_user_bubble_bg}
-                initialColorUserBubbleText={agent.widget_color_user_bubble_text}
-                initialColorBotBubbleBg={agent.widget_color_bot_bubble_bg}
-                initialColorBotBubbleText={agent.widget_color_bot_bubble_text}
-                initialColorToggleBg={agent.widget_color_toggle_bg}
-                initialColorToggleText={agent.widget_color_toggle_text}
-                data-oid=".2z0p3q"
-              />
-            </article>
-          </div>
-
-          <div className="sticky bottom-6 z-20 mt-10" data-oid="eaj.k4d">
-            <div
-              className="ui-card--strong glass-pane flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-end"
-              data-oid="7f9q1ma"
-            >
-              <SubmitButton label="Save changes" data-oid="ew1c.ap" />
-              <Link
-                href={`${AGENTS_BASE}/${agent.id}`}
-                className="ui-button ui-button--ghost w-full sm:w-auto"
-                data-oid="g2dq6yg"
-              >
-                Cancel
-              </Link>
-            </div>
           </div>
         </form>
       </section>

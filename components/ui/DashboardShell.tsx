@@ -18,6 +18,14 @@ const NAV: NavItem[] = [
   { label: "Docs", href: "/dashboard/docs" },
 ];
 
+const AGENT_SCREENS = [
+  { label: "Setup", suffix: "" },
+  { label: "Widget", suffix: "/widget" },
+  { label: "Knowledge", suffix: "/knowledge" },
+  { label: "Simulator", suffix: "/simulator" },
+  { label: "Install", suffix: "/install" },
+] as const;
+
 function cx(...cls: Array<string | false | undefined | null>) {
   return cls.filter(Boolean).join(" ");
 }
@@ -36,6 +44,18 @@ export default function DashboardShell({
         ? pathname === "/dashboard"
         : pathname?.startsWith(href);
   }, [pathname]);
+
+  const agentBaseHref = useMemo(() => {
+    const match = pathname?.match(/^\/dashboard\/agents\/([^/]+)/);
+    return match ? `/dashboard/agents/${match[1]}` : null;
+  }, [pathname]);
+
+  const agentScreenNav = agentBaseHref
+    ? AGENT_SCREENS.map((item) => ({
+        label: item.label,
+        href: `${agentBaseHref}${item.suffix}`,
+      }))
+    : [];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -98,6 +118,31 @@ export default function DashboardShell({
                 </Link>
               ))}
             </nav>
+
+            {agentScreenNav.length ? (
+              <nav className="mt-6 space-y-1" aria-label="Agent screens">
+                <div className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--foreground-muted)]">
+                  Agent screens
+                </div>
+                {agentScreenNav.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cx(
+                      "flex items-center justify-between rounded-xl px-3 py-2 text-sm transition",
+                      pathname === item.href
+                        ? "border border-accent/20 bg-accent/10 text-foreground"
+                        : "text-[var(--foreground-muted)] hover:bg-surface-strong/50",
+                    )}
+                  >
+                    <span className="font-medium">{item.label}</span>
+                    {pathname === item.href ? (
+                      <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_10px_rgba(52,211,153,0.7)]" />
+                    ) : null}
+                  </Link>
+                ))}
+              </nav>
+            ) : null}
 
             <div className="mt-auto pt-4">
               <div className="ui-card p-4">
@@ -171,6 +216,32 @@ export default function DashboardShell({
                 </Link>
               ))}
             </nav>
+
+            {agentScreenNav.length ? (
+              <nav className="mt-6 space-y-1" aria-label="Agent screens">
+                <div className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--foreground-muted)]">
+                  Agent screens
+                </div>
+                {agentScreenNav.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className={cx(
+                      "flex items-center justify-between rounded-xl px-3 py-2 text-sm transition",
+                      pathname === item.href
+                        ? "border border-accent/20 bg-accent/10 text-foreground"
+                        : "text-[var(--foreground-muted)] hover:bg-surface-strong/50",
+                    )}
+                  >
+                    <span className="font-medium">{item.label}</span>
+                    {pathname === item.href ? (
+                      <span className="h-2 w-2 rounded-full bg-accent" />
+                    ) : null}
+                  </Link>
+                ))}
+              </nav>
+            ) : null}
           </div>
         </div>
       ) : null}
