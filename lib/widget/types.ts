@@ -1,4 +1,5 @@
 export type WidgetPosition = "left" | "right";
+export type WidgetLanguage = "auto" | "en" | "es" | "pt" | "fr";
 
 export interface WidgetAppearance {
   accent: string;
@@ -28,6 +29,7 @@ export interface WidgetAppearance {
 export interface WidgetConfig {
   key: string;
   chatEndpoint: string;
+  language?: WidgetLanguage | string | null;
   accent: string;
   brandName: string;
   brandInitial: string;
@@ -57,6 +59,7 @@ export interface AgentRecord {
   widget_label: string | null;
   widget_greeting: string | null;
   widget_human_support_text: string | null;
+  language: WidgetLanguage | string | null;
   widget_position: WidgetPosition | null;
   widget_color_header_bg: string | null;
   widget_color_header_text: string | null;

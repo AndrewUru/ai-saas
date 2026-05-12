@@ -8,6 +8,8 @@ import {
 import { createAdmin } from "@/lib/supabase/admin";
 import { WidgetConfig } from "@/lib/widget/types";
 import {
+  getWidgetCopyDefaults,
+  sanitizeWidgetLanguage,
   sanitizePosition,
   widgetDefaults,
   widgetLimits,
@@ -55,6 +57,18 @@ function sanitizeText(value: string | null, fallback: string, max: number) {
     .trim();
   if (!cleaned) return fallback;
   return cleaned.slice(0, max);
+}
+
+function resolveRequestLanguage(req: Request, configuredLanguage: string) {
+  if (configuredLanguage !== "auto") return configuredLanguage;
+
+  const accepted = req.headers.get("accept-language") ?? "";
+  for (const part of accepted.split(",")) {
+    const language = sanitizeWidgetLanguage(part.trim().slice(0, 2));
+    if (language !== "auto") return language;
+  }
+
+  return "en";
 }
 
 export async function GET(req: Request) {
@@ -122,6 +136,10 @@ export async function GET(req: Request) {
   }
   const chatEndpoint = chatUrl.toString();
 
+  const baseLanguage = sanitizeWidgetLanguage(agent.language);
+  const copyDefaults = getWidgetCopyDefaults(
+    resolveRequestLanguage(req, baseLanguage)
+  );
   const baseAccent = normalizeHex(agent.widget_accent, widgetDefaults.accent);
   const baseBrandName = sanitizeText(
     agent.widget_brand,
@@ -130,17 +148,17 @@ export async function GET(req: Request) {
   );
   const baseLabel = sanitizeText(
     agent.widget_label,
-    widgetDefaults.label,
+    copyDefaults.label,
     widgetLimits.label
   );
   const baseGreeting = sanitizeText(
     agent.widget_greeting,
-    widgetDefaults.greeting,
+    copyDefaults.greeting,
     widgetLimits.greeting
   );
   const baseHumanSupportText = sanitizeText(
     agent.widget_human_support_text,
-    widgetDefaults.humanSupportText,
+    copyDefaults.humanSupportText,
     widgetLimits.humanSupportText
   );
   const basePosition = sanitizePosition(agent.widget_position);
@@ -186,6 +204,7 @@ export async function GET(req: Request) {
   const config: WidgetConfig = {
     key: agent.api_key,
     chatEndpoint,
+    language: baseLanguage,
     accent: baseAccent,
     brandName: baseBrandName,
     brandInitial: (baseBrandName.charAt(0).toUpperCase() || "A").slice(0, 1),
@@ -243,6 +262,11 @@ export async function GET(req: Request) {
         config.humanSupportText ?? widgetDefaults.humanSupportText,
         widgetLimits.humanSupportText
       );
+    }
+
+    const languageParam = getParam(params, "language");
+    if (languageParam !== null) {
+      config.language = sanitizeWidgetLanguage(languageParam);
     }
 
     const positionParam = getParam(params, "position");

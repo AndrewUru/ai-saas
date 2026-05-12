@@ -149,6 +149,136 @@ export function renderWidgetScript(
     };
   };
 
+  const UI_COPY = {
+    en: {
+      collapsedLabel: "Chat with us",
+      humanSupportText: "Talk to a human",
+      greeting: "How can I help you today?",
+      inputPlaceholder: "Type a message...",
+      inputLabel: "Type a message",
+      send: "Send",
+      sendMessage: "Send message",
+      openChat: "Open chat",
+      chatOpen: "Chat open",
+      closeChat: "Close chat",
+      assistantTyping: "Assistant is typing",
+      suggestionsLabel: "Suggested questions",
+      suggestions: ["Browse products", "Shipping info", "Talk to support"],
+      errorSending: "Error sending message. Please try again.",
+      fallbackReply: "Sorry, I didn't understand that.",
+      stockIn: "In stock",
+      stockOut: "Out of stock",
+      stockBackorder: "Backorder",
+      stockCheck: "Check availability",
+      productCategories: "Product categories",
+      product: "Product",
+      viewProduct: "View product",
+      detailsInChat: "Details in chat",
+      viewProductAria: "View product:",
+      productAria: "Product:",
+      noProducts: "No matching products found.",
+    },
+    es: {
+      collapsedLabel: "Chatea con nosotros",
+      humanSupportText: "Habla con una persona",
+      greeting: "Como puedo ayudarte hoy?",
+      inputPlaceholder: "Escribe un mensaje...",
+      inputLabel: "Escribe un mensaje",
+      send: "Enviar",
+      sendMessage: "Enviar mensaje",
+      openChat: "Abrir chat",
+      chatOpen: "Chat abierto",
+      closeChat: "Cerrar chat",
+      assistantTyping: "El asistente esta escribiendo",
+      suggestionsLabel: "Preguntas sugeridas",
+      suggestions: ["Ver productos", "Informacion de envio", "Hablar con soporte"],
+      errorSending: "Error al enviar el mensaje. Intentalo de nuevo.",
+      fallbackReply: "Lo siento, no he entendido eso.",
+      stockIn: "En stock",
+      stockOut: "Sin stock",
+      stockBackorder: "Bajo pedido",
+      stockCheck: "Consultar disponibilidad",
+      productCategories: "Categorias de producto",
+      product: "Producto",
+      viewProduct: "Ver producto",
+      detailsInChat: "Detalles en el chat",
+      viewProductAria: "Ver producto:",
+      productAria: "Producto:",
+      noProducts: "No se encontraron productos coincidentes.",
+    },
+    pt: {
+      collapsedLabel: "Fale conosco",
+      humanSupportText: "Falar com uma pessoa",
+      greeting: "Como posso ajudar hoje?",
+      inputPlaceholder: "Digite uma mensagem...",
+      inputLabel: "Digite uma mensagem",
+      send: "Enviar",
+      sendMessage: "Enviar mensagem",
+      openChat: "Abrir chat",
+      chatOpen: "Chat aberto",
+      closeChat: "Fechar chat",
+      assistantTyping: "O assistente esta digitando",
+      suggestionsLabel: "Perguntas sugeridas",
+      suggestions: ["Ver produtos", "Informacoes de envio", "Falar com suporte"],
+      errorSending: "Erro ao enviar a mensagem. Tente novamente.",
+      fallbackReply: "Desculpe, nao entendi isso.",
+      stockIn: "Em estoque",
+      stockOut: "Sem estoque",
+      stockBackorder: "Sob encomenda",
+      stockCheck: "Verificar disponibilidade",
+      productCategories: "Categorias de produto",
+      product: "Produto",
+      viewProduct: "Ver produto",
+      detailsInChat: "Detalhes no chat",
+      viewProductAria: "Ver produto:",
+      productAria: "Produto:",
+      noProducts: "Nenhum produto correspondente encontrado.",
+    },
+    fr: {
+      collapsedLabel: "Discuter avec nous",
+      humanSupportText: "Parler a une personne",
+      greeting: "Comment puis-je vous aider aujourd'hui ?",
+      inputPlaceholder: "Ecrivez un message...",
+      inputLabel: "Ecrivez un message",
+      send: "Envoyer",
+      sendMessage: "Envoyer le message",
+      openChat: "Ouvrir le chat",
+      chatOpen: "Chat ouvert",
+      closeChat: "Fermer le chat",
+      assistantTyping: "L'assistant est en train d'ecrire",
+      suggestionsLabel: "Questions suggerees",
+      suggestions: ["Voir les produits", "Infos livraison", "Parler au support"],
+      errorSending: "Erreur lors de l'envoi du message. Reessayez.",
+      fallbackReply: "Desole, je n'ai pas compris.",
+      stockIn: "En stock",
+      stockOut: "Rupture de stock",
+      stockBackorder: "Sur commande",
+      stockCheck: "Verifier la disponibilite",
+      productCategories: "Categories de produit",
+      product: "Produit",
+      viewProduct: "Voir le produit",
+      detailsInChat: "Details dans le chat",
+      viewProductAria: "Voir le produit :",
+      productAria: "Produit :",
+      noProducts: "Aucun produit correspondant trouve.",
+    },
+  };
+
+  const resolveLanguage = (configuredLanguage) => {
+    const explicit = typeof configuredLanguage === "string" ? configuredLanguage.toLowerCase().slice(0, 2) : "";
+    if (UI_COPY[explicit]) return explicit;
+
+    const docLanguage = (document.documentElement.getAttribute("lang") || "").toLowerCase().slice(0, 2);
+    if (UI_COPY[docLanguage]) return docLanguage;
+
+    const browserLanguage = (navigator.language || "").toLowerCase().slice(0, 2);
+    if (UI_COPY[browserLanguage]) return browserLanguage;
+
+    return "en";
+  };
+
+  const getCopy = (configuredLanguage) => UI_COPY[resolveLanguage(configuredLanguage)] || UI_COPY.en;
+
   const fetchConfig = async (key) => {
     const configUrl = new URL("/api/widget/config", API_BASE);
     configUrl.searchParams.set("key", key);
@@ -202,24 +332,24 @@ export function renderWidgetScript(
     root.classList.add(position === "left" ? "ai-pos-left" : "ai-pos-right");
   };
 
-  const getStockMeta = (status) => {
+  const getStockMeta = (status, copy) => {
     const normalized = typeof status === "string" ? status.toLowerCase().trim() : "";
     if (!normalized) return null;
     if (["instock", "in_stock", "available"].includes(normalized)) {
-      return { label: "In stock", tone: "instock" };
+      return { label: copy.stockIn, tone: "instock" };
     }
     if (["outofstock", "out_of_stock", "soldout", "sold_out"].includes(normalized)) {
-      return { label: "Out of stock", tone: "out" };
+      return { label: copy.stockOut, tone: "out" };
     }
     if (["onbackorder", "backorder", "preorder", "pre_order"].includes(normalized)) {
-      return { label: "Backorder", tone: "muted" };
+      return { label: copy.stockBackorder, tone: "muted" };
     }
-    return { label: "Check availability", tone: "muted" };
+    return { label: copy.stockCheck, tone: "muted" };
   };
 
-  const normalizeProductItem = (item) => {
+  const normalizeProductItem = (item, copy) => {
     const rawName = item?.name ? String(item.name).trim() : "";
-    const name = rawName || "Product";
+    const name = rawName || copy.product;
     const price = item?.price !== undefined && item?.price !== null ? String(item.price).trim() : "";
     const currency = item?.currency ? String(item.currency).trim() : "";
     const categories = Array.isArray(item?.categories)
@@ -234,13 +364,13 @@ export function renderWidgetScript(
       priceText: [price, currency].filter(Boolean).join(" "),
       permalink: sanitizeUrl(item?.permalink),
       imageUrl: sanitizeUrl(item?.image),
-      stock: getStockMeta(item?.stock_status),
+      stock: getStockMeta(item?.stock_status, copy),
       categories,
     };
   };
 
-  const renderProductCardHtml = (rawItem) => {
-    const item = normalizeProductItem(rawItem);
+  const renderProductCardHtml = (rawItem, copy) => {
+    const item = normalizeProductItem(rawItem, copy);
     const name = escapeHtml(item.name);
     const initial = escapeHtml(item.initial);
     const imageUrl = item.imageUrl ? escapeHtml(item.imageUrl) : "";
@@ -250,7 +380,7 @@ export function renderWidgetScript(
       ? \`<span class="ai-pl-stock \${item.stock.tone}">\${escapeHtml(item.stock.label)}</span>\`
       : "";
     const categories = item.categories.length
-      ? \`<div class="ai-pl-categories" aria-label="Product categories">\${item.categories
+      ? \`<div class="ai-pl-categories" aria-label="\${escapeHtml(copy.productCategories)}">\${item.categories
           .map((category) => \`<span class="ai-pl-category">\${escapeHtml(category)}</span>\`)
           .join("")}</div>\`
       : "";
@@ -258,8 +388,8 @@ export function renderWidgetScript(
       ? \`<div class="ai-pl-media"><img class="ai-pl-img" src="\${imageUrl}" alt="\${name}" loading="lazy" onerror="this.closest('.ai-pl-media').classList.add('is-fallback');this.remove();" /><span class="ai-pl-fallback-initial" aria-hidden="true">\${initial}</span></div>\`
       : \`<div class="ai-pl-media is-fallback" aria-hidden="true"><span class="ai-pl-fallback-initial">\${initial}</span></div>\`;
     const action = permalink
-      ? '<span class="ai-pl-action" aria-hidden="true">View product</span>'
-      : '<span class="ai-pl-action muted" aria-hidden="true">Details in chat</span>';
+      ? \`<span class="ai-pl-action" aria-hidden="true">\${escapeHtml(copy.viewProduct)}</span>\`
+      : \`<span class="ai-pl-action muted" aria-hidden="true">\${escapeHtml(copy.detailsInChat)}</span>\`;
     const meta = \`
       <div class="ai-pl-meta">
         <div class="ai-pl-name">\${name}</div>
@@ -270,19 +400,19 @@ export function renderWidgetScript(
     const content = \`<div class="ai-pl-item">\${media}\${meta}\${action}</div>\`;
 
     if (permalink) {
-      return \`<a class="ai-pl-link" href="\${permalink}" target="_blank" rel="noopener noreferrer" aria-label="View product: \${name}">\${content}</a>\`;
+      return \`<a class="ai-pl-link" href="\${permalink}" target="_blank" rel="noopener noreferrer" aria-label="\${escapeHtml(copy.viewProductAria)} \${name}">\${content}</a>\`;
     }
-    return \`<div class="ai-pl-link" role="group" aria-label="Product: \${name}">\${content}</div>\`;
+    return \`<div class="ai-pl-link" role="group" aria-label="\${escapeHtml(copy.productAria)} \${name}">\${content}</div>\`;
   };
 
-  const renderProductListHtml = (pl) => {
+  const renderProductListHtml = (pl, copy) => {
     const title = pl && pl.title ? \`<div class="ai-pl-title">\${escapeHtml(pl.title)}</div>\` : "";
     const items = Array.isArray(pl?.items) ? pl.items.filter(Boolean).slice(0, 6) : [];
     if (!items.length) {
-      return '<div class="ai-pl"><div class="ai-pl-empty">No matching products found.</div></div>';
+      return \`<div class="ai-pl"><div class="ai-pl-empty">\${escapeHtml(copy.noProducts)}</div></div>\`;
     }
 
-    const cards = items.map(renderProductCardHtml).join("");
+    const cards = items.map((item) => renderProductCardHtml(item, copy)).join("");
 
     return \`<div class="ai-pl">\${title}<div class="ai-pl-grid">\${cards}</div></div>\`;
   };
@@ -306,13 +436,14 @@ export function renderWidgetScript(
       // 2. Merge Overrides (Preview mode takes precedence)
       // We do a shallow merge of the top level, and deep merge of appearance
       let fullConfig = mergeConfig(config || {});
+      let copy = getCopy(fullConfig.language);
       const brandName = fullConfig.brandName || "AI Widget";
       const brandInitial =
         fullConfig.brandInitial ||
         (brandName.charAt(0).toUpperCase() || "A").slice(0, 1);
-      const collapsedLabel = fullConfig.collapsedLabel || "Chat with us";
-      const humanSupportText = fullConfig.humanSupportText || "Support Agent";
-      const greeting = fullConfig.greeting || "How can I help you today?";
+      const collapsedLabel = fullConfig.collapsedLabel || copy.collapsedLabel;
+      const humanSupportText = fullConfig.humanSupportText || copy.humanSupportText;
+      const greeting = fullConfig.greeting || copy.greeting;
 
       // 3. Inject CSS
       // We rely on STATIC_STYLES which uses variables.
@@ -334,7 +465,7 @@ export function renderWidgetScript(
 
       // 6. Build DOM
       anchor.innerHTML = \`
-        <button id="ai-saas-toggle" type="button" aria-controls="ai-saas-widget" aria-expanded="false" aria-label="Open chat">
+        <button id="ai-saas-toggle" type="button" aria-controls="ai-saas-widget" aria-expanded="false" aria-label="\${escapeHtml(copy.openChat)}">
           \${renderBrandIcon()}
           <span class="ai-saas-label">\${escapeHtml(collapsedLabel)}</span>
         </button>
@@ -347,7 +478,7 @@ export function renderWidgetScript(
                  <span><span class="ai-saas-status-dot" aria-hidden="true"></span>\${escapeHtml(humanSupportText)}</span>
                </div>
              </div>
-             <button id="ai-saas-close" type="button" aria-label="Close chat">
+             <button id="ai-saas-close" type="button" aria-label="\${escapeHtml(copy.closeChat)}">
                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                </svg>
@@ -359,12 +490,12 @@ export function renderWidgetScript(
 
            <form id="ai-saas-form">
               <div class="ai-saas-input-wrapper">
-                <input type="text" placeholder="Type a message..." aria-label="Type a message" autocomplete="off" />
-                <button type="submit" aria-label="Send message" aria-busy="false" disabled>
+                <input type="text" placeholder="\${escapeHtml(copy.inputPlaceholder)}" aria-label="\${escapeHtml(copy.inputLabel)}" autocomplete="off" />
+                <button type="submit" aria-label="\${escapeHtml(copy.sendMessage)}" aria-busy="false" disabled>
                   <span class="ai-saas-send-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                   </span>
-                  <span class="ai-saas-send-label">Send</span>
+                  <span class="ai-saas-send-label">\${escapeHtml(copy.send)}</span>
                 </button>
               </div>
            </form>
@@ -381,6 +512,7 @@ export function renderWidgetScript(
         try {
           const freshConfig = await fetchConfig(CONFIG_KEY);
           fullConfig = mergeConfig(freshConfig || {});
+          copy = getCopy(fullConfig.language);
           applyTheme(anchor, fullConfig);
         } catch (err) {
           console.warn("Widget theme refresh failed");
@@ -395,7 +527,7 @@ export function renderWidgetScript(
       const input = form.querySelector("input");
       const submitBtn = form.querySelector("button");
       const chatBox = document.getElementById("ai-saas-chat-box");
-      const suggestionLabels = ["Browse products", "Shipping info", "Talk to support"];
+      const suggestionLabels = copy.suggestions;
 
       const scrollChatToBottom = () => {
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -419,7 +551,7 @@ export function renderWidgetScript(
         const suggestions = document.createElement("div");
         suggestions.id = "ai-saas-suggestions";
         suggestions.className = "ai-saas-suggestions ai-saas-enter";
-        suggestions.setAttribute("aria-label", "Suggested questions");
+        suggestions.setAttribute("aria-label", copy.suggestionsLabel);
 
         suggestionLabels.forEach((label) => {
           const chip = document.createElement("button");
@@ -449,7 +581,7 @@ export function renderWidgetScript(
       const setOpen = (state) => {
         isOpen = state;
         toggleBtn.setAttribute("aria-expanded", state ? "true" : "false");
-        toggleBtn.setAttribute("aria-label", state ? "Chat open" : "Open chat");
+        toggleBtn.setAttribute("aria-label", state ? copy.chatOpen : copy.openChat);
         if (state) {
           refreshTheme();
           anchor.classList.add("open");
@@ -492,8 +624,8 @@ export function renderWidgetScript(
         // Typing indicator
         const typingDiv = document.createElement("div");
         typingDiv.className = "ai-saas-bubble bot typing ai-saas-enter";
-        typingDiv.setAttribute("aria-label", "Assistant is typing");
-        typingDiv.innerHTML = '<span class="ai-saas-sr-only">Assistant is typing</span><div class="ai-saas-typing" aria-hidden="true"><span></span><span></span><span></span></div>';
+        typingDiv.setAttribute("aria-label", copy.assistantTyping);
+        typingDiv.innerHTML = \`<span class="ai-saas-sr-only">\${escapeHtml(copy.assistantTyping)}</span><div class="ai-saas-typing" aria-hidden="true"><span></span><span></span><span></span></div>\`;
         chatBox.appendChild(typingDiv);
         scrollChatToBottom();
 
@@ -531,11 +663,11 @@ export function renderWidgetScript(
 
           // Bot Message
           const botDiv = document.createElement("div");
-          const replyRaw = data.reply || "Sorry, I didn't understand that.";
+          const replyRaw = data.reply || copy.fallbackReply;
           const parsed = safeJsonParse(replyRaw);
           if (isProductList(parsed)) {
             botDiv.className = "ai-saas-bubble bot product-list ai-saas-enter";
-            botDiv.innerHTML = renderProductListHtml(parsed);
+            botDiv.innerHTML = renderProductListHtml(parsed, copy);
           } else {
             botDiv.className = "ai-saas-bubble bot ai-saas-enter";
             botDiv.innerText = replyRaw;
@@ -549,7 +681,7 @@ export function renderWidgetScript(
           
           const errDiv = document.createElement("div");
           errDiv.className = "ai-saas-bubble bot ai-saas-error ai-saas-enter";
-          errDiv.innerText = "Error sending message. Please try again.";
+          errDiv.innerText = copy.errorSending;
           chatBox.appendChild(errDiv);
           scrollChatToBottom();
         }

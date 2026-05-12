@@ -28,6 +28,7 @@ type WidgetDesignerProps = {
   initialBrand: string | null;
   initialLabel: string | null;
   initialGreeting: string | null;
+  initialLanguage: string | null;
 
   initialHumanSupportText: string | null;
   initialPosition: WidgetPosition | null;
@@ -137,6 +138,7 @@ export default function WidgetDesigner({
   initialBrand,
   initialLabel,
   initialGreeting,
+  initialLanguage,
   initialHumanSupportText,
   initialPosition,
   initialColorHeaderBg,
@@ -202,6 +204,7 @@ export default function WidgetDesigner({
       brandInput,
       labelInput,
       greetingInput,
+      initialLanguage,
       humanSupportTextInput,
       position,
       colorHeaderBg,
@@ -221,6 +224,7 @@ export default function WidgetDesigner({
       brandInput,
       labelInput,
       greetingInput,
+      initialLanguage,
       humanSupportTextInput,
       position,
       colorHeaderBg,
@@ -254,6 +258,7 @@ export default function WidgetDesigner({
       "greeting",
       trimmedOrNull(liveState.greetingInput, widgetLimits.greeting) ?? "",
     );
+    params.set("language", liveState.initialLanguage ?? "auto");
     params.set(
       "humanSupportText",
       trimmedOrNull(
@@ -303,6 +308,7 @@ export default function WidgetDesigner({
       liveState.brandInput,
       liveState.labelInput,
       liveState.greetingInput,
+      liveState.initialLanguage,
       liveState.humanSupportTextInput,
       liveState.position,
     ].join("|");

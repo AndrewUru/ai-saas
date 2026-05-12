@@ -1,5 +1,6 @@
 //C:\ai-saas\lib\widget\defaults.ts
 export type WidgetPosition = "left" | "right";
+export type WidgetLanguage = "auto" | "en" | "es" | "pt" | "fr";
 
 export const widgetDefaults = {
   accent: "#2563eb",
@@ -11,6 +12,36 @@ export const widgetDefaults = {
   position: "right" as WidgetPosition,
 } as const;
 
+export const widgetCopyDefaults = {
+  en: {
+    label: "Chat with us",
+    greeting: "How can I help you today?",
+    humanSupportText: "Talk to a human",
+  },
+  es: {
+    label: "Chatea con nosotros",
+    greeting: "Como puedo ayudarte hoy?",
+    humanSupportText: "Habla con una persona",
+  },
+  pt: {
+    label: "Fale conosco",
+    greeting: "Como posso ajudar hoje?",
+    humanSupportText: "Falar com uma pessoa",
+  },
+  fr: {
+    label: "Discuter avec nous",
+    greeting: "Comment puis-je vous aider aujourd'hui ?",
+    humanSupportText: "Parler a une personne",
+  },
+} as const satisfies Record<
+  Exclude<WidgetLanguage, "auto">,
+  {
+    label: string;
+    greeting: string;
+    humanSupportText: string;
+  }
+>;
+
 export const widgetLimits = {
   brand: 40,
   label: 48,
@@ -19,6 +50,23 @@ export const widgetLimits = {
 } as const;
 
 export const widgetPositions: WidgetPosition[] = ["left", "right"];
+
+export const widgetLanguages: WidgetLanguage[] = ["auto", "en", "es", "pt", "fr"];
+
+export function sanitizeWidgetLanguage(
+  language?: string | null
+): WidgetLanguage {
+  if (language === "en" || language === "es" || language === "pt" || language === "fr") {
+    return language;
+  }
+  return "auto";
+}
+
+export function getWidgetCopyDefaults(language?: string | null) {
+  const normalized = sanitizeWidgetLanguage(language);
+  if (normalized === "auto") return widgetCopyDefaults.en;
+  return widgetCopyDefaults[normalized];
+}
 
 export function sanitizeHex(color?: string | null) {
   if (!color) return widgetDefaults.accent;

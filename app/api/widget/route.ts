@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { renderWidgetScript } from "@/lib/widget/clientScript";
 import { WidgetConfig } from "@/lib/widget/types";
 import {
+  sanitizeWidgetLanguage,
   sanitizePosition,
   widgetDefaults,
   widgetLimits,
@@ -57,6 +58,11 @@ function buildPreviewOverrides(
   params: URLSearchParams
 ): Partial<WidgetConfig> {
   const overrides: Partial<WidgetConfig> = {};
+
+  const languageParam = getParam(params, "language");
+  if (languageParam !== null) {
+    overrides.language = sanitizeWidgetLanguage(languageParam);
+  }
 
   const accentParam = getParam(params, "accent");
   if (accentParam !== null) {
