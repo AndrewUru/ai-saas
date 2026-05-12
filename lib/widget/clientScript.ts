@@ -171,6 +171,7 @@ export function renderWidgetScript(
       suggestionsLabel: "Suggested questions",
       suggestions: ["Browse products", "Shipping info", "Talk to support"],
       poweredBy: "Powered by",
+      contactSupport: "Contact support",
       errorSending: "Error sending message. Please try again.",
       fallbackReply: "Sorry, I didn't understand that.",
       stockIn: "In stock",
@@ -200,6 +201,7 @@ export function renderWidgetScript(
       suggestionsLabel: "Preguntas sugeridas",
       suggestions: ["Ver productos", "Informacion de envio", "Hablar con soporte"],
       poweredBy: "Con tecnologia de",
+      contactSupport: "Contactar con soporte",
       errorSending: "Error al enviar el mensaje. Intentalo de nuevo.",
       fallbackReply: "Lo siento, no he entendido eso.",
       stockIn: "En stock",
@@ -229,6 +231,7 @@ export function renderWidgetScript(
       suggestionsLabel: "Perguntas sugeridas",
       suggestions: ["Ver produtos", "Informacoes de envio", "Falar com suporte"],
       poweredBy: "Desenvolvido por",
+      contactSupport: "Contactar suporte",
       errorSending: "Erro ao enviar a mensagem. Tente novamente.",
       fallbackReply: "Desculpe, nao entendi isso.",
       stockIn: "Em estoque",
@@ -258,6 +261,7 @@ export function renderWidgetScript(
       suggestionsLabel: "Questions suggerees",
       suggestions: ["Voir les produits", "Infos livraison", "Parler au support"],
       poweredBy: "Propulse par",
+      contactSupport: "Contacter le support",
       errorSending: "Erreur lors de l'envoi du message. Reessayez.",
       fallbackReply: "Desole, je n'ai pas compris.",
       stockIn: "En stock",
@@ -427,6 +431,43 @@ export function renderWidgetScript(
     const cards = items.map((item) => renderProductCardHtml(item, copy)).join("");
 
     return \`<div class="ai-pl">\${title}<div class="ai-pl-grid">\${cards}</div></div>\`;
+  };
+
+  const isSupportIntent = (text) => {
+    const normalized = String(text || "").toLowerCase();
+    return [
+      "support",
+      "soporte",
+      "suporte",
+      "assistance",
+      "ayuda",
+      "humano",
+      "persona",
+      "whatsapp",
+      "telegram",
+      "contact",
+      "contacto",
+      "contato",
+    ].some((term) => normalized.includes(term));
+  };
+
+  const appendFallbackLink = (container, fallbackUrl, copy) => {
+    const safeUrl = sanitizeUrl(fallbackUrl);
+    if (!safeUrl) return;
+
+    const link = document.createElement("a");
+    link.className = "ai-saas-fallback";
+    link.href = safeUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.innerHTML = \`
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M7 17L17 7"></path>
+        <path d="M8 7h9v9"></path>
+      </svg>
+      <span>\${escapeHtml(copy.contactSupport)}</span>
+    \`;
+    container.appendChild(link);
   };
 
   async function init() {
@@ -683,6 +724,9 @@ export function renderWidgetScript(
           } else {
             botDiv.className = "ai-saas-bubble bot ai-saas-enter";
             botDiv.innerText = replyRaw;
+            if (isSupportIntent(text) || isSupportIntent(replyRaw)) {
+              appendFallbackLink(botDiv, data.fallback_url, copy);
+            }
           }
           chatBox.appendChild(botDiv);
           scrollChatToBottom();

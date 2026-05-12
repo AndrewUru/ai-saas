@@ -384,12 +384,12 @@ export const STATIC_STYLES = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(15, 23, 42, 0.12);
+  border: 1px solid var(--ai-accent-light);
   border-radius: 999px;
   padding: 0 12px;
-  background: rgba(255, 255, 255, 0.72);
-  color: rgba(15, 23, 42, 0.72);
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+  background: color-mix(in srgb, var(--ai-accent-light) 72%, #ffffff);
+  color: var(--ai-accent);
+  box-shadow: 0 6px 16px var(--ai-accent-light);
   cursor: pointer;
   font: inherit;
   font-size: 12px;
@@ -401,8 +401,9 @@ export const STATIC_STYLES = `
 .ai-saas-suggestion-chip:hover {
   transform: translateY(-1px);
   border-color: var(--ai-accent);
-  color: var(--ai-accent);
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1);
+  background: var(--ai-accent);
+  color: var(--ai-accent-contrast);
+  box-shadow: 0 10px 20px var(--ai-accent-shadow);
 }
 
 .ai-saas-suggestion-chip:focus-visible {
@@ -555,9 +556,10 @@ export const STATIC_STYLES = `
 }
 
 .ai-saas-input-wrapper button:disabled {
-  opacity: 0.48;
+  opacity: 0.68;
   cursor: default;
-  box-shadow: none;
+  filter: saturate(0.82);
+  box-shadow: 0 6px 14px var(--ai-accent-light);
 }
 
 @keyframes aiSendLoading {
@@ -611,9 +613,9 @@ export const STATIC_STYLES = `
   gap: 8px;
   margin-top: 6px;
   padding: 8px 12px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--ai-accent-light);
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.06);
+  background: var(--ai-accent-light);
   color: var(--ai-accent);
   font-size: 12px;
   font-weight: 700;
@@ -622,9 +624,9 @@ export const STATIC_STYLES = `
 }
 
 .ai-saas-fallback:hover {
-  background: rgba(15, 23, 42, 0.1);
+  background: var(--ai-accent);
+  color: var(--ai-accent-contrast);
   transform: translateY(-1px);
-  text-decoration: underline;
 }
 
 .ai-saas-fallback svg {

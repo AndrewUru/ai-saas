@@ -854,13 +854,14 @@ export default async function AgentDetailPage({
                     type="url"
                     inputMode="url"
                     defaultValue={fallbackUrlValue}
-                    placeholder="https://your-agency.com/contact"
+                    placeholder="https://wa.me/34693536768"
                     className="ui-input"
                     data-oid="c-aq-hb"
                   />
 
                   <p className="text-xs text-slate-500" data-oid="2nyqjet">
-                    Sent to the widget to escalate to humans when necessary.
+                    Use a contact page, WhatsApp link, or Telegram link for
+                    human escalation.
                   </p>
                 </div>
 
