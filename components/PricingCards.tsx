@@ -4,6 +4,7 @@ import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { PLAN_CONFIG } from "@/lib/plans";
 
 const plans = [
   {
@@ -12,8 +13,8 @@ const plans = [
     headline: "Start building agents",
     price: "0",
     period: "forever",
-    description: "Perfect to test the dashboard and launch up to five agents.",
-    features: ["Up to 5 agents", "Standard support", "Basic customization"],
+    description: "Perfect to test the dashboard and launch your first agent.",
+    features: PLAN_CONFIG.free.features,
     highlight: false,
     badge: "Free forever",
   },
@@ -25,11 +26,7 @@ const plans = [
     period: "one-time",
     description:
       "Remove branding, get priority support, and unlock higher limits.",
-    features: [
-      "Removed branding",
-      "Priority support",
-      "Higher limits and early access",
-    ],
+    features: PLAN_CONFIG.pro.features,
     highlight: true,
     badge: "Best value",
   },

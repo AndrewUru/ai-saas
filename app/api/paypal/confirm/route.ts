@@ -37,7 +37,7 @@ function addDays(base: Date, days: number) {
 
 export async function POST(req: Request) {
   try {
-    const { orderID, plan, expectedAmount, expectedCurrency } =
+    const { orderID, expectedAmount, expectedCurrency } =
       await req.json();
 
     if (!orderID) {
@@ -120,7 +120,8 @@ export async function POST(req: Request) {
     const { error: upsertErr } = await supabase.from("profiles").upsert(
       {
         id: user.id,
-        plan: plan || "basic",
+        plan: "pro",
+        is_paid: true,
         active_until: newActive.toISOString(),
       },
       { onConflict: "id" }

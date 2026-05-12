@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { PLAN_CONFIG } from "@/lib/plans";
 import { createServer } from "@/lib/supabase/server";
 
 type PlanCard = {
@@ -16,44 +17,20 @@ const PLAN_CARDS: PlanCard[] = [
   {
     id: "free",
     name: "Free plan",
-    price: "$0",
-    cycle: "per month",
+    price: PLAN_CONFIG.free.price,
+    cycle: PLAN_CONFIG.free.cycle,
     limit: "Up to 1,000 messages/month",
-    blurb: "Perfect to test the dashboard and launch up to five agents.",
-    features: [
-      "Up to 5 active agents with embeddable widget",
-      "Allowed domains validation",
-      "Customizable prompts and branding",
-      "Email support with basic SLA",
-    ],
-  },
-  {
-    id: "basic",
-    name: "Basic plan",
-    price: "$29",
-    cycle: "per month",
-    limit: "Up to 2,000 messages/month",
-    blurb: "For agencies launching agents in more than one store.",
-    features: [
-      "Up to 5 agents in parallel",
-      "Priority WooCommerce integration",
-      "Alerts when you approach the limit",
-      "Monthly usage reports",
-    ],
+    blurb: "Perfect to test the dashboard and launch your first agent.",
+    features: PLAN_CONFIG.free.features,
   },
   {
     id: "pro",
     name: "Pro plan",
-    price: "$79",
-    cycle: "per month",
+    price: PLAN_CONFIG.pro.price,
+    cycle: PLAN_CONFIG.pro.cycle,
     limit: "Up to 10,000 messages/month",
     blurb: "For 24/7 operations with high volume and escalations.",
-    features: [
-      "Up to 15 dedicated agents",
-      "Webhook and PayPal subscriptions",
-      "Custom escalation routes",
-      "Guided onboarding support",
-    ],
+    features: PLAN_CONFIG.pro.features,
   },
 ];
 

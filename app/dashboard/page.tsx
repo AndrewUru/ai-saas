@@ -1,12 +1,7 @@
 import Link from "next/link";
 import AgentsSection from "./AgentsSection";
+import { getPlanConfig } from "@/lib/plans";
 import { createServer } from "@/lib/supabase/server";
-
-const PLAN_LIMITS: Record<string, string> = {
-  free: "1,000",
-  basic: "2,000",
-  pro: "10,000",
-};
 
 const OBJECTION_TERMS = [
   "price",
@@ -142,8 +137,9 @@ export default async function DashboardPage() {
 
   const recentMessages = recentMessagesData ?? [];
   const plan = (profile?.plan ?? "free").toLowerCase();
+  const planConfig = getPlanConfig(plan);
   const planLabel = plan.toUpperCase();
-  const planLimitLabel = PLAN_LIMITS[plan] ?? PLAN_LIMITS.free;
+  const planLimitLabel = planConfig.messageLimit.toLocaleString("en-US");
   const activeUntil = formatDate(profile?.active_until);
   const activeAgents = agents.filter((agent) => agent.is_active).length;
   const pausedAgents = agents.length - activeAgents;

@@ -37,7 +37,7 @@ export type AgentFileResponse = {
 
 const Schema = z.object({
   id: z.string().uuid(),
-  integration_woocommerce: z.string().min(1).optional(), // "none"|"basic"|...
+  integration_woocommerce: z.string().min(1).optional(), // "none"|integration id
   allowed_domains: z.string().optional(), // "midominio.com,tienda.com"
 });
 const RotateApiKeySchema = z.string().uuid();

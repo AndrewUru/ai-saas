@@ -2,9 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { generateAgentApiKey } from "@/lib/agents/keys";
 import { requireUser } from "@/lib/auth/requireUser";
-import { getAgentLimit } from "@/lib/plans";
-
-const defaultMessagesLimit = 1000;
+import { getAgentLimit, getDefaultMessageLimit, getPlanConfig } from "@/lib/plans";
 
 export default async function AgentsPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -12,6 +10,16 @@ export default async function AgentsPage(props: {
   const searchParams = await props.searchParams;
   const currentError = searchParams.error;
   const { supabase, user } = await requireUser();
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", user.id)
+    .single();
+  const planConfig = getPlanConfig(profile?.plan);
+  const agentLimit = getAgentLimit(profile?.plan);
+  const agentLimitLabel =
+    agentLimit === Number.POSITIVE_INFINITY ? "Unlimited" : agentLimit;
 
   const { data: agents } = await supabase
     .from("agents")
@@ -38,6 +46,7 @@ export default async function AgentsPage(props: {
 
     // 2. Define limits
     const maxAgents = getAgentLimit(currentPlan);
+    const defaultMessagesLimit = getDefaultMessageLimit(currentPlan);
 
     // 3. Count existing agents
     const { count: currentCount } = await supabase
@@ -131,7 +140,7 @@ export default async function AgentsPage(props: {
               Default Limit
             </span>
             <span className="text-xl font-bold mt-1" data-oid="ij5j588">
-              {defaultMessagesLimit.toLocaleString("en-US")}
+              {planConfig.messageLimit.toLocaleString("en-US")}
             </span>
           </div>
 
@@ -384,6 +393,10 @@ export default async function AgentsPage(props: {
                 </p>
                 <p data-oid="nh-j-wh">
                   • Initial limits adhere to your plan defaults.
+                </p>
+                <p>
+                  • Current plan: {planConfig.name} ({agents?.length ?? 0}/
+                  {agentLimitLabel} agents).
                 </p>
               </div>
             </div>

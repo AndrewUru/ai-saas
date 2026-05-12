@@ -1,6 +1,7 @@
 //C:\ai-saas\app\api\paypal\capture-order\route.ts
 
 import { NextResponse } from "next/server";
+import { getDefaultMessageLimit } from "@/lib/plans";
 import { createServer } from "@/lib/supabase/server";
 import { createAdmin } from "@/lib/supabase/admin";
 
@@ -260,6 +261,21 @@ export async function POST(req: Request) {
           { status: 500 }
         );
       }
+    }
+
+    const proMessageLimit = getDefaultMessageLimit("pro");
+    const { error: agentLimitErr } = await admin
+      .from("agents")
+      .update({ messages_limit: proMessageLimit })
+      .eq("user_id", user.id)
+      .lt("messages_limit", proMessageLimit);
+
+    if (agentLimitErr) {
+      console.error(agentLimitErr);
+      return NextResponse.json(
+        { ok: false, error: "DB agents falló" },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ ok: true, status: "COMPLETED" });

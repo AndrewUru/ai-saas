@@ -1,13 +1,12 @@
-// app/api/paypal/subscription/confirm/route.ts
 import { NextResponse } from "next/server";
+import { getDefaultMessageLimit } from "@/lib/plans";
 import { getSubscription } from "@/lib/paypal";
+import { createAdmin } from "@/lib/supabase/admin";
 import { createServer } from "@/lib/supabase/server";
 
-const PLAN_MAP: Record<string, { plan: "basic" | "pro"; months: number }> = {
-  // Mapea tus plan_id de PayPal -> plan interno + meses por ciclo
-  [process.env.PAYPAL_PLAN_BASIC as string]: { plan: "basic", months: 1 },
-  // "P-XXXX_PRO": { plan: "pro", months: 1 }
-};
+const PRO_PAYPAL_PLAN_IDS = new Set(
+  [process.env.PAYPAL_PLAN_PRO].filter(Boolean)
+);
 
 export async function POST(req: Request) {
   try {
@@ -22,32 +21,29 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1) Autenticación
     const supabase = await createServer();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user)
+    if (!user) {
       return NextResponse.json(
         { ok: false, error: "No autenticado" },
         { status: 401 }
       );
+    }
 
-    // 2) Consultar la suscripción en PayPal
     const sub = await getSubscription(subscriptionID);
-    const status = sub.status; // APPROVAL_PENDING | ACTIVE | SUSPENDED | CANCELLED
+    const status = sub.status;
     const paypalPlanId = sub.plan_id as string;
-    const nbTime = sub.billing_info?.next_billing_time; // string ISO
+    const nextBillingTime = sub.billing_info?.next_billing_time;
 
-    // 3) Validar que el plan existe en nuestro mapeo
-    const mapped = PLAN_MAP[paypalPlanId];
-    if (!mapped) {
+    if (!PRO_PAYPAL_PLAN_IDS.has(paypalPlanId)) {
       return NextResponse.json(
         { ok: false, error: "Plan PayPal no reconocido" },
         { status: 400 }
       );
     }
-    if (requestedPlan && requestedPlan !== mapped.plan) {
+    if (requestedPlan && requestedPlan !== "pro") {
       return NextResponse.json(
         {
           ok: false,
@@ -57,43 +53,58 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4) Guardar/actualizar suscripción
-    const { error: upErr } = await supabase.from("subscriptions").upsert(
-      {
-        user_id: user.id,
-        plan: mapped.plan,
-        paypal_subscription_id: subscriptionID,
-        paypal_plan_id: paypalPlanId,
-        status: status?.toLowerCase(), // p.ej. "active"
-        next_billing_time: nbTime ? new Date(nbTime).toISOString() : null,
-        status_reason: sub.status_update_time
-          ? `updated_at=${sub.status_update_time}`
-          : null,
-        started_at: sub.start_time
-          ? new Date(sub.start_time).toISOString()
-          : new Date().toISOString(),
-        renewed_until: null,
-      },
-      { onConflict: "paypal_subscription_id" }
-    );
+    const { error: subscriptionError } = await supabase
+      .from("subscriptions")
+      .upsert(
+        {
+          user_id: user.id,
+          plan: "pro",
+          paypal_subscription_id: subscriptionID,
+          paypal_plan_id: paypalPlanId,
+          status: status?.toLowerCase(),
+          next_billing_time: nextBillingTime
+            ? new Date(nextBillingTime).toISOString()
+            : null,
+          status_reason: sub.status_update_time
+            ? `updated_at=${sub.status_update_time}`
+            : null,
+          started_at: sub.start_time
+            ? new Date(sub.start_time).toISOString()
+            : new Date().toISOString(),
+          renewed_until: null,
+        },
+        { onConflict: "paypal_subscription_id" }
+      );
 
-    if (upErr) {
+    if (subscriptionError) {
       return NextResponse.json(
-        { ok: false, error: `DB subscriptions: ${upErr.message}` },
+        { ok: false, error: `DB subscriptions: ${subscriptionError.message}` },
         { status: 500 }
       );
     }
 
-    // 5) Activar plan si la suscripción está activa
     if (status === "ACTIVE") {
-      const { error: profErr } = await supabase.rpc("activate_user_plan", {
+      const { error: profileError } = await supabase.rpc("activate_user_plan", {
         p_user_id: user.id,
-        p_plan: mapped.plan,
-        p_months: mapped.months,
+        p_plan: "pro",
+        p_months: 1,
       });
-      if (profErr) {
+      if (profileError) {
         return NextResponse.json(
-          { ok: false, error: `DB profiles: ${profErr.message}` },
+          { ok: false, error: `DB profiles: ${profileError.message}` },
+          { status: 500 }
+        );
+      }
+
+      const proMessageLimit = getDefaultMessageLimit("pro");
+      const { error: agentLimitError } = await createAdmin()
+        .from("agents")
+        .update({ messages_limit: proMessageLimit })
+        .eq("user_id", user.id)
+        .lt("messages_limit", proMessageLimit);
+      if (agentLimitError) {
+        return NextResponse.json(
+          { ok: false, error: `DB agents: ${agentLimitError.message}` },
           { status: 500 }
         );
       }
