@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import {
   ArrowLeft,
@@ -10,12 +11,15 @@ import { requireUser } from "@/lib/auth/requireUser";
 import SubmitButton from "@/components/SubmitButton";
 import AgentSimulator from "./AgentSimulator";
 import KnowledgeSection from "./KnowledgeSection";
+import WidgetDesigner from "./WidgetDesigner";
+import { getSiteUrlFromHeaders } from "@/lib/site";
 
 import {
   widgetLimits,
   sanitizeHex,
   sanitizePosition,
 } from "@/lib/widget/defaults";
+import type { WidgetPosition } from "@/lib/widget/defaults";
 
 const LANGUAGE_OPTIONS = [
   { value: "auto", label: "Automatic detection" },
@@ -374,6 +378,8 @@ export default async function AgentDetailPage({
   const resolvedSearchParams = await searchParams;
 
   const { supabase, user } = await requireUser();
+  const headersList = await headers();
+  const siteUrl = getSiteUrlFromHeaders(headersList);
 
   const { data: agent, error: agentError } = await supabase
     .from("agents")
@@ -418,6 +424,10 @@ export default async function AgentDetailPage({
   const languageValue = agent.language ?? "auto";
   const fallbackUrlValue = agent.fallback_url ?? "";
   const descriptionFallback = agent.description ?? "";
+  const widgetPositionValue: WidgetPosition | null =
+    agent.widget_position === "left" || agent.widget_position === "right"
+      ? agent.widget_position
+      : null;
 
   const createdAt = agent.created_at
     ? new Intl.DateTimeFormat("en-US", {
@@ -503,8 +513,8 @@ export default async function AgentDetailPage({
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-slate-400">
-                  Talk, tune, add knowledge, and publish from one focused agent
-                  workspace.
+                  Chat on the left. Edit the agent and widget canvas on the
+                  right.
                 </p>
               </div>
             </div>
@@ -537,13 +547,25 @@ export default async function AgentDetailPage({
           </div>
         ) : null}
 
-        <div className="grid flex-1 items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)_360px]">
-          <aside className="space-y-4 xl:sticky xl:top-24">
-            <article className="ui-card p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                Agent
-              </p>
-              <div className="mt-4 space-y-3 text-sm">
+        <div className="grid flex-1 items-start gap-5 2xl:grid-cols-[420px_minmax(0,1fr)]">
+          <aside className="min-w-0 space-y-4 2xl:sticky 2xl:top-24">
+            <article className="rounded-3xl border border-border bg-surface/45 p-4">
+              <div className="flex items-start gap-3">
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 text-emerald-200">
+                  <Bot className="h-4 w-4" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-white">
+                    I opened a widget draft in the canvas.
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">
+                    Edit the copy, colors, behavior, catalog, knowledge, and
+                    publish checklist without leaving this conversation.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 grid gap-2 text-sm">
                 <StatusRow
                   label="Catalog"
                   value={selectedIntegrationName}
@@ -559,84 +581,83 @@ export default async function AgentDetailPage({
                   value={agent.messages_limit?.toLocaleString("en-US") ?? "Not set"}
                   good={Boolean(agent.messages_limit)}
                 />
-                <StatusRow
-                  label="Created"
-                  value={createdAt}
-                  good
-                />
+                <StatusRow label="Created" value={createdAt} good />
               </div>
             </article>
 
-            <article className="ui-card p-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-                  Readiness
-                </p>
-                <span className="text-2xl font-semibold text-white">
-                  {completionPercent}%
-                </span>
-              </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
-                <div
-                  className="h-full rounded-full bg-emerald-400"
-                  style={{ width: `${completionPercent}%` }}
-                />
-              </div>
-              <p className="mt-3 text-xs leading-5 text-slate-400">
-                Next: <span className="text-emerald-200">{nextStep}</span>
-              </p>
-            </article>
-
-            <nav className="ui-card grid gap-2 p-3 text-sm">
-              <Link
-                href={`${AGENTS_BASE}/${agent.id}`}
-                className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 font-medium text-emerald-100"
-              >
-                Workspace
-              </Link>
-              <Link
-                href={`${AGENTS_BASE}/${agent.id}/knowledge`}
-                className="rounded-xl px-3 py-2 text-slate-400 transition hover:bg-surface-strong/50 hover:text-white"
-              >
-                Knowledge
-              </Link>
-              <Link
-                href={`${AGENTS_BASE}/${agent.id}/widget`}
-                className="rounded-xl px-3 py-2 text-slate-400 transition hover:bg-surface-strong/50 hover:text-white"
-              >
-                Widget appearance
-              </Link>
-              <Link
-                href={`${AGENTS_BASE}/${agent.id}/install`}
-                className="rounded-xl px-3 py-2 text-slate-400 transition hover:bg-surface-strong/50 hover:text-white"
-              >
-                Install script
-              </Link>
-            </nav>
-          </aside>
-
-          <div className="min-w-0 space-y-5">
             <AgentSimulator agentId={agent.id} />
-            <KnowledgeSection agentId={agent.id} />
-          </div>
+          </aside>
 
           <form
             action={updateAgentAndWidget}
-            className="min-w-0 space-y-4 xl:sticky xl:top-24 xl:max-h-[calc(100dvh-7rem)] xl:overflow-y-auto xl:pr-1"
+            className="min-w-0 rounded-3xl border border-border bg-background/55 shadow-[0_24px_80px_rgba(0,0,0,0.38)]"
           >
             <input type="hidden" name="agent_id" value={agent.id} />
 
-            <article className="ui-card--strong glass-pane p-4">
-              <SubmitButton label="Save agent" />
-            </article>
+            <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-t-3xl border-b border-border bg-background/90 px-4 py-3 backdrop-blur-md sm:px-5">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                  Canvas
+                </p>
+                <h2 className="truncate text-lg font-semibold text-white">
+                  Widget and agent editor
+                </h2>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-slate-300">
+                  {completionPercent}% ready
+                </span>
+                <SubmitButton label="Save canvas" />
+              </div>
+            </div>
 
-            <article className="ui-card glass-pane p-5">
-              <SectionHeading
-                eyebrow="Behavior"
-                title="Tune the assistant"
-                description="Keep the core settings close to the conversation so every test can become an improvement."
-              />
+            <div className="max-h-none space-y-5 overflow-visible p-4 sm:p-5 2xl:max-h-[calc(100dvh-10rem)] 2xl:overflow-y-auto">
+              <section className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                      Assistant response
+                    </p>
+                    <p className="mt-1 text-sm text-emerald-50">
+                      Here is a live widget draft. Change anything in the
+                      canvas and save when it matches the assistant you want.
+                    </p>
+                  </div>
+                  <p className="text-xs text-emerald-100/75">
+                    Next: {nextStep}
+                  </p>
+                </div>
+              </section>
 
+              <section className="rounded-2xl border border-slate-800/80 bg-slate-950/35 p-4">
+                <WidgetDesigner
+                  apiKey={agent.api_key}
+                  siteUrl={siteUrl}
+                  initialAccent={agent.widget_accent}
+                  initialBrand={agent.widget_brand}
+                  initialLabel={agent.widget_label}
+                  initialGreeting={agent.widget_greeting}
+                  initialLanguage={agent.language ?? "auto"}
+                  initialHumanSupportText={agent.widget_human_support_text}
+                  initialPosition={widgetPositionValue}
+                  initialColorHeaderBg={agent.widget_color_header_bg}
+                  initialColorHeaderText={agent.widget_color_header_text}
+                  initialColorChatBg={agent.widget_color_chat_bg}
+                  initialColorUserBubbleBg={agent.widget_color_user_bubble_bg}
+                  initialColorUserBubbleText={agent.widget_color_user_bubble_text}
+                  initialColorBotBubbleBg={agent.widget_color_bot_bubble_bg}
+                  initialColorBotBubbleText={agent.widget_color_bot_bubble_text}
+                  initialColorToggleBg={agent.widget_color_toggle_bg}
+                  initialColorToggleText={agent.widget_color_toggle_text}
+                />
+              </section>
+
+              <section className="rounded-2xl border border-slate-800/80 bg-slate-950/35 p-5">
+                <SectionHeading
+                  eyebrow="Behavior"
+                  title="Assistant rules"
+                  description="Tune the core instructions next to the widget draft."
+                />
               <div className="mt-5 space-y-5">
                 <div className="space-y-2" data-oid="1:fz-w-">
                   <label
@@ -861,9 +882,11 @@ export default async function AgentDetailPage({
                   )}
                 </div>
               </div>
-            </article>
+              </section>
 
-              <article className="ui-card glass-pane p-6">
+              <KnowledgeSection agentId={agent.id} />
+
+              <article className="rounded-2xl border border-slate-800/80 bg-slate-950/35 p-5">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-200">
                     <ShieldCheck className="h-4 w-4" />
@@ -929,7 +952,7 @@ export default async function AgentDetailPage({
               </article>
 
               <article
-                className="ui-card glass-pane p-6 text-sm text-slate-300"
+                className="rounded-2xl border border-slate-800/80 bg-slate-950/35 p-5 text-sm text-slate-300"
                 data-oid="n.i41pq"
               >
                 <div className="flex items-center gap-3">
@@ -958,6 +981,7 @@ export default async function AgentDetailPage({
                   </p>
                 </div>
               </article>
+            </div>
           </form>
         </div>
       </section>
