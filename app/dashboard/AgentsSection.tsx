@@ -14,55 +14,31 @@ export default function AgentsSection({ planLimitLabel }: Props) {
   const activeAgents = agents.filter((agent) => agent.is_active).length;
 
   return (
-    <section className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard
-          label="Agents created"
-          value={isLoading ? "-" : totalAgents}
-          helper={
-            isLoading
-              ? "Loading..."
-              : totalAgents === 0
-                ? "No agents yet"
-                : "Ready to configure"
-          }
-        />
-
-        <StatCard
-          label="Active agents"
-          value={isLoading ? "-" : activeAgents}
-          helper={
-            isLoading
-              ? "Checking..."
-              : activeAgents === totalAgents
-                ? "All active"
-                : "Some are paused"
-          }
-        />
-
-        <StatCard
-          label="Message limit"
-          value={planLimitLabel}
-          helper="Monthly capacity"
-        />
-      </div>
-
-      <div className="ui-card flex flex-col bg-surface/40 p-6 backdrop-blur-md">
+    <section>
+      <div className="ui-card flex flex-col bg-surface/40 p-5 backdrop-blur-md sm:p-6">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
           <div>
             <h2 className="text-xl font-semibold text-foreground">
-              Your agents
+              Agent workspaces
             </h2>
             <p className="mt-1 text-sm text-[var(--foreground-muted)]">
-              Manage integrations, limits, and widget setup
+              Open an assistant, test responses, and publish improvements.
             </p>
           </div>
-          <Link
-            href="/dashboard/agents"
-            className="ui-button ui-button--ghost text-xs"
-          >
-            View all agents
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-[var(--foreground-muted)]">
+              {isLoading ? "Loading" : `${activeAgents}/${totalAgents} active`}
+            </span>
+            <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-[var(--foreground-muted)]">
+              {planLimitLabel} messages
+            </span>
+            <Link
+              href="/dashboard/agents"
+              className="ui-button ui-button--ghost text-xs"
+            >
+              View all
+            </Link>
+          </div>
         </div>
 
         {isError ? (
@@ -134,7 +110,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                         href={`/dashboard/agents/${agent.id}`}
                         className="ui-button ui-button--subtle px-3 py-1.5 text-xs sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
                       >
-                        Configure
+                        Open workspace
                       </Link>
                     </li>
                   );
@@ -148,30 +124,6 @@ export default function AgentsSection({ planLimitLabel }: Props) {
         ) : null}
       </div>
     </section>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  helper,
-}: {
-  label: string;
-  value: string | number;
-  helper: string;
-}) {
-  return (
-    <div className="ui-card group p-5 transition-colors hover:border-accent/20">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--foreground-muted)]">
-        {label}
-      </p>
-      <p className="mt-2 text-2xl font-bold tracking-tight text-foreground transition-colors group-hover:text-accent">
-        {value}
-      </p>
-      <p className="mt-1 text-xs text-[var(--foreground-muted)] opacity-70">
-        {helper}
-      </p>
-    </div>
   );
 }
 

@@ -1,4 +1,13 @@
 import Link from "next/link";
+import {
+  ArrowUpRight,
+  Bot,
+  Boxes,
+  LifeBuoy,
+  MessageSquare,
+  Send,
+  Sparkles,
+} from "lucide-react";
 import AgentsSection from "./AgentsSection";
 import { getPlanConfig } from "@/lib/plans";
 import { createServer } from "@/lib/supabase/server";
@@ -194,65 +203,174 @@ export default async function DashboardPage() {
     "Customer objects to shipping cost",
     "Customer wants a refund or human support",
   ];
+  const recentAgents = agents.slice(0, 4);
+
+  const commandPrompts = [
+    {
+      label: "Test an agent response",
+      detail: "Open a workspace and ask a real customer question.",
+      href: recentAgents[0]?.id
+        ? `/dashboard/agents/${recentAgents[0].id}`
+        : "/dashboard/agents",
+      icon: MessageSquare,
+    },
+    {
+      label: "Connect product context",
+      detail: "Sync WooCommerce or Shopify so answers use catalog data.",
+      href: "/dashboard/integrations",
+      icon: Boxes,
+    },
+    {
+      label: "Create a new assistant",
+      detail: "Start another workspace for a store, language, or brand.",
+      href: "/dashboard/agents",
+      icon: Bot,
+    },
+  ];
 
   return (
-    <div className="space-y-8">
-      <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="ui-card ui-card--strong p-6">
-          <p className="ui-badge">Commerce Copilot</p>
-          <div className="mt-5 max-w-3xl space-y-3">
-            <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Turn store conversations into sales actions.
+    <div className="space-y-6">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0 rounded-3xl border border-border bg-surface/50 p-4 shadow-soft sm:p-6">
+          <div className="mx-auto flex min-h-[360px] max-w-3xl flex-col justify-center">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent/25 bg-accent/10 text-accent">
+                <Sparkles className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+                  Commerce Copilot
+                </p>
+                <p className="text-xs text-[var(--foreground-muted)]">
+                  {activeAgents} active of {agents.length} agents
+                </p>
+              </div>
+            </div>
+
+            <h1 className="mt-8 text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+              What should your agents improve today?
             </h1>
-            <p className="text-sm leading-6 text-[var(--foreground-muted)] sm:text-base">
-              Your agents do more than answer chats. They surface objections,
-              handoff moments, product gaps, and training ideas your team can
-              act on.
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-[var(--foreground-muted)] sm:text-base">
+              Ask, test, tune, and publish from focused workspaces instead of
+              digging through long setup screens.
             </p>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/dashboard/agents" className="ui-button ui-button--primary">
-              Configure agents
-            </Link>
-            <Link
-              href="/dashboard/integrations"
-              className="ui-button ui-button--secondary"
-            >
-              Connect catalog
-            </Link>
+
+            <div className="mt-8 rounded-2xl border border-border bg-background/70 p-3">
+              <div className="flex items-center gap-3 rounded-xl border border-border bg-surface/70 px-4 py-3">
+                <MessageSquare
+                  className="h-4 w-4 shrink-0 text-[var(--foreground-muted)]"
+                  aria-hidden="true"
+                />
+                <span className="min-w-0 flex-1 text-sm text-[var(--foreground-muted)]">
+                  Test shipping objections, tune product recommendations, or
+                  prepare a widget for launch...
+                </span>
+                <Link
+                  href={recentAgents[0]?.id ? `/dashboard/agents/${recentAgents[0].id}` : "/dashboard/agents"}
+                  className="ui-button ui-button--primary h-10 w-10 shrink-0 p-0"
+                  aria-label="Open agent workspace"
+                >
+                  <Send className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </div>
+
+              <div className="mt-3 grid gap-2 md:grid-cols-3">
+                {commandPrompts.map((prompt) => {
+                  const Icon = prompt.icon;
+                  return (
+                    <Link
+                      key={prompt.label}
+                      href={prompt.href}
+                      className="group rounded-xl border border-border bg-surface/40 p-3 transition hover:border-accent/25 hover:bg-surface"
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-[var(--foreground-muted)] transition group-hover:text-accent">
+                          <Icon className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-sm font-semibold text-foreground">
+                            {prompt.label}
+                          </span>
+                          <span className="mt-1 block text-xs leading-5 text-[var(--foreground-muted)]">
+                            {prompt.detail}
+                          </span>
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
-        <aside className="ui-card p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--foreground-muted)]">
-            Plan health
-          </p>
-          <div className="mt-4 space-y-3 text-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-[var(--foreground-muted)]">Plan</span>
-              <span className="font-semibold">{planLabel}</span>
+        <aside className="space-y-4">
+          <div className="ui-card p-5">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--foreground-muted)]">
+                Plan
+              </p>
+              <Link
+                href="/dashboard/billing"
+                className="text-xs font-semibold text-accent hover:text-accent"
+              >
+                Manage
+              </Link>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[var(--foreground-muted)]">Limit</span>
-              <span className="font-semibold">{planLimitLabel}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[var(--foreground-muted)]">Renewal</span>
-              <span className="font-semibold">{activeUntil}</span>
+            <div className="mt-4 grid gap-3 text-sm">
+              <InfoRow label="Current" value={planLabel} />
+              <InfoRow label="Limit" value={planLimitLabel} />
+              <InfoRow label="Renewal" value={activeUntil} />
             </div>
           </div>
-          <Link
-            href="/dashboard/billing"
-            className="ui-button ui-button--secondary mt-5 w-full justify-center"
-          >
-            Manage subscription
-          </Link>
+
+          <div className="ui-card p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="font-semibold text-foreground">Recent agents</h2>
+              <Link
+                href="/dashboard/agents"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent"
+              >
+                All
+                <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              {recentAgents.length ? (
+                recentAgents.map((agent) => (
+                  <Link
+                    key={agent.id}
+                    href={`/dashboard/agents/${agent.id}`}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/30 px-3 py-3 transition hover:border-accent/25 hover:bg-surface"
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium text-foreground">
+                        {agent.name || "Unnamed Agent"}
+                      </span>
+                      <span className="text-xs text-[var(--foreground-muted)]">
+                        {agent.is_active ? "Active" : "Paused"}
+                      </span>
+                    </span>
+                    <ArrowUpRight
+                      className="h-4 w-4 shrink-0 text-[var(--foreground-muted)]"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                ))
+              ) : (
+                <div className="rounded-xl border border-dashed border-border p-4 text-sm text-[var(--foreground-muted)]">
+                  No agents yet. Create one to start testing responses.
+                </div>
+              )}
+            </div>
+          </div>
         </aside>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {opportunityCards.map((item) => (
-          <article key={item.label} className="ui-card p-5">
+          <article key={item.label} className="rounded-2xl border border-border bg-surface/35 p-5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--foreground-muted)]">
               {item.label}
             </p>
@@ -266,16 +384,16 @@ export default async function DashboardPage() {
         ))}
       </section>
 
-      <section className="grid gap-8 lg:grid-cols-12">
-        <div className="space-y-6 lg:col-span-8 xl:col-span-9">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="space-y-6">
           <div className="ui-card p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-                  Opportunity board
+                  Copilot signals
                 </p>
                 <h2 className="mt-2 text-xl font-semibold text-foreground">
-                  What the copilot noticed
+                  What needs attention
                 </h2>
               </div>
               <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-[var(--foreground-muted)]">
@@ -305,14 +423,14 @@ export default async function DashboardPage() {
           <AgentsSection planLimitLabel={planLimitLabel} />
         </div>
 
-        <aside className="space-y-6 lg:col-span-4 xl:col-span-3">
-          <div className="ui-card p-6">
+        <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
+          <div className="ui-card p-5">
             <h3 className="font-semibold text-foreground">Launch playbooks</h3>
             <div className="mt-4 space-y-3">
               {playbooks.map((playbook) => (
                 <article
                   key={playbook.title}
-                  className="rounded-xl border border-border bg-surface/40 p-3"
+                  className="rounded-xl border border-border bg-surface/35 p-3"
                 >
                   <p className="text-sm font-semibold text-foreground">
                     {playbook.title}
@@ -325,30 +443,44 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="ui-card p-6">
-            <h3 className="font-semibold text-foreground">Agent simulator</h3>
-            <p className="mt-2 text-sm leading-6 text-[var(--foreground-muted)]">
-              Test common ecommerce moments before publishing a widget.
-            </p>
+          <div className="ui-card p-5">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-[var(--foreground-muted)]">
+                <LifeBuoy className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <h3 className="font-semibold text-foreground">Test scenarios</h3>
+            </div>
             <div className="mt-4 space-y-2">
               {simulatorScenarios.map((scenario) => (
                 <div
                   key={scenario}
-                  className="rounded-xl border border-border bg-surface/40 px-3 py-2 text-xs text-foreground"
+                  className="rounded-xl border border-border bg-surface/35 px-3 py-2 text-xs text-foreground"
                 >
                   {scenario}
                 </div>
               ))}
             </div>
             <Link
-              href="/dashboard/agents"
+              href={recentAgents[0]?.id ? `/dashboard/agents/${recentAgents[0].id}` : "/dashboard/agents"}
               className="ui-button ui-button--secondary mt-5 w-full justify-center"
             >
-              Open an agent
+              Open workspace
+              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
         </aside>
       </section>
+    </div>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface/30 px-3 py-2">
+      <span className="text-[var(--foreground-muted)]">{label}</span>
+      <span className="min-w-0 truncate text-right font-semibold text-foreground">
+        {value}
+      </span>
     </div>
   );
 }

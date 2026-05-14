@@ -298,7 +298,7 @@ export default async function AgentsPage(props: {
                           className="ui-button ui-button--secondary text-xs"
                           data-oid="-py4aju"
                         >
-                          Configure
+                          Open workspace
                         </Link>
                         <form action={deleteAgent} data-oid="bsi7cqb">
                           <input

@@ -1,18 +1,15 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
-import type { ComponentType } from "react";
 import {
   ArrowLeft,
   Bot,
   CheckCircle2,
-  Globe2,
-  KeyRound,
-  MessageSquare,
-  PlugZap,
   ShieldCheck,
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/requireUser";
 import SubmitButton from "@/components/SubmitButton";
+import AgentSimulator from "./AgentSimulator";
+import KnowledgeSection from "./KnowledgeSection";
 
 import {
   widgetLimits,
@@ -60,20 +57,7 @@ function normalizeWidgetText(value: string, max: number): string | null {
   return trimmed.slice(0, max);
 }
 
-// Centralized route base to avoid future hardcoded path issues
 const AGENTS_BASE = "/dashboard/agents";
-
-type StatusTone = "good" | "warn" | "muted";
-
-function toneClasses(tone: StatusTone) {
-  if (tone === "good") {
-    return "border-emerald-400/30 bg-emerald-400/10 text-emerald-200";
-  }
-  if (tone === "warn") {
-    return "border-amber-400/30 bg-amber-400/10 text-amber-200";
-  }
-  return "border-slate-700/70 bg-slate-900/50 text-slate-300";
-}
 
 function SectionHeading({
   eyebrow,
@@ -97,39 +81,26 @@ function SectionHeading({
   );
 }
 
-function MetricCard({
-  icon: Icon,
+function StatusRow({
   label,
   value,
-  detail,
-  tone = "muted",
+  good,
 }: {
-  icon: ComponentType<{ className?: string }>;
   label: string;
   value: string;
-  detail: string;
-  tone?: StatusTone;
+  good: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-800/80 bg-slate-950/45 p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-            {label}
-          </p>
-          <p className="mt-2 truncate text-lg font-semibold text-white">
-            {value}
-          </p>
-        </div>
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950/35 px-3 py-2">
+      <span className="text-slate-500">{label}</span>
+      <span className="flex min-w-0 items-center gap-2 text-right font-medium text-slate-200">
         <span
-          className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${toneClasses(
-            tone,
-          )}`}
-        >
-          <Icon className="h-4 w-4" />
-        </span>
-      </div>
-      <p className="mt-3 text-xs leading-5 text-slate-500">{detail}</p>
+          className={`h-2 w-2 shrink-0 rounded-full ${
+            good ? "bg-emerald-400" : "bg-amber-300"
+          }`}
+        />
+        <span className="truncate">{value}</span>
+      </span>
     </div>
   );
 }
@@ -505,189 +476,168 @@ export default async function AgentDetailPage({
             : "Install the widget";
 
   return (
-    <main
-      className="relative min-h-screen overflow-hidden text-slate-100"
-      data-oid="9z-ztr5"
-    >
-      <div
-        className="pointer-events-none absolute inset-0"
-        data-oid="mbzx0jj"
-      />
-
-      <section
-        className="relative z-10 mx-auto flex min-h-screen flex-col"
-        data-oid="zpn9_yd"
-      >
-        <header
-          className="ui-card--strong relative overflow-hidden p-6 sm:p-8"
-          data-oid="r.1rhe:"
-        >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(52,211,153,0.14),transparent_34%),radial-gradient(circle_at_80%_20%,rgba(139,92,246,0.12),transparent_32%)]" />
-          <div
-            className="relative flex flex-wrap items-start justify-between gap-6"
-            data-oid=".wh4hdg"
-          >
-            <div className="min-w-0 space-y-4" data-oid="jzx-z02">
-              <p className="ui-badge" data-oid="h3259kg">
-                Agent command center
-              </p>
-              <div
-                className="flex flex-wrap items-center gap-3"
-                data-oid="73ouqi_"
+    <main className="min-h-screen text-slate-100">
+      <section className="mx-auto flex min-h-[calc(100vh-4rem)] flex-col gap-5">
+        <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-5">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href={AGENTS_BASE}
+                className="ui-button ui-button--subtle h-10 w-10 p-0"
+                aria-label="Back to agents"
               >
-                <h1
-                  className="text-3xl font-semibold leading-tight sm:text-5xl"
-                  data-oid="1.pma0j"
-                >
-                  {agent.name}
-                </h1>
-                <span
-                  className="ui-badge border-slate-700 text-slate-300 bg-transparent"
-                  data-oid="r6at1a."
-                >
-                  <span
-                    className={`dot ${
-                      agent.is_active ? "dot--active" : "dot--paused"
-                    }`}
-                    data-oid="ogvvkd:"
-                  />
-
-                  {statusLabel}
-                </span>
-              </div>
-              <p
-                className="max-w-3xl text-sm leading-6 text-slate-300 sm:text-base"
-                data-oid="sjx7ds9"
-              >
-                Configure the agent, connect catalog data, tune the widget, and
-                copy the install script from one focused workspace.
-              </p>
-              <div className="flex flex-wrap gap-2 text-xs font-semibold text-slate-300">
-                <a
-                  href={`${AGENTS_BASE}/${agent.id}`}
-                  className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
-                >
-                  Setup
-                </a>
-                <a
-                  href={`${AGENTS_BASE}/${agent.id}/simulator`}
-                  className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
-                >
-                  Simulator
-                </a>
-                <a
-                  href={`${AGENTS_BASE}/${agent.id}/knowledge`}
-                  className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
-                >
-                  Knowledge
-                </a>
-                <a
-                  href={`${AGENTS_BASE}/${agent.id}/widget`}
-                  className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
-                >
-                  Widget
-                </a>
-                <a
-                  href={`${AGENTS_BASE}/${agent.id}/install`}
-                  className="rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1.5 hover:border-emerald-400/50 hover:text-emerald-200"
-                >
-                  Install
-                </a>
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="truncate text-2xl font-semibold text-white sm:text-3xl">
+                    {agent.name}
+                  </h1>
+                  <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950/50 px-3 py-1 text-xs font-semibold text-slate-300">
+                    <span
+                      className={`dot ${
+                        agent.is_active ? "dot--active" : "dot--paused"
+                      }`}
+                    />
+                    {statusLabel}
+                  </span>
+                </div>
+                <p className="mt-1 text-sm text-slate-400">
+                  Talk, tune, add knowledge, and publish from one focused agent
+                  workspace.
+                </p>
               </div>
             </div>
-            <Link
-              href={AGENTS_BASE}
-              className="ui-button ui-button--ghost"
-              data-oid="hrr377v"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to agents
-            </Link>
           </div>
 
-          <div className="relative mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <MetricCard
-              icon={PlugZap}
-              label="Catalog"
-              value={selectedIntegrationName}
-              detail={
-                hasCatalog
-                  ? `${indexedProducts.toLocaleString("en-US")} products indexed`
-                  : "Connect WooCommerce or Shopify to answer with catalog context."
-              }
-              tone={
-                hasCatalog && selectedIntegrationActive
-                  ? "good"
-                  : hasCatalog
-                    ? "warn"
-                    : "muted"
-              }
-            />
-            <MetricCard
-              icon={Globe2}
-              label="Domains"
-              value={hasDomains ? `${allowedDomains.length} allowed` : "Open"}
-              detail={
-                hasDomains
-                  ? allowedDomains.slice(0, 2).join(", ")
-                  : "Add production domains before publishing."
-              }
-              tone={hasDomains ? "good" : "warn"}
-            />
-            <MetricCard
-              icon={MessageSquare}
-              label="Messages"
-              value={agent.messages_limit?.toLocaleString("en-US") ?? "Not set"}
-              detail="Current monthly usage cap for this agent."
-              tone={agent.messages_limit ? "good" : "muted"}
-            />
-            <MetricCard
-              icon={KeyRound}
-              label="Created"
-              value={createdAt}
-              detail={`Key ending in ${agent.api_key.slice(-6)}`}
-              tone="muted"
-            />
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href={`${AGENTS_BASE}/${agent.id}/widget`}
+              className="ui-button ui-button--secondary"
+            >
+              Widget
+            </Link>
+            <Link
+              href={`${AGENTS_BASE}/${agent.id}/install`}
+              className="ui-button ui-button--primary"
+            >
+              Publish
+            </Link>
           </div>
         </header>
 
-        {/* Alerts */}
-        {saved && (
-          <div
-            className="ui-alert ui-alert--success items-center mt-6"
-            data-oid="qai4ugb"
-          >
+        {saved ? (
+          <div className="ui-alert ui-alert--success">
             Changes saved successfully.
           </div>
-        )}
-        {errorKey && (
-          <div className="ui-alert ui-alert--error mt-6" data-oid="iiw:3dy">
+        ) : null}
+        {errorKey ? (
+          <div className="ui-alert ui-alert--error">
             {errorMessages[errorKey] ?? "An unexpected error occurred."}
           </div>
-        )}
+        ) : null}
 
-        <form action={updateAgentAndWidget} data-oid="6_2z8c2">
-          <input
-            type="hidden"
-            name="agent_id"
-            value={agent.id}
-            data-oid="761fhl8"
-          />
+        <div className="grid flex-1 items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)_360px]">
+          <aside className="space-y-4 xl:sticky xl:top-24">
+            <article className="ui-card p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                Agent
+              </p>
+              <div className="mt-4 space-y-3 text-sm">
+                <StatusRow
+                  label="Catalog"
+                  value={selectedIntegrationName}
+                  good={hasCatalog && selectedIntegrationActive}
+                />
+                <StatusRow
+                  label="Domains"
+                  value={hasDomains ? `${allowedDomains.length} allowed` : "Open"}
+                  good={hasDomains}
+                />
+                <StatusRow
+                  label="Messages"
+                  value={agent.messages_limit?.toLocaleString("en-US") ?? "Not set"}
+                  good={Boolean(agent.messages_limit)}
+                />
+                <StatusRow
+                  label="Created"
+                  value={createdAt}
+                  good
+                />
+              </div>
+            </article>
 
-          <div className="mt-8 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_390px]">
-            <div className="min-w-0 space-y-8">
-              <article
-                id="setup"
-                className="min-w-0 ui-card glass-pane p-7"
-                data-oid="_cmxgf2"
+            <article className="ui-card p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                  Readiness
+                </p>
+                <span className="text-2xl font-semibold text-white">
+                  {completionPercent}%
+                </span>
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
+                <div
+                  className="h-full rounded-full bg-emerald-400"
+                  style={{ width: `${completionPercent}%` }}
+                />
+              </div>
+              <p className="mt-3 text-xs leading-5 text-slate-400">
+                Next: <span className="text-emerald-200">{nextStep}</span>
+              </p>
+            </article>
+
+            <nav className="ui-card grid gap-2 p-3 text-sm">
+              <Link
+                href={`${AGENTS_BASE}/${agent.id}`}
+                className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 font-medium text-emerald-100"
               >
+                Workspace
+              </Link>
+              <Link
+                href={`${AGENTS_BASE}/${agent.id}/knowledge`}
+                className="rounded-xl px-3 py-2 text-slate-400 transition hover:bg-surface-strong/50 hover:text-white"
+              >
+                Knowledge
+              </Link>
+              <Link
+                href={`${AGENTS_BASE}/${agent.id}/widget`}
+                className="rounded-xl px-3 py-2 text-slate-400 transition hover:bg-surface-strong/50 hover:text-white"
+              >
+                Widget appearance
+              </Link>
+              <Link
+                href={`${AGENTS_BASE}/${agent.id}/install`}
+                className="rounded-xl px-3 py-2 text-slate-400 transition hover:bg-surface-strong/50 hover:text-white"
+              >
+                Install script
+              </Link>
+            </nav>
+          </aside>
+
+          <div className="min-w-0 space-y-5">
+            <AgentSimulator agentId={agent.id} />
+            <KnowledgeSection agentId={agent.id} />
+          </div>
+
+          <form
+            action={updateAgentAndWidget}
+            className="min-w-0 space-y-4 xl:sticky xl:top-24 xl:max-h-[calc(100dvh-7rem)] xl:overflow-y-auto xl:pr-1"
+          >
+            <input type="hidden" name="agent_id" value={agent.id} />
+
+            <article className="ui-card--strong glass-pane p-4">
+              <SubmitButton label="Save agent" />
+            </article>
+
+            <article className="ui-card glass-pane p-5">
               <SectionHeading
-                eyebrow="Setup"
-                title="Integration, behavior, and access"
-                description="Connect catalog data, define response behavior, and lock the widget to approved domains."
+                eyebrow="Behavior"
+                title="Tune the assistant"
+                description="Keep the core settings close to the conversation so every test can become an improvement."
               />
 
-              <div className="mt-6 space-y-6" data-oid="l4:ji3-">
+              <div className="mt-5 space-y-5">
                 <div className="space-y-2" data-oid="1:fz-w-">
                   <label
                     htmlFor="woo-integration"
@@ -911,41 +861,7 @@ export default async function AgentDetailPage({
                   )}
                 </div>
               </div>
-              </article>
-
-            </div>
-
-            <aside className="min-w-0 space-y-5 xl:sticky xl:top-24 xl:max-h-[calc(100dvh-7rem)] xl:overflow-y-auto xl:pr-1" data-oid="1sn3crl">
-              <article className="rounded-2xl border border-emerald-400/20 bg-slate-950/55 p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-                    Launch readiness
-                  </p>
-                  <span className="text-2xl font-semibold text-white">
-                    {completionPercent}%
-                  </span>
-                </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
-                  <div
-                    className="h-full rounded-full bg-emerald-400"
-                    style={{ width: `${completionPercent}%` }}
-                  />
-                </div>
-                <p className="mt-3 text-xs leading-5 text-slate-400">
-                  Next step: <span className="text-emerald-200">{nextStep}</span>
-                </p>
-              </article>
-
-              <article className="ui-card--strong glass-pane p-4">
-                <SubmitButton label="Save changes" data-oid="ew1c.ap" />
-                <Link
-                  href={`${AGENTS_BASE}/${agent.id}`}
-                  className="ui-button ui-button--ghost mt-3 w-full justify-center"
-                  data-oid="g2dq6yg"
-                >
-                  Cancel
-                </Link>
-              </article>
+            </article>
 
               <article className="ui-card glass-pane p-6">
                 <div className="flex items-center gap-3">
@@ -1042,10 +958,8 @@ export default async function AgentDetailPage({
                   </p>
                 </div>
               </article>
-
-            </aside>
-          </div>
-        </form>
+          </form>
+        </div>
       </section>
     </main>
   );
