@@ -1,7 +1,17 @@
-//C:\ai-saas\app\dashboard\agents\[id]\WidgetDesigner.tsx
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  Check,
+  Clipboard,
+  type LucideIcon,
+  MessageSquare,
+  MonitorSmartphone,
+  Palette,
+  RotateCcw,
+  SlidersHorizontal,
+  Type,
+} from "lucide-react";
 import {
   widgetDefaults,
   widgetLimits,
@@ -72,61 +82,146 @@ function trimmedOrNull(value: string, max: number): string | null {
   return trimmed.slice(0, max);
 }
 
-// Mobile-first ColorInput: wrap + min-w-0 everywhere + reset button no-wrap
+const inputClass =
+  "w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-3.5 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30";
+
+function SectionCard({
+  icon: Icon,
+  eyebrow,
+  title,
+  children,
+}: {
+  icon: LucideIcon;
+  eyebrow: string;
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-2xl border border-slate-800/80 bg-slate-950/45 p-4 shadow-sm shadow-slate-950/20">
+      <div className="mb-4 flex items-start gap-3">
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 text-emerald-200">
+          <Icon className="h-4 w-4" aria-hidden="true" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+            {eyebrow}
+          </p>
+          <h3 className="mt-1 text-sm font-semibold text-white">{title}</h3>
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function FieldInput({
+  label,
+  name,
+  value,
+  onChange,
+  maxLength,
+  placeholder,
+  helper,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (val: string) => void;
+  maxLength: number;
+  placeholder: string;
+  helper: string;
+}) {
+  const remaining = maxLength - value.length;
+
+  return (
+    <div className="space-y-2 min-w-0">
+      <div className="flex items-end justify-between gap-3">
+        <label
+          htmlFor={name}
+          className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400"
+        >
+          {label}
+        </label>
+        <span className="text-[11px] text-slate-500">{remaining} left</span>
+      </div>
+      <input
+        id={name}
+        name={name}
+        maxLength={maxLength}
+        placeholder={placeholder}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={inputClass}
+      />
+      <p className="text-xs leading-relaxed text-slate-500">{helper}</p>
+    </div>
+  );
+}
+
 function ColorInput({
   label,
   name,
   value,
   onChange,
   defaultValue,
+  errorMessage = "Use a valid hex value.",
 }: {
   label: string;
   name: string;
   value: string;
   onChange: (val: string) => void;
   defaultValue: string;
+  errorMessage?: string;
 }) {
   const pickerValue = normalizeHex(value) ?? defaultValue;
+  const hasCustomValue = Boolean(value.trim());
+  const isInvalid = hasCustomValue && !normalizeHex(value);
 
   return (
-    <div className="space-y-1 min-w-0" data-oid="3fvi0b8">
-      <label
-        className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-        data-oid="w_yx1ax"
-      >
-        {label}
-      </label>
+    <div className="space-y-2 min-w-0">
+      <div className="flex items-center justify-between gap-3">
+        <label
+          htmlFor={name}
+          className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400"
+        >
+          {label}
+        </label>
+        {hasCustomValue && (
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="text-[11px] font-semibold text-slate-500 transition hover:text-emerald-200"
+          >
+            Reset
+          </button>
+        )}
+      </div>
 
-      <div
-        className="flex flex-wrap items-center gap-2 min-w-0"
-        data-oid="z4zrd3n"
-      >
+      <div className="flex items-center gap-2 min-w-0">
         <input
           type="color"
-          className="h-9 w-9 shrink-0 cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-0"
+          aria-label={`${label} color picker`}
+          className="h-10 w-10 shrink-0 cursor-pointer rounded-xl border border-slate-700 bg-slate-900 p-1"
           value={pickerValue}
           onChange={(e) => onChange(e.target.value)}
-          data-oid="umxgg7:"
         />
 
         <input
+          id={name}
           name={name}
           placeholder={defaultValue}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="min-w-0 flex-1 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-2 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-          data-oid="npde-3i"
+          className={`min-w-0 flex-1 rounded-xl border bg-slate-950/70 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition focus:ring-2 ${
+            isInvalid
+              ? "border-rose-400/60 focus:border-rose-300 focus:ring-rose-400/25"
+              : "border-slate-800 focus:border-emerald-400 focus:ring-emerald-400/30"
+          }`}
         />
-
-        <button
-          type="button"
-          onClick={() => onChange("")}
-          className="shrink-0 whitespace-nowrap text-xs uppercase text-slate-500 hover:text-emerald-300"
-          data-oid="8-dur2t"
-        >
-          Reset
-        </button>
       </div>
+      {isInvalid && (
+        <p className="text-xs text-rose-300">{errorMessage}</p>
+      )}
     </div>
   );
 }
@@ -187,14 +282,9 @@ export default function WidgetDesigner({
   const [colorToggleText, setColorToggleText] = useState(
     initialColorToggleText ?? "",
   );
+  const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
 
   const embedSnippet = getEmbedSnippet(apiKey);
-
-  const accentPickerValue = normalizeHex(accentInput) ?? widgetDefaults.accent;
-  const accentError =
-    accentInput && !normalizeHex(accentInput)
-      ? "Use a 3- or 6-character hex value."
-      : null;
 
   const liveStateInput = useMemo(
     () => ({
@@ -332,398 +422,242 @@ export default function WidgetDesigner({
     setColorToggleText("");
   }
 
+  function handleCopySnippet() {
+    navigator.clipboard.writeText(embedSnippet);
+    setCopyState("copied");
+    window.setTimeout(() => setCopyState("idle"), 1600);
+  }
+
   return (
     <div
       className="
-        mt-6 grid grid-cols-1 gap-6
-        lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,1fr)]
-        xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,1fr)]
-        2xl:grid-cols-[minmax(0,1.35fr)_minmax(420px,1fr)]
+        mt-6 grid grid-cols-1 gap-5
+        lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)]
+        xl:grid-cols-[minmax(0,1.15fr)_minmax(380px,0.85fr)]
         w-full min-w-0
       "
-      data-oid="0l98r5_"
     >
-      {/* Left column */}
-      <div className="space-y-4 min-w-0" data-oid=":jg9qap">
-        <div
-          className="flex flex-wrap items-center justify-between gap-3"
-          data-oid="cm6q09d"
-        >
-          <div className="space-y-1 min-w-0" data-oid="r-i6cm_">
-            <p
-              className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200"
-              data-oid="6jb0d7n"
-            >
-              Branding & UX
-            </p>
-            <h3
-              className="text-base sm:text-lg font-semibold text-white"
-              data-oid="l1ht4d8"
-            >
-              Adjust appearance and visible texts
-            </h3>
-          </div>
-
-          <button
-            type="button"
-            className="shrink-0 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300 transition hover:text-emerald-200"
-            onClick={handleReset}
-            data-oid="qs3b0sa"
-          >
-            Clear fields
-          </button>
-        </div>
-
-        <div
-          className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0"
-          data-oid="5fl-ybt"
-        >
-          <div
-            className="flex flex-wrap items-center gap-3 min-w-0"
-            data-oid="0uzx4c-"
-          >
-            <label
-              htmlFor="widget-accent"
-              className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-              data-oid="n19gled"
-            >
-              Main Accent Color
-            </label>
-
-            <input
-              type="color"
-              aria-label="Color picker"
-              className="h-9 w-9 shrink-0 cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-0"
-              value={accentPickerValue}
-              onChange={(event) => setAccentInput(event.target.value)}
-              data-oid="oa-nkik"
-            />
+      <div className="space-y-4 min-w-0">
+        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/35 p-4 sm:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
+                Widget studio
+              </p>
+              <h2 className="mt-2 text-lg font-semibold text-white">
+                Tune the chat experience
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">
+                Changes update the preview automatically. Leave a field empty to
+                keep the default value.
+              </p>
+            </div>
 
             <button
               type="button"
-              className="shrink-0 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300 transition hover:text-emerald-200"
-              onClick={() => setAccentInput("")}
-              data-oid="rd0w1m4"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-100"
+              onClick={handleReset}
             >
-              Reset
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+              Defaults
             </button>
           </div>
-
-          <input
-            id="widget-accent"
-            name="widget_accent"
-            placeholder={widgetDefaults.accent}
-            value={accentInput}
-            onChange={(event) => setAccentInput(event.target.value)}
-            className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-            data-oid="ub-ypt-"
-          />
-
-          <p className="text-xs text-slate-500" data-oid="6iwtdca">
-            Accepts #RRGGBB or RRGGBB formats. Empty = default color (
-            {widgetDefaults.accent}).
-          </p>
-
-          {accentError && (
-            <p className="text-xs text-rose-300" data-oid="48vbmz1">
-              {accentError}
-            </p>
-          )}
         </div>
 
-        {/* Detailed Color Customization */}
-        <div
-          className="space-y-4 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0"
-          data-oid="2n7sres"
+        <SectionCard
+          icon={Palette}
+          eyebrow="Colors"
+          title="Set the widget palette"
         >
-          <p
-            className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-200"
-            data-oid="cgsutxn"
-          >
-            Advanced Colors
-          </p>
-
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0"
-            data-oid="_jmncbn"
-          >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-3">
+              <ColorInput
+                label="Main accent"
+                name="widget_accent"
+                value={accentInput}
+                onChange={setAccentInput}
+                defaultValue={widgetDefaults.accent}
+                errorMessage="Use a 3- or 6-character hex value."
+              />
+            </div>
             <ColorInput
-              label="Header BG"
+              label="Header bg"
               name="widget_color_header_bg"
               value={colorHeaderBg}
               onChange={setColorHeaderBg}
               defaultValue="#0f172a"
-              data-oid="6cj2tyc"
             />
 
             <ColorInput
-              label="Header Text"
+              label="Header text"
               name="widget_color_header_text"
               value={colorHeaderText}
               onChange={setColorHeaderText}
               defaultValue="#ffffff"
-              data-oid="rboi65u"
             />
 
             <ColorInput
-              label="Chat Background"
+              label="Chat background"
               name="widget_color_chat_bg"
               value={colorChatBg}
               onChange={setColorChatBg}
               defaultValue="#f1f5f9"
-              data-oid="uv-ya1e"
             />
 
-            {/* Spacer only on >= sm */}
-            <div className="hidden sm:block" data-oid="tzuc109" />
-
             <ColorInput
-              label="User Bubble BG"
+              label="User bubble bg"
               name="widget_color_user_bubble_bg"
               value={colorUserBubbleBg}
               onChange={setColorUserBubbleBg}
               defaultValue="#2563eb"
-              data-oid="k44gotl"
             />
 
             <ColorInput
-              label="User Bubble Text"
+              label="User text"
               name="widget_color_user_bubble_text"
               value={colorUserBubbleText}
               onChange={setColorUserBubbleText}
               defaultValue="#ffffff"
-              data-oid="dnhykuo"
             />
 
             <ColorInput
-              label="Bot Bubble BG"
+              label="Bot bubble bg"
               name="widget_color_bot_bubble_bg"
               value={colorBotBubbleBg}
               onChange={setColorBotBubbleBg}
               defaultValue="#ffffff"
-              data-oid="pr.rcf0"
             />
 
             <ColorInput
-              label="Bot Bubble Text"
+              label="Bot text"
               name="widget_color_bot_bubble_text"
               value={colorBotBubbleText}
               onChange={setColorBotBubbleText}
               defaultValue="#0f172a"
-              data-oid="p2r.w:h"
             />
 
-            <div className="hidden sm:block" data-oid="s6.4ssk" />
-
             <ColorInput
-              label="Toggle Button BG"
+              label="Launcher bg"
               name="widget_color_toggle_bg"
               value={colorToggleBg}
               onChange={setColorToggleBg}
               defaultValue="#0f172a"
-              data-oid="dmzwni3"
             />
 
             <ColorInput
-              label="Toggle Button Icon"
+              label="Launcher icon"
               name="widget_color_toggle_text"
               value={colorToggleText}
               onChange={setColorToggleText}
               defaultValue="#ffffff"
-              data-oid="y.wxa._"
             />
           </div>
-        </div>
+        </SectionCard>
 
-        <div className="space-y-2 min-w-0" data-oid="x50fbx9">
-          <label
-            htmlFor="widget-brand"
-            className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-            data-oid="h-7kjtx"
-          >
-            Visible name
-          </label>
-          <input
-            id="widget-brand"
-            name="widget_brand"
-            maxLength={widgetLimits.brand}
-            placeholder={widgetDefaults.brand}
-            value={brandInput}
-            onChange={(event) => setBrandInput(event.target.value)}
-            className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-            data-oid="d78.put"
-          />
-
-          <p className="text-xs text-slate-500" data-oid="6z:i1jk">
-            Max {widgetLimits.brand} characters. Empty = uses &quot;
-            {widgetDefaults.brand}&quot;.
-          </p>
-        </div>
-
-        <div className="space-y-2 min-w-0" data-oid="hlfz._a">
-          <label
-            htmlFor="widget-label"
-            className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-            data-oid="2:5udzr"
-          >
-            Button text
-          </label>
-          <input
-            id="widget-label"
-            name="widget_label"
-            maxLength={widgetLimits.label}
-            placeholder={widgetDefaults.label}
-            value={labelInput}
-            onChange={(event) => setLabelInput(event.target.value)}
-            className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-            data-oid="ppy.u98"
-          />
-
-          <p className="text-xs text-slate-500" data-oid=".gp1eu_">
-            Max {widgetLimits.label} characters. Empty = uses &quot;
-            {widgetDefaults.label}&quot;.
-          </p>
-        </div>
-
-        <div className="space-y-2 min-w-0" data-oid="moi.o8_">
-          <label
-            htmlFor="widget-greeting"
-            className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-            data-oid="l.qv5bn"
-          >
-            Initial message
-          </label>
-          <input
-            id="widget-greeting"
-            name="widget_greeting"
-            maxLength={widgetLimits.greeting}
-            placeholder={widgetDefaults.greeting}
-            value={greetingInput}
-            onChange={(event) => setGreetingInput(event.target.value)}
-            className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-            data-oid="klpv9lg"
-          />
-
-          <p className="text-xs text-slate-500" data-oid="1viqapu">
-            Max {widgetLimits.greeting} characters. Empty = uses &quot;
-            {widgetDefaults.greeting}&quot;.
-          </p>
-        </div>
-
-        <div className="space-y-2 min-w-0" data-oid="kce0r5o">
-          <label
-            htmlFor="widget-human-support"
-            className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-            data-oid="s_q8rr4"
-          >
-            Header subtitle
-          </label>
-          <input
-            id="widget-human-support"
-            name="widget_human_support_text"
-            maxLength={widgetLimits.humanSupportText}
-            placeholder={widgetDefaults.humanSupportText}
-            value={humanSupportTextInput}
-            onChange={(event) => setHumanSupportTextInput(event.target.value)}
-            className="w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-            data-oid=".y_y3.4"
-          />
-
-          <p className="text-xs text-slate-500" data-oid="3:-64jy">
-            Max {widgetLimits.humanSupportText} characters. Empty = uses &quot;
-            {widgetDefaults.humanSupportText}&quot;.
-          </p>
-        </div>
-
-        <fieldset
-          className="space-y-3 rounded-2xl border border-slate-800 bg-slate-950/60 p-3 sm:p-4 min-w-0"
-          data-oid="kk.-txs"
+        <SectionCard
+          icon={Type}
+          eyebrow="Copy"
+          title="Customize visible text"
         >
-          <legend
-            className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-            data-oid="o-jy09:"
-          >
-            Screen position
-          </legend>
-          <div className="flex flex-wrap gap-3" data-oid="r_cx7nx">
-            {widgetPositions.map((option) => (
-              <label
-                key={option}
-                className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] ${
-                  position === option
-                    ? "border-emerald-400 text-emerald-200"
-                    : "border-slate-700 text-slate-300"
-                }`}
-                data-oid="tkk.q31"
-              >
-                <input
-                  type="radio"
-                  name="widget_position"
-                  value={option}
-                  checked={position === option}
-                  onChange={() => setPosition(option)}
-                  className="sr-only"
-                  data-oid="tcxq_2-"
-                />
-
-                {option === "right" ? "Right" : "Left"}
-              </label>
-            ))}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FieldInput
+              label="Visible name"
+              name="widget_brand"
+              maxLength={widgetLimits.brand}
+              placeholder={widgetDefaults.brand}
+              value={brandInput}
+              onChange={setBrandInput}
+              helper={`Default: "${widgetDefaults.brand}".`}
+            />
+            <FieldInput
+              label="Button text"
+              name="widget_label"
+              maxLength={widgetLimits.label}
+              placeholder={widgetDefaults.label}
+              value={labelInput}
+              onChange={setLabelInput}
+              helper={`Default: "${widgetDefaults.label}".`}
+            />
+            <div className="sm:col-span-2">
+              <FieldInput
+                label="Initial message"
+                name="widget_greeting"
+                maxLength={widgetLimits.greeting}
+                placeholder={widgetDefaults.greeting}
+                value={greetingInput}
+                onChange={setGreetingInput}
+                helper={`Default: "${widgetDefaults.greeting}".`}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <FieldInput
+                label="Header subtitle"
+                name="widget_human_support_text"
+                maxLength={widgetLimits.humanSupportText}
+                placeholder={widgetDefaults.humanSupportText}
+                value={humanSupportTextInput}
+                onChange={setHumanSupportTextInput}
+                helper={`Default: "${widgetDefaults.humanSupportText}".`}
+              />
+            </div>
           </div>
-        </fieldset>
+        </SectionCard>
 
-        <div className="flex flex-wrap gap-3" data-oid="8y8je0-">
-          <button
-            type="button"
-            onClick={handleReset}
-            className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 sm:flex-none"
-            data-oid="5kzsuwe"
-          >
-            Default values
-          </button>
-        </div>
+        <SectionCard
+          icon={SlidersHorizontal}
+          eyebrow="Behavior"
+          title="Choose where the launcher sits"
+        >
+          <fieldset>
+            <legend className="sr-only">Screen position</legend>
+            <div className="grid grid-cols-2 gap-2 rounded-xl border border-slate-800 bg-slate-950/60 p-1.5">
+              {widgetPositions.map((option) => (
+                <label
+                  key={option}
+                  className={`flex cursor-pointer items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+                    position === option
+                      ? "bg-emerald-400 text-slate-950 shadow-sm shadow-emerald-950/40"
+                      : "text-slate-400 hover:bg-slate-900 hover:text-slate-100"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="widget_position"
+                    value={option}
+                    checked={position === option}
+                    onChange={() => setPosition(option)}
+                    className="sr-only"
+                  />
 
-        <p className="text-xs text-slate-500" data-oid="twtwhdf">
-          Empty values automatically use the widget&apos;s default texts and
-          colors.
-        </p>
+                  {option === "right" ? "Right" : "Left"}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </SectionCard>
       </div>
 
-      {/* Right column */}
       <div
-        className="space-y-5 rounded-2xl border border-slate-800/70 bg-linear-to-br from-slate-950/80 via-slate-950/65 to-slate-900/70 p-4 shadow-xl shadow-slate-950/40 min-w-0 overflow-x-hidden sm:p-5"
-        data-oid="p-o81-s"
+        className="min-w-0 space-y-5 rounded-2xl border border-slate-800/70 bg-linear-to-br from-slate-950/85 via-slate-950/70 to-slate-900/70 p-4 shadow-xl shadow-slate-950/40 sm:p-5 lg:sticky lg:top-6 lg:self-start"
       >
-        <div
-          className="flex flex-wrap items-start justify-between gap-3"
-          data-oid=".:gzju-"
-        >
-          <div className="space-y-1" data-oid="seqoi.d">
-            <p
-              className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200"
-              data-oid="kg.cb2h"
-            >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
               Preview
             </p>
-            <p className="text-sm text-slate-300" data-oid="lw55c4f">
-              Updates automatically as you edit.
+            <p className="text-sm text-slate-300">
+              Live mobile preview with your current styling.
             </p>
           </div>
+          <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1 text-xs font-semibold text-slate-300">
+            <MonitorSmartphone className="h-3.5 w-3.5" aria-hidden="true" />
+            320 x 640
+          </span>
         </div>
 
-        {/* Preview canvas (mobile-first) */}
-        <div
-          className="mx-auto w-[320px] max-w-[calc(100vw-24px)] sm:w-[360px] lg:w-[390px]"
-          data-oid="ms7_rkv"
-        >
-          <div
-            className="relative overflow-hidden rounded-[28px] border border-white/10 bg-black p-2 shadow-[0_24px_70px_rgba(0,0,0,.55)]"
-            data-oid="-oxjv36"
-          >
-            <div
-              className="absolute left-1/2 top-3 z-10 h-5 w-24 -translate-x-1/2 rounded-full border border-white/10 bg-black/70"
-              data-oid="o4yx4a8"
-            />
+        <div className="mx-auto w-[320px] max-w-full sm:w-[360px]">
+          <div className="relative overflow-hidden rounded-[30px] border border-white/10 bg-black p-2 shadow-[0_24px_70px_rgba(0,0,0,.55)]">
+            <div className="absolute left-1/2 top-3 z-10 h-5 w-24 -translate-x-1/2 rounded-full border border-white/10 bg-black/70" />
 
             <iframe
               key={iframeKey}
@@ -731,50 +665,40 @@ export default function WidgetDesigner({
               src={previewPageUrl}
               sandbox="allow-scripts allow-same-origin"
               className="block h-[640px] w-full rounded-[22px] border-0 bg-slate-100"
-              data-oid="svxitrx"
             />
-          </div>
-
-          <div
-            className="mt-3 flex items-center justify-between text-[11px] text-slate-400"
-            data-oid="c7del-j"
-          >
-            <span data-oid="2vm99im">Mobile preview</span>
-            <span className="text-slate-500" data-oid="ssp7ti9">
-              320 x 640
-            </span>
           </div>
         </div>
 
-        <div className="space-y-2 min-w-0" data-oid="q07ffv4">
-          <p
-            className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
-            data-oid="pxpuo1y"
-          >
-            Installation Code - Place before &lt;/body&gt;
-          </p>
-
-          <div className="relative group min-w-0" data-oid="ijuq6.z">
-            <code
-              className="block rounded-xl border border-slate-800 bg-slate-950/80 p-4 text-[11px] text-emerald-200 overflow-x-auto break-all font-mono"
-              data-oid="yl0nfz2"
-            >
-              {embedSnippet}
-            </code>
-
+        <div className="space-y-3 min-w-0 rounded-2xl border border-slate-800 bg-slate-950/45 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <MessageSquare
+                className="h-4 w-4 shrink-0 text-emerald-200"
+                aria-hidden="true"
+              />
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Install before &lt;/body&gt;
+              </p>
+            </div>
             <button
               type="button"
-              onClick={() => {
-                navigator.clipboard.writeText(embedSnippet);
-              }}
-              className="absolute top-2 right-2 rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 opacity-0 transition group-hover:opacity-100 hover:border-emerald-500 hover:text-emerald-400"
-              data-oid="vx3uu2d"
+              onClick={handleCopySnippet}
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-100"
             >
-              Copy
+              {copyState === "copied" ? (
+                <Check className="h-3.5 w-3.5" aria-hidden="true" />
+              ) : (
+                <Clipboard className="h-3.5 w-3.5" aria-hidden="true" />
+              )}
+              {copyState === "copied" ? "Copied" : "Copy"}
             </button>
           </div>
 
-          <p className="text-xs text-slate-500" data-oid="cot769u">
+          <code className="block max-h-36 overflow-auto rounded-xl border border-slate-800 bg-slate-950/80 p-3 font-mono text-[11px] leading-relaxed text-emerald-200 break-all">
+            {embedSnippet}
+          </code>
+
+          <p className="text-xs leading-relaxed text-slate-500">
             This snippet is stable. You don&apos;t need to update it when
             changing settings.
           </p>
