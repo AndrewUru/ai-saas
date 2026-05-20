@@ -293,6 +293,41 @@ export function renderWidgetScript(
 
   const getCopy = (configuredLanguage) => UI_COPY[resolveLanguage(configuredLanguage)] || UI_COPY.en;
 
+  const countWords = (value) => {
+    return String(value || "")
+      .trim()
+      .split(/\\s+/)
+      .filter(Boolean).length;
+  };
+
+  const trackWidgetEvent = (eventType, extra) => {
+    try {
+      const payload = JSON.stringify({
+        key: CONFIG_KEY,
+        eventType,
+        pageUrl: window.location.href,
+        referrer: document.referrer || null,
+        ...(extra || {}),
+      });
+      const endpoint = new URL("/api/widget/events", API_BASE).toString();
+
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: "application/json" });
+        navigator.sendBeacon(endpoint, blob);
+        return;
+      }
+
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+        keepalive: true,
+      }).catch(() => {});
+    } catch (err) {
+      // Analytics must never block the widget.
+    }
+  };
+
   const fetchConfig = async (key) => {
     const configUrl = new URL("/api/widget/config", API_BASE);
     configUrl.searchParams.set("key", key);
@@ -560,6 +595,7 @@ export function renderWidgetScript(
       \`;
 
       document.body.appendChild(anchor);
+      trackWidgetEvent("load");
 
       const refreshTheme = async () => {
         try {
@@ -636,6 +672,7 @@ export function renderWidgetScript(
         toggleBtn.setAttribute("aria-expanded", state ? "true" : "false");
         toggleBtn.setAttribute("aria-label", state ? copy.chatOpen : copy.openChat);
         if (state) {
+          trackWidgetEvent("open");
           refreshTheme();
           anchor.classList.add("open");
           widget.setAttribute("aria-hidden", "false");
@@ -663,6 +700,7 @@ export function renderWidgetScript(
         e.preventDefault();
         const text = input.value.trim();
         if (!text) return;
+        const userWordCount = countWords(text);
         removeSuggestions();
 
         // User Message
@@ -713,6 +751,9 @@ export function renderWidgetScript(
             throw new Error("API Error");
           }
           const data = await resp.json();
+          trackWidgetEvent("message_sent", {
+            wordCount: userWordCount,
+          });
 
           // Bot Message
           const botDiv = document.createElement("div");
@@ -732,6 +773,9 @@ export function renderWidgetScript(
           scrollChatToBottom();
 
         } catch (err) {
+          trackWidgetEvent("message_failed", {
+            wordCount: userWordCount,
+          });
           if (chatBox.contains(typingDiv)) chatBox.removeChild(typingDiv);
           setSending(false);
           

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import {
   ArrowLeft,
+  BarChart3,
   BookOpen,
   Bot,
   Brain,
@@ -622,6 +623,12 @@ export default async function AgentDetailPage({
                       ? "Copy or colors have custom settings."
                       : "Customize copy, colors, position, and preview."
                   }
+                />
+                <SidebarLink
+                  href={`${AGENTS_BASE}/${agent.id}/analytics`}
+                  icon={BarChart3}
+                  label="Analytics"
+                  description="Traffic, opens, interactions, and words."
                 />
                 <SidebarLink
                   href={`${AGENTS_BASE}/${agent.id}/knowledge`}

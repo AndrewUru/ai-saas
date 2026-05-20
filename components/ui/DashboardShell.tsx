@@ -21,6 +21,7 @@ const NAV: NavItem[] = [
 const AGENT_SCREENS = [
   { label: "Workspace", suffix: "" },
   { label: "Widget", suffix: "/widget" },
+  { label: "Analytics", suffix: "/analytics" },
   { label: "Knowledge", suffix: "/knowledge" },
   { label: "Simulator", suffix: "/simulator" },
   { label: "Install", suffix: "/install" },
