@@ -1,25 +1,26 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import {
   ArrowLeft,
+  BookOpen,
   Bot,
+  Brain,
   CheckCircle2,
+  MessageSquare,
+  Palette,
+  Rocket,
   ShieldCheck,
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/requireUser";
 import SubmitButton from "@/components/SubmitButton";
 import AgentSimulator from "./AgentSimulator";
 import KnowledgeSection from "./KnowledgeSection";
-import WidgetDesigner from "./WidgetDesigner";
-import { getSiteUrlFromHeaders } from "@/lib/site";
 
 import {
   widgetLimits,
   sanitizeHex,
   sanitizePosition,
 } from "@/lib/widget/defaults";
-import type { WidgetPosition } from "@/lib/widget/defaults";
 
 const LANGUAGE_OPTIONS = [
   { value: "auto", label: "Automatic detection" },
@@ -378,8 +379,6 @@ export default async function AgentDetailPage({
   const resolvedSearchParams = await searchParams;
 
   const { supabase, user } = await requireUser();
-  const headersList = await headers();
-  const siteUrl = getSiteUrlFromHeaders(headersList);
 
   const { data: agent, error: agentError } = await supabase
     .from("agents")
@@ -424,10 +423,6 @@ export default async function AgentDetailPage({
   const languageValue = agent.language ?? "auto";
   const fallbackUrlValue = agent.fallback_url ?? "";
   const descriptionFallback = agent.description ?? "";
-  const widgetPositionValue: WidgetPosition | null =
-    agent.widget_position === "left" || agent.widget_position === "right"
-      ? agent.widget_position
-      : null;
 
   const createdAt = agent.created_at
     ? new Intl.DateTimeFormat("en-US", {
@@ -461,6 +456,18 @@ export default async function AgentDetailPage({
       agent.widget_label?.trim() ||
       agent.widget_greeting?.trim() ||
       agent.widget_human_support_text?.trim(),
+  );
+  const hasWidgetColors = Boolean(
+    agent.widget_accent?.trim() ||
+      agent.widget_color_header_bg?.trim() ||
+      agent.widget_color_header_text?.trim() ||
+      agent.widget_color_chat_bg?.trim() ||
+      agent.widget_color_user_bubble_bg?.trim() ||
+      agent.widget_color_user_bubble_text?.trim() ||
+      agent.widget_color_bot_bubble_bg?.trim() ||
+      agent.widget_color_bot_bubble_text?.trim() ||
+      agent.widget_color_toggle_bg?.trim() ||
+      agent.widget_color_toggle_text?.trim(),
   );
   const completionItems = [
     agent.is_active,
@@ -513,8 +520,8 @@ export default async function AgentDetailPage({
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-slate-400">
-                  Chat on the left. Edit the agent and widget canvas on the
-                  right.
+                  Use the left sidebar to move between setup, widget design,
+                  knowledge, simulator, and install.
                 </p>
               </div>
             </div>
@@ -525,7 +532,7 @@ export default async function AgentDetailPage({
               href={`${AGENTS_BASE}/${agent.id}/widget`}
               className="ui-button ui-button--secondary"
             >
-              Widget
+              Edit widget
             </Link>
             <Link
               href={`${AGENTS_BASE}/${agent.id}/install`}
@@ -585,6 +592,58 @@ export default async function AgentDetailPage({
               </div>
             </article>
 
+            <nav
+              aria-label="Agent editor sections"
+              className="rounded-3xl border border-border bg-surface/35 p-3"
+            >
+              <div className="px-2 pb-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
+                  Editor
+                </p>
+                <p className="mt-1 text-xs leading-5 text-slate-400">
+                  Widget design now lives in its own focused screen.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <SidebarLink
+                  href={`${AGENTS_BASE}/${agent.id}`}
+                  icon={Brain}
+                  label="Agent setup"
+                  description="Rules, integrations, domains, and escalation."
+                  active
+                />
+                <SidebarLink
+                  href={`${AGENTS_BASE}/${agent.id}/widget`}
+                  icon={Palette}
+                  label="Widget editor"
+                  description={
+                    hasWidgetCopy || hasWidgetColors
+                      ? "Copy or colors have custom settings."
+                      : "Customize copy, colors, position, and preview."
+                  }
+                />
+                <SidebarLink
+                  href={`${AGENTS_BASE}/${agent.id}/knowledge`}
+                  icon={BookOpen}
+                  label="Knowledge"
+                  description="Upload product and support context."
+                />
+                <SidebarLink
+                  href={`${AGENTS_BASE}/${agent.id}/simulator`}
+                  icon={MessageSquare}
+                  label="Simulator"
+                  description="Test replies before publishing."
+                />
+                <SidebarLink
+                  href={`${AGENTS_BASE}/${agent.id}/install`}
+                  icon={Rocket}
+                  label="Install"
+                  description="Copy the production snippet."
+                />
+              </div>
+            </nav>
+
             <AgentSimulator agentId={agent.id} />
           </aside>
 
@@ -597,10 +656,10 @@ export default async function AgentDetailPage({
             <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-t-3xl border-b border-border bg-background/90 px-4 py-3 backdrop-blur-md sm:px-5">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-                  Canvas
+                  Setup
                 </p>
                 <h2 className="truncate text-lg font-semibold text-white">
-                  Widget and agent editor
+                  Agent editor
                 </h2>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -616,40 +675,26 @@ export default async function AgentDetailPage({
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-                      Assistant response
+                      Workspace
                     </p>
                     <p className="mt-1 text-sm text-emerald-50">
-                      Here is a live widget draft. Change anything in the
-                      canvas and save when it matches the assistant you want.
+                      Configure the assistant here. Open the widget editor from
+                      the left sidebar when you want to tune the customer-facing
+                      launcher and preview.
                     </p>
                   </div>
-                  <p className="text-xs text-emerald-100/75">
-                    Next: {nextStep}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-xs text-emerald-100/75">
+                      Next: {nextStep}
+                    </p>
+                    <Link
+                      href={`${AGENTS_BASE}/${agent.id}/widget`}
+                      className="rounded-full border border-emerald-300/35 bg-emerald-300/10 px-3 py-1.5 text-xs font-semibold text-emerald-50 transition hover:bg-emerald-300/20"
+                    >
+                      Edit widget
+                    </Link>
+                  </div>
                 </div>
-              </section>
-
-              <section className="rounded-2xl border border-slate-800/80 bg-slate-950/35 p-4">
-                <WidgetDesigner
-                  apiKey={agent.api_key}
-                  siteUrl={siteUrl}
-                  initialAccent={agent.widget_accent}
-                  initialBrand={agent.widget_brand}
-                  initialLabel={agent.widget_label}
-                  initialGreeting={agent.widget_greeting}
-                  initialLanguage={agent.language ?? "auto"}
-                  initialHumanSupportText={agent.widget_human_support_text}
-                  initialPosition={widgetPositionValue}
-                  initialColorHeaderBg={agent.widget_color_header_bg}
-                  initialColorHeaderText={agent.widget_color_header_text}
-                  initialColorChatBg={agent.widget_color_chat_bg}
-                  initialColorUserBubbleBg={agent.widget_color_user_bubble_bg}
-                  initialColorUserBubbleText={agent.widget_color_user_bubble_text}
-                  initialColorBotBubbleBg={agent.widget_color_bot_bubble_bg}
-                  initialColorBotBubbleText={agent.widget_color_bot_bubble_text}
-                  initialColorToggleBg={agent.widget_color_toggle_bg}
-                  initialColorToggleText={agent.widget_color_toggle_text}
-                />
               </section>
 
               <section className="rounded-2xl border border-slate-800/80 bg-slate-950/35 p-5">
@@ -986,5 +1031,46 @@ export default async function AgentDetailPage({
         </div>
       </section>
     </main>
+  );
+}
+
+function SidebarLink({
+  href,
+  icon: Icon,
+  label,
+  description,
+  active = false,
+}: {
+  href: string;
+  icon: typeof Palette;
+  label: string;
+  description: string;
+  active?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`group flex gap-3 rounded-2xl border p-3 transition ${
+        active
+          ? "border-emerald-400/35 bg-emerald-400/10 text-white"
+          : "border-slate-800/80 bg-slate-950/30 text-slate-300 hover:border-emerald-400/35 hover:bg-slate-950/55 hover:text-white"
+      }`}
+    >
+      <span
+        className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${
+          active
+            ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
+            : "border-slate-700 bg-slate-900/60 text-slate-400 group-hover:text-emerald-200"
+        }`}
+      >
+        <Icon className="h-4 w-4" aria-hidden="true" />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold">{label}</span>
+        <span className="mt-0.5 block text-xs leading-5 text-slate-400">
+          {description}
+        </span>
+      </span>
+    </Link>
   );
 }
