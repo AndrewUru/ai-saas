@@ -2,6 +2,19 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  AlertCircle,
+  CheckCircle2,
+  Database,
+  FileText,
+  Loader2,
+  MoreHorizontal,
+  RefreshCw,
+  Trash2,
+  Upload,
+  UploadCloud,
+  X,
+} from "lucide-react";
+import {
   deleteAgentFile,
   listAgentFiles,
   processAgentFile,
@@ -26,10 +39,17 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  uploaded: "border-slate-700/60 bg-slate-900/40 text-slate-200",
-  processing: "border-amber-500/40 bg-amber-500/10 text-amber-200",
-  ready: "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
-  failed: "border-rose-500/40 bg-rose-500/10 text-rose-200",
+  uploaded: "border-border bg-surface text-slate-200",
+  processing: "border-amber-500/30 bg-amber-500/10 text-amber-200",
+  ready: "border-emerald-500/30 bg-emerald-500/10 text-emerald-200",
+  failed: "border-rose-500/30 bg-rose-500/10 text-rose-200",
+};
+
+const STATUS_ICONS = {
+  uploaded: FileText,
+  processing: Loader2,
+  ready: CheckCircle2,
+  failed: AlertCircle,
 };
 
 function formatBytes(bytes: number | null) {
@@ -278,28 +298,25 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
   };
 
   return (
-    <article
-      className="lg:col-span-2 w-full min-w-0 rounded-3xl border border-slate-800/60 bg-slate-900/60 p-7 shadow-xl shadow-slate-900/40 backdrop-blur"
-      data-oid="nnwanq:"
-    >
-      <div
-        className="flex flex-wrap items-start justify-between gap-4"
-        data-oid="5o:xo-8"
-      >
-        <div data-oid="djr4_:g">
-          <h2 className="text-xl font-semibold text-white" data-oid="fsmu3n-">
-            Knowledge files
-          </h2>
-          <p className="mt-1 text-sm text-slate-300" data-oid="dwdq56n">
-            Upload files to improve answers with your store data.
-          </p>
+    <article className="ui-card lg:col-span-2 w-full min-w-0 p-5 sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-accent/25 bg-accent/10 text-accent">
+            <Database className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <p className="ui-badge">Knowledge</p>
+            <h2 className="mt-2 text-xl font-semibold text-white">
+              Knowledge files
+            </h2>
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-300">
+              Upload PDFs or CSVs that improve answers with your store data.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div
-        className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]"
-        data-oid="m9hds9b"
-      >
+      <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
         <div
           role="button"
           tabIndex={0}
@@ -321,12 +338,11 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
             const file = event.dataTransfer.files?.[0] ?? null;
             onPickFile(file);
           }}
-          className={`rounded-2xl border bg-slate-950/50 p-4 text-left transition ${
+          className={`rounded-2xl border p-4 text-left transition ${
             isDragging
-              ? "border-emerald-400/60 bg-slate-900/70"
-              : "border-slate-800 hover:border-emerald-400/40"
+              ? "border-accent/60 bg-accent/10"
+              : "border-border bg-surface/35 hover:border-accent/40 hover:bg-surface/55"
           }`}
-          data-oid="dq1nn60"
         >
           <input
             ref={fileInputRef}
@@ -334,59 +350,20 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
             accept=".pdf,.csv"
             className="sr-only"
             onChange={(event) => onPickFile(event.target.files?.[0] ?? null)}
-            data-oid="c1qourq"
           />
 
-          <div
-            className="flex items-start justify-between gap-4"
-            data-oid="lh:owvc"
-          >
-            <div className="flex items-start gap-3" data-oid="0djg:7b">
-              <span
-                className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/60 text-emerald-200"
-                data-oid="d1y61ji"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  data-oid="w52jijl"
-                >
-                  <path
-                    d="M12 16V8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    data-oid="fv-u9xp"
-                  />
-
-                  <path
-                    d="m8.5 11.5 3.5-3.5 3.5 3.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    data-oid="y.638oj"
-                  />
-
-                  <path
-                    d="M4 16.5a3.5 3.5 0 0 0 3.5 3.5h9a3.5 3.5 0 0 0 0-7h-.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    data-oid="8:hw3p7"
-                  />
-                </svg>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex min-w-0 items-start gap-3">
+              <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-accent/25 bg-accent/10 text-accent">
+                <UploadCloud className="h-5 w-5" aria-hidden="true" />
               </span>
-              <div data-oid="9at2j70">
-                <p
-                  className="text-sm font-semibold text-white"
-                  data-oid="t2-3po2"
-                >
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-white">
                   {selectedFile ? "File selected" : "Drop your file here"}
                 </p>
-                <p className="mt-1 text-xs text-slate-400" data-oid="khp:ogn">
+                <p className="mt-1 break-words text-xs leading-5 text-slate-400">
                   {selectedFile
-                    ? `${selectedFile.name} \u2022 ${formatBytes(
+                    ? `${selectedFile.name} - ${formatBytes(
                         selectedFile.size,
                       )}`
                     : "PDF or CSV up to 10MB. Click to browse."}
@@ -399,23 +376,22 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                 event.stopPropagation();
                 fileInputRef.current?.click();
               }}
-              className="rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200"
-              data-oid="mk9g_qr"
+              className="ui-button ui-button--secondary h-9 shrink-0 px-3 text-xs"
             >
               {selectedFile ? "Change file" : "Browse"}
             </button>
           </div>
           {selectedFile && (
-            <div className="mt-3 flex gap-2" data-oid="ea04t2l">
+            <div className="mt-3 flex gap-2">
               <button
                 type="button"
                 onClick={(event) => {
                   event.stopPropagation();
                   onPickFile(null);
                 }}
-                className="text-xs text-slate-400 transition hover:text-slate-200"
-                data-oid="dug0dkj"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 transition hover:text-slate-200"
               >
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
                 Remove
               </button>
             </div>
@@ -425,93 +401,88 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
           type="button"
           onClick={handleUpload}
           disabled={uploading || !selectedFile}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-emerald-400/60 disabled:text-slate-950/60 disabled:hover:bg-emerald-400/60"
-          data-oid="b7a5y_c"
+          className="ui-button ui-button--primary min-h-11 justify-center px-5"
         >
-          {uploading && (
-            <span
-              className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900/30 border-t-slate-900"
-              aria-hidden="true"
-              data-oid="ekgyucl"
-            />
+          {uploading ? (
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <Upload className="h-4 w-4" aria-hidden="true" />
           )}
-          <span data-oid="yvjqpun">
-            {uploading ? "Uploading\u2026" : "Upload"}
-          </span>
+          {uploading ? "Uploading..." : "Upload"}
         </button>
       </div>
 
-      <div
-        className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-400"
-        data-oid="bq_.s7:"
-      >
-        <label
-          className="inline-flex items-center gap-2 text-slate-300"
-          data-oid="74:fvq1"
-        >
+      <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+        <label className="inline-flex items-center gap-2 text-slate-300">
           <input
             type="checkbox"
             checked={autoProcess}
             onChange={(event) => setAutoProcess(event.target.checked)}
-            className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-emerald-400 focus:ring-emerald-400/40"
-            data-oid="aenu0jg"
+            className="h-4 w-4 rounded border-border bg-background text-accent focus:ring-accent/40"
           />
           Index automatically after upload
         </label>
-        <span className="text-slate-500" data-oid="zk1v610">
+        <span className="text-slate-500">
           Max file size 10MB. Supported formats: PDF, CSV.
         </span>
       </div>
 
       {notice && (
         <div
-          className={`mt-4 flex items-start justify-between gap-3 rounded-2xl border px-4 py-3 text-xs transition duration-200 ${
+          className={`ui-alert mt-4 flex items-start justify-between gap-3 text-sm transition duration-200 ${
             notice.type === "success"
-              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-100"
-              : "border-rose-500/30 bg-rose-500/10 text-rose-100"
+              ? "ui-alert--success"
+              : "ui-alert--error"
           } ${
             noticeVisible
               ? "translate-y-0 opacity-100"
               : "-translate-y-1 opacity-0"
           }`}
-          data-oid="qasknp:"
         >
-          <span data-oid="oyyta9l">{notice.message}</span>
+          <span className="flex min-w-0 items-start gap-2">
+            {notice.type === "success" ? (
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+            ) : (
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            )}
+            <span>{notice.message}</span>
+          </span>
           <button
             type="button"
             onClick={dismissNotice}
-            className="text-sm text-current/70 transition hover:text-current"
+            className="rounded-full p-1 text-current/70 transition hover:bg-current/10 hover:text-current"
             aria-label="Dismiss notice"
-            data-oid="o57.9-_"
           >
-            \u00d7
+            <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       )}
 
-      <div className="mt-6 space-y-2" data-oid="rfu5dus">
+      <div className="mt-6 space-y-2">
         {loading && (
-          <p className="text-xs text-slate-400" data-oid="_qc9y1:">
-            Loading knowledge files\u2026
+          <p className="flex items-center gap-2 rounded-2xl border border-border bg-surface/35 px-4 py-3 text-sm text-slate-400">
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            Loading knowledge files...
           </p>
         )}
         {!loading && files.length === 0 && (
-          <p className="text-xs text-slate-400" data-oid="g_8i0zz">
-            No knowledge files uploaded yet.
-          </p>
+          <div className="rounded-2xl border border-dashed border-border bg-surface/25 px-4 py-6 text-center">
+            <Database className="mx-auto h-5 w-5 text-slate-500" />
+            <p className="mt-2 text-sm font-semibold text-white">
+              No knowledge files yet
+            </p>
+            <p className="mt-1 text-xs text-slate-400">
+              Upload a PDF or CSV to give this agent more context.
+            </p>
+          </div>
         )}
         {!loading && files.length > 0 && (
-          <div
-            className="hidden sm:grid sm:grid-cols-[minmax(0,2.4fr)_minmax(0,0.7fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] sm:gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500"
-            data-oid="z8w18z-"
-          >
-            <span data-oid="a6xjfvf">File</span>
-            <span data-oid="pv6vi2y">Size</span>
-            <span data-oid="iu_7eyw">Uploaded</span>
-            <span data-oid="e9vnji-">Status</span>
-            <span className="text-right" data-oid="s6dmfed">
-              Actions
-            </span>
+          <div className="hidden grid-cols-[minmax(0,2.4fr)_minmax(0,0.7fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] gap-3 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 sm:grid">
+            <span>File</span>
+            <span>Size</span>
+            <span>Uploaded</span>
+            <span>Status</span>
+            <span className="text-right">Actions</span>
           </div>
         )}
         {files.map((file) => {
@@ -524,89 +495,72 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
           const isBusy = isProcessing || isDeleting || uploading;
           const processLabel = statusKey === "ready" ? "Re-index" : "Process";
           const isIndexing = statusKey === "processing" || isProcessing;
+          const StatusIcon =
+            STATUS_ICONS[statusKey as keyof typeof STATUS_ICONS] ?? FileText;
 
           return (
             <div
               key={file.id}
-              className="rounded-2xl border border-slate-800/70 bg-slate-950/40 p-4"
-              data-oid="1_4l_q1"
+              className="rounded-2xl border border-border bg-surface/35 p-4"
             >
-              <div
-                className="hidden sm:grid sm:grid-cols-[minmax(0,2.4fr)_minmax(0,0.7fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] sm:items-center sm:gap-3"
-                data-oid="bhaqd:x"
-              >
-                <div className="min-w-0" data-oid="jr4-xp0">
-                  <p
-                    className="truncate text-sm font-semibold text-white"
-                    data-oid="-c.lfhz"
-                  >
+              <div className="hidden grid-cols-[minmax(0,2.4fr)_minmax(0,0.7fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] items-center gap-3 sm:grid">
+                <div className="flex min-w-0 items-center gap-2">
+                  <FileText className="h-4 w-4 shrink-0 text-slate-500" />
+                  <p className="truncate text-sm font-semibold text-white">
                     {file.filename}
                   </p>
                 </div>
-                <p className="text-xs text-slate-400" data-oid="2a.40xx">
+                <p className="text-xs text-slate-400">
                   {formatBytes(file.size_bytes)}
                 </p>
-                <p className="text-xs text-slate-400" data-oid="0iofb4:">
+                <p className="text-xs text-slate-400">
                   {formatDate(file.created_at)}
                 </p>
-                <div data-oid="hqodikl">
+                <div>
                   <span
-                    className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${statusStyle}`}
-                    data-oid="kvzs7xh"
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${statusStyle}`}
                   >
+                    <StatusIcon
+                      className={`h-3.5 w-3.5 ${
+                        isIndexing ? "animate-spin" : ""
+                      }`}
+                      aria-hidden="true"
+                    />
                     {statusLabel}
                   </span>
                   {isIndexing && (
-                    <div className="mt-2 space-y-1" data-oid="rt6d0dp">
-                      <div
-                        className="relative h-1 overflow-hidden rounded-full bg-slate-800"
-                        data-oid="l78vvkz"
-                      >
-                        <div
-                          className="absolute inset-y-0 w-1/2 animate-pulse rounded-full bg-amber-400/70"
-                          data-oid="npjlpyn"
-                        />
+                    <div className="mt-2 space-y-1">
+                      <div className="relative h-1 overflow-hidden rounded-full bg-slate-800">
+                        <div className="absolute inset-y-0 w-1/2 animate-pulse rounded-full bg-amber-400/70" />
                       </div>
-                      <p
-                        className="text-[11px] text-slate-400"
-                        data-oid="spweoh2"
-                      >
-                        Indexing\u2026 this can take ~30\u201390s
+                      <p className="text-[11px] text-slate-400">
+                        Indexing can take 30-90s
                       </p>
                     </div>
                   )}
                 </div>
-                <div
-                  className="flex items-center justify-end gap-2"
-                  data-oid="v0c5fxg"
-                >
+                <div className="flex items-center justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => handleProcess(file.id)}
                     disabled={isBusy || statusKey === "processing"}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-950 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
-                    data-oid="9pa2.69"
+                    className="ui-button ui-button--secondary h-9 px-3 text-xs disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {isProcessing && (
-                      <span
-                        className="h-3 w-3 animate-spin rounded-full border-2 border-slate-400/40 border-t-slate-900"
+                    {isProcessing ? (
+                      <Loader2
+                        className="h-3.5 w-3.5 animate-spin"
                         aria-hidden="true"
-                        data-oid="tr96jl-"
                       />
+                    ) : (
+                      <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
                     )}
-                    {isProcessing ? "Indexing\u2026" : processLabel}
+                    {isProcessing ? "Indexing..." : processLabel}
                   </button>
-                  <details className="relative" data-oid="8ve6cer">
-                    <summary
-                      className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-slate-800 text-slate-300 transition hover:border-slate-600 hover:text-white [&::-webkit-details-marker]:hidden"
-                      data-oid="m2g-h35"
-                    >
-                      \u22ef
+                  <details className="relative">
+                    <summary className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-border text-slate-300 transition hover:border-slate-600 hover:bg-surface hover:text-white [&::-webkit-details-marker]:hidden">
+                      <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
                     </summary>
-                    <div
-                      className="absolute right-0 z-10 mt-2 w-40 rounded-xl border border-slate-800 bg-slate-950/90 p-2 text-xs shadow-xl shadow-slate-950/60 backdrop-blur"
-                      data-oid="szpt2tv"
-                    >
+                    <div className="absolute right-0 z-10 mt-2 w-40 rounded-xl border border-border bg-background/95 p-2 text-xs shadow-xl shadow-slate-950/60 backdrop-blur">
                       <button
                         type="button"
                         onClick={(event) => {
@@ -616,97 +570,89 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                           setConfirmDeleteId(file.id);
                         }}
                         disabled={isBusy}
-                        className="w-full rounded-lg px-3 py-2 text-left text-rose-200 transition hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:text-slate-500"
-                        data-oid="hzh9m7h"
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-rose-200 transition hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:text-slate-500"
                       >
+                        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                         Delete
                       </button>
                     </div>
                   </details>
                 </div>
               </div>
-              <div className="space-y-2 sm:hidden" data-oid="lt0pq0n">
-                <div className="space-y-1" data-oid="5gghw8m">
-                  <p
-                    className="text-sm font-semibold text-white"
-                    data-oid="g_b2s-9"
-                  >
-                    {file.filename}
-                  </p>
-                  <p className="text-xs text-slate-400" data-oid="z8thq7d">
-                    {formatBytes(file.size_bytes)}
-                    {" \u2022 "}
-                    {formatDate(file.created_at)}
-                  </p>
+              <div className="space-y-3 sm:hidden">
+                <div className="flex items-start gap-2">
+                  <FileText className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
+                  <div className="min-w-0 space-y-1">
+                    <p className="break-words text-sm font-semibold text-white">
+                      {file.filename}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      {formatBytes(file.size_bytes)}
+                      {" - "}
+                      {formatDate(file.created_at)}
+                    </p>
+                  </div>
                 </div>
-                <div
-                  className="flex flex-wrap items-center gap-2"
-                  data-oid="fi470_t"
-                >
+                <div className="flex flex-wrap items-center gap-2">
                   <span
-                    className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${statusStyle}`}
-                    data-oid="p4hp2ih"
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${statusStyle}`}
                   >
+                    <StatusIcon
+                      className={`h-3.5 w-3.5 ${
+                        isIndexing ? "animate-spin" : ""
+                      }`}
+                      aria-hidden="true"
+                    />
                     {statusLabel}
                   </span>
                   <button
                     type="button"
                     onClick={() => handleProcess(file.id)}
                     disabled={isBusy || statusKey === "processing"}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-950 transition hover:bg-white disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
-                    data-oid="vf:9574"
+                    className="ui-button ui-button--secondary h-9 px-3 text-xs disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {isProcessing && (
-                      <span
-                        className="h-3 w-3 animate-spin rounded-full border-2 border-slate-400/40 border-t-slate-900"
+                    {isProcessing ? (
+                      <Loader2
+                        className="h-3.5 w-3.5 animate-spin"
                         aria-hidden="true"
-                        data-oid="05dnwo4"
                       />
+                    ) : (
+                      <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
                     )}
-                    {isProcessing ? "Indexing\u2026" : processLabel}
+                    {isProcessing ? "Indexing..." : processLabel}
                   </button>
                   <button
                     type="button"
                     onClick={() => setConfirmDeleteId(file.id)}
                     disabled={isBusy}
-                    className="rounded-full border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-rose-400 hover:text-rose-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
-                    data-oid="2iqkqd4"
+                    className="ui-button ui-button--ghost h-9 px-3 text-xs text-rose-200 hover:text-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
                   >
+                    <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                     Delete
                   </button>
                 </div>
                 {isIndexing && (
-                  <div className="space-y-1" data-oid="ljhay9u">
-                    <div
-                      className="relative h-1 overflow-hidden rounded-full bg-slate-800"
-                      data-oid="fq-06_p"
-                    >
-                      <div
-                        className="absolute inset-y-0 w-1/2 animate-pulse rounded-full bg-amber-400/70"
-                        data-oid="kv5az:d"
-                      />
+                  <div className="space-y-1">
+                    <div className="relative h-1 overflow-hidden rounded-full bg-slate-800">
+                      <div className="absolute inset-y-0 w-1/2 animate-pulse rounded-full bg-amber-400/70" />
                     </div>
-                    <p
-                      className="text-[11px] text-slate-400"
-                      data-oid="0cnc6r7"
-                    >
-                      Indexing\u2026 this can take ~30\u201390s
+                    <p className="text-[11px] text-slate-400">
+                      Indexing can take 30-90s
                     </p>
                   </div>
                 )}
               </div>
               {confirmDeleteId === file.id && (
-                <div
-                  className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-100"
-                  data-oid="q3z_uhb"
-                >
-                  <span data-oid="8zb1qiu">Delete file?</span>
-                  <div className="flex gap-2" data-oid="qva47s9">
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-100">
+                  <span className="inline-flex items-center gap-2">
+                    <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                    Delete this file?
+                  </span>
+                  <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => setConfirmDeleteId(null)}
-                      className="rounded-full border border-slate-700 px-3 py-1 text-xs font-semibold text-slate-200 transition hover:border-slate-500 hover:text-white"
-                      data-oid="f0es.sy"
+                      className="ui-button ui-button--secondary h-8 px-3 text-xs"
                     >
                       Cancel
                     </button>
@@ -714,16 +660,27 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                       type="button"
                       onClick={() => handleDelete(file.id)}
                       disabled={isBusy}
-                      className="rounded-full bg-rose-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:bg-rose-500/50"
-                      data-oid="-l0izym"
+                      className="inline-flex h-8 items-center gap-1.5 rounded-full bg-rose-500 px-3 text-xs font-semibold text-white transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:bg-rose-500/50"
                     >
-                      {isDeleting ? "Deleting\u2026" : "Delete"}
+                      {isDeleting ? (
+                        <Loader2
+                          className="h-3.5 w-3.5 animate-spin"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                      )}
+                      {isDeleting ? "Deleting..." : "Delete"}
                     </button>
                   </div>
                 </div>
               )}
               {file.error && (
-                <p className="mt-2 text-xs text-rose-300" data-oid="l7r1tpl">
+                <p className="mt-2 flex items-start gap-2 text-xs text-rose-300">
+                  <AlertCircle
+                    className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                    aria-hidden="true"
+                  />
                   {file.error}
                 </p>
               )}
