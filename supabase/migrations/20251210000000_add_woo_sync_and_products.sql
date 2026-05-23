@@ -7,10 +7,19 @@ begin
   if exists (
     select 1
     from information_schema.columns
-    where table_name = 'integrations_woocommerce'
+    where table_schema = 'public'
+      and table_name = 'integrations_woocommerce'
       and column_name = 'site_url'
+  )
+  and not exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'integrations_woocommerce'
+      and column_name = 'store_url'
   ) then
-    alter table integrations_woocommerce rename column site_url to store_url;
+    alter table public.integrations_woocommerce
+      rename column site_url to store_url;
   end if;
 end $$;
 
