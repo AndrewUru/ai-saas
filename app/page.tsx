@@ -1,13 +1,16 @@
 import Link from "next/link";
+import { ThreeBackground } from "./ThreeBackground";
 
 export default function HomePage() {
   return (
-    <main className="flex h-screen min-h-screen items-center justify-center bg-slate-950 px-6 text-white">
-      <section className="w-full max-w-sm text-center">
+    <main className="relative flex h-screen min-h-screen overflow-hidden bg-slate-950 px-6 text-white">
+      <ThreeBackground />
+
+      <section className="relative z-10 m-auto w-full max-w-sm text-center">
         <p className="text-sm font-medium uppercase tracking-[0.24em] text-emerald-300">
           AI SaaS
         </p>
-        <h1 className="mt-4 text-3xl font-semibold tracking-normal">
+        <h1 className="mt-4 text-3xl font-semibold tracking-normal text-white">
           Welcome back
         </h1>
         <p className="mt-3 text-sm leading-6 text-slate-400">
