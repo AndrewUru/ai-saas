@@ -3,7 +3,7 @@ import { ThreeBackground } from "./ThreeBackground";
 
 export default function HomePage() {
   return (
-    <main className="relative flex h-screen min-h-screen overflow-hidden bg-slate-950 px-6 text-white">
+    <main className="fixed inset-0 z-[60] flex h-screen min-h-screen overflow-hidden bg-slate-950 px-6 text-white">
       <ThreeBackground />
 
       <section className="relative z-10 m-auto w-full max-w-sm text-center">
