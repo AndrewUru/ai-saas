@@ -18,3 +18,21 @@
  ○ Compiling /signup ...
  ✓ Compiled /signup in 1641ms (935 modules)
  GET /signup 200 in 2663ms
+ ✓ Compiled in 2.9s (402 modules)
+ ✓ Compiled in 1009ms (402 modules)
+ ○ Compiling /dashboard/docs ...
+ ⚠ ./app/dashboard/docs/page.tsx
+Attempted import error: 'MessageSquareText' is not exported from '__barrel_optimize__?names=BarChart3,Bot,CheckCircle2,Code2,Database,Globe2,KeyRound,LifeBuoy,MessageSquareText,Palette,PlugZap,ShieldCheck!=!lucide-react' (imported as 'MessageSquareText').
+
+Import trace for requested module:
+./app/dashboard/docs/page.tsx
+ ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.] {
+  digest: '297986236'
+}
+ GET /dashboard/docs 500 in 3326ms
+ ⨯ [Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.] {
+  digest: '297986236'
+}
+ GET /dashboard/docs 500 in 610ms
+ ✓ Compiled /dashboard/docs in 1630ms (960 modules)
+ GET /dashboard/docs 200 in 1094ms
