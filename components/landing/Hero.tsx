@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Hero() {
   const signals = [
     { label: "Top objection", value: "Shipping cost" },
@@ -6,7 +8,7 @@ export function Hero() {
   ];
 
   return (
-    <header className="relative flex min-h-screen w-full flex-col justify-center overflow-hidden bg-[#030303]">
+    <header className="relative flex min-h-[calc(100svh-64px)] w-full flex-col justify-center overflow-hidden bg-[#030303]">
       <div className="absolute inset-0 z-0">
         <div className="absolute left-[-10%] top-[-10%] h-[40%] w-[40%] rounded-full bg-accent/10 blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] h-[40%] w-[40%] rounded-full bg-accent-secondary/10 blur-[120px]" />
@@ -35,18 +37,30 @@ export function Hero() {
           </div>
 
           <div className="flex w-full flex-col items-center gap-4 pt-2 sm:w-auto sm:flex-row lg:items-start">
-            <a
+            <Link
               href="/dashboard"
               className="w-full rounded-xl bg-white px-8 py-4 text-center font-semibold text-black transition-all hover:scale-[1.02] active:scale-[0.98] sm:w-auto"
             >
               Open copilot
-            </a>
-            <a
-              href="/pricing"
+            </Link>
+            <Link
+              href="/dashboard/docs"
               className="w-full rounded-xl border border-white/10 bg-white/5 px-8 py-4 text-center font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:w-auto"
             >
-              View plans
-            </a>
+              View documentation
+            </Link>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm font-medium text-zinc-400 lg:justify-start">
+            <Link href="/academy" className="hover:text-white">
+              Academy guides
+            </Link>
+            <Link href="/dashboard/docs" className="hover:text-white">
+              Installation docs
+            </Link>
+            <Link href="/pricing" className="hover:text-white">
+              Pricing
+            </Link>
           </div>
         </div>
 
