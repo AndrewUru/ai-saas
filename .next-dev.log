@@ -1,0 +1,20 @@
+
+> ai-saas@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.7
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.12:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 4.6s
+ ○ Compiling / ...
+ ✓ Compiled / in 12.2s (937 modules)
+ GET / 200 in 13615ms
+ ✓ Compiled in 1841ms (400 modules)
+ ✓ Compiled in 656ms (400 modules)
+ ✓ Compiled in 1301ms (400 modules)
+ ○ Compiling /signup ...
+ ✓ Compiled /signup in 1641ms (935 modules)
+ GET /signup 200 in 2663ms

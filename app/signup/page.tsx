@@ -3,15 +3,21 @@
 
 export const dynamic = "force-dynamic";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
 type Status = {
   intent: "info" | "success" | "error";
   message: string;
 } | null;
+
+const inputClassName =
+  "w-full rounded-lg border border-white/10 bg-white/[0.03] px-3.5 py-3 text-sm text-white placeholder:text-zinc-600 outline-none transition hover:border-white/15 focus:border-accent/70 focus:ring-2 focus:ring-accent/20";
+
+const labelClassName = "text-sm font-medium text-zinc-300";
 
 export default function SignupPage() {
   const supabase = createClient();
@@ -26,11 +32,9 @@ export default function SignupPage() {
 
   useEffect(() => {
     const base = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
-
     setRedirectUrl(`${base}/auth/callback?next=/dashboard`);
   }, []);
 
-  // --- Email + password ----------------------------------------------------
   const handleSignup = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -62,14 +66,12 @@ export default function SignupPage() {
       }
 
       if (data.session) {
-        // Email confirmation disabled
         setStatus({
           intent: "success",
           message: "Account created. Redirecting to your dashboard...",
         });
         router.push("/dashboard");
       } else {
-        // Email confirmation enabled
         setStatus({
           intent: "success",
           message:
@@ -89,7 +91,6 @@ export default function SignupPage() {
     }
   };
 
-  // --- Google OAuth --------------------------------------------------------
   const signUpWithGoogle = async () => {
     if (!redirectUrl) return;
 
@@ -105,7 +106,6 @@ export default function SignupPage() {
     }
   };
 
-  // --- Magic link (passwordless) -------------------------------------------
   const sendMagicLink = async () => {
     if (!email) {
       setStatus({
@@ -152,71 +152,38 @@ export default function SignupPage() {
   };
 
   return (
-    <main
-      className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100"
-      data-oid="gp70muo"
-    >
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.20),transparent_55%)]"
-        data-oid="9z0-ca2"
-      />
+    <main className="relative min-h-[calc(100svh-64px)] overflow-hidden bg-[#030303] text-white">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-      <div
-        className="relative mx-auto flex min-h-screen max-w-6xl flex-col-reverse items-center gap-12 px-6 py-16 md:flex-row md:items-stretch md:gap-16 md:px-10 lg:px-16"
-        data-oid="20suqca"
-      >
-        {/* LEFT COLUMN */}
-        <section
-          className="flex flex-1 flex-col justify-center space-y-6 text-center md:text-left"
-          data-oid="w.qtwk_"
-        >
-          <p
-            className="inline-flex items-center gap-2 self-center rounded-full border border-emerald-500/40 bg-emerald-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300 md:self-start"
-            data-oid="ex1vev4"
-          >
-            Create your workspace
-          </p>
-          <h1
-            className="text-3xl font-semibold leading-tight sm:text-4xl"
-            data-oid="75:z1.7"
-          >
-            Create your account to manage all your AI agents
-          </h1>
-          <p className="text-base text-slate-300 sm:text-lg" data-oid="1z-t.ld">
-            Sign up with email, passwordless magic link, or Google and
-            orchestrate every store and agent from a single dashboard.
-          </p>
-        </section>
-
-        {/* SIGNUP CARD */}
-        <section
-          className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur"
-          data-oid="61bj8q_"
-        >
-          <div className="mb-6 space-y-2 text-center" data-oid="qufgjne">
-            <h2
-              className="text-2xl font-semibold text-white"
-              data-oid="8.yt-6x"
+      <div className="relative mx-auto flex min-h-[calc(100svh-64px)] w-full max-w-md items-center px-6 py-16">
+        <section className="w-full rounded-2xl border border-white/10 bg-white/[0.03] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
+          <div className="mb-8 text-center">
+            <Link
+              href="/"
+              className="mb-8 inline-flex items-center justify-center"
+              aria-label="AICommerce home"
             >
+              <Image
+                src="/logo.svg"
+                alt="AICommerce"
+                width={132}
+                height={36}
+                className="object-contain"
+                priority
+              />
+            </Link>
+
+            <h1 className="text-2xl font-semibold tracking-tight">
               Create account
-            </h2>
-            <p className="text-sm text-slate-400" data-oid="wf84y2u">
-              Use your work email to get started.
+            </h1>
+            <p className="mt-2 text-sm text-zinc-500">
+              Start managing your commerce agents.
             </p>
           </div>
 
-          {/* Email + password form */}
-          <form
-            onSubmit={handleSignup}
-            className="space-y-4"
-            data-oid="f-szciu"
-          >
-            <div className="space-y-2" data-oid="84yx_p7">
-              <label
-                htmlFor="email"
-                className="text-sm font-medium text-slate-200"
-                data-oid="u1tz__o"
-              >
+          <form onSubmit={handleSignup} className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="email" className={labelClassName}>
                 Work email
               </label>
               <input
@@ -226,18 +193,13 @@ export default function SignupPage() {
                 required
                 placeholder="you@store.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                data-oid="uqle6c2"
+                onChange={(event) => setEmail(event.target.value)}
+                className={inputClassName}
               />
             </div>
 
-            <div className="space-y-2" data-oid="67zwne_">
-              <label
-                htmlFor="password"
-                className="text-sm font-medium text-slate-200"
-                data-oid="aop20_s"
-              >
+            <div className="space-y-2">
+              <label htmlFor="password" className={labelClassName}>
                 Password
               </label>
               <input
@@ -245,20 +207,15 @@ export default function SignupPage() {
                 type="password"
                 autoComplete="new-password"
                 required
-                placeholder="••••••••"
+                placeholder="********"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                data-oid="zf:a0j5"
+                onChange={(event) => setPassword(event.target.value)}
+                className={inputClassName}
               />
             </div>
 
-            <div className="space-y-2" data-oid="_ps02cz">
-              <label
-                htmlFor="confirm-password"
-                className="text-sm font-medium text-slate-200"
-                data-oid="cfxdt20"
-              >
+            <div className="space-y-2">
+              <label htmlFor="confirm-password" className={labelClassName}>
                 Confirm password
               </label>
               <input
@@ -266,90 +223,80 @@ export default function SignupPage() {
                 type="password"
                 autoComplete="new-password"
                 required
-                placeholder="••••••••"
+                placeholder="********"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
-                data-oid="6nnsnq9"
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                className={inputClassName}
               />
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full rounded-full bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-70"
-              data-oid="ty5l6ac"
+              className="w-full rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-black transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSubmitting ? "Creating your account..." : "Create account"}
+              {isSubmitting ? "Creating account..." : "Create account"}
             </button>
           </form>
 
-          {/* Divider */}
-          <div
-            className="my-6 flex items-center gap-4 text-xs text-slate-500"
-            data-oid="1hwuphu"
-          >
-            <span className="h-px flex-1 bg-slate-800" data-oid="mignu2v" />
+          <div className="my-6 flex items-center gap-4 text-xs text-zinc-600">
+            <span className="h-px flex-1 bg-white/10" />
             Or sign up with
-            <span className="h-px flex-1 bg-slate-800" data-oid="l4:-66u" />
+            <span className="h-px flex-1 bg-white/10" />
           </div>
 
-          {/* Google */}
-          <button
-            onClick={signUpWithGoogle}
-            className="w-full mb-3 flex items-center justify-center gap-3 px-4 py-3 rounded-full bg-white/10 border border-white/20 text-white font-medium hover:bg-white/20 transition"
-            data-oid="l3qix:8"
-          >
-            <Image
-              src="/google.svg"
-              alt="Google"
-              width={20}
-              height={20}
-              className="h-5 w-5"
-              data-oid="-_3wx8g"
-            />
-            Continue with Google
-          </button>
-          <button
-            type="button"
-            onClick={sendMagicLink}
-            disabled={isSubmitting}
-            className="w-full rounded-full border border-slate-700 bg-slate-900/70 px-4 py-3 text-sm font-semibold text-slate-100 hover:bg-slate-800 transition disabled:cursor-not-allowed disabled:opacity-70"
-            data-oid="j2mdn2y"
-          >
-            {isSubmitting ? "Sending magic link..." : "Send me a magic link"}
-          </button>
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={signUpWithGoogle}
+              className="flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.07]"
+            >
+              <Image
+                src="/google.svg"
+                alt=""
+                width={20}
+                height={20}
+                className="h-5 w-5"
+                aria-hidden="true"
+              />
+              Continue with Google
+            </button>
 
-          <p
-            className="mt-6 text-center text-xs text-slate-500"
-            data-oid="6u.8whm"
-          >
+            <button
+              type="button"
+              onClick={sendMagicLink}
+              disabled={isSubmitting}
+              className="w-full rounded-lg border border-white/10 bg-transparent px-4 py-3 text-sm font-semibold text-zinc-200 transition hover:border-white/20 hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSubmitting ? "Sending magic link..." : "Send magic link"}
+            </button>
+          </div>
+
+          <p className="mt-6 text-center text-xs text-zinc-500">
             Already have an account?{" "}
-            <a
+            <Link
               href="/login"
-              className="text-emerald-300 hover:text-emerald-200"
-              data-oid="98.ggim"
+              className="font-medium text-accent hover:text-accent-strong"
             >
               Sign in
-            </a>
+            </Link>
           </p>
 
           {status && (
             <p
               className={[
-                "mt-6 rounded-2xl border px-4 py-3 text-sm",
+                "mt-6 rounded-lg border px-4 py-3 text-sm",
                 status.intent === "success" &&
                   "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
                 status.intent === "error" &&
                   "border-rose-500/40 bg-rose-500/10 text-rose-200",
                 status.intent === "info" &&
-                  "border-slate-700 bg-slate-900/70 text-slate-200",
+                  "border-white/10 bg-white/[0.04] text-zinc-200",
               ]
                 .filter(Boolean)
                 .join(" ")}
               role="status"
               aria-live="polite"
-              data-oid="ai8858u"
             >
               {status.message}
             </p>
