@@ -1,13 +1,15 @@
 //C:\ai-saas\lib\widget\defaults.ts
 export type WidgetPosition = "left" | "right";
 export type WidgetLanguage = "auto" | "en" | "es" | "pt" | "fr";
+export type WidgetLauncherIcon = "whatsapp" | "chat" | "bot" | "store" | "logo";
 
 export const widgetDefaults = {
-  accent: "#2563eb",
+  accent: "#25d366",
   brand: "AI Widget",
   label: "Chat with us",
   greeting: "How can I help you today?",
   humanSupportText: "Talk to a human",
+  launcherIcon: "whatsapp" as WidgetLauncherIcon,
 
   position: "right" as WidgetPosition,
 } as const;
@@ -47,11 +49,20 @@ export const widgetLimits = {
   label: 48,
   greeting: 48,
   humanSupportText: 32,
+  launcherLogoUrl: 512,
 } as const;
 
 export const widgetPositions: WidgetPosition[] = ["left", "right"];
 
 export const widgetLanguages: WidgetLanguage[] = ["auto", "en", "es", "pt", "fr"];
+
+export const widgetLauncherIcons: WidgetLauncherIcon[] = [
+  "whatsapp",
+  "chat",
+  "bot",
+  "store",
+  "logo",
+];
 
 export function sanitizeWidgetLanguage(
   language?: string | null
@@ -89,4 +100,16 @@ export function sanitizeHex(color?: string | null) {
 
 export function sanitizePosition(pos?: string | null): WidgetPosition {
   return pos === "left" || pos === "right" ? pos : widgetDefaults.position;
+}
+
+export function sanitizeLauncherIcon(
+  icon?: string | null
+): WidgetLauncherIcon {
+  return icon === "chat" ||
+    icon === "bot" ||
+    icon === "store" ||
+    icon === "logo" ||
+    icon === "whatsapp"
+    ? icon
+    : widgetDefaults.launcherIcon;
 }

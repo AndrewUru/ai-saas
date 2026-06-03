@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { getSiteUrlFromHeaders } from "@/lib/site";
 import {
   sanitizeHex,
+  sanitizeLauncherIcon,
   sanitizePosition,
   widgetLimits,
 } from "@/lib/widget/defaults";
@@ -15,6 +16,22 @@ function normalizeWidgetText(value: string, max: number): string | null {
   const trimmed = value.trim();
   if (!trimmed) return null;
   return trimmed.slice(0, max);
+}
+
+function normalizeWidgetUrl(value: string, max: number): string | null {
+  const trimmed = value.replace(/[<>]/g, "").trim();
+  if (!trimmed) return null;
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.toString().slice(0, max);
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
 }
 
 async function updateWidget(formData: FormData) {
@@ -52,6 +69,10 @@ async function updateWidget(formData: FormData) {
   const colorToggleBgRaw = String(formData.get("widget_color_toggle_bg") ?? "");
   const colorToggleTextRaw = String(
     formData.get("widget_color_toggle_text") ?? "",
+  );
+  const launcherIconRaw = String(formData.get("widget_launcher_icon") ?? "");
+  const launcherLogoUrlRaw = String(
+    formData.get("widget_launcher_logo_url") ?? "",
   );
 
   const { error } = await supabase
@@ -93,6 +114,13 @@ async function updateWidget(formData: FormData) {
       widget_color_toggle_text: colorToggleTextRaw.trim()
         ? sanitizeHex(colorToggleTextRaw)
         : null,
+      widget_launcher_icon: launcherIconRaw.trim()
+        ? sanitizeLauncherIcon(launcherIconRaw)
+        : null,
+      widget_launcher_logo_url: normalizeWidgetUrl(
+        launcherLogoUrlRaw,
+        widgetLimits.launcherLogoUrl,
+      ),
       updated_at: new Date().toISOString(),
     })
     .eq("id", agentId)
@@ -115,7 +143,7 @@ export default async function AgentWidgetPage({
   const { data: agent, error } = await supabase
     .from("agents")
     .select(
-      "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
+      "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -185,6 +213,8 @@ export default async function AgentWidgetPage({
           initialColorBotBubbleText={agent.widget_color_bot_bubble_text}
           initialColorToggleBg={agent.widget_color_toggle_bg}
           initialColorToggleText={agent.widget_color_toggle_text}
+          initialLauncherIcon={agent.widget_launcher_icon}
+          initialLauncherLogoUrl={agent.widget_launcher_logo_url}
         />
       </article>
     </form>

@@ -4,20 +4,21 @@ import { renderWidgetScript } from "@/lib/widget/clientScript";
 import { WidgetConfig } from "@/lib/widget/types";
 import {
   sanitizeWidgetLanguage,
+  sanitizeLauncherIcon,
   sanitizePosition,
   widgetDefaults,
   widgetLimits,
 } from "@/lib/widget/defaults";
 
 const appearanceDefaults = {
-  colorHeaderBg: "#0f172a",
+  colorHeaderBg: "#075e54",
   colorHeaderText: "#ffffff",
-  colorChatBg: "#f1f5f9",
-  colorUserBubbleBg: "#2563eb",
-  colorUserBubbleText: "#ffffff",
+  colorChatBg: "#efeae2",
+  colorUserBubbleBg: "#d9fdd3",
+  colorUserBubbleText: "#0b2f20",
   colorBotBubbleBg: "#ffffff",
   colorBotBubbleText: "#0f172a",
-  colorToggleBg: "#0f172a",
+  colorToggleBg: "#25d366",
   colorToggleText: "#ffffff",
 } as const;
 
@@ -52,6 +53,22 @@ function sanitizeText(value: string | null, fallback: string, max: number) {
   const cleaned = String(value ?? "").replace(/[<>]/g, "").trim();
   if (!cleaned) return fallback;
   return cleaned.slice(0, max);
+}
+
+function normalizeImageUrl(value: string | null, fallback: string | null = null) {
+  const trimmed = (value ?? "").replace(/[<>]/g, "").trim();
+  if (!trimmed) return fallback;
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.toString().slice(0, widgetLimits.launcherLogoUrl);
+    }
+  } catch {
+    return fallback;
+  }
+
+  return fallback;
 }
 
 function buildPreviewOverrides(
@@ -108,6 +125,16 @@ function buildPreviewOverrides(
       widgetDefaults.humanSupportText,
       widgetLimits.humanSupportText
     );
+  }
+
+  const launcherIconParam = getParam(params, "launcherIcon");
+  if (launcherIconParam !== null) {
+    overrides.launcherIcon = sanitizeLauncherIcon(launcherIconParam);
+  }
+
+  const launcherLogoUrlParam = getParam(params, "launcherLogoUrl");
+  if (launcherLogoUrlParam !== null) {
+    overrides.launcherLogoUrl = normalizeImageUrl(launcherLogoUrlParam);
   }
 
   const positionParam = getParam(params, "position");
@@ -203,7 +230,7 @@ export async function GET(req: Request) {
   // Pass overrides if preview
   const overrides = isPreview ? buildPreviewOverrides(url.searchParams) : {};
 
-  const js = renderWidgetScript(key, url.origin, overrides);
+  const js = renderWidgetScript(key, url.origin, overrides, { isPreview });
 
   return new NextResponse(js, {
     headers: {

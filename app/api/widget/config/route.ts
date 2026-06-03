@@ -10,20 +10,21 @@ import { WidgetConfig } from "@/lib/widget/types";
 import {
   getWidgetCopyDefaults,
   sanitizeWidgetLanguage,
+  sanitizeLauncherIcon,
   sanitizePosition,
   widgetDefaults,
   widgetLimits,
 } from "@/lib/widget/defaults";
 
 const appearanceDefaults = {
-  colorHeaderBg: "#0f172a",
+  colorHeaderBg: "#075e54",
   colorHeaderText: "#ffffff",
-  colorChatBg: "#f1f5f9",
-  colorUserBubbleBg: "#2563eb",
-  colorUserBubbleText: "#ffffff",
+  colorChatBg: "#efeae2",
+  colorUserBubbleBg: "#d9fdd3",
+  colorUserBubbleText: "#0b2f20",
   colorBotBubbleBg: "#ffffff",
   colorBotBubbleText: "#0f172a",
-  colorToggleBg: "#0f172a",
+  colorToggleBg: "#25d366",
   colorToggleText: "#ffffff",
 } as const;
 
@@ -57,6 +58,22 @@ function sanitizeText(value: string | null, fallback: string, max: number) {
     .trim();
   if (!cleaned) return fallback;
   return cleaned.slice(0, max);
+}
+
+function normalizeImageUrl(value: string | null, fallback: string | null = null) {
+  const trimmed = (value ?? "").replace(/[<>]/g, "").trim();
+  if (!trimmed) return fallback;
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.toString().slice(0, widgetLimits.launcherLogoUrl);
+    }
+  } catch {
+    return fallback;
+  }
+
+  return fallback;
 }
 
 function resolveRequestLanguage(
@@ -173,6 +190,8 @@ export async function GET(req: Request) {
     copyDefaults.humanSupportText,
     widgetLimits.humanSupportText
   );
+  const baseLauncherIcon = sanitizeLauncherIcon(agent.widget_launcher_icon);
+  const baseLauncherLogoUrl = normalizeImageUrl(agent.widget_launcher_logo_url);
   const basePosition = sanitizePosition(agent.widget_position);
   const baseAppearance = {
     colorHeaderBg: normalizeHex(
@@ -223,6 +242,8 @@ export async function GET(req: Request) {
     collapsedLabel: baseLabel,
     greeting: baseGreeting,
     humanSupportText: baseHumanSupportText,
+    launcherIcon: baseLauncherIcon,
+    launcherLogoUrl: baseLauncherLogoUrl,
     position: basePosition,
     appearance: baseAppearance,
   };
@@ -273,6 +294,19 @@ export async function GET(req: Request) {
         humanSupportParam,
         config.humanSupportText ?? widgetDefaults.humanSupportText,
         widgetLimits.humanSupportText
+      );
+    }
+
+    const launcherIconParam = getParam(params, "launcherIcon");
+    if (launcherIconParam !== null) {
+      config.launcherIcon = sanitizeLauncherIcon(launcherIconParam);
+    }
+
+    const launcherLogoUrlParam = getParam(params, "launcherLogoUrl");
+    if (launcherLogoUrlParam !== null) {
+      config.launcherLogoUrl = normalizeImageUrl(
+        launcherLogoUrlParam,
+        config.launcherLogoUrl ?? null
       );
     }
 

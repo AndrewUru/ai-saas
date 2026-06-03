@@ -20,6 +20,7 @@ import KnowledgeSection from "./KnowledgeSection";
 import {
   widgetLimits,
   sanitizeHex,
+  sanitizeLauncherIcon,
   sanitizePosition,
 } from "@/lib/widget/defaults";
 
@@ -85,6 +86,22 @@ function SectionHeading({
       </p>
     </div>
   );
+}
+
+function normalizeWidgetUrl(value: string, max: number): string | null {
+  const trimmed = value.replace(/[<>]/g, "").trim();
+  if (!trimmed) return null;
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.toString().slice(0, max);
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
 }
 
 function StatusRow({
@@ -188,6 +205,10 @@ async function updateAgentAndWidget(formData: FormData) {
   const colorToggleBgRaw = String(formData.get("widget_color_toggle_bg") ?? "");
   const colorToggleTextRaw = String(
     formData.get("widget_color_toggle_text") ?? "",
+  );
+  const launcherIconRaw = String(formData.get("widget_launcher_icon") ?? "");
+  const launcherLogoUrlRaw = String(
+    formData.get("widget_launcher_logo_url") ?? "",
   );
 
   const allowedDomains = normalizeDomainList(domainsRaw);
@@ -355,6 +376,21 @@ async function updateAgentAndWidget(formData: FormData) {
               : null,
           }
         : {}),
+      ...(formData.has("widget_launcher_icon")
+        ? {
+            widget_launcher_icon: launcherIconRaw.trim()
+              ? sanitizeLauncherIcon(launcherIconRaw)
+              : null,
+          }
+        : {}),
+      ...(formData.has("widget_launcher_logo_url")
+        ? {
+            widget_launcher_logo_url: normalizeWidgetUrl(
+              launcherLogoUrlRaw,
+              widgetLimits.launcherLogoUrl,
+            ),
+          }
+        : {}),
       updated_at: new Date().toISOString(),
     })
     .eq("id", agentId)
@@ -384,7 +420,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, shopify_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
+      "id, user_id, name, api_key, woo_integration_id, shopify_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -468,7 +504,9 @@ export default async function AgentDetailPage({
       agent.widget_color_bot_bubble_bg?.trim() ||
       agent.widget_color_bot_bubble_text?.trim() ||
       agent.widget_color_toggle_bg?.trim() ||
-      agent.widget_color_toggle_text?.trim(),
+      agent.widget_color_toggle_text?.trim() ||
+      agent.widget_launcher_icon?.trim() ||
+      agent.widget_launcher_logo_url?.trim(),
   );
   const completionItems = [
     agent.is_active,

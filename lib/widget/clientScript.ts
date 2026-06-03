@@ -8,10 +8,12 @@ import { STATIC_STYLES } from "./styles";
 export function renderWidgetScript(
   key: string,
   siteUrl: string,
-  overrides: Partial<WidgetConfig> = {}
+  overrides: Partial<WidgetConfig> = {},
+  options: { isPreview?: boolean } = {}
 ) {
   // We serialize overrides to be injected into the script if any (e.g. preview mode)
   const overridesJson = JSON.stringify(overrides);
+  const isPreview = options.isPreview === true;
 
   return `
 (function() {
@@ -20,6 +22,7 @@ export function renderWidgetScript(
   const CONFIG_KEY = "${key}";
   const API_BASE = "${siteUrl}";
   const OVERRIDES = ${overridesJson};
+  const IS_PREVIEW = ${isPreview ? "true" : "false"};
 
   // Helper to safely serialize text
   const escapeHtml = (unsafe) => {
@@ -301,6 +304,7 @@ export function renderWidgetScript(
   };
 
   const trackWidgetEvent = (eventType, extra) => {
+    if (IS_PREVIEW) return;
     try {
       const payload = JSON.stringify({
         key: CONFIG_KEY,
@@ -332,6 +336,7 @@ export function renderWidgetScript(
     const configUrl = new URL("/api/widget/config", API_BASE);
     configUrl.searchParams.set("key", key);
     configUrl.searchParams.set("t", String(Date.now()));
+    if (IS_PREVIEW) configUrl.searchParams.set("preview", "1");
     const pageLanguage = (document.documentElement.getAttribute("lang") || "").trim();
     if (pageLanguage) configUrl.searchParams.set("pageLanguage", pageLanguage);
     const res = await fetch(configUrl.toString(), { cache: "no-store" });
@@ -532,6 +537,10 @@ export function renderWidgetScript(
       const collapsedLabel = fullConfig.collapsedLabel || copy.collapsedLabel;
       const humanSupportText = fullConfig.humanSupportText || copy.humanSupportText;
       const greeting = fullConfig.greeting || copy.greeting;
+      const launcherIcon = ["whatsapp", "chat", "bot", "store", "logo"].includes(fullConfig.launcherIcon)
+        ? fullConfig.launcherIcon
+        : "whatsapp";
+      const launcherLogoUrl = sanitizeUrl(fullConfig.launcherLogoUrl);
 
       // 3. Inject CSS
       // We rely on STATIC_STYLES which uses variables.
@@ -547,8 +556,29 @@ export function renderWidgetScript(
       applyTheme(anchor, fullConfig);
 
       
+      const renderLauncherSvg = (icon) => {
+        if (icon === "chat") {
+          return \`<svg viewBox="0 0 32 32" fill="none" role="img"><path fill="currentColor" d="M16 5C9.37 5 4 9.8 4 15.7c0 3.06 1.46 5.82 3.8 7.77l-.77 3.83a.8.8 0 0 0 1.1.9l4.66-2.05c1.02.25 2.1.38 3.21.38 6.63 0 12-4.8 12-10.83C28 9.8 22.63 5 16 5Zm-5.2 12.4a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4Zm5.2 0a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4Zm5.2 0a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4Z"/></svg>\`;
+        }
+        if (icon === "bot") {
+          return \`<svg viewBox="0 0 32 32" fill="none" role="img"><path fill="currentColor" d="M15 4.5a1 1 0 1 1 2 0V7h3.5A5.5 5.5 0 0 1 26 12.5v8A5.5 5.5 0 0 1 20.5 26h-9A5.5 5.5 0 0 1 6 20.5v-8A5.5 5.5 0 0 1 11.5 7H15V4.5ZM11.5 9A3.5 3.5 0 0 0 8 12.5v8a3.5 3.5 0 0 0 3.5 3.5h9a3.5 3.5 0 0 0 3.5-3.5v-8A3.5 3.5 0 0 0 20.5 9h-9Zm1.75 8.25a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5Zm7.25-1.75a1.75 1.75 0 1 1-3.5 0 1.75 1.75 0 0 1 3.5 0Zm-8.1 5.15a1 1 0 0 1 1.4-.2c1.3.98 3.1.98 4.4 0a1 1 0 1 1 1.2 1.6c-2.02 1.51-4.78 1.51-6.8 0a1 1 0 0 1-.2-1.4Z"/></svg>\`;
+        }
+        if (icon === "store") {
+          return \`<svg viewBox="0 0 32 32" fill="none" role="img"><path fill="currentColor" d="M7.34 5h17.32c.86 0 1.62.55 1.9 1.36l1.36 4.08A4.52 4.52 0 0 1 24 16.35V25a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8.65a4.52 4.52 0 0 1-3.92-5.91l1.36-4.08A2 2 0 0 1 7.34 5ZM10 16.2V25h12v-8.8a4.5 4.5 0 0 1-3-1.2 4.48 4.48 0 0 1-6 0 4.5 4.5 0 0 1-3 1.2ZM7.34 7l-1.37 4.07A2.5 2.5 0 0 0 10.78 12a1 1 0 0 1 1.94 0 2.5 2.5 0 0 0 4.56 0 1 1 0 0 1 1.94 0A2.5 2.5 0 0 0 24.03 11.07L22.66 7H7.34Z"/></svg>\`;
+        }
+        return \`<svg viewBox="0 0 32 32" fill="none" role="img"><path fill="currentColor" d="M16.04 4.5c-6.32 0-11.46 4.95-11.46 11.04 0 2.12.63 4.18 1.82 5.95L4.5 27.5l6.35-1.78a11.75 11.75 0 0 0 5.19 1.21c6.32 0 11.46-4.95 11.46-11.04S22.36 4.5 16.04 4.5Zm0 20.34c-1.72 0-3.41-.45-4.88-1.31l-.38-.22-3.24.91.97-3.06-.25-.4a8.82 8.82 0 0 1-1.43-4.82c0-4.94 4.13-8.95 9.21-8.95s9.21 4.01 9.21 8.95-4.13 8.9-9.21 8.9Zm5.07-6.71c-.28-.14-1.66-.79-1.92-.88-.26-.09-.45-.14-.64.14-.19.27-.73.88-.9 1.06-.17.18-.33.2-.61.07-.28-.14-1.18-.42-2.25-1.34-.83-.72-1.39-1.6-1.55-1.87-.16-.27-.02-.42.12-.55.13-.12.28-.32.42-.48.14-.16.19-.27.28-.46.09-.18.05-.34-.02-.48-.07-.14-.64-1.48-.88-2.03-.23-.53-.47-.46-.64-.46h-.55c-.19 0-.5.07-.76.34-.26.27-1 1-1 2.42s1.03 2.81 1.18 3c.14.18 2.04 3.01 4.94 4.22.69.3 1.23.48 1.65.61.69.21 1.32.18 1.82.11.56-.08 1.66-.66 1.9-1.29.24-.64.24-1.18.17-1.29-.07-.11-.26-.18-.54-.32Z"/></svg>\`;
+      };
+
       const renderBrandIcon = () => {
-        return \`<div class="ai-saas-icon"><span>\${escapeHtml(brandInitial)}</span></div>\`;
+        const fallbackIcon = launcherIcon === "logo" ? "whatsapp" : launcherIcon;
+        if (launcherIcon === "logo" && launcherLogoUrl) {
+          return \`<div class="ai-saas-icon has-logo" aria-hidden="true">
+            <img class="ai-saas-launcher-logo" src="\${escapeHtml(launcherLogoUrl)}" alt="" loading="eager" decoding="async" onerror="this.closest('.ai-saas-icon').classList.remove('has-logo');this.remove();" />
+            <span class="ai-saas-icon-fallback">\${renderLauncherSvg(fallbackIcon)}</span>
+          </div>\`;
+        }
+
+        return \`<div class="ai-saas-icon" aria-hidden="true">\${renderLauncherSvg(fallbackIcon)}</div>\`;
       };
 
       // 6. Build DOM

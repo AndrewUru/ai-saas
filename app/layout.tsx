@@ -10,6 +10,12 @@ import CookieBanner from "@/components/CookieBanner";
 // (opcional) si lo implementaste:
 // import AnalyticsGate from "@/components/AnalyticsGate";
 
+const widgetKey = "agt_419oweh9oi6mjswq07p";
+const widgetSrc =
+  process.env.NODE_ENV === "development"
+    ? `/api/widget?key=${widgetKey}&preview=1`
+    : `https://agentes.elsaltoweb.es/api/widget?key=${widgetKey}`;
+
 export const metadata: Metadata = {
   title: "AI SaaS",
   description: "Proyecto SaaS con Next.js + Supabase + LangChain",
@@ -43,7 +49,7 @@ export default function RootLayout({
 
         {/* ✅ Widget: mejor con next/script */}
         <Script
-          src="https://agentes.elsaltoweb.es/api/widget?key=agt_419oweh9oi6mjswq07p"
+          src={widgetSrc}
           strategy="afterInteractive"
           data-oid="gf3b1-j"
         />

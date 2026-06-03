@@ -2,18 +2,23 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
+  Bot,
   Check,
   Clipboard,
+  Image as ImageIcon,
   type LucideIcon,
   MessageSquare,
   MonitorSmartphone,
   Palette,
   RotateCcw,
   SlidersHorizontal,
+  Store,
   Type,
 } from "lucide-react";
 import {
+  type WidgetLauncherIcon,
   widgetDefaults,
+  widgetLauncherIcons,
   widgetLimits,
   widgetPositions,
   WidgetPosition,
@@ -52,6 +57,8 @@ type WidgetDesignerProps = {
   initialColorBotBubbleText: string | null;
   initialColorToggleBg: string | null;
   initialColorToggleText: string | null;
+  initialLauncherIcon: WidgetLauncherIcon | string | null;
+  initialLauncherLogoUrl: string | null;
 };
 
 function normalizeHex(value: string): string | null {
@@ -84,6 +91,28 @@ function trimmedOrNull(value: string, max: number): string | null {
 
 const inputClass =
   "w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-3.5 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30";
+
+const launcherIconLabels: Record<WidgetLauncherIcon, string> = {
+  whatsapp: "WhatsApp",
+  chat: "Chat",
+  bot: "Bot",
+  store: "Store",
+  logo: "Logo URL",
+};
+
+const launcherIconHelp: Record<WidgetLauncherIcon, string> = {
+  whatsapp: "Familiar green support launcher.",
+  chat: "Neutral chat bubble.",
+  bot: "Assistant style icon.",
+  store: "Commerce storefront icon.",
+  logo: "Use an image or SVG URL.",
+};
+
+function normalizeLauncherIcon(value: string | null): WidgetLauncherIcon {
+  return widgetLauncherIcons.includes(value as WidgetLauncherIcon)
+    ? (value as WidgetLauncherIcon)
+    : widgetDefaults.launcherIcon;
+}
 
 function SectionCard({
   icon: Icon,
@@ -245,6 +274,8 @@ export default function WidgetDesigner({
   initialColorBotBubbleText,
   initialColorToggleBg,
   initialColorToggleText,
+  initialLauncherIcon,
+  initialLauncherLogoUrl,
 }: WidgetDesignerProps) {
   const [accentInput, setAccentInput] = useState(initialAccent ?? "");
   const [brandInput, setBrandInput] = useState(initialBrand ?? "");
@@ -282,6 +313,12 @@ export default function WidgetDesigner({
   const [colorToggleText, setColorToggleText] = useState(
     initialColorToggleText ?? "",
   );
+  const [launcherIcon, setLauncherIcon] = useState<WidgetLauncherIcon>(
+    normalizeLauncherIcon(initialLauncherIcon),
+  );
+  const [launcherLogoUrl, setLauncherLogoUrl] = useState(
+    initialLauncherLogoUrl ?? "",
+  );
   const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
 
   const embedSnippet = getEmbedSnippet(apiKey);
@@ -306,6 +343,8 @@ export default function WidgetDesigner({
       colorBotBubbleText,
       colorToggleBg,
       colorToggleText,
+      launcherIcon,
+      launcherLogoUrl,
     }),
     [
       apiKey,
@@ -326,6 +365,8 @@ export default function WidgetDesigner({
       colorBotBubbleText,
       colorToggleBg,
       colorToggleText,
+      launcherIcon,
+      launcherLogoUrl,
     ],
   );
 
@@ -379,6 +420,11 @@ export default function WidgetDesigner({
     );
     params.set("colorToggleBg", toParamHex(liveState.colorToggleBg) ?? "");
     params.set("colorToggleText", toParamHex(liveState.colorToggleText) ?? "");
+    params.set("launcherIcon", liveState.launcherIcon);
+    params.set(
+      "launcherLogoUrl",
+      liveState.launcherLogoUrl.trim().slice(0, widgetLimits.launcherLogoUrl),
+    );
 
     return `/widget/preview?${params.toString()}`;
   }, [liveState]);
@@ -394,6 +440,8 @@ export default function WidgetDesigner({
       liveState.colorBotBubbleText,
       liveState.colorToggleBg,
       liveState.colorToggleText,
+      liveState.launcherIcon,
+      liveState.launcherLogoUrl,
       liveState.accentInput,
       liveState.brandInput,
       liveState.labelInput,
@@ -420,6 +468,8 @@ export default function WidgetDesigner({
     setColorBotBubbleText("");
     setColorToggleBg("");
     setColorToggleText("");
+    setLauncherIcon(widgetDefaults.launcherIcon);
+    setLauncherLogoUrl("");
   }
 
   function handleCopySnippet() {
@@ -485,7 +535,7 @@ export default function WidgetDesigner({
               name="widget_color_header_bg"
               value={colorHeaderBg}
               onChange={setColorHeaderBg}
-              defaultValue="#0f172a"
+              defaultValue="#075e54"
             />
 
             <ColorInput
@@ -501,7 +551,7 @@ export default function WidgetDesigner({
               name="widget_color_chat_bg"
               value={colorChatBg}
               onChange={setColorChatBg}
-              defaultValue="#f1f5f9"
+              defaultValue="#efeae2"
             />
 
             <ColorInput
@@ -509,7 +559,7 @@ export default function WidgetDesigner({
               name="widget_color_user_bubble_bg"
               value={colorUserBubbleBg}
               onChange={setColorUserBubbleBg}
-              defaultValue="#2563eb"
+              defaultValue="#d9fdd3"
             />
 
             <ColorInput
@@ -517,7 +567,7 @@ export default function WidgetDesigner({
               name="widget_color_user_bubble_text"
               value={colorUserBubbleText}
               onChange={setColorUserBubbleText}
-              defaultValue="#ffffff"
+              defaultValue="#0b2f20"
             />
 
             <ColorInput
@@ -541,7 +591,7 @@ export default function WidgetDesigner({
               name="widget_color_toggle_bg"
               value={colorToggleBg}
               onChange={setColorToggleBg}
-              defaultValue="#0f172a"
+              defaultValue="#25d366"
             />
 
             <ColorInput
@@ -551,6 +601,85 @@ export default function WidgetDesigner({
               onChange={setColorToggleText}
               defaultValue="#ffffff"
             />
+          </div>
+        </SectionCard>
+
+        <SectionCard
+          icon={ImageIcon}
+          eyebrow="Launcher"
+          title="Choose the button icon"
+        >
+          <div className="space-y-4">
+            <fieldset>
+              <legend className="sr-only">Launcher icon</legend>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {widgetLauncherIcons.map((option) => {
+                  const OptionIcon =
+                    option === "bot"
+                      ? Bot
+                      : option === "store"
+                        ? Store
+                        : option === "logo"
+                          ? ImageIcon
+                          : MessageSquare;
+
+                  return (
+                    <label
+                      key={option}
+                      className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-3 transition ${
+                        launcherIcon === option
+                          ? "border-emerald-400/70 bg-emerald-400/10 text-emerald-100"
+                          : "border-slate-800 bg-slate-950/60 text-slate-400 hover:border-slate-700 hover:text-slate-100"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="widget_launcher_icon"
+                        value={option}
+                        checked={launcherIcon === option}
+                        onChange={() => setLauncherIcon(option)}
+                        className="sr-only"
+                      />
+                      <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-current/20 bg-black/20">
+                        <OptionIcon className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-sm font-semibold">
+                          {launcherIconLabels[option]}
+                        </span>
+                        <span className="mt-0.5 block text-xs text-slate-500">
+                          {launcherIconHelp[option]}
+                        </span>
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </fieldset>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="widget_launcher_logo_url"
+                className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400"
+              >
+                Logo image URL
+              </label>
+              <input
+                id="widget_launcher_logo_url"
+                name="widget_launcher_logo_url"
+                type="url"
+                inputMode="url"
+                maxLength={widgetLimits.launcherLogoUrl}
+                placeholder="https://example.com/logo.svg"
+                value={launcherLogoUrl}
+                onChange={(event) => setLauncherLogoUrl(event.target.value)}
+                className={inputClass}
+              />
+              <p className="text-xs leading-relaxed text-slate-500">
+                Used only when Logo URL is selected. Supports normal image URLs,
+                including hosted SVG files.
+              </p>
+            </div>
           </div>
         </SectionCard>
 

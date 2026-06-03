@@ -1,23 +1,23 @@
 export const STATIC_STYLES = `
 #ai-saas-anchor {
-  --ai-accent: #2563eb;
-  --ai-accent-gradient: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(37, 99, 235, 0.42));
+  --ai-accent: #25d366;
+  --ai-accent-gradient: linear-gradient(135deg, rgba(37, 211, 102, 0.94), rgba(18, 140, 126, 0.96));
   --ai-accent-contrast: #f8fafc;
-  --ai-accent-shadow: rgba(37, 99, 235, 0.28);
-  --ai-accent-light: rgba(37, 99, 235, 0.14);
-  --ai-surface: #f8fafc;
+  --ai-accent-shadow: rgba(37, 211, 102, 0.3);
+  --ai-accent-light: rgba(37, 211, 102, 0.16);
+  --ai-surface: #f7f7f2;
   --ai-surface-strong: #ffffff;
   --ai-border: rgba(15, 23, 42, 0.14);
   --ai-shadow: 0 24px 70px rgba(15, 23, 42, 0.24), 0 10px 26px rgba(15, 23, 42, 0.12);
   --ai-soft-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
-  --ai-header-bg: #0f172a;
+  --ai-header-bg: #075e54;
   --ai-header-text: #ffffff;
-  --ai-chat-bg: #f1f5f9;
-  --ai-user-bg: #2563eb;
-  --ai-user-text: #ffffff;
+  --ai-chat-bg: #efeae2;
+  --ai-user-bg: #d9fdd3;
+  --ai-user-text: #0b2f20;
   --ai-bot-bg: #ffffff;
   --ai-bot-text: #0f172a;
-  --ai-toggle-bg: #0f172a;
+  --ai-toggle-bg: #25d366;
   --ai-toggle-text: #ffffff;
   --ai-close-bg: rgba(255, 255, 255, 0.24);
   --ai-close-text: #ffffff;
@@ -52,21 +52,21 @@ export const STATIC_STYLES = `
 
 #ai-saas-toggle {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 64px;
+  height: 64px;
   max-width: calc(100vw - 36px);
-  min-width: 58px;
-  min-height: 56px;
-  padding: 0 18px;
-  background: var(--ai-toggle-bg);
+  padding: 0;
+  background: linear-gradient(135deg, var(--ai-toggle-bg), #128c7e);
   color: var(--ai-toggle-text);
-  border: 1px solid rgba(15, 23, 42, 0.16);
+  border: 0;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.22);
-  gap: 10px;
+  box-shadow: 0 16px 34px rgba(18, 140, 126, 0.36), 0 6px 16px rgba(15, 23, 42, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  gap: 0;
   font: inherit;
   font-size: 13px;
   font-weight: 700;
@@ -78,15 +78,15 @@ export const STATIC_STYLES = `
 #ai-saas-toggle::after {
   content: "";
   position: absolute;
-  top: 9px;
-  right: 12px;
+  top: 8px;
+  right: 8px;
   z-index: 2;
-  width: 9px;
-  height: 9px;
-  border: 2px solid var(--ai-toggle-bg);
+  width: 13px;
+  height: 13px;
+  border: 3px solid #ffffff;
   border-radius: 999px;
   background: #22c55e;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18);
 }
 
 #ai-saas-toggle::before {
@@ -94,13 +94,13 @@ export const STATIC_STYLES = `
   position: absolute;
   inset: 1px;
   border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0));
+  background: radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 42%);
   pointer-events: none;
 }
 
 #ai-saas-toggle:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  box-shadow: 0 20px 42px rgba(18, 140, 126, 0.42), 0 8px 20px rgba(15, 23, 42, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.28);
   filter: saturate(1.04);
 }
 
@@ -115,30 +115,78 @@ export const STATIC_STYLES = `
 #ai-saas-toggle .ai-saas-icon {
   position: relative;
   z-index: 1;
-  width: 34px;
-  height: 34px;
-  flex: 0 0 34px;
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  font-size: 13px;
-  font-weight: 800;
-  text-transform: uppercase;
+}
+
+#ai-saas-toggle .ai-saas-icon svg {
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 2px 3px rgba(15, 23, 42, 0.16));
+}
+
+#ai-saas-toggle .ai-saas-icon.has-logo {
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.72);
+}
+
+#ai-saas-toggle .ai-saas-launcher-logo {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+#ai-saas-toggle .ai-saas-icon-fallback {
+  display: inline-flex;
+}
+
+#ai-saas-toggle .ai-saas-icon.has-logo .ai-saas-icon-fallback {
+  display: none;
 }
 
 #ai-saas-toggle .ai-saas-label {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  z-index: 3;
+  top: 50%;
   display: inline-flex;
   align-items: center;
+  min-height: 34px;
   min-width: 0;
-  max-width: 168px;
+  max-width: 190px;
+  padding: 0 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: #0f172a;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) scale(0.96);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+#ai-saas-anchor.ai-pos-right #ai-saas-toggle .ai-saas-label {
+  right: calc(100% + 12px);
+}
+
+#ai-saas-anchor.ai-pos-left #ai-saas-toggle .ai-saas-label {
+  left: calc(100% + 12px);
+}
+
+#ai-saas-toggle:hover .ai-saas-label,
+#ai-saas-toggle:focus-visible .ai-saas-label {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
 }
 
 #ai-saas-anchor.open #ai-saas-toggle {
@@ -156,9 +204,9 @@ export const STATIC_STYLES = `
   flex-direction: column;
   overflow: hidden;
   overflow: clip;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), var(--ai-surface));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), var(--ai-surface));
   border: 1px solid var(--ai-border);
-  border-radius: 22px;
+  border-radius: 24px;
   box-shadow: var(--ai-shadow);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -190,12 +238,12 @@ export const STATIC_STYLES = `
 }
 
 #ai-saas-header {
-  min-height: 64px;
+  min-height: 68px;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 14px 12px 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.08)), var(--ai-header-bg);
+  padding: 13px 14px 13px 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.08)), var(--ai-header-bg);
   color: var(--ai-header-text);
   border-bottom: 1px solid rgba(15, 23, 42, 0.12);
   box-shadow: var(--ai-soft-shadow);
@@ -210,11 +258,11 @@ export const STATIC_STYLES = `
 }
 
 .ai-saas-brand-icon {
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
-  border-radius: 13px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
   color: var(--ai-header-text);
   border: 1px solid rgba(255, 255, 255, 0.34);
   display: flex;
@@ -300,11 +348,16 @@ export const STATIC_STYLES = `
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 18px min(6vw, 24px);
+  gap: 9px;
+  padding: 18px min(6vw, 24px) 16px;
   overflow-y: auto;
   overflow-x: hidden;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.08)), var(--ai-chat-bg);
+  background:
+    radial-gradient(circle at 18px 18px, rgba(15, 23, 42, 0.035) 1px, transparent 1.5px),
+    radial-gradient(circle at 42px 38px, rgba(15, 23, 42, 0.026) 1px, transparent 1.5px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.06)),
+    var(--ai-chat-bg);
+  background-size: 56px 56px, 56px 56px, auto, auto;
   background-attachment: local;
   scrollbar-width: thin;
   scrollbar-color: rgba(15, 23, 42, 0.24) transparent;
@@ -324,9 +377,9 @@ export const STATIC_STYLES = `
 .ai-saas-bubble {
   position: relative;
   max-width: min(86%, 360px);
-  padding: 10px 14px;
+  padding: 9px 13px;
   margin: 0;
-  border-radius: 18px;
+  border-radius: 16px;
   font-size: 14px;
   line-height: 1.5;
   white-space: pre-wrap;
@@ -340,8 +393,8 @@ export const STATIC_STYLES = `
   color: var(--ai-user-text);
   background: var(--ai-user-bg);
   border: 1px solid rgba(15, 23, 42, 0.04);
-  border-bottom-right-radius: 7px;
-  box-shadow: var(--ai-soft-shadow);
+  border-bottom-right-radius: 5px;
+  box-shadow: 0 4px 11px rgba(15, 23, 42, 0.08);
 }
 
 .ai-saas-bubble.bot {
@@ -350,8 +403,27 @@ export const STATIC_STYLES = `
   color: var(--ai-bot-text);
   background: var(--ai-bot-bg);
   border: 1px solid rgba(15, 23, 42, 0.08);
-  border-bottom-left-radius: 7px;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  border-bottom-left-radius: 5px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.07);
+}
+
+.ai-saas-bubble.user::after,
+.ai-saas-bubble.bot::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 10px;
+  height: 12px;
+}
+
+.ai-saas-bubble.user::after {
+  right: -6px;
+  background: radial-gradient(circle at 100% 0, transparent 12px, var(--ai-user-bg) 13px);
+}
+
+.ai-saas-bubble.bot::after {
+  left: -6px;
+  background: radial-gradient(circle at 0 0, transparent 12px, var(--ai-bot-bg) 13px);
 }
 
 .ai-saas-bubble.product-list {
@@ -384,12 +456,12 @@ export const STATIC_STYLES = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--ai-accent-light);
+  border: 1px solid rgba(18, 140, 126, 0.18);
   border-radius: 999px;
   padding: 0 12px;
-  background: color-mix(in srgb, var(--ai-accent-light) 72%, #ffffff);
-  color: var(--ai-accent);
-  box-shadow: 0 6px 16px var(--ai-accent-light);
+  background: rgba(255, 255, 255, 0.82);
+  color: #075e54;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
   cursor: pointer;
   font: inherit;
   font-size: 12px;
@@ -477,8 +549,8 @@ export const STATIC_STYLES = `
 }
 
 #ai-saas-form {
-  padding: 12px 14px 10px;
-  background: rgba(255, 255, 255, 0.94);
+  padding: 10px 12px 9px;
+  background: #f0f2f5;
   border-top: 1px solid rgba(15, 23, 42, 0.1);
   box-shadow: 0 -10px 24px rgba(15, 23, 42, 0.06);
   backdrop-filter: blur(12px);
@@ -489,12 +561,12 @@ export const STATIC_STYLES = `
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 48px;
-  padding: 6px 6px 6px 14px;
+  min-height: 50px;
+  padding: 6px 6px 6px 16px;
   background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.14);
-  border-radius: 16px;
-  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05), 0 8px 18px rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.05);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -525,16 +597,18 @@ export const STATIC_STYLES = `
 }
 
 .ai-saas-input-wrapper button {
-  min-width: 42px;
-  min-height: 38px;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
   border: 0;
-  border-radius: 13px;
-  padding: 0 13px;
-  background: var(--ai-accent-gradient);
+  border-radius: 999px;
+  padding: 0;
+  background: linear-gradient(135deg, var(--ai-accent), #128c7e);
   color: var(--ai-accent-contrast);
   box-shadow: 0 9px 18px var(--ai-accent-shadow);
   cursor: pointer;
@@ -572,14 +646,18 @@ export const STATIC_STYLES = `
 }
 
 .ai-saas-send-icon {
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
   display: inline-flex;
 }
 
 .ai-saas-send-icon svg {
   width: 16px;
   height: 16px;
+}
+
+.ai-saas-send-label {
+  display: none;
 }
 
 .ai-saas-bubble.ai-saas-error {
@@ -590,7 +668,7 @@ export const STATIC_STYLES = `
 
 .ai-saas-powered {
   padding: 0 12px 10px;
-  background: rgba(255, 255, 255, 0.94);
+  background: #f0f2f5;
   color: rgba(15, 23, 42, 0.48);
   text-align: center;
   font-size: 10px;
@@ -849,27 +927,37 @@ export const STATIC_STYLES = `
 
 @media (max-width: 640px) {
   #ai-saas-anchor {
-    right: 12px;
-    left: 12px;
+    right: 16px;
+    left: auto;
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-    align-items: stretch;
+    align-items: flex-end;
   }
 
-  #ai-saas-anchor.ai-pos-right,
+  #ai-saas-anchor.ai-pos-right {
+    right: 16px;
+    left: auto;
+    align-items: flex-end;
+  }
+
   #ai-saas-anchor.ai-pos-left {
-    right: 12px;
-    left: 12px;
-    align-items: stretch;
+    left: 16px;
+    right: auto;
+    align-items: flex-start;
   }
 
   #ai-saas-toggle {
-    width: 100%;
-    min-height: 56px;
-    padding: 0 16px;
+    width: 60px;
+    height: 60px;
+  }
+
+  #ai-saas-toggle .ai-saas-icon {
+    width: 60px;
+    height: 60px;
+    flex-basis: 60px;
   }
 
   #ai-saas-toggle .ai-saas-label {
-    max-width: none;
+    display: none;
   }
 
   #ai-saas-widget {

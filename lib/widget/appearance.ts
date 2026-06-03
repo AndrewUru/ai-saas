@@ -2,6 +2,7 @@ import {
   widgetDefaults,
   widgetLimits,
   sanitizeHex,
+  sanitizeLauncherIcon,
   sanitizePosition,
 } from "@/lib/widget/defaults";
 import type { AgentRecord, WidgetAppearance, WidgetConfig } from "./types";
@@ -11,6 +12,7 @@ const BRAND_DEFAULT = widgetDefaults.brand;
 const LABEL_DEFAULT = widgetDefaults.label;
 const GREETING_DEFAULT = widgetDefaults.greeting;
 const POSITION_DEFAULT = widgetDefaults.position;
+const LAUNCHER_ICON_DEFAULT = widgetDefaults.launcherIcon;
 
 function escapeForJs(str: string = "") {
   return String(str)
@@ -28,6 +30,23 @@ function sanitizeText(value: string | null, fallback: string, max = 60) {
   const trimmed = value.replace(/[<>]/g, "").trim();
   if (!trimmed) return fallback;
   return trimmed.slice(0, max);
+}
+
+function sanitizeImageUrl(value: string | null, max = 512) {
+  if (!value) return null;
+  const trimmed = value.replace(/[<>]/g, "").trim().slice(0, max);
+  if (!trimmed) return null;
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.toString();
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
 }
 
 function hexToRgb(hex: string) {
@@ -110,6 +129,15 @@ export function buildAppearance(
   const position = sanitizePosition(
     params.get("position") ?? agent.widget_position ?? POSITION_DEFAULT
   );
+  const launcherIcon = sanitizeLauncherIcon(
+    params.get("launcherIcon") ??
+      agent.widget_launcher_icon ??
+      LAUNCHER_ICON_DEFAULT
+  );
+  const launcherLogoUrl = sanitizeImageUrl(
+    params.get("launcherLogoUrl") ?? agent.widget_launcher_logo_url,
+    widgetLimits.launcherLogoUrl
+  );
 
   const brandInitial = escapeForJs(
     (brandName.charAt(0).toUpperCase() || "A").slice(0, 1)
@@ -117,23 +145,23 @@ export function buildAppearance(
 
   // Custom colors with modern neutral defaults.
   const colorHeaderBg = sanitizeHex(
-    params.get("colorHeaderBg") ?? agent.widget_color_header_bg ?? "#0f172a"
+    params.get("colorHeaderBg") ?? agent.widget_color_header_bg ?? "#075e54"
   );
   const colorHeaderText = sanitizeHex(
     params.get("colorHeaderText") ?? agent.widget_color_header_text ?? "#ffffff"
   );
   const colorChatBg = sanitizeHex(
-    params.get("colorChatBg") ?? agent.widget_color_chat_bg ?? "#f1f5f9"
+    params.get("colorChatBg") ?? agent.widget_color_chat_bg ?? "#efeae2"
   );
   const colorUserBubbleBg = sanitizeHex(
     params.get("colorUserBubbleBg") ??
       agent.widget_color_user_bubble_bg ??
-      "#2563eb"
+      "#d9fdd3"
   );
   const colorUserBubbleText = sanitizeHex(
     params.get("colorUserBubbleText") ??
       agent.widget_color_user_bubble_text ??
-      "#ffffff"
+      "#0b2f20"
   );
   const colorBotBubbleBg = sanitizeHex(
     params.get("colorBotBubbleBg") ?? agent.widget_color_bot_bubble_bg ?? "#ffffff"
@@ -144,7 +172,7 @@ export function buildAppearance(
       "#0f172a"
   );
   const colorToggleBg = sanitizeHex(
-    params.get("colorToggleBg") ?? agent.widget_color_toggle_bg ?? "#0f172a"
+    params.get("colorToggleBg") ?? agent.widget_color_toggle_bg ?? "#25d366"
   );
   const colorToggleText = sanitizeHex(
     params.get("colorToggleText") ?? agent.widget_color_toggle_text ?? "#ffffff"
@@ -162,6 +190,8 @@ export function buildAppearance(
     brandInitial,
     collapsedLabel,
     greeting,
+    launcherIcon,
+    launcherLogoUrl,
     position,
     colorHeaderBg,
     colorHeaderText,
@@ -188,6 +218,8 @@ export function buildConfig(
     brandInitial: appearance.brandInitial,
     collapsedLabel: appearance.collapsedLabel,
     greeting: appearance.greeting,
+    launcherIcon: appearance.launcherIcon,
+    launcherLogoUrl: appearance.launcherLogoUrl,
     position: appearance.position,
     appearance: {
       colorHeaderBg: appearance.colorHeaderBg,

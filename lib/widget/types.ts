@@ -1,5 +1,6 @@
 export type WidgetPosition = "left" | "right";
 export type WidgetLanguage = "auto" | "en" | "es" | "pt" | "fr";
+export type WidgetLauncherIcon = "whatsapp" | "chat" | "bot" | "store" | "logo";
 
 export interface WidgetAppearance {
   accent: string;
@@ -13,6 +14,8 @@ export interface WidgetAppearance {
   brandInitial: string;
   collapsedLabel: string;
   greeting: string;
+  launcherIcon: WidgetLauncherIcon;
+  launcherLogoUrl: string | null;
   position: WidgetPosition;
   // New customization fields
   colorHeaderBg: string;
@@ -36,6 +39,8 @@ export interface WidgetConfig {
   collapsedLabel: string;
   greeting: string;
   humanSupportText?: string;
+  launcherIcon?: WidgetLauncherIcon | string | null;
+  launcherLogoUrl?: string | null;
   position: WidgetPosition;
   appearance: {
     colorHeaderBg: string;
@@ -59,6 +64,8 @@ export interface AgentRecord {
   widget_label: string | null;
   widget_greeting: string | null;
   widget_human_support_text: string | null;
+  widget_launcher_icon: WidgetLauncherIcon | string | null;
+  widget_launcher_logo_url: string | null;
   language: WidgetLanguage | string | null;
   widget_position: WidgetPosition | null;
   widget_color_header_bg: string | null;
