@@ -6,6 +6,7 @@ import {
   sanitizeWidgetLanguage,
   sanitizeLauncherIcon,
   sanitizePosition,
+  sanitizeWidgetNumber,
   widgetDefaults,
   widgetLimits,
 } from "@/lib/widget/defaults";
@@ -140,6 +141,66 @@ function buildPreviewOverrides(
   const positionParam = getParam(params, "position");
   if (positionParam !== null) {
     overrides.position = sanitizePosition(positionParam);
+  }
+
+  const widthParam = getParam(params, "width");
+  if (widthParam !== null) {
+    overrides.width = sanitizeWidgetNumber(
+      widthParam,
+      widgetDefaults.width,
+      widgetLimits.width.min,
+      widgetLimits.width.max
+    );
+  }
+
+  const heightParam = getParam(params, "height");
+  if (heightParam !== null) {
+    overrides.height = sanitizeWidgetNumber(
+      heightParam,
+      widgetDefaults.height,
+      widgetLimits.height.min,
+      widgetLimits.height.max
+    );
+  }
+
+  const offsetXParam = getParam(params, "offsetX");
+  if (offsetXParam !== null) {
+    overrides.offsetX = sanitizeWidgetNumber(
+      offsetXParam,
+      widgetDefaults.offsetX,
+      widgetLimits.offsetX.min,
+      widgetLimits.offsetX.max
+    );
+  }
+
+  const offsetYParam = getParam(params, "offsetY");
+  if (offsetYParam !== null) {
+    overrides.offsetY = sanitizeWidgetNumber(
+      offsetYParam,
+      widgetDefaults.offsetY,
+      widgetLimits.offsetY.min,
+      widgetLimits.offsetY.max
+    );
+  }
+
+  const launcherSizeParam = getParam(params, "launcherSize");
+  if (launcherSizeParam !== null) {
+    overrides.launcherSize = sanitizeWidgetNumber(
+      launcherSizeParam,
+      widgetDefaults.launcherSize,
+      widgetLimits.launcherSize.min,
+      widgetLimits.launcherSize.max
+    );
+  }
+
+  const borderRadiusParam = getParam(params, "borderRadius");
+  if (borderRadiusParam !== null) {
+    overrides.borderRadius = sanitizeWidgetNumber(
+      borderRadiusParam,
+      widgetDefaults.borderRadius,
+      widgetLimits.borderRadius.min,
+      widgetLimits.borderRadius.max
+    );
   }
 
   const colorHeaderBg = getParam(params, "colorHeaderBg");

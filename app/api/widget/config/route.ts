@@ -12,6 +12,7 @@ import {
   sanitizeWidgetLanguage,
   sanitizeLauncherIcon,
   sanitizePosition,
+  sanitizeWidgetNumber,
   widgetDefaults,
   widgetLimits,
 } from "@/lib/widget/defaults";
@@ -193,6 +194,42 @@ export async function GET(req: Request) {
   const baseLauncherIcon = sanitizeLauncherIcon(agent.widget_launcher_icon);
   const baseLauncherLogoUrl = normalizeImageUrl(agent.widget_launcher_logo_url);
   const basePosition = sanitizePosition(agent.widget_position);
+  const baseWidth = sanitizeWidgetNumber(
+    agent.widget_width,
+    widgetDefaults.width,
+    widgetLimits.width.min,
+    widgetLimits.width.max
+  );
+  const baseHeight = sanitizeWidgetNumber(
+    agent.widget_height,
+    widgetDefaults.height,
+    widgetLimits.height.min,
+    widgetLimits.height.max
+  );
+  const baseOffsetX = sanitizeWidgetNumber(
+    agent.widget_offset_x,
+    widgetDefaults.offsetX,
+    widgetLimits.offsetX.min,
+    widgetLimits.offsetX.max
+  );
+  const baseOffsetY = sanitizeWidgetNumber(
+    agent.widget_offset_y,
+    widgetDefaults.offsetY,
+    widgetLimits.offsetY.min,
+    widgetLimits.offsetY.max
+  );
+  const baseLauncherSize = sanitizeWidgetNumber(
+    agent.widget_launcher_size,
+    widgetDefaults.launcherSize,
+    widgetLimits.launcherSize.min,
+    widgetLimits.launcherSize.max
+  );
+  const baseBorderRadius = sanitizeWidgetNumber(
+    agent.widget_border_radius,
+    widgetDefaults.borderRadius,
+    widgetLimits.borderRadius.min,
+    widgetLimits.borderRadius.max
+  );
   const baseAppearance = {
     colorHeaderBg: normalizeHex(
       agent.widget_color_header_bg,
@@ -245,6 +282,12 @@ export async function GET(req: Request) {
     launcherIcon: baseLauncherIcon,
     launcherLogoUrl: baseLauncherLogoUrl,
     position: basePosition,
+    width: baseWidth,
+    height: baseHeight,
+    offsetX: baseOffsetX,
+    offsetY: baseOffsetY,
+    launcherSize: baseLauncherSize,
+    borderRadius: baseBorderRadius,
     appearance: baseAppearance,
   };
 
@@ -321,6 +364,66 @@ export async function GET(req: Request) {
         positionParam === "left" || positionParam === "right"
           ? positionParam
           : config.position;
+    }
+
+    const widthParam = getParam(params, "width");
+    if (widthParam !== null) {
+      config.width = sanitizeWidgetNumber(
+        widthParam,
+        config.width ?? widgetDefaults.width,
+        widgetLimits.width.min,
+        widgetLimits.width.max
+      );
+    }
+
+    const heightParam = getParam(params, "height");
+    if (heightParam !== null) {
+      config.height = sanitizeWidgetNumber(
+        heightParam,
+        config.height ?? widgetDefaults.height,
+        widgetLimits.height.min,
+        widgetLimits.height.max
+      );
+    }
+
+    const offsetXParam = getParam(params, "offsetX");
+    if (offsetXParam !== null) {
+      config.offsetX = sanitizeWidgetNumber(
+        offsetXParam,
+        config.offsetX ?? widgetDefaults.offsetX,
+        widgetLimits.offsetX.min,
+        widgetLimits.offsetX.max
+      );
+    }
+
+    const offsetYParam = getParam(params, "offsetY");
+    if (offsetYParam !== null) {
+      config.offsetY = sanitizeWidgetNumber(
+        offsetYParam,
+        config.offsetY ?? widgetDefaults.offsetY,
+        widgetLimits.offsetY.min,
+        widgetLimits.offsetY.max
+      );
+    }
+
+    const launcherSizeParam = getParam(params, "launcherSize");
+    if (launcherSizeParam !== null) {
+      config.launcherSize = sanitizeWidgetNumber(
+        launcherSizeParam,
+        config.launcherSize ?? widgetDefaults.launcherSize,
+        widgetLimits.launcherSize.min,
+        widgetLimits.launcherSize.max
+      );
+    }
+
+    const borderRadiusParam = getParam(params, "borderRadius");
+    if (borderRadiusParam !== null) {
+      config.borderRadius = sanitizeWidgetNumber(
+        borderRadiusParam,
+        config.borderRadius ?? widgetDefaults.borderRadius,
+        widgetLimits.borderRadius.min,
+        widgetLimits.borderRadius.max
+      );
     }
 
     const appearanceOverrides: Partial<WidgetConfig["appearance"]> = {};

@@ -4,6 +4,7 @@ import {
   sanitizeHex,
   sanitizeLauncherIcon,
   sanitizePosition,
+  sanitizeWidgetNumber,
 } from "@/lib/widget/defaults";
 import type { AgentRecord, WidgetAppearance, WidgetConfig } from "./types";
 
@@ -129,6 +130,42 @@ export function buildAppearance(
   const position = sanitizePosition(
     params.get("position") ?? agent.widget_position ?? POSITION_DEFAULT
   );
+  const width = sanitizeWidgetNumber(
+    params.get("width") ?? agent.widget_width,
+    widgetDefaults.width,
+    widgetLimits.width.min,
+    widgetLimits.width.max
+  );
+  const height = sanitizeWidgetNumber(
+    params.get("height") ?? agent.widget_height,
+    widgetDefaults.height,
+    widgetLimits.height.min,
+    widgetLimits.height.max
+  );
+  const offsetX = sanitizeWidgetNumber(
+    params.get("offsetX") ?? agent.widget_offset_x,
+    widgetDefaults.offsetX,
+    widgetLimits.offsetX.min,
+    widgetLimits.offsetX.max
+  );
+  const offsetY = sanitizeWidgetNumber(
+    params.get("offsetY") ?? agent.widget_offset_y,
+    widgetDefaults.offsetY,
+    widgetLimits.offsetY.min,
+    widgetLimits.offsetY.max
+  );
+  const launcherSize = sanitizeWidgetNumber(
+    params.get("launcherSize") ?? agent.widget_launcher_size,
+    widgetDefaults.launcherSize,
+    widgetLimits.launcherSize.min,
+    widgetLimits.launcherSize.max
+  );
+  const borderRadius = sanitizeWidgetNumber(
+    params.get("borderRadius") ?? agent.widget_border_radius,
+    widgetDefaults.borderRadius,
+    widgetLimits.borderRadius.min,
+    widgetLimits.borderRadius.max
+  );
   const launcherIcon = sanitizeLauncherIcon(
     params.get("launcherIcon") ??
       agent.widget_launcher_icon ??
@@ -193,6 +230,12 @@ export function buildAppearance(
     launcherIcon,
     launcherLogoUrl,
     position,
+    width,
+    height,
+    offsetX,
+    offsetY,
+    launcherSize,
+    borderRadius,
     colorHeaderBg,
     colorHeaderText,
     colorChatBg,
@@ -221,6 +264,12 @@ export function buildConfig(
     launcherIcon: appearance.launcherIcon,
     launcherLogoUrl: appearance.launcherLogoUrl,
     position: appearance.position,
+    width: appearance.width,
+    height: appearance.height,
+    offsetX: appearance.offsetX,
+    offsetY: appearance.offsetY,
+    launcherSize: appearance.launcherSize,
+    borderRadius: appearance.borderRadius,
     appearance: {
       colorHeaderBg: appearance.colorHeaderBg,
       colorHeaderText: appearance.colorHeaderText,

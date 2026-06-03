@@ -8,6 +8,8 @@ import {
   sanitizeHex,
   sanitizeLauncherIcon,
   sanitizePosition,
+  sanitizeWidgetNumber,
+  widgetDefaults,
   widgetLimits,
 } from "@/lib/widget/defaults";
 import WidgetDesigner from "../WidgetDesigner";
@@ -46,6 +48,12 @@ async function updateWidget(formData: FormData) {
   const labelRaw = String(formData.get("widget_label") ?? "");
   const greetingRaw = String(formData.get("widget_greeting") ?? "");
   const positionRaw = String(formData.get("widget_position") ?? "");
+  const widthRaw = String(formData.get("widget_width") ?? "");
+  const heightRaw = String(formData.get("widget_height") ?? "");
+  const offsetXRaw = String(formData.get("widget_offset_x") ?? "");
+  const offsetYRaw = String(formData.get("widget_offset_y") ?? "");
+  const launcherSizeRaw = String(formData.get("widget_launcher_size") ?? "");
+  const borderRadiusRaw = String(formData.get("widget_border_radius") ?? "");
   const humanSupportRaw = String(
     formData.get("widget_human_support_text") ?? "",
   );
@@ -87,6 +95,54 @@ async function updateWidget(formData: FormData) {
         widgetLimits.humanSupportText,
       ),
       widget_position: positionRaw.trim() ? sanitizePosition(positionRaw) : null,
+      widget_width: widthRaw.trim()
+        ? sanitizeWidgetNumber(
+            widthRaw,
+            widgetDefaults.width,
+            widgetLimits.width.min,
+            widgetLimits.width.max,
+          )
+        : null,
+      widget_height: heightRaw.trim()
+        ? sanitizeWidgetNumber(
+            heightRaw,
+            widgetDefaults.height,
+            widgetLimits.height.min,
+            widgetLimits.height.max,
+          )
+        : null,
+      widget_offset_x: offsetXRaw.trim()
+        ? sanitizeWidgetNumber(
+            offsetXRaw,
+            widgetDefaults.offsetX,
+            widgetLimits.offsetX.min,
+            widgetLimits.offsetX.max,
+          )
+        : null,
+      widget_offset_y: offsetYRaw.trim()
+        ? sanitizeWidgetNumber(
+            offsetYRaw,
+            widgetDefaults.offsetY,
+            widgetLimits.offsetY.min,
+            widgetLimits.offsetY.max,
+          )
+        : null,
+      widget_launcher_size: launcherSizeRaw.trim()
+        ? sanitizeWidgetNumber(
+            launcherSizeRaw,
+            widgetDefaults.launcherSize,
+            widgetLimits.launcherSize.min,
+            widgetLimits.launcherSize.max,
+          )
+        : null,
+      widget_border_radius: borderRadiusRaw.trim()
+        ? sanitizeWidgetNumber(
+            borderRadiusRaw,
+            widgetDefaults.borderRadius,
+            widgetLimits.borderRadius.min,
+            widgetLimits.borderRadius.max,
+          )
+        : null,
       widget_color_header_bg: colorHeaderBgRaw.trim()
         ? sanitizeHex(colorHeaderBgRaw)
         : null,
@@ -143,7 +199,7 @@ export default async function AgentWidgetPage({
   const { data: agent, error } = await supabase
     .from("agents")
     .select(
-      "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
+      "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -204,6 +260,12 @@ export default async function AgentWidgetPage({
           initialLanguage={agent.language ?? "auto"}
           initialHumanSupportText={agent.widget_human_support_text}
           initialPosition={widgetPositionValue}
+          initialWidth={agent.widget_width}
+          initialHeight={agent.widget_height}
+          initialOffsetX={agent.widget_offset_x}
+          initialOffsetY={agent.widget_offset_y}
+          initialLauncherSize={agent.widget_launcher_size}
+          initialBorderRadius={agent.widget_border_radius}
           initialColorHeaderBg={agent.widget_color_header_bg}
           initialColorHeaderText={agent.widget_color_header_text}
           initialColorChatBg={agent.widget_color_chat_bg}

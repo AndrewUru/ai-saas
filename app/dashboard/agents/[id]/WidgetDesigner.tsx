@@ -6,9 +6,11 @@ import {
   Check,
   Clipboard,
   Image as ImageIcon,
+  Maximize2,
   type LucideIcon,
   MessageSquare,
   MonitorSmartphone,
+  Move,
   Palette,
   RotateCcw,
   SlidersHorizontal,
@@ -47,6 +49,12 @@ type WidgetDesignerProps = {
 
   initialHumanSupportText: string | null;
   initialPosition: WidgetPosition | null;
+  initialWidth: number | null;
+  initialHeight: number | null;
+  initialOffsetX: number | null;
+  initialOffsetY: number | null;
+  initialLauncherSize: number | null;
+  initialBorderRadius: number | null;
 
   initialColorHeaderBg: string | null;
   initialColorHeaderText: string | null;
@@ -255,6 +263,54 @@ function ColorInput({
   );
 }
 
+function RangeInput({
+  label,
+  name,
+  value,
+  onChange,
+  min,
+  max,
+  step = 1,
+  suffix = "px",
+}: {
+  label: string;
+  name: string;
+  value: number;
+  onChange: (val: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  suffix?: string;
+}) {
+  return (
+    <div className="space-y-2 min-w-0">
+      <div className="flex items-center justify-between gap-3">
+        <label
+          htmlFor={name}
+          className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400"
+        >
+          {label}
+        </label>
+        <span className="rounded-full border border-slate-800 bg-slate-950/70 px-2 py-0.5 text-[11px] font-semibold text-emerald-100">
+          {value}
+          {suffix}
+        </span>
+      </div>
+      <input
+        id={name}
+        name={name}
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className="w-full accent-emerald-400"
+      />
+    </div>
+  );
+}
+
 export default function WidgetDesigner({
   apiKey,
   siteUrl,
@@ -265,6 +321,12 @@ export default function WidgetDesigner({
   initialLanguage,
   initialHumanSupportText,
   initialPosition,
+  initialWidth,
+  initialHeight,
+  initialOffsetX,
+  initialOffsetY,
+  initialLauncherSize,
+  initialBorderRadius,
   initialColorHeaderBg,
   initialColorHeaderText,
   initialColorChatBg,
@@ -286,6 +348,20 @@ export default function WidgetDesigner({
   );
   const [position, setPosition] = useState<WidgetPosition>(
     initialPosition ?? widgetDefaults.position,
+  );
+  const [width, setWidth] = useState(initialWidth ?? widgetDefaults.width);
+  const [height, setHeight] = useState(initialHeight ?? widgetDefaults.height);
+  const [offsetX, setOffsetX] = useState(
+    initialOffsetX ?? widgetDefaults.offsetX,
+  );
+  const [offsetY, setOffsetY] = useState(
+    initialOffsetY ?? widgetDefaults.offsetY,
+  );
+  const [launcherSize, setLauncherSize] = useState(
+    initialLauncherSize ?? widgetDefaults.launcherSize,
+  );
+  const [borderRadius, setBorderRadius] = useState(
+    initialBorderRadius ?? widgetDefaults.borderRadius,
   );
 
   const [colorHeaderBg, setColorHeaderBg] = useState(
@@ -334,6 +410,12 @@ export default function WidgetDesigner({
       initialLanguage,
       humanSupportTextInput,
       position,
+      width,
+      height,
+      offsetX,
+      offsetY,
+      launcherSize,
+      borderRadius,
       colorHeaderBg,
       colorHeaderText,
       colorChatBg,
@@ -356,6 +438,12 @@ export default function WidgetDesigner({
       initialLanguage,
       humanSupportTextInput,
       position,
+      width,
+      height,
+      offsetX,
+      offsetY,
+      launcherSize,
+      borderRadius,
       colorHeaderBg,
       colorHeaderText,
       colorChatBg,
@@ -398,6 +486,12 @@ export default function WidgetDesigner({
       ) ?? "",
     );
     params.set("position", liveState.position);
+    params.set("width", String(liveState.width));
+    params.set("height", String(liveState.height));
+    params.set("offsetX", String(liveState.offsetX));
+    params.set("offsetY", String(liveState.offsetY));
+    params.set("launcherSize", String(liveState.launcherSize));
+    params.set("borderRadius", String(liveState.borderRadius));
 
     params.set("colorHeaderBg", toParamHex(liveState.colorHeaderBg) ?? "");
     params.set("colorHeaderText", toParamHex(liveState.colorHeaderText) ?? "");
@@ -449,6 +543,12 @@ export default function WidgetDesigner({
       liveState.initialLanguage,
       liveState.humanSupportTextInput,
       liveState.position,
+      liveState.width,
+      liveState.height,
+      liveState.offsetX,
+      liveState.offsetY,
+      liveState.launcherSize,
+      liveState.borderRadius,
     ].join("|");
   }, [liveState]);
 
@@ -459,6 +559,12 @@ export default function WidgetDesigner({
     setGreetingInput("");
     setHumanSupportTextInput("");
     setPosition(widgetDefaults.position);
+    setWidth(widgetDefaults.width);
+    setHeight(widgetDefaults.height);
+    setOffsetX(widgetDefaults.offsetX);
+    setOffsetY(widgetDefaults.offsetY);
+    setLauncherSize(widgetDefaults.launcherSize);
+    setBorderRadius(widgetDefaults.borderRadius);
     setColorHeaderBg("");
     setColorHeaderText("");
     setColorChatBg("");
@@ -763,6 +869,69 @@ export default function WidgetDesigner({
               ))}
             </div>
           </fieldset>
+        </SectionCard>
+
+        <SectionCard
+          icon={Maximize2}
+          eyebrow="Pro layout"
+          title="Control size, spacing, and shape"
+        >
+          <div className="space-y-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <RangeInput
+                label="Widget width"
+                name="widget_width"
+                value={width}
+                onChange={setWidth}
+                min={widgetLimits.width.min}
+                max={widgetLimits.width.max}
+              />
+              <RangeInput
+                label="Widget height"
+                name="widget_height"
+                value={height}
+                onChange={setHeight}
+                min={widgetLimits.height.min}
+                max={widgetLimits.height.max}
+              />
+              <RangeInput
+                label="Side offset"
+                name="widget_offset_x"
+                value={offsetX}
+                onChange={setOffsetX}
+                min={widgetLimits.offsetX.min}
+                max={widgetLimits.offsetX.max}
+              />
+              <RangeInput
+                label="Bottom offset"
+                name="widget_offset_y"
+                value={offsetY}
+                onChange={setOffsetY}
+                min={widgetLimits.offsetY.min}
+                max={widgetLimits.offsetY.max}
+              />
+              <RangeInput
+                label="Launcher size"
+                name="widget_launcher_size"
+                value={launcherSize}
+                onChange={setLauncherSize}
+                min={widgetLimits.launcherSize.min}
+                max={widgetLimits.launcherSize.max}
+              />
+              <RangeInput
+                label="Corner radius"
+                name="widget_border_radius"
+                value={borderRadius}
+                onChange={setBorderRadius}
+                min={widgetLimits.borderRadius.min}
+                max={widgetLimits.borderRadius.max}
+              />
+            </div>
+            <div className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/50 p-3 text-xs leading-5 text-slate-400">
+              <Move className="h-4 w-4 shrink-0 text-emerald-200" aria-hidden="true" />
+              Mobile keeps a safe full-width layout automatically while desktop uses these Pro controls.
+            </div>
+          </div>
         </SectionCard>
       </div>
 

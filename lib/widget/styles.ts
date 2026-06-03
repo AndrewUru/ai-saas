@@ -19,10 +19,16 @@ export const STATIC_STYLES = `
   --ai-bot-text: #0f172a;
   --ai-toggle-bg: #25d366;
   --ai-toggle-text: #ffffff;
+  --ai-widget-width: 420px;
+  --ai-widget-height: 640px;
+  --ai-widget-offset-x: 18px;
+  --ai-widget-offset-y: 20px;
+  --ai-widget-radius: 24px;
+  --ai-launcher-size: 64px;
   --ai-close-bg: rgba(255, 255, 255, 0.24);
   --ai-close-text: #ffffff;
   position: fixed;
-  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--ai-widget-offset-y) + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -39,13 +45,13 @@ export const STATIC_STYLES = `
 }
 
 #ai-saas-anchor.ai-pos-right {
-  right: max(18px, env(safe-area-inset-right, 0px));
+  right: max(var(--ai-widget-offset-x), env(safe-area-inset-right, 0px));
   left: auto;
   align-items: flex-end;
 }
 
 #ai-saas-anchor.ai-pos-left {
-  left: max(18px, env(safe-area-inset-left, 0px));
+  left: max(var(--ai-widget-offset-x), env(safe-area-inset-left, 0px));
   right: auto;
   align-items: flex-start;
 }
@@ -56,8 +62,8 @@ export const STATIC_STYLES = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
+  width: var(--ai-launcher-size);
+  height: var(--ai-launcher-size);
   max-width: calc(100vw - 36px);
   padding: 0;
   background: linear-gradient(135deg, var(--ai-toggle-bg), #128c7e);
@@ -115,9 +121,9 @@ export const STATIC_STYLES = `
 #ai-saas-toggle .ai-saas-icon {
   position: relative;
   z-index: 1;
-  width: 64px;
-  height: 64px;
-  flex: 0 0 64px;
+  width: var(--ai-launcher-size);
+  height: var(--ai-launcher-size);
+  flex: 0 0 var(--ai-launcher-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -196,17 +202,17 @@ export const STATIC_STYLES = `
 #ai-saas-widget {
   position: absolute;
   bottom: 0;
-  width: clamp(360px, 34vw, 480px);
-  max-width: min(480px, calc(100vw - 48px));
-  height: clamp(500px, 70vh, 720px);
-  max-height: min(760px, calc(100dvh - 112px));
+  width: var(--ai-widget-width);
+  max-width: min(var(--ai-widget-width), calc(100vw - 48px));
+  height: var(--ai-widget-height);
+  max-height: min(var(--ai-widget-height), calc(100dvh - 112px));
   display: flex;
   flex-direction: column;
   overflow: hidden;
   overflow: clip;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), var(--ai-surface));
   border: 1px solid var(--ai-border);
-  border-radius: 24px;
+  border-radius: var(--ai-widget-radius);
   box-shadow: var(--ai-shadow);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -920,7 +926,7 @@ export const STATIC_STYLES = `
 
 @media (max-height: 800px) {
   #ai-saas-widget {
-    height: min(620px, 68vh);
+    height: min(var(--ai-widget-height), 68vh);
     max-height: calc(100dvh - 104px);
   }
 }

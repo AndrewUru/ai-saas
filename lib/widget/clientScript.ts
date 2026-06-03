@@ -381,6 +381,12 @@ export function renderWidgetScript(
     setVar(root, "--ai-bot-text", appearance.colorBotBubbleText);
     setVar(root, "--ai-toggle-bg", appearance.colorToggleBg);
     setVar(root, "--ai-toggle-text", appearance.colorToggleText);
+    setVar(root, "--ai-widget-width", cfg.width ? cfg.width + "px" : null);
+    setVar(root, "--ai-widget-height", cfg.height ? cfg.height + "px" : null);
+    setVar(root, "--ai-widget-offset-x", cfg.offsetX !== undefined ? cfg.offsetX + "px" : null);
+    setVar(root, "--ai-widget-offset-y", cfg.offsetY !== undefined ? cfg.offsetY + "px" : null);
+    setVar(root, "--ai-launcher-size", cfg.launcherSize ? cfg.launcherSize + "px" : null);
+    setVar(root, "--ai-widget-radius", cfg.borderRadius ? cfg.borderRadius + "px" : null);
   };
 
   const applyPosition = (root, position) => {

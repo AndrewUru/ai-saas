@@ -10,7 +10,12 @@ export const widgetDefaults = {
   greeting: "How can I help you today?",
   humanSupportText: "Talk to a human",
   launcherIcon: "whatsapp" as WidgetLauncherIcon,
-
+  width: 420,
+  height: 640,
+  offsetX: 18,
+  offsetY: 20,
+  launcherSize: 64,
+  borderRadius: 24,
   position: "right" as WidgetPosition,
 } as const;
 
@@ -50,6 +55,12 @@ export const widgetLimits = {
   greeting: 48,
   humanSupportText: 32,
   launcherLogoUrl: 512,
+  width: { min: 320, max: 720 },
+  height: { min: 420, max: 820 },
+  offsetX: { min: 0, max: 120 },
+  offsetY: { min: 0, max: 120 },
+  launcherSize: { min: 48, max: 88 },
+  borderRadius: { min: 12, max: 32 },
 } as const;
 
 export const widgetPositions: WidgetPosition[] = ["left", "right"];
@@ -112,4 +123,16 @@ export function sanitizeLauncherIcon(
     icon === "whatsapp"
     ? icon
     : widgetDefaults.launcherIcon;
+}
+
+export function sanitizeWidgetNumber(
+  value: string | number | null | undefined,
+  fallback: number,
+  min: number,
+  max: number
+) {
+  const parsed =
+    typeof value === "number" ? value : Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(max, Math.max(min, Math.round(parsed)));
 }

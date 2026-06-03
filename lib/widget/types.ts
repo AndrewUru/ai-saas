@@ -17,6 +17,12 @@ export interface WidgetAppearance {
   launcherIcon: WidgetLauncherIcon;
   launcherLogoUrl: string | null;
   position: WidgetPosition;
+  width: number;
+  height: number;
+  offsetX: number;
+  offsetY: number;
+  launcherSize: number;
+  borderRadius: number;
   // New customization fields
   colorHeaderBg: string;
   colorHeaderText: string;
@@ -42,6 +48,12 @@ export interface WidgetConfig {
   launcherIcon?: WidgetLauncherIcon | string | null;
   launcherLogoUrl?: string | null;
   position: WidgetPosition;
+  width?: number;
+  height?: number;
+  offsetX?: number;
+  offsetY?: number;
+  launcherSize?: number;
+  borderRadius?: number;
   appearance: {
     colorHeaderBg: string;
     colorHeaderText: string;
@@ -68,6 +80,12 @@ export interface AgentRecord {
   widget_launcher_logo_url: string | null;
   language: WidgetLanguage | string | null;
   widget_position: WidgetPosition | null;
+  widget_width: number | null;
+  widget_height: number | null;
+  widget_offset_x: number | null;
+  widget_offset_y: number | null;
+  widget_launcher_size: number | null;
+  widget_border_radius: number | null;
   widget_color_header_bg: string | null;
   widget_color_header_text: string | null;
   widget_color_chat_bg: string | null;
