@@ -1,0 +1,26 @@
+{
+  "baseUrl": "http://127.0.0.1:4173",
+  "routes": [
+    "/",
+    "/pricing",
+    "/academy",
+    "/blog",
+    "/login",
+    "/signup"
+  ],
+  "lighthouseRoutes": [
+    "/"
+  ],
+  "viewports": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "name": "mobile",
+      "width": 390,
+      "height": 844
+    }
+  ]
+}

@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "maintenance:audit": "node .maintenance/scripts/weekly-audit.mjs",
+    "maintenance:audit:full": "node .maintenance/scripts/weekly-audit.mjs --start-server",
+    "maintenance:visual": "node .maintenance/scripts/weekly-audit.mjs --skip-lint --skip-build --skip-audit --start-server",
     "sync:woo": "node scripts/woo-sync.js"
   },
   "dependencies": {
