@@ -111,6 +111,21 @@ function replaceOnce(relativePath, search, replacement) {
   return `${relativePath}: updated`;
 }
 
+function replacePattern(relativePath, pattern, replacement, alreadyPresent) {
+  const current = readText(relativePath);
+  if (alreadyPresent && current.includes(alreadyPresent)) {
+    return `${relativePath}: replacement already present`;
+  }
+
+  const next = current.replace(pattern, replacement);
+  if (next === current) {
+    throw new Error(`Could not find expected pattern in ${relativePath}`);
+  }
+
+  writeText(relativePath, next);
+  return `${relativePath}: updated`;
+}
+
 function insertAfter(relativePath, marker, insertion) {
   const current = readText(relativePath);
   if (current.includes(insertion.trim())) {
@@ -290,12 +305,6 @@ const recipes = {
   "integration-empty-state-cta": {
     files: ["app/dashboard/integrations/page.tsx"],
     apply() {
-      const search = String.raw`        <div
-          className="mt-6 rounded-xl border border-dashed border-border/60 bg-surface/30 p-6 text-center text-sm text-[var(--foreground-muted)]"
-          data-oid="pyivl2c"
-        >
-          No connections yet. Add your first store to start syncing data.
-        </div>`;
       const replacement = String.raw`        <div
           className="mt-6 rounded-xl border border-dashed border-border/60 bg-surface/30 p-6 text-center"
           data-oid="pyivl2c"
@@ -310,7 +319,14 @@ const recipes = {
             Connect {title}
           </Link>
         </div>`;
-      return [replaceOnce("app/dashboard/integrations/page.tsx", search, replacement)];
+      return [
+        replacePattern(
+          "app/dashboard/integrations/page.tsx",
+          /        <div\r?\n          className="mt-6 rounded-xl border border-dashed border-border\/60 bg-surface\/30 p-6 text-center text-sm text-\[var\(--foreground-muted\)\]"\r?\n          data-oid="pyivl2c"\r?\n        >\r?\n          No connections yet\. Add your first store to start syncing data\.\r?\n        <\/div>/,
+          replacement,
+          "No {title} connection yet",
+        ),
+      ];
     },
   },
   "button-mobile-stability": {
