@@ -1,6 +1,14 @@
-# Weekly UI/UX Checklist
+# Weekly UI/UX PR Checklist
 
-## Salud tecnica
+## Resultado esperado
+
+- [ ] El PR tiene un cambio UI/UX concreto, no solo reporte.
+- [ ] El PR explica el problema de usuario que resuelve.
+- [ ] El PR incluye criterios de aceptacion claros.
+- [ ] El cambio es pequeno y reversible.
+- [ ] El cambio no toca auth, billing, datos o integraciones criticas sin revision explicita.
+
+## Salud tecnica de apoyo
 
 - [ ] Instalacion reproducible con un solo gestor de paquetes.
 - [ ] `lint` sin errores nuevos.
@@ -31,7 +39,7 @@
 - [ ] Three.js no deja canvas en blanco.
 - [ ] La consola no muestra errores en rutas publicas.
 
-## Decision
+## Decision de merge
 
 - [ ] Hallazgos P0/P1 convertidos en issue o tarea.
 - [ ] Mejoras pequenas agrupadas para PR.

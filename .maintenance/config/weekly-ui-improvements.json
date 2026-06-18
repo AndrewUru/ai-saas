@@ -1,0 +1,57 @@
+{
+  "cadence": "weekly",
+  "mode": "create-reviewable-pr",
+  "focus": [
+    "UI/UX clarity",
+    "responsive behavior",
+    "accessibility",
+    "empty, loading, and error states",
+    "small product features that reduce user friction"
+  ],
+  "improvements": [
+    {
+      "id": "dashboard-empty-state-system",
+      "status": "proposed",
+      "priority": "P1",
+      "area": "Dashboard",
+      "title": "Create a reusable EmptyState component and use it for agent workspaces",
+      "why": "Repeated empty states should feel intentional and guide the next action clearly.",
+      "acceptance": [
+        "A reusable EmptyState UI component exists.",
+        "The dashboard agent empty state uses the shared component.",
+        "The call to action remains visible on mobile and desktop."
+      ],
+      "proposedAt": "2026-06-18T15:04:46.945Z",
+      "files": [
+        "components/ui/EmptyState.tsx",
+        "app/dashboard/AgentsSection.tsx"
+      ]
+    },
+    {
+      "id": "integration-empty-state-cta",
+      "status": "ready",
+      "priority": "P1",
+      "area": "Integrations",
+      "title": "Upgrade integration empty states with provider-specific CTAs",
+      "why": "When no store is connected, users need a direct next step, not only a passive message.",
+      "acceptance": [
+        "WooCommerce and Shopify empty states include a clear action.",
+        "The action label names the provider.",
+        "The panel still works with existing connection summaries."
+      ]
+    },
+    {
+      "id": "button-mobile-stability",
+      "status": "ready",
+      "priority": "P2",
+      "area": "Design system",
+      "title": "Improve button sizing and label stability on narrow screens",
+      "why": "Buttons should not shift, clip, or feel inconsistent across dense SaaS panels.",
+      "acceptance": [
+        "Buttons have stable minimum dimensions.",
+        "Icon and text alignment stays predictable.",
+        "Focus styles remain visible."
+      ]
+    }
+  ]
+}

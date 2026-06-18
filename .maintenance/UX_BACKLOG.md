@@ -1,4 +1,4 @@
-# UX Backlog
+# UI/UX Improvement Backlog
 
 Prioridades:
 
@@ -10,7 +10,8 @@ Prioridades:
 | --- | --- | --- | --- | --- |
 | P0 | Mantenimiento | Elegir un solo gestor de paquetes y alinear lockfile/node_modules. | Existen `package-lock.json` y `pnpm-lock.yaml`; esta maquina no tiene `pnpm`. | Abierto |
 | P0 | Dependencias | Actualizar `lucide-react` a una version compatible con React 19 antes de depender de `npm ci`. | `npm install` falla por peer dependency antiguo. | Abierto |
-| P1 | Auditoria visual | Instalar `playwright`, `lighthouse` y `chrome-launcher` cuando el gestor de paquetes este limpio. | La capa visual esta preparada pero queda omitida si faltan herramientas. | Abierto |
+| P1 | PR semanal | Mantener una cola de mejoras con recetas pequenas y revisables. | `.github/workflows/weekly-ui-improvements.yml` abre PR draft semanal. | En progreso |
+| P1 | Scan visual | Instalar `playwright`, `lighthouse` y `chrome-launcher` cuando el gestor de paquetes este limpio. | La capa visual esta preparada pero queda omitida si faltan herramientas. | Abierto |
 | P1 | Mobile | Revisar dashboard, widget designer y paginas de integraciones en 390px. | Son flujos densos y propensos a overflow. | Pendiente |
 | P1 | Estados vacios | Pulir estados vacios de agentes, integraciones, knowledge y analytics. | Flujos SaaS necesitan orientar la siguiente accion. | Pendiente |
 | P1 | Accesibilidad | Revisar foco visible, labels de formularios y contraste en botones secundarios. | Lighthouse y revision manual semanal. | Pendiente |

@@ -55,8 +55,8 @@ try {
     results.push(await runPackageScript(manager, "build", "Build"));
   }
 
-  if (!options.skipAudit) {
-    results.push(await runDependencyAudit(manager));
+  if (!options.skipSecurity) {
+    results.push(await runDependencySecurityGate(manager));
     results.push(await runOutdatedReport(manager));
   }
 
@@ -81,7 +81,7 @@ try {
 
     if (!reachable.ok) {
       results.push({
-        name: "Visual audit",
+        name: "Visual UX scan",
         status: "skip",
         summary: `No server responded at ${baseUrl}. Use --start-server or --url.`,
         details: [reachable.error ?? "Target URL was not reachable."],
@@ -112,14 +112,14 @@ const report = {
   finishedAt: finishedAt.toISOString(),
   durationMs: finishedAt.getTime() - startedAt.getTime(),
   packageManager: manager.name,
-  command: `node .maintenance/scripts/weekly-audit.mjs ${process.argv.slice(2).join(" ")}`.trim(),
+  command: `node .maintenance/scripts/quality-gates.mjs ${process.argv.slice(2).join(" ")}`.trim(),
   results,
 };
 
 writeFileSync(jsonPath, JSON.stringify(report, null, 2));
 writeFileSync(mdPath, renderMarkdown(report, mdPath));
 
-console.log(`Maintenance report written to ${path.relative(ROOT_DIR, mdPath)}`);
+console.log(`Improvement quality report written to ${path.relative(ROOT_DIR, mdPath)}`);
 
 if (!options.noFail && results.some((result) => result.status === "fail")) {
   process.exitCode = 1;
@@ -130,7 +130,7 @@ function parseArgs(args) {
     help: false,
     noFail: false,
     port: null,
-    skipAudit: false,
+    skipSecurity: false,
     skipBuild: false,
     skipInstallCheck: false,
     skipLint: false,
@@ -142,7 +142,7 @@ function parseArgs(args) {
   for (const arg of args) {
     if (arg === "--help" || arg === "-h") parsed.help = true;
     else if (arg === "--no-fail") parsed.noFail = true;
-    else if (arg === "--skip-audit") parsed.skipAudit = true;
+    else if (arg === "--skip-security") parsed.skipSecurity = true;
     else if (arg === "--skip-build") parsed.skipBuild = true;
     else if (arg === "--skip-install-check") parsed.skipInstallCheck = true;
     else if (arg === "--skip-lint") parsed.skipLint = true;
@@ -158,7 +158,7 @@ function parseArgs(args) {
 function printHelp() {
   console.log(`
 Usage:
-  node .maintenance/scripts/weekly-audit.mjs [options]
+  node .maintenance/scripts/quality-gates.mjs [options]
 
 Options:
   --start-server          Start Next dev server before visual checks.
@@ -167,7 +167,7 @@ Options:
   --skip-install-check    Skip package install reproducibility check.
   --skip-lint             Skip lint.
   --skip-build            Skip build.
-  --skip-audit            Skip npm/pnpm audit and outdated checks.
+  --skip-security         Skip npm/pnpm security and outdated checks.
   --skip-visual           Skip Playwright and Lighthouse checks.
   --no-fail               Always exit 0 after writing the report.
 `);
@@ -243,7 +243,7 @@ function detectPackageManager() {
     name,
     bin: name,
     runArgs: (scriptName) => ["run", scriptName],
-    auditArgs: () => [name === "npm" ? "audit" : "audit", "--json"],
+    securityArgs: () => [name === "npm" ? "audit" : "audit", "--json"],
     outdatedArgs: () => [name === "npm" ? "outdated" : "outdated", "--json"],
     result: {
       name: "Package manager",
@@ -311,18 +311,18 @@ async function runPackageScript(manager, scriptName, label) {
   });
 }
 
-async function runDependencyAudit(manager) {
-  const result = await runProcess(commandName(manager.bin), manager.auditArgs(), {
+async function runDependencySecurityGate(manager) {
+  const result = await runProcess(commandName(manager.bin), manager.securityArgs(), {
     timeoutMs: 120000,
   });
   const parsed = parseJsonLoose(result.stdout);
 
   if (!parsed) {
     return processResultToCheck({
-      name: "Dependency audit",
+      name: "Dependency security gate",
       result,
-      okSummary: "Dependency audit completed.",
-      failSummary: "Dependency audit failed or returned invalid JSON.",
+      okSummary: "Dependency security gate completed.",
+      failSummary: "Dependency security gate failed or returned invalid JSON.",
     });
   }
 
@@ -333,7 +333,7 @@ async function runDependencyAudit(manager) {
   const moderate = vulnerabilities.moderate ?? 0;
 
   return {
-    name: "Dependency audit",
+    name: "Dependency security gate",
     status: critical || high ? "fail" : total ? "warn" : "pass",
     summary: total
       ? `${total} vulnerabilities found (${critical} critical, ${high} high, ${moderate} moderate).`
@@ -564,7 +564,7 @@ async function runVisualAudit(config, baseUrl, reportDir) {
 
   if (!chromium) {
     return {
-      name: "Visual audit",
+      name: "Visual UX scan",
       status: "skip",
       summary: "Playwright is not installed.",
       details: [
@@ -662,7 +662,7 @@ async function runVisualAudit(config, baseUrl, reportDir) {
   const details = pages.flatMap((page) => summarizeVisualPage(page)).slice(0, 80);
 
   return {
-    name: "Visual audit",
+    name: "Visual UX scan",
     status: issueCount ? "warn" : "pass",
     summary: issueCount
       ? `${issueCount} visual signals found across ${pages.length} captures.`
@@ -959,7 +959,7 @@ function renderMarkdown(report, mdPath) {
 
   const relativeReportPath = path.relative(ROOT_DIR, mdPath);
   const lines = [
-    "# Weekly Maintenance Report",
+    "# Weekly UI/UX Improvement Quality Gate",
     "",
     `Generated: ${report.finishedAt}`,
     `Duration: ${Math.round(report.durationMs / 1000)}s`,
@@ -1037,16 +1037,16 @@ function buildNextActions(results) {
     if (result.name === "Install reproducibility" && result.status === "fail") {
       actions.push("Resolver la instalacion reproducible; revisar peer dependencies y lockfile elegido.");
     }
-    if (result.name === "Dependency audit" && result.status !== "pass") {
+    if (result.name === "Dependency security gate" && result.status !== "pass") {
       actions.push("Priorizar vulnerabilidades high/critical antes de mejoras de pulido.");
     }
     if (result.name === "Outdated packages" && result.status !== "pass") {
       actions.push("Agrupar updates minor/patch en PR pequeno y revisar majors aparte.");
     }
-    if (result.name === "Visual audit" && result.status === "skip") {
+    if (result.name === "Visual UX scan" && result.status === "skip") {
       actions.push("Instalar herramientas visuales opcionales cuando el gestor de paquetes este limpio.");
     }
-    if (result.name === "Visual audit" && result.status === "warn") {
+    if (result.name === "Visual UX scan" && result.status === "warn") {
       actions.push("Revisar capturas y convertir overflow/texto cortado/consola en tareas concretas.");
     }
     if (result.name === "Lighthouse" && result.status === "warn") {

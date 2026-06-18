@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useAgents } from "./hooks/useAgents";
 
 type Props = {
@@ -48,19 +49,12 @@ export default function AgentsSection({ planLimitLabel }: Props) {
         ) : null}
 
         {!isError && totalAgents === 0 && !isLoading ? (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border p-12 text-center">
-            <p className="font-medium text-foreground">No agents configured</p>
-            <p className="mt-2 max-w-sm text-sm text-[var(--foreground-muted)]">
-              Create your first agent to connect store data and start replying
-              to chats automatically.
-            </p>
-            <Link
-              href="/dashboard/agents"
-              className="ui-button ui-button--primary mt-6"
-            >
-              Create agent
-            </Link>
-          </div>
+          <EmptyState
+            title="No agents configured"
+            description="Create your first agent to connect store data and start replying to chats automatically."
+            actionHref="/dashboard/agents"
+            actionLabel="Create agent"
+          />
         ) : null}
 
         {!isError && totalAgents > 0 ? (

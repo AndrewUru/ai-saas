@@ -1,35 +1,50 @@
-# Maintenance System
+# Weekly UI/UX Improvements
 
-Este directorio deja preparada una primera capa de mejora continua: revisar el proyecto cada semana, generar un reporte y priorizar mejoras sin aplicar cambios a ciegas.
+Este directorio monta un sistema de mejoras constantes: cada semana se prepara un PR pequeno, revisable y centrado en UI/UX, no un reporte pasivo.
+
+La idea es que la automatizacion actue como product designer + frontend engineer junior: propone una mejora concreta, aplica cambios acotados, deja un PR en draft y obliga a revision humana antes de merge.
 
 ## Comandos
 
 ```bash
-npm run maintenance:audit
-npm run maintenance:audit:full
-npm run maintenance:visual
+npm run improve:weekly
+npm run improve:weekly:dry
+npm run improve:quality
+npm run improve:quality:full
+npm run improve:visual
 ```
 
-- `maintenance:audit`: ejecuta checks tecnicos, paquetes desactualizados, vulnerabilidades y genera un reporte Markdown.
-- `maintenance:audit:full`: ademas levanta Next en `127.0.0.1:4173` y ejecuta auditoria visual/Lighthouse si las herramientas opcionales estan instaladas.
-- `maintenance:visual`: solo levanta la app y ejecuta la capa visual, util para revisar pantallas rapido.
+- `improve:weekly`: aplica la siguiente mejora preparada en `.maintenance/config/weekly-ui-improvements.json`.
+- `improve:weekly:dry`: muestra cual seria el siguiente PR sin tocar archivos.
+- `improve:quality`: ejecuta gates tecnicos de apoyo: instalacion, lint, build, seguridad y paquetes.
+- `improve:quality:full`: ademas levanta Next y ejecuta scan visual/Lighthouse si estan instalados.
+- `improve:visual`: solo revisa la capa visual cuando las herramientas opcionales existan.
 
-Los reportes se escriben en `.maintenance/reports/<fecha>/`.
+## Flujo semanal
+
+El workflow real vive en `.github/workflows/weekly-ui-improvements.yml`.
+
+Cada lunes:
+
+1. Selecciona la siguiente mejora con `status: ready`.
+2. Aplica cambios de interfaz o experiencia de usuario.
+3. Actualiza `.maintenance/IMPROVEMENT_LOG.md`.
+4. Intenta validar con `npm ci`, `lint` y `build`.
+5. Abre un PR draft con contexto de diseno, cambios y criterios de aceptacion.
+
+Si la validacion tecnica falla, el PR igualmente se abre como draft para no perder el trabajo de producto. La razon queda anotada en el cuerpo del PR.
+
+## Como se anaden mejoras
+
+1. Crear un item en `.maintenance/config/weekly-ui-improvements.json` con `status: ready`.
+2. Anadir su receta en `.maintenance/scripts/weekly-ui-improvement.mjs`.
+3. Mantener el cambio pequeno: una mejora visual, un estado vacio, una micro-funcionalidad o una correccion mobile.
+4. Evitar cambios grandes automaticos en pricing, auth, billing, datos o integraciones sin revision explicita.
 
 ## Herramientas opcionales
 
-La auditoria visual usa `playwright`, `lighthouse` y `chrome-launcher` cuando estan disponibles en `node_modules`. Si faltan, el reporte no falla: deja la seccion como omitida y explica como habilitarla.
+La parte visual usa `playwright`, `lighthouse` y `chrome-launcher` cuando esten instalados. Hoy el proyecto tiene una deuda previa: conviene elegir un solo gestor de paquetes y actualizar `lucide-react` antes de depender de `npm ci` como gate obligatorio.
 
-Antes de instalarlas conviene resolver la deuda de paquetes detectada: el repo tiene `package-lock.json` y `pnpm-lock.yaml`, pero esta maquina no tiene `pnpm`, y `npm install` falla por el peer antiguo de `lucide-react` con React 19.
+## Principio
 
-## Rutina semanal
-
-1. Ejecutar `npm run maintenance:audit:full`.
-2. Revisar el Markdown generado.
-3. Mover hallazgos accionables a `.maintenance/UX_BACKLOG.md`.
-4. Elegir cambios pequenos para PRs concretos.
-5. No aplicar sugerencias automaticas sin revisar impacto visual, tecnico y de producto.
-
-## Fase 2
-
-Cuando el repo tenga un gestor de paquetes unico y una instalacion reproducible, se puede copiar `.maintenance/templates/github-weekly-maintenance.yml` a `.github/workflows/weekly-maintenance.yml` y activar ejecucion semanal en GitHub Actions.
+La automatizacion no decide por ti. Cada semana deja trabajo masticado en forma de PR: cambio pequeno, razon de diseno, checklist y validacion. Tu decides si se mergea, se modifica o se descarta.

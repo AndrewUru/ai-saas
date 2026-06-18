@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "maintenance:audit": "node .maintenance/scripts/weekly-audit.mjs",
-    "maintenance:audit:full": "node .maintenance/scripts/weekly-audit.mjs --start-server",
-    "maintenance:visual": "node .maintenance/scripts/weekly-audit.mjs --skip-lint --skip-build --skip-audit --start-server",
+    "improve:weekly": "node .maintenance/scripts/weekly-ui-improvement.mjs --apply",
+    "improve:weekly:dry": "node .maintenance/scripts/weekly-ui-improvement.mjs --dry-run",
+    "improve:quality": "node .maintenance/scripts/quality-gates.mjs",
+    "improve:quality:full": "node .maintenance/scripts/quality-gates.mjs --start-server",
+    "improve:visual": "node .maintenance/scripts/quality-gates.mjs --skip-lint --skip-build --skip-security --start-server",
     "sync:woo": "node scripts/woo-sync.js"
   },
   "dependencies": {

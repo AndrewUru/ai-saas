@@ -1,0 +1,89 @@
+name: Weekly UI/UX Improvements
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: weekly-ui-ux-improvements
+  cancel-in-progress: false
+
+jobs:
+  propose-ui-ux-improvement:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Apply next weekly UI/UX improvement
+        run: npm run improve:weekly
+
+      - name: Try validation
+        id: validation
+        continue-on-error: true
+        run: |
+          npm ci
+          npm run lint
+          npm run build
+
+      - name: Record validation note
+        if: always()
+        run: |
+          {
+            echo ""
+            echo "## Automation validation"
+            echo ""
+            if [ "${{ steps.validation.outcome }}" = "success" ]; then
+              echo "- GitHub Actions validation passed: npm ci, lint, build."
+            else
+              echo "- GitHub Actions validation did not pass. Review package manager/dependency state before merge."
+            fi
+          } >> .maintenance/reports/weekly-ui-improvement-pr.md
+
+      - name: Check for changes
+        id: changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create draft pull request
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        shell: bash
+        run: |
+          BRANCH="automation/weekly-ui-ux-${GITHUB_RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BRANCH"
+          git add .
+          git commit -m "chore: propose weekly UI/UX improvement"
+          git push --set-upstream origin "$BRANCH"
+          gh pr create \
+            --draft \
+            --base "$DEFAULT_BRANCH" \
+            --head "$BRANCH" \
+            --title "Weekly UI/UX improvement" \
+            --body-file .maintenance/reports/weekly-ui-improvement-pr.md
+
+      - name: No ready improvement
+        if: steps.changes.outputs.has_changes != 'true'
+        run: echo "No weekly UI/UX improvement changes were generated."
