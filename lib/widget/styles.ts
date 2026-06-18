@@ -19,6 +19,10 @@ export const STATIC_STYLES = `
   --ai-bot-text: #0f172a;
   --ai-toggle-bg: #25d366;
   --ai-toggle-text: #ffffff;
+  --ai-toggle-shadow: rgba(37, 211, 102, 0.34);
+  --ai-toggle-shadow-hover: rgba(37, 211, 102, 0.42);
+  --ai-toggle-status-bg: #25d366;
+  --ai-toggle-status-border: #ffffff;
   --ai-widget-width: 420px;
   --ai-widget-height: 640px;
   --ai-widget-offset-x: 18px;
@@ -66,12 +70,14 @@ export const STATIC_STYLES = `
   height: var(--ai-launcher-size);
   max-width: calc(100vw - 36px);
   padding: 0;
-  background: linear-gradient(135deg, var(--ai-toggle-bg), #128c7e);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0)),
+    var(--ai-toggle-bg);
   color: var(--ai-toggle-text);
   border: 0;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 16px 34px rgba(18, 140, 126, 0.36), 0 6px 16px rgba(15, 23, 42, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  box-shadow: 0 16px 34px var(--ai-toggle-shadow), 0 6px 16px rgba(15, 23, 42, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.24);
   gap: 0;
   font: inherit;
   font-size: 13px;
@@ -89,9 +95,9 @@ export const STATIC_STYLES = `
   z-index: 2;
   width: 13px;
   height: 13px;
-  border: 3px solid #ffffff;
+  border: 3px solid var(--ai-toggle-status-border);
   border-radius: 999px;
-  background: #22c55e;
+  background: var(--ai-toggle-status-bg);
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18);
 }
 
@@ -106,7 +112,7 @@ export const STATIC_STYLES = `
 
 #ai-saas-toggle:hover {
   transform: translateY(-2px);
-  box-shadow: 0 20px 42px rgba(18, 140, 126, 0.42), 0 8px 20px rgba(15, 23, 42, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  box-shadow: 0 20px 42px var(--ai-toggle-shadow-hover), 0 8px 20px rgba(15, 23, 42, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.28);
   filter: saturate(1.04);
 }
 
@@ -317,8 +323,8 @@ export const STATIC_STYLES = `
   height: 7px;
   flex: 0 0 7px;
   border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+  background: var(--ai-accent);
+  box-shadow: 0 0 0 2px var(--ai-accent-light);
   animation: aiStatusPulse 2.2s ease-in-out infinite;
 }
 
@@ -462,11 +468,11 @@ export const STATIC_STYLES = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(18, 140, 126, 0.18);
+  border: 1px solid var(--ai-accent-light);
   border-radius: 999px;
   padding: 0 12px;
   background: rgba(255, 255, 255, 0.82);
-  color: #075e54;
+  color: var(--ai-accent);
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
   cursor: pointer;
   font: inherit;
@@ -614,7 +620,9 @@ export const STATIC_STYLES = `
   border: 0;
   border-radius: 999px;
   padding: 0;
-  background: linear-gradient(135deg, var(--ai-accent), #128c7e);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0)),
+    var(--ai-accent);
   color: var(--ai-accent-contrast);
   box-shadow: 0 9px 18px var(--ai-accent-shadow);
   cursor: pointer;

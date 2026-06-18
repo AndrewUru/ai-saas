@@ -379,8 +379,14 @@ export function renderWidgetScript(
     setVar(root, "--ai-user-text", appearance.colorUserBubbleText);
     setVar(root, "--ai-bot-bg", appearance.colorBotBubbleBg);
     setVar(root, "--ai-bot-text", appearance.colorBotBubbleText);
-    setVar(root, "--ai-toggle-bg", appearance.colorToggleBg);
-    setVar(root, "--ai-toggle-text", appearance.colorToggleText);
+    const toggleBg = normalizeHex(appearance.colorToggleBg) || "#25d366";
+    const toggleText = normalizeHex(appearance.colorToggleText) || "#ffffff";
+    setVar(root, "--ai-toggle-bg", toggleBg);
+    setVar(root, "--ai-toggle-shadow", rgba(toggleBg, 0.34));
+    setVar(root, "--ai-toggle-shadow-hover", rgba(toggleBg, 0.42));
+    setVar(root, "--ai-toggle-status-bg", toggleBg);
+    setVar(root, "--ai-toggle-status-border", toggleText);
+    setVar(root, "--ai-toggle-text", toggleText);
     setVar(root, "--ai-widget-width", cfg.width ? cfg.width + "px" : null);
     setVar(root, "--ai-widget-height", cfg.height ? cfg.height + "px" : null);
     setVar(root, "--ai-widget-offset-x", cfg.offsetX !== undefined ? cfg.offsetX + "px" : null);
