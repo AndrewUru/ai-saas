@@ -98,7 +98,7 @@ function trimmedOrNull(value: string, max: number): string | null {
 }
 
 const inputClass =
-  "w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 px-3.5 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30";
+  "w-full min-w-0 rounded-xl border border-slate-800 px-3.5 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/30";
 
 const launcherIconLabels: Record<WidgetLauncherIcon, string> = {
   whatsapp: "WhatsApp",
@@ -134,7 +134,7 @@ function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-slate-800/80 bg-slate-950/45 p-4 shadow-sm shadow-slate-950/20">
+    <section className="rounded-2xl border border-slate-800/80 p-4 shadow-sm shadow-slate-950/20">
       <div className="mb-4 flex items-start gap-3">
         <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 text-emerald-200">
           <Icon className="h-4 w-4" aria-hidden="true" />
@@ -238,7 +238,7 @@ function ColorInput({
         <input
           type="color"
           aria-label={`${label} color picker`}
-          className="h-10 w-10 shrink-0 cursor-pointer rounded-xl border border-slate-700 bg-slate-900 p-1"
+          className="h-10 w-10 shrink-0 cursor-pointer rounded-xl border border-slate-700  p-1"
           value={pickerValue}
           onChange={(e) => onChange(e.target.value)}
         />
@@ -249,7 +249,7 @@ function ColorInput({
           placeholder={defaultValue}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`min-w-0 flex-1 rounded-xl border bg-slate-950/70 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition focus:ring-2 ${
+          className={`min-w-0 flex-1 rounded-xl border px-3 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none transition focus:ring-2 ${
             isInvalid
               ? "border-rose-400/60 focus:border-rose-300 focus:ring-rose-400/25"
               : "border-slate-800 focus:border-emerald-400 focus:ring-emerald-400/30"
@@ -291,7 +291,7 @@ function RangeInput({
         >
           {label}
         </label>
-        <span className="rounded-full border border-slate-800 bg-slate-950/70 px-2 py-0.5 text-[11px] font-semibold text-emerald-100">
+        <span className="rounded-full border border-slate-800 px-2 py-0.5 text-[11px] font-semibold text-emerald-100">
           {value}
           {suffix}
         </span>
@@ -594,7 +594,7 @@ export default function WidgetDesigner({
       "
     >
       <div className="space-y-4 min-w-0">
-        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/35 p-4 sm:p-5">
+        <div className="rounded-2xl border border-slate-800/80 p-4 sm:p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
@@ -626,7 +626,7 @@ export default function WidgetDesigner({
           title="Set the widget palette"
         >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-3">
+            <div className="sm:col-span-2 rounded-xl border border-emerald-400/20 p-3">
               <ColorInput
                 label="Main accent"
                 name="widget_accent"
@@ -734,8 +734,8 @@ export default function WidgetDesigner({
                       key={option}
                       className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-3 transition ${
                         launcherIcon === option
-                          ? "border-emerald-400/70 bg-emerald-400/10 text-emerald-100"
-                          : "border-slate-800 bg-slate-950/60 text-slate-400 hover:border-slate-700 hover:text-slate-100"
+                          ? "border-emerald-400/70  text-emerald-100"
+                          : "border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-100"
                       }`}
                     >
                       <input
@@ -845,7 +845,7 @@ export default function WidgetDesigner({
         >
           <fieldset>
             <legend className="sr-only">Screen position</legend>
-            <div className="grid grid-cols-2 gap-2 rounded-xl border border-slate-800 bg-slate-950/60 p-1.5">
+            <div className="grid grid-cols-2 gap-2 rounded-xl border border-slate-800  p-1.5">
               {widgetPositions.map((option) => (
                 <label
                   key={option}
@@ -927,7 +927,7 @@ export default function WidgetDesigner({
                 max={widgetLimits.borderRadius.max}
               />
             </div>
-            <div className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/50 p-3 text-xs leading-5 text-slate-400">
+            <div className="flex items-center gap-3 rounded-xl border border-slate-800 p-3 text-xs leading-5 text-slate-400">
               <Move className="h-4 w-4 shrink-0 text-emerald-200" aria-hidden="true" />
               Mobile keeps a safe full-width layout automatically while desktop uses these Pro controls.
             </div>
@@ -936,7 +936,7 @@ export default function WidgetDesigner({
       </div>
 
       <div
-        className="min-w-0 space-y-5 rounded-2xl border border-slate-800/70 bg-linear-to-br from-slate-950/85 via-slate-950/70 to-slate-900/70 p-4 shadow-xl shadow-slate-950/40 sm:p-5 lg:sticky lg:top-6 lg:self-start"
+        className="min-w-0 space-y-5 rounded-2xl border border-slate-800/70 p-4 shadow-xl shadow-slate-950/40 sm:p-5 lg:sticky lg:top-6 lg:self-start"
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
@@ -947,7 +947,7 @@ export default function WidgetDesigner({
               Live mobile preview with your current styling.
             </p>
           </div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950/60 px-3 py-1 text-xs font-semibold text-slate-300">
+          <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs font-semibold text-slate-300">
             <MonitorSmartphone className="h-3.5 w-3.5" aria-hidden="true" />
             320 x 640
           </span>
@@ -967,7 +967,7 @@ export default function WidgetDesigner({
           </div>
         </div>
 
-        <div className="space-y-3 min-w-0 rounded-2xl border border-slate-800 bg-slate-950/45 p-4">
+        <div className="space-y-3 min-w-0 rounded-2xl border border-slate-800 p-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2">
               <MessageSquare
@@ -992,7 +992,7 @@ export default function WidgetDesigner({
             </button>
           </div>
 
-          <code className="block max-h-36 overflow-auto rounded-xl border border-slate-800 bg-slate-950/80 p-3 font-mono text-[11px] leading-relaxed text-emerald-200 break-all">
+          <code className="block max-h-36 overflow-auto rounded-xl border border-slate-800 p-3 font-mono text-[11px] leading-relaxed text-emerald-200 break-all">
             {embedSnippet}
           </code>
 

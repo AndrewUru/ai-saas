@@ -114,7 +114,7 @@ function StatusRow({
   good: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950/35 px-3 py-2">
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 px-3 py-2">
       <span className="text-slate-500">{label}</span>
       <span className="flex min-w-0 items-center gap-2 text-right font-medium text-slate-200">
         <span
@@ -138,12 +138,12 @@ function ChecklistItem({
   detail: string;
 }) {
   return (
-    <li className="flex gap-3 rounded-2xl border border-slate-800/70 bg-slate-950/35 p-3">
+    <li className="flex gap-3 rounded-2xl border border-slate-800/70 p-3">
       <span
         className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
           done
             ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200"
-            : "border-slate-700 bg-slate-900/60 text-slate-500"
+            : "border-slate-700  text-slate-500"
         }`}
       >
         <CheckCircle2 className="h-3.5 w-3.5" />
@@ -555,7 +555,7 @@ export default async function AgentDetailPage({
                   <h1 className="truncate text-2xl font-semibold text-white sm:text-3xl">
                     {agent.name}
                   </h1>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950/50 px-3 py-1 text-xs font-semibold text-slate-300">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs font-semibold text-slate-300">
                     <span
                       className={`dot ${
                         agent.is_active ? "dot--active" : "dot--paused"
@@ -748,7 +748,7 @@ export default async function AgentDetailPage({
                 </div>
               </section>
 
-              <section className="rounded-2xl border border-slate-800/80 bg-slate-950/35 p-5">
+              <section className="rounded-2xl border border-slate-800/80 p-5">
                 <SectionHeading
                   eyebrow="Behavior"
                   title="Assistant rules"
@@ -982,7 +982,7 @@ export default async function AgentDetailPage({
 
               <KnowledgeSection agentId={agent.id} />
 
-              <article className="rounded-2xl border border-slate-800/80 bg-slate-950/35 p-5">
+              <article className="rounded-2xl border border-slate-800/80 p-5">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-200">
                     <ShieldCheck className="h-4 w-4" />
@@ -1048,11 +1048,11 @@ export default async function AgentDetailPage({
               </article>
 
               <article
-                className="rounded-2xl border border-slate-800/80 bg-slate-950/35 p-5 text-sm text-slate-300"
+                className="rounded-2xl border border-slate-800/80 p-5 text-sm text-slate-300"
                 data-oid="n.i41pq"
               >
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-700 bg-slate-900/60 text-slate-200">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-700 text-slate-200">
                     <Bot className="h-4 w-4" />
                   </span>
                   <h3
