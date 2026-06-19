@@ -1,9 +1,10 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
+import { LogIn, LogOut, Menu, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 type NavItem = {
   label: string;
@@ -38,6 +39,43 @@ export default function DashboardShell({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const supabase = useMemo(() => createClient(), []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        if (!isMounted) return;
+        setUserEmail(data.user?.email ?? null);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingUser(false);
+      });
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!isMounted) return;
+        setUserEmail(session?.user?.email ?? null);
+        setIsLoadingUser(false);
+      },
+    );
+
+    return () => {
+      isMounted = false;
+      listener.subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  }
 
   const active = useMemo(() => {
     return (href: string) =>
@@ -57,6 +95,7 @@ export default function DashboardShell({
         href: `${agentBaseHref}${item.suffix}`,
       }))
     : [];
+  const userInitial = userEmail?.charAt(0).toUpperCase() ?? "A";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -79,9 +118,15 @@ export default function DashboardShell({
             </span>
           </div>
 
-          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-surface-strong text-xs font-bold">
-            A
-          </div>
+          {isLoadingUser || userEmail ? (
+            <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-surface-strong text-xs font-bold">
+              {userInitial}
+            </div>
+          ) : (
+            <Link href="/login" className="ui-button ui-button--secondary px-3 py-1.5 text-xs">
+              Log in
+            </Link>
+          )}
         </div>
       </header>
 
@@ -145,18 +190,19 @@ export default function DashboardShell({
               </nav>
             ) : null}
 
-            <div className="mt-auto pt-4">
-              <div className="ui-card p-4">
-                <div className="text-xs text-[var(--foreground-muted)]">
-                  Need human support?
-                </div>
-                <Link
-                  href="/contact"
-                  className="ui-button ui-button--secondary mt-2 inline-flex w-full justify-center"
-                >
-                  Contact
-                </Link>
-              </div>
+            <div className="mt-auto space-y-3 pt-4">
+              <AccountPanel
+                isLoadingUser={isLoadingUser}
+                isSigningOut={isSigningOut}
+                onSignOut={handleSignOut}
+                userEmail={userEmail}
+              />
+              <Link
+                href="/contact"
+                className="ui-button ui-button--subtle inline-flex w-full justify-center text-xs"
+              >
+                Contact support
+              </Link>
             </div>
           </div>
         </aside>
@@ -243,9 +289,84 @@ export default function DashboardShell({
                 ))}
               </nav>
             ) : null}
+
+            <div className="mt-6 border-t border-border pt-4">
+              <AccountPanel
+                isLoadingUser={isLoadingUser}
+                isSigningOut={isSigningOut}
+                onNavigate={() => setOpen(false)}
+                onSignOut={handleSignOut}
+                userEmail={userEmail}
+              />
+            </div>
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function AccountPanel({
+  isLoadingUser,
+  isSigningOut,
+  onNavigate,
+  onSignOut,
+  userEmail,
+}: {
+  isLoadingUser: boolean;
+  isSigningOut: boolean;
+  onNavigate?: () => void;
+  onSignOut: () => void;
+  userEmail: string | null;
+}) {
+  if (isLoadingUser) {
+    return (
+      <div className="rounded-xl border border-border bg-surface/40 p-3">
+        <div className="h-4 w-24 animate-pulse rounded bg-border/50" />
+        <div className="mt-3 h-9 w-full animate-pulse rounded-full bg-border/30" />
+      </div>
+    );
+  }
+
+  if (!userEmail) {
+    return (
+      <Link
+        href="/login"
+        onClick={onNavigate}
+        className="ui-button ui-button--primary inline-flex w-full justify-center"
+      >
+        <LogIn className="h-4 w-4" aria-hidden="true" />
+        <span>Log in</span>
+      </Link>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-surface/40 p-3">
+      <div className="flex min-w-0 items-center gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-surface-strong text-xs font-bold">
+          {userEmail.charAt(0).toUpperCase()}
+        </span>
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+            <User className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+            Account
+          </div>
+          <p className="truncate text-xs text-[var(--foreground-muted)]">
+            {userEmail}
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={onSignOut}
+        disabled={isSigningOut}
+        className="ui-button ui-button--secondary mt-3 inline-flex w-full justify-center text-xs disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <LogOut className="h-4 w-4" aria-hidden="true" />
+        <span>{isSigningOut ? "Signing out..." : "Sign out"}</span>
+      </button>
     </div>
   );
 }
