@@ -3,25 +3,16 @@ import { NextResponse } from "next/server";
 import { renderWidgetScript } from "@/lib/widget/clientScript";
 import { WidgetConfig } from "@/lib/widget/types";
 import {
+  getWidgetAccentDefault,
+  getWidgetAppearanceDefaults,
   sanitizeWidgetLanguage,
+  sanitizeWidgetFormat,
   sanitizeLauncherIcon,
   sanitizePosition,
   sanitizeWidgetNumber,
   widgetDefaults,
   widgetLimits,
 } from "@/lib/widget/defaults";
-
-const appearanceDefaults = {
-  colorHeaderBg: "#075e54",
-  colorHeaderText: "#ffffff",
-  colorChatBg: "#efeae2",
-  colorUserBubbleBg: "#d9fdd3",
-  colorUserBubbleText: "#0b2f20",
-  colorBotBubbleBg: "#ffffff",
-  colorBotBubbleText: "#0f172a",
-  colorToggleBg: "#25d366",
-  colorToggleText: "#ffffff",
-} as const;
 
 function getParam(
   params: URLSearchParams,
@@ -82,9 +73,21 @@ function buildPreviewOverrides(
     overrides.language = sanitizeWidgetLanguage(languageParam);
   }
 
+  const formatParam = getParam(params, "format");
+  const previewFormat =
+    formatParam !== null
+      ? sanitizeWidgetFormat(formatParam)
+      : widgetDefaults.format;
+  if (formatParam !== null) {
+    overrides.format = previewFormat;
+  }
+
   const accentParam = getParam(params, "accent");
   if (accentParam !== null) {
-    overrides.accent = normalizeHex(accentParam, widgetDefaults.accent);
+    overrides.accent = normalizeHex(
+      accentParam,
+      getWidgetAccentDefault(previewFormat)
+    );
   }
 
   const brandParam = getParam(params, "brandName", "brand");
@@ -212,8 +215,10 @@ function buildPreviewOverrides(
   const colorBotBubbleText = getParam(params, "colorBotBubbleText");
   const colorToggleBg = getParam(params, "colorToggleBg");
   const colorToggleText = getParam(params, "colorToggleText");
+  const appearanceDefaults = getWidgetAppearanceDefaults(previewFormat);
 
   const hasAppearanceOverrides = [
+    formatParam,
     colorHeaderBg,
     colorHeaderText,
     colorChatBg,

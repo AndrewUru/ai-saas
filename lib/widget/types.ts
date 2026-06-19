@@ -1,8 +1,10 @@
 export type WidgetPosition = "left" | "right";
 export type WidgetLanguage = "auto" | "en" | "es" | "pt" | "fr";
 export type WidgetLauncherIcon = "whatsapp" | "chat" | "bot" | "store" | "logo";
+export type WidgetFormat = "classic" | "assistant";
 
 export interface WidgetAppearance {
+  format: WidgetFormat;
   accent: string;
   accentContrast: string;
   accentShadow: string;
@@ -39,6 +41,7 @@ export interface WidgetConfig {
   key: string;
   chatEndpoint: string;
   language?: WidgetLanguage | string | null;
+  format?: WidgetFormat | string | null;
   accent: string;
   brandName: string;
   brandInitial: string;
@@ -76,6 +79,7 @@ export interface AgentRecord {
   widget_label: string | null;
   widget_greeting: string | null;
   widget_human_support_text: string | null;
+  widget_format: WidgetFormat | string | null;
   widget_launcher_icon: WidgetLauncherIcon | string | null;
   widget_launcher_logo_url: string | null;
   language: WidgetLanguage | string | null;

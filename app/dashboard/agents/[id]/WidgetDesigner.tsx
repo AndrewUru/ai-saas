@@ -14,12 +14,17 @@ import {
   Palette,
   RotateCcw,
   SlidersHorizontal,
+  Sparkles,
   Store,
   Type,
 } from "lucide-react";
 import {
+  getWidgetAccentDefault,
+  getWidgetAppearanceDefaults,
+  type WidgetFormat,
   type WidgetLauncherIcon,
   widgetDefaults,
+  widgetFormats,
   widgetLauncherIcons,
   widgetLimits,
   widgetPositions,
@@ -48,6 +53,7 @@ type WidgetDesignerProps = {
   initialLanguage: string | null;
 
   initialHumanSupportText: string | null;
+  initialFormat: WidgetFormat | string | null;
   initialPosition: WidgetPosition | null;
   initialWidth: number | null;
   initialHeight: number | null;
@@ -115,6 +121,22 @@ const launcherIconHelp: Record<WidgetLauncherIcon, string> = {
   store: "Commerce storefront icon.",
   logo: "Use an image or SVG URL.",
 };
+
+const widgetFormatLabels: Record<WidgetFormat, string> = {
+  classic: "Classic",
+  assistant: "AI assistant",
+};
+
+const widgetFormatHelp: Record<WidgetFormat, string> = {
+  classic: "Compact support chat with a branded header.",
+  assistant: "Neutral workspace inspired by modern AI apps.",
+};
+
+function normalizeWidgetFormat(value: string | null): WidgetFormat {
+  return widgetFormats.includes(value as WidgetFormat)
+    ? (value as WidgetFormat)
+    : widgetDefaults.format;
+}
 
 function normalizeLauncherIcon(value: string | null): WidgetLauncherIcon {
   return widgetLauncherIcons.includes(value as WidgetLauncherIcon)
@@ -320,6 +342,7 @@ export default function WidgetDesigner({
   initialGreeting,
   initialLanguage,
   initialHumanSupportText,
+  initialFormat,
   initialPosition,
   initialWidth,
   initialHeight,
@@ -345,6 +368,9 @@ export default function WidgetDesigner({
   const [greetingInput, setGreetingInput] = useState(initialGreeting ?? "");
   const [humanSupportTextInput, setHumanSupportTextInput] = useState(
     initialHumanSupportText ?? "",
+  );
+  const [format, setFormat] = useState<WidgetFormat>(
+    normalizeWidgetFormat(initialFormat),
   );
   const [position, setPosition] = useState<WidgetPosition>(
     initialPosition ?? widgetDefaults.position,
@@ -398,6 +424,8 @@ export default function WidgetDesigner({
   const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
 
   const embedSnippet = getEmbedSnippet(apiKey);
+  const accentDefault = getWidgetAccentDefault(format);
+  const appearanceDefaults = getWidgetAppearanceDefaults(format);
 
   const liveStateInput = useMemo(
     () => ({
@@ -409,6 +437,7 @@ export default function WidgetDesigner({
       greetingInput,
       initialLanguage,
       humanSupportTextInput,
+      format,
       position,
       width,
       height,
@@ -437,6 +466,7 @@ export default function WidgetDesigner({
       greetingInput,
       initialLanguage,
       humanSupportTextInput,
+      format,
       position,
       width,
       height,
@@ -485,6 +515,7 @@ export default function WidgetDesigner({
         widgetLimits.humanSupportText,
       ) ?? "",
     );
+    params.set("format", liveState.format);
     params.set("position", liveState.position);
     params.set("width", String(liveState.width));
     params.set("height", String(liveState.height));
@@ -542,6 +573,7 @@ export default function WidgetDesigner({
       liveState.greetingInput,
       liveState.initialLanguage,
       liveState.humanSupportTextInput,
+      liveState.format,
       liveState.position,
       liveState.width,
       liveState.height,
@@ -558,6 +590,7 @@ export default function WidgetDesigner({
     setLabelInput("");
     setGreetingInput("");
     setHumanSupportTextInput("");
+    setFormat(widgetDefaults.format);
     setPosition(widgetDefaults.position);
     setWidth(widgetDefaults.width);
     setHeight(widgetDefaults.height);
@@ -621,6 +654,48 @@ export default function WidgetDesigner({
         </div>
 
         <SectionCard
+          icon={Sparkles}
+          eyebrow="Format"
+          title="Choose the chat interface"
+        >
+          <fieldset>
+            <legend className="sr-only">Widget format</legend>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {widgetFormats.map((option) => (
+                <label
+                  key={option}
+                  className={`flex min-h-[92px] cursor-pointer flex-col justify-between rounded-xl border px-3 py-3 transition ${
+                    format === option
+                      ? "border-emerald-400/70 text-emerald-100"
+                      : "border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-100"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="widget_format"
+                    value={option}
+                    checked={format === option}
+                    onChange={() => setFormat(option)}
+                    className="sr-only"
+                  />
+                  <span className="flex items-center gap-2 text-sm font-semibold">
+                    {option === "assistant" ? (
+                      <Sparkles className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <MessageSquare className="h-4 w-4" aria-hidden="true" />
+                    )}
+                    {widgetFormatLabels[option]}
+                  </span>
+                  <span className="mt-2 text-xs leading-5 text-slate-500">
+                    {widgetFormatHelp[option]}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </SectionCard>
+
+        <SectionCard
           icon={Palette}
           eyebrow="Colors"
           title="Set the widget palette"
@@ -632,7 +707,7 @@ export default function WidgetDesigner({
                 name="widget_accent"
                 value={accentInput}
                 onChange={setAccentInput}
-                defaultValue={widgetDefaults.accent}
+                defaultValue={accentDefault}
                 errorMessage="Use a 3- or 6-character hex value."
               />
             </div>
@@ -641,7 +716,7 @@ export default function WidgetDesigner({
               name="widget_color_header_bg"
               value={colorHeaderBg}
               onChange={setColorHeaderBg}
-              defaultValue="#075e54"
+              defaultValue={appearanceDefaults.colorHeaderBg}
             />
 
             <ColorInput
@@ -649,7 +724,7 @@ export default function WidgetDesigner({
               name="widget_color_header_text"
               value={colorHeaderText}
               onChange={setColorHeaderText}
-              defaultValue="#ffffff"
+              defaultValue={appearanceDefaults.colorHeaderText}
             />
 
             <ColorInput
@@ -657,7 +732,7 @@ export default function WidgetDesigner({
               name="widget_color_chat_bg"
               value={colorChatBg}
               onChange={setColorChatBg}
-              defaultValue="#efeae2"
+              defaultValue={appearanceDefaults.colorChatBg}
             />
 
             <ColorInput
@@ -665,7 +740,7 @@ export default function WidgetDesigner({
               name="widget_color_user_bubble_bg"
               value={colorUserBubbleBg}
               onChange={setColorUserBubbleBg}
-              defaultValue="#d9fdd3"
+              defaultValue={appearanceDefaults.colorUserBubbleBg}
             />
 
             <ColorInput
@@ -673,7 +748,7 @@ export default function WidgetDesigner({
               name="widget_color_user_bubble_text"
               value={colorUserBubbleText}
               onChange={setColorUserBubbleText}
-              defaultValue="#0b2f20"
+              defaultValue={appearanceDefaults.colorUserBubbleText}
             />
 
             <ColorInput
@@ -681,7 +756,7 @@ export default function WidgetDesigner({
               name="widget_color_bot_bubble_bg"
               value={colorBotBubbleBg}
               onChange={setColorBotBubbleBg}
-              defaultValue="#ffffff"
+              defaultValue={appearanceDefaults.colorBotBubbleBg}
             />
 
             <ColorInput
@@ -689,7 +764,7 @@ export default function WidgetDesigner({
               name="widget_color_bot_bubble_text"
               value={colorBotBubbleText}
               onChange={setColorBotBubbleText}
-              defaultValue="#0f172a"
+              defaultValue={appearanceDefaults.colorBotBubbleText}
             />
 
             <ColorInput
@@ -697,7 +772,7 @@ export default function WidgetDesigner({
               name="widget_color_toggle_bg"
               value={colorToggleBg}
               onChange={setColorToggleBg}
-              defaultValue="#25d366"
+              defaultValue={appearanceDefaults.colorToggleBg}
             />
 
             <ColorInput
@@ -705,7 +780,7 @@ export default function WidgetDesigner({
               name="widget_color_toggle_text"
               value={colorToggleText}
               onChange={setColorToggleText}
-              defaultValue="#ffffff"
+              defaultValue={appearanceDefaults.colorToggleText}
             />
           </div>
         </SectionCard>

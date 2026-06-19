@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth/requireUser";
 import { getSiteUrlFromHeaders } from "@/lib/site";
 import {
   sanitizeHex,
+  sanitizeWidgetFormat,
   sanitizeLauncherIcon,
   sanitizePosition,
   sanitizeWidgetNumber,
@@ -47,6 +48,7 @@ async function updateWidget(formData: FormData) {
   const brandRaw = String(formData.get("widget_brand") ?? "");
   const labelRaw = String(formData.get("widget_label") ?? "");
   const greetingRaw = String(formData.get("widget_greeting") ?? "");
+  const formatRaw = String(formData.get("widget_format") ?? "");
   const positionRaw = String(formData.get("widget_position") ?? "");
   const widthRaw = String(formData.get("widget_width") ?? "");
   const heightRaw = String(formData.get("widget_height") ?? "");
@@ -90,6 +92,7 @@ async function updateWidget(formData: FormData) {
       widget_brand: normalizeWidgetText(brandRaw, widgetLimits.brand),
       widget_label: normalizeWidgetText(labelRaw, widgetLimits.label),
       widget_greeting: normalizeWidgetText(greetingRaw, widgetLimits.greeting),
+      widget_format: formatRaw.trim() ? sanitizeWidgetFormat(formatRaw) : null,
       widget_human_support_text: normalizeWidgetText(
         humanSupportRaw,
         widgetLimits.humanSupportText,
@@ -199,7 +202,7 @@ export default async function AgentWidgetPage({
   const { data: agent, error } = await supabase
     .from("agents")
     .select(
-      "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
+      "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_format, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -259,6 +262,7 @@ export default async function AgentWidgetPage({
           initialGreeting={agent.widget_greeting}
           initialLanguage={agent.language ?? "auto"}
           initialHumanSupportText={agent.widget_human_support_text}
+          initialFormat={agent.widget_format}
           initialPosition={widgetPositionValue}
           initialWidth={agent.widget_width}
           initialHeight={agent.widget_height}

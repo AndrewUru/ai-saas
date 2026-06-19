@@ -8,26 +8,17 @@ import {
 import { createAdmin } from "@/lib/supabase/admin";
 import { WidgetConfig } from "@/lib/widget/types";
 import {
+  getWidgetAccentDefault,
+  getWidgetAppearanceDefaults,
   getWidgetCopyDefaults,
   sanitizeWidgetLanguage,
+  sanitizeWidgetFormat,
   sanitizeLauncherIcon,
   sanitizePosition,
   sanitizeWidgetNumber,
   widgetDefaults,
   widgetLimits,
 } from "@/lib/widget/defaults";
-
-const appearanceDefaults = {
-  colorHeaderBg: "#075e54",
-  colorHeaderText: "#ffffff",
-  colorChatBg: "#efeae2",
-  colorUserBubbleBg: "#d9fdd3",
-  colorUserBubbleText: "#0b2f20",
-  colorBotBubbleBg: "#ffffff",
-  colorBotBubbleText: "#0f172a",
-  colorToggleBg: "#25d366",
-  colorToggleText: "#ffffff",
-} as const;
 
 function getParam(params: URLSearchParams, ...names: string[]): string | null {
   for (const name of names) {
@@ -170,7 +161,11 @@ export async function GET(req: Request) {
     url.searchParams.get("pageLanguage")
   );
   const copyDefaults = getWidgetCopyDefaults(resolvedLanguage);
-  const baseAccent = normalizeHex(agent.widget_accent, widgetDefaults.accent);
+  const baseFormat = sanitizeWidgetFormat(agent.widget_format);
+  const baseAccent = normalizeHex(
+    agent.widget_accent,
+    getWidgetAccentDefault(baseFormat)
+  );
   const baseBrandName = sanitizeText(
     agent.widget_brand,
     widgetDefaults.brand,
@@ -191,6 +186,7 @@ export async function GET(req: Request) {
     copyDefaults.humanSupportText,
     widgetLimits.humanSupportText
   );
+  const appearanceDefaults = getWidgetAppearanceDefaults(baseFormat);
   const baseLauncherIcon = sanitizeLauncherIcon(agent.widget_launcher_icon);
   const baseLauncherLogoUrl = normalizeImageUrl(agent.widget_launcher_logo_url);
   const basePosition = sanitizePosition(agent.widget_position);
@@ -273,6 +269,7 @@ export async function GET(req: Request) {
     key: agent.api_key,
     chatEndpoint,
     language: resolvedLanguage,
+    format: baseFormat,
     accent: baseAccent,
     brandName: baseBrandName,
     brandInitial: (baseBrandName.charAt(0).toUpperCase() || "A").slice(0, 1),
@@ -351,6 +348,58 @@ export async function GET(req: Request) {
         launcherLogoUrlParam,
         config.launcherLogoUrl ?? null
       );
+    }
+
+    const formatParam = getParam(params, "format");
+    if (formatParam !== null) {
+      const previousAccent = getWidgetAccentDefault(config.format);
+      const previousDefaults = getWidgetAppearanceDefaults(config.format);
+      const nextFormat = sanitizeWidgetFormat(formatParam);
+      const nextAccent = getWidgetAccentDefault(nextFormat);
+      const nextDefaults = getWidgetAppearanceDefaults(nextFormat);
+
+      config.format = nextFormat;
+      if (config.accent === previousAccent) {
+        config.accent = nextAccent;
+      }
+      config.appearance = {
+        colorHeaderBg:
+          config.appearance.colorHeaderBg === previousDefaults.colorHeaderBg
+            ? nextDefaults.colorHeaderBg
+            : config.appearance.colorHeaderBg,
+        colorHeaderText:
+          config.appearance.colorHeaderText === previousDefaults.colorHeaderText
+            ? nextDefaults.colorHeaderText
+            : config.appearance.colorHeaderText,
+        colorChatBg:
+          config.appearance.colorChatBg === previousDefaults.colorChatBg
+            ? nextDefaults.colorChatBg
+            : config.appearance.colorChatBg,
+        colorUserBubbleBg:
+          config.appearance.colorUserBubbleBg === previousDefaults.colorUserBubbleBg
+            ? nextDefaults.colorUserBubbleBg
+            : config.appearance.colorUserBubbleBg,
+        colorUserBubbleText:
+          config.appearance.colorUserBubbleText === previousDefaults.colorUserBubbleText
+            ? nextDefaults.colorUserBubbleText
+            : config.appearance.colorUserBubbleText,
+        colorBotBubbleBg:
+          config.appearance.colorBotBubbleBg === previousDefaults.colorBotBubbleBg
+            ? nextDefaults.colorBotBubbleBg
+            : config.appearance.colorBotBubbleBg,
+        colorBotBubbleText:
+          config.appearance.colorBotBubbleText === previousDefaults.colorBotBubbleText
+            ? nextDefaults.colorBotBubbleText
+            : config.appearance.colorBotBubbleText,
+        colorToggleBg:
+          config.appearance.colorToggleBg === previousDefaults.colorToggleBg
+            ? nextDefaults.colorToggleBg
+            : config.appearance.colorToggleBg,
+        colorToggleText:
+          config.appearance.colorToggleText === previousDefaults.colorToggleText
+            ? nextDefaults.colorToggleText
+            : config.appearance.colorToggleText,
+      };
     }
 
     const languageParam = getParam(params, "language");

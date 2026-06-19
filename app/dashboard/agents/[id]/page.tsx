@@ -18,8 +18,10 @@ import AgentSimulator from "./AgentSimulator";
 import KnowledgeSection from "./KnowledgeSection";
 
 import {
+  widgetDefaults,
   widgetLimits,
   sanitizeHex,
+  sanitizeWidgetFormat,
   sanitizeLauncherIcon,
   sanitizePosition,
 } from "@/lib/widget/defaults";
@@ -180,6 +182,7 @@ async function updateAgentAndWidget(formData: FormData) {
   const brandRaw = String(formData.get("widget_brand") ?? "");
   const labelRaw = String(formData.get("widget_label") ?? "");
   const greetingRaw = String(formData.get("widget_greeting") ?? "");
+  const formatRaw = String(formData.get("widget_format") ?? "");
   const positionRaw = String(formData.get("widget_position") ?? "");
   const humanSupportRaw = String(
     formData.get("widget_human_support_text") ?? "",
@@ -296,6 +299,13 @@ async function updateAgentAndWidget(formData: FormData) {
               greetingRaw,
               widgetLimits.greeting,
             ),
+          }
+        : {}),
+      ...(formData.has("widget_format")
+        ? {
+            widget_format: formatRaw.trim()
+              ? sanitizeWidgetFormat(formatRaw)
+              : null,
           }
         : {}),
       ...(formData.has("widget_human_support_text")
@@ -420,7 +430,7 @@ export default async function AgentDetailPage({
   const { data: agent, error: agentError } = await supabase
     .from("agents")
     .select(
-      "id, user_id, name, api_key, woo_integration_id, shopify_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
+      "id, user_id, name, api_key, woo_integration_id, shopify_integration_id, allowed_domains, messages_limit, is_active, created_at, prompt_system, language, fallback_url, description, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_format, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
     )
     .eq("id", id)
     .eq("user_id", user.id)
@@ -496,6 +506,8 @@ export default async function AgentDetailPage({
   );
   const hasWidgetColors = Boolean(
     agent.widget_accent?.trim() ||
+      (agent.widget_format?.trim() &&
+        agent.widget_format !== widgetDefaults.format) ||
       agent.widget_color_header_bg?.trim() ||
       agent.widget_color_header_text?.trim() ||
       agent.widget_color_chat_bg?.trim() ||

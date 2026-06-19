@@ -932,6 +932,223 @@ export const STATIC_STYLES = `
   font-size: 13px;
 }
 
+#ai-saas-anchor.ai-format-assistant {
+  --ai-surface: #f7f7f4;
+  --ai-surface-strong: #ffffff;
+  --ai-border: rgba(17, 24, 39, 0.12);
+  --ai-shadow: 0 24px 64px rgba(17, 24, 39, 0.2), 0 8px 22px rgba(17, 24, 39, 0.1);
+  --ai-soft-shadow: 0 10px 28px rgba(17, 24, 39, 0.09);
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-toggle {
+  background: var(--ai-toggle-bg);
+  color: var(--ai-toggle-text);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 18px 40px var(--ai-toggle-shadow), 0 7px 18px rgba(17, 24, 39, 0.22);
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-toggle::before {
+  background: radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 46%);
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-toggle::after {
+  background: #34d399;
+  border-color: var(--ai-toggle-status-border);
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-widget {
+  background: var(--ai-chat-bg);
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  box-shadow: var(--ai-shadow);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-header {
+  min-height: 64px;
+  padding: 12px 14px 12px 16px;
+  background: var(--ai-header-bg);
+  color: var(--ai-header-text);
+  border-bottom: 1px solid rgba(17, 24, 39, 0.1);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.84);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-brand-icon {
+  width: 34px;
+  height: 34px;
+  flex-basis: 34px;
+  border-radius: 12px;
+  background: var(--ai-accent);
+  color: var(--ai-accent-contrast);
+  border: 0;
+  box-shadow: 0 8px 18px var(--ai-accent-shadow);
+  font-size: 13px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-brand-text strong {
+  color: var(--ai-header-text);
+  font-size: 14px;
+  font-weight: 760;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-brand-text > span {
+  color: color-mix(in srgb, var(--ai-header-text) 68%, transparent);
+  opacity: 1;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-status-dot {
+  width: 6px;
+  height: 6px;
+  flex-basis: 6px;
+  background: #34d399;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.14);
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(17, 24, 39, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ai-header-text);
+  box-shadow: none;
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-close:hover {
+  background: rgba(17, 24, 39, 0.06);
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-chat-box {
+  gap: 14px;
+  padding: 18px min(6vw, 26px) 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0)),
+    var(--ai-chat-bg);
+  background-size: auto;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble {
+  max-width: min(100%, 430px);
+  padding: 11px 14px;
+  border-radius: 20px;
+  box-shadow: none;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble.user {
+  max-width: min(78%, 360px);
+  border: 0;
+  border-radius: 20px;
+  background: var(--ai-user-bg);
+  color: var(--ai-user-text);
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.12);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble.bot {
+  align-self: stretch;
+  margin-right: 0;
+  padding-left: 48px;
+  border: 0;
+  background: transparent;
+  color: var(--ai-bot-text);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble.typing {
+  align-self: flex-start;
+  width: auto;
+  min-width: 92px;
+  background: var(--ai-bot-bg);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  box-shadow: var(--ai-soft-shadow);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble.product-list {
+  width: 100%;
+  max-width: 100%;
+  padding: 8px 0;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble.user::after,
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble.bot::after {
+  display: none;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble.bot:not(.product-list)::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 9px;
+  width: 30px;
+  height: 30px;
+  border-radius: 11px;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 42%),
+    var(--ai-accent);
+  box-shadow: 0 8px 18px var(--ai-accent-shadow);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-suggestions {
+  padding-left: 48px;
+  gap: 7px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-suggestion-chip {
+  min-height: 36px;
+  border-color: rgba(17, 24, 39, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.82);
+  color: rgba(17, 24, 39, 0.74);
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.06);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-suggestion-chip:hover {
+  border-color: var(--ai-accent);
+  background: var(--ai-accent);
+  color: var(--ai-accent-contrast);
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-form {
+  padding: 10px 14px 12px;
+  background: var(--ai-chat-bg);
+  border-top: 0;
+  box-shadow: none;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-input-wrapper {
+  min-height: 56px;
+  padding: 7px 7px 7px 18px;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.1);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-input-wrapper:focus-within {
+  border-color: color-mix(in srgb, var(--ai-accent) 42%, rgba(17, 24, 39, 0.12));
+  box-shadow: 0 0 0 4px var(--ai-accent-light), 0 14px 34px rgba(17, 24, 39, 0.12);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-input-wrapper button {
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  min-height: 42px;
+  border-radius: 15px;
+  background: var(--ai-accent);
+  color: var(--ai-accent-contrast);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-powered {
+  padding: 0 14px 12px;
+  background: var(--ai-chat-bg);
+  color: rgba(17, 24, 39, 0.38);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-pl-item {
+  border-color: rgba(17, 24, 39, 0.1);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.08);
+}
+
 @media (max-height: 800px) {
   #ai-saas-widget {
     height: min(var(--ai-widget-height), 68vh);

@@ -1,19 +1,22 @@
 import {
+  getWidgetAccentDefault,
+  getWidgetAppearanceDefaults,
   widgetDefaults,
   widgetLimits,
   sanitizeHex,
+  sanitizeWidgetFormat,
   sanitizeLauncherIcon,
   sanitizePosition,
   sanitizeWidgetNumber,
 } from "@/lib/widget/defaults";
 import type { AgentRecord, WidgetAppearance, WidgetConfig } from "./types";
 
-const ACCENT_DEFAULT = widgetDefaults.accent;
 const BRAND_DEFAULT = widgetDefaults.brand;
 const LABEL_DEFAULT = widgetDefaults.label;
 const GREETING_DEFAULT = widgetDefaults.greeting;
 const POSITION_DEFAULT = widgetDefaults.position;
 const LAUNCHER_ICON_DEFAULT = widgetDefaults.launcherIcon;
+const FORMAT_DEFAULT = widgetDefaults.format;
 
 function escapeForJs(str: string = "") {
   return String(str)
@@ -83,8 +86,13 @@ export function buildAppearance(
   agent: AgentRecord,
   params: URLSearchParams
 ): WidgetAppearance {
+  const format = sanitizeWidgetFormat(
+    params.get("format") ?? agent.widget_format ?? FORMAT_DEFAULT
+  );
   const accent = sanitizeHex(
-    params.get("accent") ?? agent.widget_accent ?? ACCENT_DEFAULT
+    params.get("accent") ??
+      agent.widget_accent ??
+      getWidgetAccentDefault(format)
   );
   const accentContrast = contrastTextColor(accent);
   const accentShadow = rgba(accent, 0.32);
@@ -98,6 +106,7 @@ export function buildAppearance(
   const closeBg = isLightAccent
     ? "rgba(15,23,42,.12)"
     : "rgba(255,255,255,.24)";
+  const appearanceDefaults = getWidgetAppearanceDefaults(format);
 
   const storedBrand = agent.widget_brand?.trim() || null;
   const storedLabel = agent.widget_label?.trim() || null;
@@ -182,40 +191,53 @@ export function buildAppearance(
 
   // Custom colors with modern neutral defaults.
   const colorHeaderBg = sanitizeHex(
-    params.get("colorHeaderBg") ?? agent.widget_color_header_bg ?? "#075e54"
+    params.get("colorHeaderBg") ??
+      agent.widget_color_header_bg ??
+      appearanceDefaults.colorHeaderBg
   );
   const colorHeaderText = sanitizeHex(
-    params.get("colorHeaderText") ?? agent.widget_color_header_text ?? "#ffffff"
+    params.get("colorHeaderText") ??
+      agent.widget_color_header_text ??
+      appearanceDefaults.colorHeaderText
   );
   const colorChatBg = sanitizeHex(
-    params.get("colorChatBg") ?? agent.widget_color_chat_bg ?? "#efeae2"
+    params.get("colorChatBg") ??
+      agent.widget_color_chat_bg ??
+      appearanceDefaults.colorChatBg
   );
   const colorUserBubbleBg = sanitizeHex(
     params.get("colorUserBubbleBg") ??
       agent.widget_color_user_bubble_bg ??
-      "#d9fdd3"
+      appearanceDefaults.colorUserBubbleBg
   );
   const colorUserBubbleText = sanitizeHex(
     params.get("colorUserBubbleText") ??
       agent.widget_color_user_bubble_text ??
-      "#0b2f20"
+      appearanceDefaults.colorUserBubbleText
   );
   const colorBotBubbleBg = sanitizeHex(
-    params.get("colorBotBubbleBg") ?? agent.widget_color_bot_bubble_bg ?? "#ffffff"
+    params.get("colorBotBubbleBg") ??
+      agent.widget_color_bot_bubble_bg ??
+      appearanceDefaults.colorBotBubbleBg
   );
   const colorBotBubbleText = sanitizeHex(
     params.get("colorBotBubbleText") ??
       agent.widget_color_bot_bubble_text ??
-      "#0f172a"
+      appearanceDefaults.colorBotBubbleText
   );
   const colorToggleBg = sanitizeHex(
-    params.get("colorToggleBg") ?? agent.widget_color_toggle_bg ?? "#25d366"
+    params.get("colorToggleBg") ??
+      agent.widget_color_toggle_bg ??
+      appearanceDefaults.colorToggleBg
   );
   const colorToggleText = sanitizeHex(
-    params.get("colorToggleText") ?? agent.widget_color_toggle_text ?? "#ffffff"
+    params.get("colorToggleText") ??
+      agent.widget_color_toggle_text ??
+      appearanceDefaults.colorToggleText
   );
 
   return {
+    format,
     accent,
     accentContrast,
     accentShadow,
@@ -256,6 +278,7 @@ export function buildConfig(
   return {
     key,
     chatEndpoint,
+    format: appearance.format,
     accent: appearance.accent,
     brandName: appearance.brandName,
     brandInitial: appearance.brandInitial,

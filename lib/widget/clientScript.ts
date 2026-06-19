@@ -400,6 +400,15 @@ export function renderWidgetScript(
     root.classList.add(position === "left" ? "ai-pos-left" : "ai-pos-right");
   };
 
+  const normalizeFormat = (format) => {
+    return format === "assistant" ? "assistant" : "classic";
+  };
+
+  const applyFormat = (root, format) => {
+    root.classList.remove("ai-format-classic", "ai-format-assistant");
+    root.classList.add(\`ai-format-\${normalizeFormat(format)}\`);
+  };
+
   const getStockMeta = (status, copy) => {
     const normalized = typeof status === "string" ? status.toLowerCase().trim() : "";
     if (!normalized) return null;
@@ -565,6 +574,7 @@ export function renderWidgetScript(
       const anchor = document.createElement("div");
       anchor.id = "ai-saas-anchor";
       applyPosition(anchor, fullConfig.position);
+      applyFormat(anchor, fullConfig.format);
       applyTheme(anchor, fullConfig);
 
       
@@ -644,6 +654,7 @@ export function renderWidgetScript(
           const freshConfig = await fetchConfig(CONFIG_KEY);
           fullConfig = mergeConfig(freshConfig || {});
           copy = getCopy(fullConfig.language);
+          applyFormat(anchor, fullConfig.format);
           applyTheme(anchor, fullConfig);
         } catch (err) {
           console.warn("Widget theme refresh failed");
