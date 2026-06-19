@@ -15,6 +15,20 @@ import {
 } from "@/lib/widget/defaults";
 import WidgetDesigner from "../WidgetDesigner";
 
+const WIDGET_AGENT_SELECT =
+  "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_format, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text";
+const WIDGET_AGENT_SELECT_LEGACY =
+  "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text";
+
+function isMissingWidgetFormatColumn(error: unknown) {
+  const maybeError = error as
+    | { code?: string; message?: string; details?: string }
+    | null
+    | undefined;
+  const text = `${maybeError?.message ?? ""} ${maybeError?.details ?? ""}`;
+  return maybeError?.code === "42703" && text.includes("widget_format");
+}
+
 function normalizeWidgetText(value: string, max: number): string | null {
   const trimmed = value.trim();
   if (!trimmed) return null;
@@ -199,14 +213,26 @@ export default async function AgentWidgetPage({
   const { id } = await params;
   const query = await searchParams;
   const { supabase, user } = await requireUser();
-  const { data: agent, error } = await supabase
+  let { data: agent, error } = await supabase
     .from("agents")
-    .select(
-      "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_format, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text",
-    )
+    .select(WIDGET_AGENT_SELECT)
     .eq("id", id)
     .eq("user_id", user.id)
     .single();
+
+  if (isMissingWidgetFormatColumn(error)) {
+    console.warn(
+      "[AI SaaS] agents.widget_format is missing; using legacy widget select.",
+    );
+    const fallback = await supabase
+      .from("agents")
+      .select(WIDGET_AGENT_SELECT_LEGACY)
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+    agent = fallback.data ? { ...fallback.data, widget_format: null } : null;
+    error = fallback.error;
+  }
 
   if (error || !agent) return notFound();
 
