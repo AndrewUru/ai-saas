@@ -603,12 +603,69 @@ export function renderWidgetScript(
         return \`<div class="ai-saas-icon" aria-hidden="true">\${renderLauncherSvg(fallbackIcon)}</div>\`;
       };
 
-      // 6. Build DOM
-      anchor.innerHTML = \`
-        <button id="ai-saas-toggle" type="button" aria-controls="ai-saas-widget" aria-expanded="false" aria-label="\${escapeHtml(copy.openChat)}">
-          \${renderBrandIcon()}
-          <span class="ai-saas-label">\${escapeHtml(collapsedLabel)}</span>
+      const renderCloseButton = (className) => \`
+        <button id="ai-saas-close" class="\${className || ""}" type="button" aria-label="\${escapeHtml(copy.closeChat)}">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
+      \`;
+
+      const renderMessageForm = () => \`
+        <form id="ai-saas-form">
+          <div class="ai-saas-input-wrapper">
+            <input type="text" placeholder="\${escapeHtml(copy.inputPlaceholder)}" aria-label="\${escapeHtml(copy.inputLabel)}" autocomplete="off" />
+            <button type="submit" aria-label="\${escapeHtml(copy.sendMessage)}" aria-busy="false" disabled>
+              <span class="ai-saas-send-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </span>
+              <span class="ai-saas-send-label">\${escapeHtml(copy.send)}</span>
+            </button>
+          </div>
+        </form>
+      \`;
+
+      const renderAssistantSidebarItem = (label, icon) => \`
+        <div class="ai-assistant-sidebar-item">
+          <span class="ai-assistant-sidebar-icon" aria-hidden="true">\${icon}</span>
+          <span>\${escapeHtml(label)}</span>
+        </div>
+      \`;
+
+      const renderAssistantSidebar = () => \`
+        <aside class="ai-assistant-sidebar" aria-label="Assistant navigation">
+          <div class="ai-assistant-sidebar-top">
+            <div class="ai-assistant-sidebar-brand">
+              <strong>\${escapeHtml(brandName)}</strong>
+              <span aria-hidden="true">[]</span>
+            </div>
+            <nav class="ai-assistant-sidebar-nav" aria-label="Assistant shortcuts">
+              \${renderAssistantSidebarItem("Nuevo chat", "+")}
+              \${renderAssistantSidebarItem("Buscar chats", "?")}
+              \${renderAssistantSidebarItem("Biblioteca", "[]")}
+              \${renderAssistantSidebarItem("Programadas", "o")}
+              \${renderAssistantSidebarItem("Aplicaciones", "*")}
+            </nav>
+            <div class="ai-assistant-sidebar-group">
+              <p>Anclado</p>
+              \${renderAssistantSidebarItem("Soporte y ventas", "[]")}
+              \${renderAssistantSidebarItem("Pedidos recientes", "[]")}
+              \${renderAssistantSidebarItem("Catalogo 2026", "[]")}
+            </div>
+            <div class="ai-assistant-sidebar-group">
+              <p>Proyectos</p>
+              \${renderAssistantSidebarItem("Ecommerce", "[]")}
+              \${renderAssistantSidebarItem("Clientes", "[]")}
+            </div>
+          </div>
+          <div class="ai-assistant-sidebar-account">
+            <span class="ai-assistant-avatar" aria-hidden="true">\${escapeHtml(brandInitial)}</span>
+            <span>\${escapeHtml(brandName)}</span>
+          </div>
+        </aside>
+      \`;
+
+      const renderClassicWidget = () => \`
         <section id="ai-saas-widget" role="dialog" aria-modal="false" aria-labelledby="ai-saas-title" aria-hidden="true">
            <div id="ai-saas-header">
              <div class="ai-saas-brand">
@@ -618,32 +675,61 @@ export function renderWidgetScript(
                  <span><span class="ai-saas-status-dot" aria-hidden="true"></span>\${escapeHtml(humanSupportText)}</span>
                </div>
              </div>
-             <button id="ai-saas-close" type="button" aria-label="\${escapeHtml(copy.closeChat)}">
-               <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-               </svg>
-             </button>
+             \${renderCloseButton("")}
            </div>
            
            <div id="ai-saas-chat-box" role="log" aria-live="polite" aria-relevant="additions">
            </div>
 
-           <form id="ai-saas-form">
-              <div class="ai-saas-input-wrapper">
-                <input type="text" placeholder="\${escapeHtml(copy.inputPlaceholder)}" aria-label="\${escapeHtml(copy.inputLabel)}" autocomplete="off" />
-                <button type="submit" aria-label="\${escapeHtml(copy.sendMessage)}" aria-busy="false" disabled>
-                  <span class="ai-saas-send-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                  </span>
-                  <span class="ai-saas-send-label">\${escapeHtml(copy.send)}</span>
-                </button>
-              </div>
-           </form>
+           \${renderMessageForm()}
            
            <div class="ai-saas-powered">
              \${escapeHtml(copy.poweredBy)} <a href="https://agentes.elsaltoweb.es" target="_blank" rel="noopener noreferrer">AI SaaS</a>
            </div>
         </section>
+      \`;
+
+      const renderAssistantWidget = () => \`
+        <section id="ai-saas-widget" role="dialog" aria-modal="true" aria-labelledby="ai-saas-title" aria-hidden="true">
+          \${renderAssistantSidebar()}
+          <main class="ai-assistant-main">
+            <header id="ai-saas-header" class="ai-assistant-topbar">
+              <div class="ai-saas-brand">
+                <div class="ai-saas-brand-icon" aria-hidden="true">\${escapeHtml(brandInitial)}</div>
+                <div class="ai-saas-brand-text">
+                  <strong id="ai-saas-title">\${escapeHtml(brandName)}</strong>
+                  <span><span class="ai-saas-status-dot" aria-hidden="true"></span>\${escapeHtml(humanSupportText)}</span>
+                </div>
+              </div>
+              \${renderCloseButton("ai-assistant-close")}
+            </header>
+            <div class="ai-assistant-stage">
+              <div id="ai-saas-chat-box" role="log" aria-live="polite" aria-relevant="additions">
+                <div id="ai-saas-assistant-hero" class="ai-assistant-hero">
+                  <h2>\${escapeHtml(greeting)}</h2>
+                </div>
+              </div>
+              <div class="ai-assistant-composer">
+                \${renderMessageForm()}
+                <div id="ai-saas-suggestions-mount" class="ai-assistant-suggestions-mount"></div>
+              </div>
+            </div>
+            <div class="ai-saas-powered">
+              \${escapeHtml(copy.poweredBy)} <a href="https://agentes.elsaltoweb.es" target="_blank" rel="noopener noreferrer">AI SaaS</a>
+            </div>
+          </main>
+        </section>
+      \`;
+
+      const isAssistantFormat = normalizeFormat(fullConfig.format) === "assistant";
+
+      // 6. Build DOM
+      anchor.innerHTML = \`
+        <button id="ai-saas-toggle" type="button" aria-controls="ai-saas-widget" aria-expanded="false" aria-label="\${escapeHtml(copy.openChat)}">
+          \${renderBrandIcon()}
+          <span class="ai-saas-label">\${escapeHtml(collapsedLabel)}</span>
+        </button>
+        \${isAssistantFormat ? renderAssistantWidget() : renderClassicWidget()}
       \`;
 
       document.body.appendChild(anchor);
@@ -690,6 +776,7 @@ export function renderWidgetScript(
       };
 
       const appendSuggestions = () => {
+        const suggestionsMount = document.getElementById("ai-saas-suggestions-mount");
         const suggestions = document.createElement("div");
         suggestions.id = "ai-saas-suggestions";
         suggestions.className = "ai-saas-suggestions ai-saas-enter";
@@ -708,7 +795,7 @@ export function renderWidgetScript(
           suggestions.appendChild(chip);
         });
 
-        chatBox.appendChild(suggestions);
+        (suggestionsMount || chatBox).appendChild(suggestions);
         scrollChatToBottom();
       };
 
@@ -720,10 +807,17 @@ export function renderWidgetScript(
       };
       
       let isOpen = false;
+      const setPageScrollLock = (locked) => {
+        const shouldLock = locked && normalizeFormat(fullConfig.format) === "assistant";
+        document.documentElement.classList.toggle("ai-saas-page-locked", shouldLock);
+        document.body.classList.toggle("ai-saas-page-locked", shouldLock);
+      };
+
       const setOpen = (state) => {
         isOpen = state;
         toggleBtn.setAttribute("aria-expanded", state ? "true" : "false");
         toggleBtn.setAttribute("aria-label", state ? copy.chatOpen : copy.openChat);
+        setPageScrollLock(state);
         if (state) {
           trackWidgetEvent("open");
           refreshTheme();
@@ -733,12 +827,19 @@ export function renderWidgetScript(
         } else {
           anchor.classList.remove("open");
           widget.setAttribute("aria-hidden", "true");
+          setPageScrollLock(false);
           toggleBtn.focus();
         }
       };
 
-      appendBotMessage(greeting);
+      if (!isAssistantFormat) {
+        appendBotMessage(greeting);
+      }
       appendSuggestions();
+
+      if (isAssistantFormat && IS_PREVIEW) {
+        window.setTimeout(() => setOpen(true), 0);
+      }
 
       toggleBtn.addEventListener("click", () => setOpen(true));
       closeBtn.addEventListener("click", () => setOpen(false));
@@ -754,6 +855,8 @@ export function renderWidgetScript(
         const text = input.value.trim();
         if (!text) return;
         const userWordCount = countWords(text);
+        const assistantHero = document.getElementById("ai-saas-assistant-hero");
+        if (assistantHero) assistantHero.remove();
         removeSuggestions();
 
         // User Message
