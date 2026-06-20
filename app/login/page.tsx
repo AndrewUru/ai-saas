@@ -116,7 +116,7 @@ export default function LoginPage() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100"
+      className="relative min-h-screen overflow-hidden  text-slate-100"
       data-oid="bhgy-mf"
     >
       <div
@@ -191,7 +191,7 @@ export default function LoginPage() {
 
         {/* RIGHT CARD */}
         <section
-          className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/60 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur"
+          className="w-full max-w-md rounded-3xl border border-slate-800 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur"
           data-oid="u79:y10"
         >
           <div className="mb-6 space-y-2 text-center" data-oid="y8h6man">
