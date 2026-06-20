@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 function buildScriptSrc(searchParams: URLSearchParams) {
   const params = new URLSearchParams(searchParams);
   params.set("preview", "1");
+  params.set("open", "1");
   const query = params.toString();
   return `/api/widget${query ? `?${query}` : ""}`;
 }

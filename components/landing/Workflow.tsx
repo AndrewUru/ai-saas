@@ -20,7 +20,7 @@ const steps = [
 export function Workflow() {
   return (
     <section className="relative overflow-hidden bg-[#030303] py-24 sm:py-32">
-      <div className="absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+      <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
@@ -78,7 +78,7 @@ export function Workflow() {
           </div>
 
           <div className="relative">
-            <div className="absolute -inset-4 rounded-[2rem] bg-accent/5 blur-2xl" />
+            <div className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-accent/5 blur-2xl" />
 
             <div className="relative rounded-3xl border border-white/10 bg-zinc-900/50 p-8 shadow-2xl backdrop-blur-xl">
               <div className="mb-8 flex items-center justify-between">
@@ -93,7 +93,7 @@ export function Workflow() {
               </div>
 
               <ol className="relative space-y-8">
-                <div className="absolute left-[19px] top-2 h-[calc(100%-16px)] w-px bg-gradient-to-b from-accent/50 via-zinc-800 to-transparent" />
+                <div className="pointer-events-none absolute left-[19px] top-2 h-[calc(100%-16px)] w-px bg-gradient-to-b from-accent/50 via-zinc-800 to-transparent" />
 
                 {steps.map((step, index) => (
                   <li key={step.title} className="relative flex gap-6">

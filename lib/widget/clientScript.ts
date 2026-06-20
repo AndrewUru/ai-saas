@@ -9,11 +9,12 @@ export function renderWidgetScript(
   key: string,
   siteUrl: string,
   overrides: Partial<WidgetConfig> = {},
-  options: { isPreview?: boolean } = {}
+  options: { isPreview?: boolean; autoOpen?: boolean } = {}
 ) {
   // We serialize overrides to be injected into the script if any (e.g. preview mode)
   const overridesJson = JSON.stringify(overrides);
   const isPreview = options.isPreview === true;
+  const autoOpen = options.autoOpen === true;
 
   return `
 (function() {
@@ -23,6 +24,7 @@ export function renderWidgetScript(
   const API_BASE = "${siteUrl}";
   const OVERRIDES = ${overridesJson};
   const IS_PREVIEW = ${isPreview ? "true" : "false"};
+  const SHOULD_AUTO_OPEN = ${autoOpen ? "true" : "false"};
 
   // Helper to safely serialize text
   const escapeHtml = (unsafe) => {
@@ -837,7 +839,7 @@ export function renderWidgetScript(
       }
       appendSuggestions();
 
-      if (isAssistantFormat && IS_PREVIEW) {
+      if (isAssistantFormat && SHOULD_AUTO_OPEN) {
         window.setTimeout(() => setOpen(true), 0);
       }
 

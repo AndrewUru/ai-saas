@@ -88,10 +88,8 @@ main {
   flex: 1;
 }
 
-body,
-main,
-section {
-  overscroll-behavior-y: none;
+body {
+  overscroll-behavior-x: none;
 }
 
 /* Links */

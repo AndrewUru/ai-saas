@@ -288,6 +288,7 @@ export async function GET(req: Request) {
   // Preview Mode: We allow overrides from query params for the Designer
   // Production Mode: We strictly use the key and fetch config from /api/widget/config
   const isPreview = url.searchParams.get("preview") === "1";
+  const autoOpen = isPreview && url.searchParams.get("open") === "1";
 
   // Create a minimal config object just to kickstart the client script
   // The client script will now handle fetching the full config.
@@ -296,7 +297,10 @@ export async function GET(req: Request) {
   // Pass overrides if preview
   const overrides = isPreview ? buildPreviewOverrides(url.searchParams) : {};
 
-  const js = renderWidgetScript(key, url.origin, overrides, { isPreview });
+  const js = renderWidgetScript(key, url.origin, overrides, {
+    isPreview,
+    autoOpen,
+  });
 
   return new NextResponse(js, {
     headers: {
