@@ -120,7 +120,7 @@ export default function LoginPage() {
       data-oid="bhgy-mf"
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.20),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 "
         data-oid="j-vmt7e"
       />
 
@@ -191,7 +191,7 @@ export default function LoginPage() {
 
         {/* RIGHT CARD */}
         <section
-          className="w-full max-w-md rounded-3xl border border-slate-800 p-8 shadow-xl shadow-emerald-500/10 backdrop-blur"
+          className="w-full max-w-md rounded-3xl border border-slate-800 p-8 shadow-xl backdrop-blur"
           data-oid="u79:y10"
         >
           <div className="mb-6 space-y-2 text-center" data-oid="y8h6man">
