@@ -1,6 +1,6 @@
 export default function AboutPage() {
   return (
-    <main className="bg-slate-950 text-slate-100" data-oid="472x0q2">
+    <main className="text-slate-100" data-oid="472x0q2">
       <section
         className="mx-auto max-w-5xl px-6 py-24 sm:px-10 lg:px-16"
         data-oid="5vnxk7l"
@@ -28,7 +28,7 @@ export default function AboutPage() {
 
         <div className="mt-16 grid gap-8 md:grid-cols-2" data-oid="epiq9.w">
           <article
-            className="space-y-3 rounded-3xl border border-slate-800 bg-slate-900/50 p-8"
+            className="space-y-3 rounded-3xl border border-slate-800  p-8"
             data-oid="odb3zup"
           >
             <h2 className="text-xl font-semibold text-white" data-oid="--ng9c3">
@@ -42,7 +42,7 @@ export default function AboutPage() {
             </p>
           </article>
           <article
-            className="space-y-3 rounded-3xl border border-slate-800 bg-slate-900/50 p-8"
+            className="space-y-3 rounded-3xl border border-slate-800 p-8"
             data-oid="4txaq9j"
           >
             <h2 className="text-xl font-semibold text-white" data-oid="g2.y:x3">
