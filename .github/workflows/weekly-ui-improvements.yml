@@ -95,12 +95,32 @@ jobs:
           git add .
           git commit -m "chore: propose weekly UI/UX improvement"
           git push --set-upstream origin "$BRANCH"
-          gh pr create \
+          PR_URL="https://github.com/${GITHUB_REPOSITORY}/pull/new/${BRANCH}"
+          if ! gh pr create \
             --draft \
             --base "$DEFAULT_BRANCH" \
             --head "$BRANCH" \
             --title "Weekly UI/UX improvement" \
-            --body-file .maintenance/reports/weekly-ui-improvement-pr.md
+            --body-file .maintenance/reports/weekly-ui-improvement-pr.md 2> pr-create-error.log; then
+            cat pr-create-error.log
+
+            if grep -q "GitHub Actions is not permitted to create or approve pull requests" pr-create-error.log; then
+              {
+                echo "### Pull request was not created automatically"
+                echo ""
+                echo "The automation pushed the branch, but this repository has not enabled GitHub Actions to create pull requests."
+                echo ""
+                echo "- Branch: \`$BRANCH\`"
+                echo "- Manual PR URL: $PR_URL"
+                echo ""
+                echo "To enable automatic PR creation, open repository Settings > Actions > General > Workflow permissions, enable read/write permissions, and allow GitHub Actions to create and approve pull requests."
+              } >> "$GITHUB_STEP_SUMMARY"
+              echo "Branch pushed. Create the PR manually: $PR_URL"
+              exit 0
+            fi
+
+            exit 1
+          fi
 
       - name: No ready improvement
         if: steps.open-pr.outputs.count == '0' && steps.changes.outputs.has_changes != 'true'

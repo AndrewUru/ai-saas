@@ -34,6 +34,8 @@ Cada lunes:
 
 Si la validacion tecnica falla, el PR igualmente se abre como draft para no perder el trabajo de producto. La razon queda anotada en el cuerpo del PR.
 
+Para que GitHub Actions pueda abrir el PR automaticamente, el repositorio debe permitirlo en Settings > Actions > General > Workflow permissions: activar permisos de lectura/escritura y marcar que GitHub Actions puede crear y aprobar pull requests. Si esa opcion esta apagada, el workflow deja la rama subida y muestra el enlace para crear el PR manualmente.
+
 ## Como se anaden mejoras
 
 1. Crear un item en `.maintenance/config/weekly-ui-improvements.json` con `status: ready`.
