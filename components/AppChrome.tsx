@@ -16,10 +16,16 @@ function isDashboardPath(pathname: string | null) {
   return pathname === "/dashboard" || pathname?.startsWith("/dashboard/");
 }
 
+function isStandalonePath(pathname: string | null) {
+  return (
+    isDashboardPath(pathname) || pathname === "/login" || pathname === "/signup"
+  );
+}
+
 export default function AppChrome({ children, widgetSrc }: AppChromeProps) {
   const pathname = usePathname();
 
-  if (isDashboardPath(pathname)) {
+  if (isStandalonePath(pathname)) {
     return <>{children}</>;
   }
 

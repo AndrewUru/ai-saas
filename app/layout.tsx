@@ -13,6 +13,9 @@ const widgetSrc =
 export const metadata: Metadata = {
   title: "AI SaaS",
   description: "Proyecto SaaS con Next.js + Supabase + LangChain",
+  icons: {
+    icon: "/logo.svg",
+  },
 };
 
 export default function RootLayout({
