@@ -19,7 +19,7 @@ const steps = [
 
 export function Workflow() {
   return (
-    <section className="relative overflow-hidden bg-[#030303] py-24 sm:py-32">
+    <section className="relative overflow-hidden py-24 sm:py-32">
       <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">

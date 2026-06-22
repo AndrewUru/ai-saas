@@ -111,7 +111,7 @@ export default function Footer() {
             {/* Status Indicator */}
             <div className="flex items-center gap-2 pt-2" data-oid="kz7x-d4">
               <span className="relative flex h-2 w-2" data-oid="f06f415">
-                <span
+                <span           
                   className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
                   data-oid="t68q3-h"
                 ></span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { LogIn, LogOut, Menu, User, X } from "lucide-react";
+import { Home, LogIn, LogOut, Menu, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -145,6 +145,14 @@ export default function DashboardShell({
               </span>
             </div>
 
+            <Link
+              href="/"
+              className="ui-button ui-button--secondary mt-3 inline-flex w-full justify-center text-xs"
+            >
+              <Home className="h-4 w-4" aria-hidden="true" />
+              <span>Home page</span>
+            </Link>
+
             <nav className="mt-4 space-y-1" aria-label="Dashboard">
               {NAV.map((item) => (
                 <Link
@@ -242,6 +250,15 @@ export default function DashboardShell({
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
+
+            <Link
+              href="/"
+              onClick={() => setOpen(false)}
+              className="ui-button ui-button--secondary mt-4 inline-flex w-full justify-center text-xs"
+            >
+              <Home className="h-4 w-4" aria-hidden="true" />
+              <span>Home page</span>
+            </Link>
 
             <nav className="mt-4 space-y-1" aria-label="Dashboard">
               {NAV.map((item) => (
