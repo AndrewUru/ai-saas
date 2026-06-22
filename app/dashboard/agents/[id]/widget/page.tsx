@@ -294,15 +294,19 @@ export default async function AgentWidgetPage({
     console.warn(
       "[AI SaaS] a widget customization column is missing; using legacy widget select.",
     );
-    const select = text.includes("widget_format")
-      ? WIDGET_AGENT_SELECT_MINIMAL
-      : WIDGET_AGENT_SELECT_LEGACY;
-    const fallback = await supabase
-      .from("agents")
-      .select(select)
-      .eq("id", id)
-      .eq("user_id", user.id)
-      .single();
+    const fallback = text.includes("widget_format")
+      ? await supabase
+          .from("agents")
+          .select(WIDGET_AGENT_SELECT_MINIMAL)
+          .eq("id", id)
+          .eq("user_id", user.id)
+          .single()
+      : await supabase
+          .from("agents")
+          .select(WIDGET_AGENT_SELECT_LEGACY)
+          .eq("id", id)
+          .eq("user_id", user.id)
+          .single();
     agent = fallback.data
       ? {
           ...fallback.data,
