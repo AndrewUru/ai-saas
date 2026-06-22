@@ -151,10 +151,18 @@ function IntegrationPanel<T extends IntegrationBase>({
 
       {total === 0 ? (
         <div
-          className="mt-6 rounded-xl border border-dashed border-border/60 bg-surface/30 p-6 text-center text-sm text-[var(--foreground-muted)]"
+          className="mt-6 rounded-xl border border-dashed border-border/60 bg-surface/30 p-6 text-center"
           data-oid="pyivl2c"
         >
-          No connections yet. Add your first store to start syncing data.
+          <p className="text-sm font-medium text-foreground">
+            No {title} connection yet
+          </p>
+          <p className="mx-auto mt-2 max-w-sm text-sm text-[var(--foreground-muted)]">
+            Add your first store to start syncing products and make agent answers more useful.
+          </p>
+          <Link href={href} className="ui-button ui-button--ghost mt-5 text-xs">
+            Connect {title}
+          </Link>
         </div>
       ) : (
         <div className="mt-6 space-y-3" data-oid="49u04ec">
