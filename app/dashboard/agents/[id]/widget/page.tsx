@@ -8,7 +8,9 @@ import {
   sanitizeHex,
   sanitizeWidgetFormat,
   sanitizeLauncherIcon,
+  sanitizeLauncherStyle,
   sanitizePosition,
+  sanitizeWidgetBoolean,
   sanitizeWidgetNumber,
   widgetDefaults,
   widgetLimits,
@@ -16,17 +18,19 @@ import {
 import WidgetDesigner from "../WidgetDesigner";
 
 const WIDGET_AGENT_SELECT =
-  "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_format, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text";
+  "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_format, widget_launcher_icon, widget_launcher_logo_url, widget_launcher_style, widget_bubble_subtitle, widget_bubble_use_three, widget_bubble_width, widget_bubble_radius, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text, widget_color_bubble_bg, widget_color_bubble_text, widget_color_bubble_subtext, widget_color_bubble_border, widget_color_bubble_glow";
 const WIDGET_AGENT_SELECT_LEGACY =
+  "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_format, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text";
+const WIDGET_AGENT_SELECT_MINIMAL =
   "id, name, api_key, language, widget_accent, widget_brand, widget_label, widget_greeting, widget_human_support_text, widget_launcher_icon, widget_launcher_logo_url, widget_position, widget_width, widget_height, widget_offset_x, widget_offset_y, widget_launcher_size, widget_border_radius, widget_color_header_bg, widget_color_header_text, widget_color_chat_bg, widget_color_user_bubble_bg, widget_color_user_bubble_text, widget_color_bot_bubble_bg, widget_color_bot_bubble_text, widget_color_toggle_bg, widget_color_toggle_text";
 
-function isMissingWidgetFormatColumn(error: unknown) {
+function isMissingSelectedWidgetColumn(error: unknown) {
   const maybeError = error as
     | { code?: string; message?: string; details?: string }
     | null
     | undefined;
   const text = `${maybeError?.message ?? ""} ${maybeError?.details ?? ""}`;
-  return maybeError?.code === "42703" && text.includes("widget_format");
+  return maybeError?.code === "42703" && text.includes("widget_");
 }
 
 function normalizeWidgetText(value: string, max: number): string | null {
@@ -63,6 +67,13 @@ async function updateWidget(formData: FormData) {
   const labelRaw = String(formData.get("widget_label") ?? "");
   const greetingRaw = String(formData.get("widget_greeting") ?? "");
   const formatRaw = String(formData.get("widget_format") ?? "");
+  const launcherStyleRaw = String(formData.get("widget_launcher_style") ?? "");
+  const bubbleSubtitleRaw = String(formData.get("widget_bubble_subtitle") ?? "");
+  const bubbleUseThreeRaw = String(
+    formData.get("widget_bubble_use_three") ?? "",
+  );
+  const bubbleWidthRaw = String(formData.get("widget_bubble_width") ?? "");
+  const bubbleRadiusRaw = String(formData.get("widget_bubble_radius") ?? "");
   const positionRaw = String(formData.get("widget_position") ?? "");
   const widthRaw = String(formData.get("widget_width") ?? "");
   const heightRaw = String(formData.get("widget_height") ?? "");
@@ -94,6 +105,19 @@ async function updateWidget(formData: FormData) {
   const colorToggleTextRaw = String(
     formData.get("widget_color_toggle_text") ?? "",
   );
+  const colorBubbleBgRaw = String(formData.get("widget_color_bubble_bg") ?? "");
+  const colorBubbleTextRaw = String(
+    formData.get("widget_color_bubble_text") ?? "",
+  );
+  const colorBubbleSubtextRaw = String(
+    formData.get("widget_color_bubble_subtext") ?? "",
+  );
+  const colorBubbleBorderRaw = String(
+    formData.get("widget_color_bubble_border") ?? "",
+  );
+  const colorBubbleGlowRaw = String(
+    formData.get("widget_color_bubble_glow") ?? "",
+  );
   const launcherIconRaw = String(formData.get("widget_launcher_icon") ?? "");
   const launcherLogoUrlRaw = String(
     formData.get("widget_launcher_logo_url") ?? "",
@@ -107,6 +131,35 @@ async function updateWidget(formData: FormData) {
       widget_label: normalizeWidgetText(labelRaw, widgetLimits.label),
       widget_greeting: normalizeWidgetText(greetingRaw, widgetLimits.greeting),
       widget_format: formatRaw.trim() ? sanitizeWidgetFormat(formatRaw) : null,
+      widget_launcher_style: launcherStyleRaw.trim()
+        ? sanitizeLauncherStyle(launcherStyleRaw)
+        : null,
+      widget_bubble_subtitle: normalizeWidgetText(
+        bubbleSubtitleRaw,
+        widgetLimits.bubbleSubtitle,
+      ),
+      widget_bubble_use_three: bubbleUseThreeRaw.trim()
+        ? sanitizeWidgetBoolean(
+            bubbleUseThreeRaw,
+            widgetDefaults.bubbleUseThree,
+          )
+        : null,
+      widget_bubble_width: bubbleWidthRaw.trim()
+        ? sanitizeWidgetNumber(
+            bubbleWidthRaw,
+            widgetDefaults.bubbleWidth,
+            widgetLimits.bubbleWidth.min,
+            widgetLimits.bubbleWidth.max,
+          )
+        : null,
+      widget_bubble_radius: bubbleRadiusRaw.trim()
+        ? sanitizeWidgetNumber(
+            bubbleRadiusRaw,
+            widgetDefaults.bubbleRadius,
+            widgetLimits.bubbleRadius.min,
+            widgetLimits.bubbleRadius.max,
+          )
+        : null,
       widget_human_support_text: normalizeWidgetText(
         humanSupportRaw,
         widgetLimits.humanSupportText,
@@ -187,6 +240,21 @@ async function updateWidget(formData: FormData) {
       widget_color_toggle_text: colorToggleTextRaw.trim()
         ? sanitizeHex(colorToggleTextRaw)
         : null,
+      widget_color_bubble_bg: colorBubbleBgRaw.trim()
+        ? sanitizeHex(colorBubbleBgRaw)
+        : null,
+      widget_color_bubble_text: colorBubbleTextRaw.trim()
+        ? sanitizeHex(colorBubbleTextRaw)
+        : null,
+      widget_color_bubble_subtext: colorBubbleSubtextRaw.trim()
+        ? sanitizeHex(colorBubbleSubtextRaw)
+        : null,
+      widget_color_bubble_border: colorBubbleBorderRaw.trim()
+        ? sanitizeHex(colorBubbleBorderRaw)
+        : null,
+      widget_color_bubble_glow: colorBubbleGlowRaw.trim()
+        ? sanitizeHex(colorBubbleGlowRaw)
+        : null,
       widget_launcher_icon: launcherIconRaw.trim()
         ? sanitizeLauncherIcon(launcherIconRaw)
         : null,
@@ -220,17 +288,37 @@ export default async function AgentWidgetPage({
     .eq("user_id", user.id)
     .single();
 
-  if (isMissingWidgetFormatColumn(error)) {
+  if (isMissingSelectedWidgetColumn(error)) {
+    const maybeError = error as { message?: string; details?: string } | null;
+    const text = `${maybeError?.message ?? ""} ${maybeError?.details ?? ""}`;
     console.warn(
-      "[AI SaaS] agents.widget_format is missing; using legacy widget select.",
+      "[AI SaaS] a widget customization column is missing; using legacy widget select.",
     );
+    const select = text.includes("widget_format")
+      ? WIDGET_AGENT_SELECT_MINIMAL
+      : WIDGET_AGENT_SELECT_LEGACY;
     const fallback = await supabase
       .from("agents")
-      .select(WIDGET_AGENT_SELECT_LEGACY)
+      .select(select)
       .eq("id", id)
       .eq("user_id", user.id)
       .single();
-    agent = fallback.data ? { ...fallback.data, widget_format: null } : null;
+    agent = fallback.data
+      ? {
+          ...fallback.data,
+          widget_format: "widget_format" in fallback.data ? fallback.data.widget_format : null,
+          widget_launcher_style: null,
+          widget_bubble_subtitle: null,
+          widget_bubble_use_three: null,
+          widget_bubble_width: null,
+          widget_bubble_radius: null,
+          widget_color_bubble_bg: null,
+          widget_color_bubble_text: null,
+          widget_color_bubble_subtext: null,
+          widget_color_bubble_border: null,
+          widget_color_bubble_glow: null,
+        }
+      : null;
     error = fallback.error;
   }
 
@@ -290,6 +378,11 @@ export default async function AgentWidgetPage({
           initialHumanSupportText={agent.widget_human_support_text}
           initialFormat={agent.widget_format}
           initialPosition={widgetPositionValue}
+          initialLauncherStyle={agent.widget_launcher_style}
+          initialBubbleSubtitle={agent.widget_bubble_subtitle}
+          initialBubbleUseThree={agent.widget_bubble_use_three}
+          initialBubbleWidth={agent.widget_bubble_width}
+          initialBubbleRadius={agent.widget_bubble_radius}
           initialWidth={agent.widget_width}
           initialHeight={agent.widget_height}
           initialOffsetX={agent.widget_offset_x}
@@ -305,6 +398,11 @@ export default async function AgentWidgetPage({
           initialColorBotBubbleText={agent.widget_color_bot_bubble_text}
           initialColorToggleBg={agent.widget_color_toggle_bg}
           initialColorToggleText={agent.widget_color_toggle_text}
+          initialColorBubbleBg={agent.widget_color_bubble_bg}
+          initialColorBubbleText={agent.widget_color_bubble_text}
+          initialColorBubbleSubtext={agent.widget_color_bubble_subtext}
+          initialColorBubbleBorder={agent.widget_color_bubble_border}
+          initialColorBubbleGlow={agent.widget_color_bubble_glow}
           initialLauncherIcon={agent.widget_launcher_icon}
           initialLauncherLogoUrl={agent.widget_launcher_logo_url}
         />

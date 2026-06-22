@@ -3,6 +3,7 @@ export type WidgetPosition = "left" | "right";
 export type WidgetLanguage = "auto" | "en" | "es" | "pt" | "fr";
 export type WidgetLauncherIcon = "whatsapp" | "chat" | "bot" | "store" | "logo";
 export type WidgetFormat = "classic" | "assistant";
+export type WidgetLauncherStyle = "icon" | "card";
 
 export const widgetDefaults = {
   format: "classic" as WidgetFormat,
@@ -12,6 +13,11 @@ export const widgetDefaults = {
   greeting: "How can I help you today?",
   humanSupportText: "Talk to a human",
   launcherIcon: "whatsapp" as WidgetLauncherIcon,
+  launcherStyle: "icon" as WidgetLauncherStyle,
+  bubbleSubtitle: "I'm here to assist you.",
+  bubbleUseThree: true,
+  bubbleWidth: 224,
+  bubbleRadius: 22,
   width: 420,
   height: 640,
   offsetX: 18,
@@ -37,6 +43,11 @@ export const widgetAppearanceDefaults = {
     colorBotBubbleText: "#0f172a",
     colorToggleBg: "#25d366",
     colorToggleText: "#ffffff",
+    colorBubbleBg: "#111827",
+    colorBubbleText: "#ffffff",
+    colorBubbleSubtext: "#cbd5e1",
+    colorBubbleBorder: "#273244",
+    colorBubbleGlow: "#8b5cf6",
   },
   assistant: {
     colorHeaderBg: "#ffffff",
@@ -48,6 +59,11 @@ export const widgetAppearanceDefaults = {
     colorBotBubbleText: "#1f2937",
     colorToggleBg: "#111827",
     colorToggleText: "#ffffff",
+    colorBubbleBg: "#050505",
+    colorBubbleText: "#ffffff",
+    colorBubbleSubtext: "#a1a1aa",
+    colorBubbleBorder: "#2a2a2a",
+    colorBubbleGlow: "#8b5cf6",
   },
 } as const satisfies Record<
   WidgetFormat,
@@ -61,6 +77,11 @@ export const widgetAppearanceDefaults = {
     colorBotBubbleText: string;
     colorToggleBg: string;
     colorToggleText: string;
+    colorBubbleBg: string;
+    colorBubbleText: string;
+    colorBubbleSubtext: string;
+    colorBubbleBorder: string;
+    colorBubbleGlow: string;
   }
 >;
 
@@ -99,6 +120,7 @@ export const widgetLimits = {
   label: 48,
   greeting: 48,
   humanSupportText: 32,
+  bubbleSubtitle: 64,
   launcherLogoUrl: 512,
   width: { min: 320, max: 720 },
   height: { min: 420, max: 820 },
@@ -106,6 +128,8 @@ export const widgetLimits = {
   offsetY: { min: 0, max: 120 },
   launcherSize: { min: 48, max: 88 },
   borderRadius: { min: 12, max: 32 },
+  bubbleWidth: { min: 184, max: 320 },
+  bubbleRadius: { min: 14, max: 32 },
 } as const;
 
 export const widgetPositions: WidgetPosition[] = ["left", "right"];
@@ -113,6 +137,7 @@ export const widgetPositions: WidgetPosition[] = ["left", "right"];
 export const widgetLanguages: WidgetLanguage[] = ["auto", "en", "es", "pt", "fr"];
 
 export const widgetFormats: WidgetFormat[] = ["classic", "assistant"];
+export const widgetLauncherStyles: WidgetLauncherStyle[] = ["icon", "card"];
 
 export const widgetLauncherIcons: WidgetLauncherIcon[] = [
   "whatsapp",
@@ -182,6 +207,23 @@ export function sanitizeLauncherIcon(
     icon === "whatsapp"
     ? icon
     : widgetDefaults.launcherIcon;
+}
+
+export function sanitizeLauncherStyle(
+  style?: string | null
+): WidgetLauncherStyle {
+  return style === "card" ? "card" : widgetDefaults.launcherStyle;
+}
+
+export function sanitizeWidgetBoolean(
+  value: string | boolean | null | undefined,
+  fallback: boolean
+) {
+  if (typeof value === "boolean") return value;
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (["1", "true", "yes", "on"].includes(normalized)) return true;
+  if (["0", "false", "no", "off"].includes(normalized)) return false;
+  return fallback;
 }
 
 export function sanitizeWidgetNumber(

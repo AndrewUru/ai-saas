@@ -14,7 +14,9 @@ import {
   sanitizeWidgetLanguage,
   sanitizeWidgetFormat,
   sanitizeLauncherIcon,
+  sanitizeLauncherStyle,
   sanitizePosition,
+  sanitizeWidgetBoolean,
   sanitizeWidgetNumber,
   widgetDefaults,
   widgetLimits,
@@ -189,6 +191,16 @@ export async function GET(req: Request) {
   const appearanceDefaults = getWidgetAppearanceDefaults(baseFormat);
   const baseLauncherIcon = sanitizeLauncherIcon(agent.widget_launcher_icon);
   const baseLauncherLogoUrl = normalizeImageUrl(agent.widget_launcher_logo_url);
+  const baseLauncherStyle = sanitizeLauncherStyle(agent.widget_launcher_style);
+  const baseBubbleSubtitle = sanitizeText(
+    agent.widget_bubble_subtitle,
+    widgetDefaults.bubbleSubtitle,
+    widgetLimits.bubbleSubtitle
+  );
+  const baseBubbleUseThree = sanitizeWidgetBoolean(
+    agent.widget_bubble_use_three,
+    widgetDefaults.bubbleUseThree
+  );
   const basePosition = sanitizePosition(agent.widget_position);
   const baseWidth = sanitizeWidgetNumber(
     agent.widget_width,
@@ -225,6 +237,18 @@ export async function GET(req: Request) {
     widgetDefaults.borderRadius,
     widgetLimits.borderRadius.min,
     widgetLimits.borderRadius.max
+  );
+  const baseBubbleWidth = sanitizeWidgetNumber(
+    agent.widget_bubble_width,
+    widgetDefaults.bubbleWidth,
+    widgetLimits.bubbleWidth.min,
+    widgetLimits.bubbleWidth.max
+  );
+  const baseBubbleRadius = sanitizeWidgetNumber(
+    agent.widget_bubble_radius,
+    widgetDefaults.bubbleRadius,
+    widgetLimits.bubbleRadius.min,
+    widgetLimits.bubbleRadius.max
   );
   const baseAppearance = {
     colorHeaderBg: normalizeHex(
@@ -263,6 +287,26 @@ export async function GET(req: Request) {
       agent.widget_color_toggle_text,
       appearanceDefaults.colorToggleText
     ),
+    colorBubbleBg: normalizeHex(
+      agent.widget_color_bubble_bg,
+      appearanceDefaults.colorBubbleBg
+    ),
+    colorBubbleText: normalizeHex(
+      agent.widget_color_bubble_text,
+      appearanceDefaults.colorBubbleText
+    ),
+    colorBubbleSubtext: normalizeHex(
+      agent.widget_color_bubble_subtext,
+      appearanceDefaults.colorBubbleSubtext
+    ),
+    colorBubbleBorder: normalizeHex(
+      agent.widget_color_bubble_border,
+      appearanceDefaults.colorBubbleBorder
+    ),
+    colorBubbleGlow: normalizeHex(
+      agent.widget_color_bubble_glow,
+      appearanceDefaults.colorBubbleGlow
+    ),
   };
 
   const config: WidgetConfig = {
@@ -278,6 +322,9 @@ export async function GET(req: Request) {
     humanSupportText: baseHumanSupportText,
     launcherIcon: baseLauncherIcon,
     launcherLogoUrl: baseLauncherLogoUrl,
+    launcherStyle: baseLauncherStyle,
+    bubbleSubtitle: baseBubbleSubtitle,
+    bubbleUseThree: baseBubbleUseThree,
     position: basePosition,
     width: baseWidth,
     height: baseHeight,
@@ -285,6 +332,8 @@ export async function GET(req: Request) {
     offsetY: baseOffsetY,
     launcherSize: baseLauncherSize,
     borderRadius: baseBorderRadius,
+    bubbleWidth: baseBubbleWidth,
+    bubbleRadius: baseBubbleRadius,
     appearance: baseAppearance,
   };
 
@@ -350,6 +399,28 @@ export async function GET(req: Request) {
       );
     }
 
+    const launcherStyleParam = getParam(params, "launcherStyle");
+    if (launcherStyleParam !== null) {
+      config.launcherStyle = sanitizeLauncherStyle(launcherStyleParam);
+    }
+
+    const bubbleSubtitleParam = getParam(params, "bubbleSubtitle");
+    if (bubbleSubtitleParam !== null) {
+      config.bubbleSubtitle = sanitizeText(
+        bubbleSubtitleParam,
+        config.bubbleSubtitle ?? widgetDefaults.bubbleSubtitle,
+        widgetLimits.bubbleSubtitle
+      );
+    }
+
+    const bubbleUseThreeParam = getParam(params, "bubbleUseThree");
+    if (bubbleUseThreeParam !== null) {
+      config.bubbleUseThree = sanitizeWidgetBoolean(
+        bubbleUseThreeParam,
+        config.bubbleUseThree ?? widgetDefaults.bubbleUseThree
+      );
+    }
+
     const formatParam = getParam(params, "format");
     if (formatParam !== null) {
       const previousAccent = getWidgetAccentDefault(config.format);
@@ -399,6 +470,26 @@ export async function GET(req: Request) {
           config.appearance.colorToggleText === previousDefaults.colorToggleText
             ? nextDefaults.colorToggleText
             : config.appearance.colorToggleText,
+        colorBubbleBg:
+          config.appearance.colorBubbleBg === previousDefaults.colorBubbleBg
+            ? nextDefaults.colorBubbleBg
+            : config.appearance.colorBubbleBg,
+        colorBubbleText:
+          config.appearance.colorBubbleText === previousDefaults.colorBubbleText
+            ? nextDefaults.colorBubbleText
+            : config.appearance.colorBubbleText,
+        colorBubbleSubtext:
+          config.appearance.colorBubbleSubtext === previousDefaults.colorBubbleSubtext
+            ? nextDefaults.colorBubbleSubtext
+            : config.appearance.colorBubbleSubtext,
+        colorBubbleBorder:
+          config.appearance.colorBubbleBorder === previousDefaults.colorBubbleBorder
+            ? nextDefaults.colorBubbleBorder
+            : config.appearance.colorBubbleBorder,
+        colorBubbleGlow:
+          config.appearance.colorBubbleGlow === previousDefaults.colorBubbleGlow
+            ? nextDefaults.colorBubbleGlow
+            : config.appearance.colorBubbleGlow,
       };
     }
 
@@ -475,6 +566,26 @@ export async function GET(req: Request) {
       );
     }
 
+    const bubbleWidthParam = getParam(params, "bubbleWidth");
+    if (bubbleWidthParam !== null) {
+      config.bubbleWidth = sanitizeWidgetNumber(
+        bubbleWidthParam,
+        config.bubbleWidth ?? widgetDefaults.bubbleWidth,
+        widgetLimits.bubbleWidth.min,
+        widgetLimits.bubbleWidth.max
+      );
+    }
+
+    const bubbleRadiusParam = getParam(params, "bubbleRadius");
+    if (bubbleRadiusParam !== null) {
+      config.bubbleRadius = sanitizeWidgetNumber(
+        bubbleRadiusParam,
+        config.bubbleRadius ?? widgetDefaults.bubbleRadius,
+        widgetLimits.bubbleRadius.min,
+        widgetLimits.bubbleRadius.max
+      );
+    }
+
     const appearanceOverrides: Partial<WidgetConfig["appearance"]> = {};
     const colorHeaderBg = getParam(params, "colorHeaderBg");
     if (colorHeaderBg !== null) {
@@ -537,6 +648,41 @@ export async function GET(req: Request) {
       appearanceOverrides.colorToggleText = normalizeHex(
         colorToggleText,
         config.appearance.colorToggleText
+      );
+    }
+    const colorBubbleBg = getParam(params, "colorBubbleBg");
+    if (colorBubbleBg !== null) {
+      appearanceOverrides.colorBubbleBg = normalizeHex(
+        colorBubbleBg,
+        config.appearance.colorBubbleBg
+      );
+    }
+    const colorBubbleText = getParam(params, "colorBubbleText");
+    if (colorBubbleText !== null) {
+      appearanceOverrides.colorBubbleText = normalizeHex(
+        colorBubbleText,
+        config.appearance.colorBubbleText
+      );
+    }
+    const colorBubbleSubtext = getParam(params, "colorBubbleSubtext");
+    if (colorBubbleSubtext !== null) {
+      appearanceOverrides.colorBubbleSubtext = normalizeHex(
+        colorBubbleSubtext,
+        config.appearance.colorBubbleSubtext
+      );
+    }
+    const colorBubbleBorder = getParam(params, "colorBubbleBorder");
+    if (colorBubbleBorder !== null) {
+      appearanceOverrides.colorBubbleBorder = normalizeHex(
+        colorBubbleBorder,
+        config.appearance.colorBubbleBorder
+      );
+    }
+    const colorBubbleGlow = getParam(params, "colorBubbleGlow");
+    if (colorBubbleGlow !== null) {
+      appearanceOverrides.colorBubbleGlow = normalizeHex(
+        colorBubbleGlow,
+        config.appearance.colorBubbleGlow
       );
     }
 

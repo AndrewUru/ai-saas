@@ -6,7 +6,9 @@ import {
   sanitizeHex,
   sanitizeWidgetFormat,
   sanitizeLauncherIcon,
+  sanitizeLauncherStyle,
   sanitizePosition,
+  sanitizeWidgetBoolean,
   sanitizeWidgetNumber,
 } from "@/lib/widget/defaults";
 import type { AgentRecord, WidgetAppearance, WidgetConfig } from "./types";
@@ -16,6 +18,7 @@ const LABEL_DEFAULT = widgetDefaults.label;
 const GREETING_DEFAULT = widgetDefaults.greeting;
 const POSITION_DEFAULT = widgetDefaults.position;
 const LAUNCHER_ICON_DEFAULT = widgetDefaults.launcherIcon;
+const LAUNCHER_STYLE_DEFAULT = widgetDefaults.launcherStyle;
 const FORMAT_DEFAULT = widgetDefaults.format;
 
 function escapeForJs(str: string = "") {
@@ -184,6 +187,34 @@ export function buildAppearance(
     params.get("launcherLogoUrl") ?? agent.widget_launcher_logo_url,
     widgetLimits.launcherLogoUrl
   );
+  const launcherStyle = sanitizeLauncherStyle(
+    params.get("launcherStyle") ??
+      agent.widget_launcher_style ??
+      LAUNCHER_STYLE_DEFAULT
+  );
+  const bubbleSubtitle = escapeForJs(
+    sanitizeText(
+      params.get("bubbleSubtitle") ?? agent.widget_bubble_subtitle,
+      widgetDefaults.bubbleSubtitle,
+      widgetLimits.bubbleSubtitle
+    )
+  );
+  const bubbleUseThree = sanitizeWidgetBoolean(
+    params.get("bubbleUseThree") ?? agent.widget_bubble_use_three,
+    widgetDefaults.bubbleUseThree
+  );
+  const bubbleWidth = sanitizeWidgetNumber(
+    params.get("bubbleWidth") ?? agent.widget_bubble_width,
+    widgetDefaults.bubbleWidth,
+    widgetLimits.bubbleWidth.min,
+    widgetLimits.bubbleWidth.max
+  );
+  const bubbleRadius = sanitizeWidgetNumber(
+    params.get("bubbleRadius") ?? agent.widget_bubble_radius,
+    widgetDefaults.bubbleRadius,
+    widgetLimits.bubbleRadius.min,
+    widgetLimits.bubbleRadius.max
+  );
 
   const brandInitial = escapeForJs(
     (brandName.charAt(0).toUpperCase() || "A").slice(0, 1)
@@ -235,6 +266,31 @@ export function buildAppearance(
       agent.widget_color_toggle_text ??
       appearanceDefaults.colorToggleText
   );
+  const colorBubbleBg = sanitizeHex(
+    params.get("colorBubbleBg") ??
+      agent.widget_color_bubble_bg ??
+      appearanceDefaults.colorBubbleBg
+  );
+  const colorBubbleText = sanitizeHex(
+    params.get("colorBubbleText") ??
+      agent.widget_color_bubble_text ??
+      appearanceDefaults.colorBubbleText
+  );
+  const colorBubbleSubtext = sanitizeHex(
+    params.get("colorBubbleSubtext") ??
+      agent.widget_color_bubble_subtext ??
+      appearanceDefaults.colorBubbleSubtext
+  );
+  const colorBubbleBorder = sanitizeHex(
+    params.get("colorBubbleBorder") ??
+      agent.widget_color_bubble_border ??
+      appearanceDefaults.colorBubbleBorder
+  );
+  const colorBubbleGlow = sanitizeHex(
+    params.get("colorBubbleGlow") ??
+      agent.widget_color_bubble_glow ??
+      appearanceDefaults.colorBubbleGlow
+  );
 
   return {
     format,
@@ -251,6 +307,11 @@ export function buildAppearance(
     greeting,
     launcherIcon,
     launcherLogoUrl,
+    launcherStyle,
+    bubbleSubtitle,
+    bubbleUseThree,
+    bubbleWidth,
+    bubbleRadius,
     position,
     width,
     height,
@@ -267,6 +328,11 @@ export function buildAppearance(
     colorBotBubbleText,
     colorToggleBg,
     colorToggleText,
+    colorBubbleBg,
+    colorBubbleText,
+    colorBubbleSubtext,
+    colorBubbleBorder,
+    colorBubbleGlow,
   };
 }
 
@@ -286,6 +352,11 @@ export function buildConfig(
     greeting: appearance.greeting,
     launcherIcon: appearance.launcherIcon,
     launcherLogoUrl: appearance.launcherLogoUrl,
+    launcherStyle: appearance.launcherStyle,
+    bubbleSubtitle: appearance.bubbleSubtitle,
+    bubbleUseThree: appearance.bubbleUseThree,
+    bubbleWidth: appearance.bubbleWidth,
+    bubbleRadius: appearance.bubbleRadius,
     position: appearance.position,
     width: appearance.width,
     height: appearance.height,
@@ -303,6 +374,11 @@ export function buildConfig(
       colorBotBubbleText: appearance.colorBotBubbleText,
       colorToggleBg: appearance.colorToggleBg,
       colorToggleText: appearance.colorToggleText,
+      colorBubbleBg: appearance.colorBubbleBg,
+      colorBubbleText: appearance.colorBubbleText,
+      colorBubbleSubtext: appearance.colorBubbleSubtext,
+      colorBubbleBorder: appearance.colorBubbleBorder,
+      colorBubbleGlow: appearance.colorBubbleGlow,
     },
   };
 }

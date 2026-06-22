@@ -23,9 +23,11 @@ import {
   getWidgetAppearanceDefaults,
   type WidgetFormat,
   type WidgetLauncherIcon,
+  type WidgetLauncherStyle,
   widgetDefaults,
   widgetFormats,
   widgetLauncherIcons,
+  widgetLauncherStyles,
   widgetLimits,
   widgetPositions,
   WidgetPosition,
@@ -61,6 +63,11 @@ type WidgetDesignerProps = {
   initialOffsetY: number | null;
   initialLauncherSize: number | null;
   initialBorderRadius: number | null;
+  initialLauncherStyle: WidgetLauncherStyle | string | null;
+  initialBubbleSubtitle: string | null;
+  initialBubbleUseThree: boolean | null;
+  initialBubbleWidth: number | null;
+  initialBubbleRadius: number | null;
 
   initialColorHeaderBg: string | null;
   initialColorHeaderText: string | null;
@@ -71,6 +78,11 @@ type WidgetDesignerProps = {
   initialColorBotBubbleText: string | null;
   initialColorToggleBg: string | null;
   initialColorToggleText: string | null;
+  initialColorBubbleBg: string | null;
+  initialColorBubbleText: string | null;
+  initialColorBubbleSubtext: string | null;
+  initialColorBubbleBorder: string | null;
+  initialColorBubbleGlow: string | null;
   initialLauncherIcon: WidgetLauncherIcon | string | null;
   initialLauncherLogoUrl: string | null;
 };
@@ -122,6 +134,16 @@ const launcherIconHelp: Record<WidgetLauncherIcon, string> = {
   logo: "Use an image or SVG URL.",
 };
 
+const launcherStyleLabels: Record<WidgetLauncherStyle, string> = {
+  icon: "Compact icon",
+  card: "AI bubble card",
+};
+
+const launcherStyleHelp: Record<WidgetLauncherStyle, string> = {
+  icon: "Round launcher with hover label.",
+  card: "Always-visible title, subtitle, glow, and 3D orb.",
+};
+
 const widgetFormatLabels: Record<WidgetFormat, string> = {
   classic: "Classic",
   assistant: "AI assistant",
@@ -142,6 +164,12 @@ function normalizeLauncherIcon(value: string | null): WidgetLauncherIcon {
   return widgetLauncherIcons.includes(value as WidgetLauncherIcon)
     ? (value as WidgetLauncherIcon)
     : widgetDefaults.launcherIcon;
+}
+
+function normalizeLauncherStyle(value: string | null): WidgetLauncherStyle {
+  return widgetLauncherStyles.includes(value as WidgetLauncherStyle)
+    ? (value as WidgetLauncherStyle)
+    : widgetDefaults.launcherStyle;
 }
 
 function SectionCard({
@@ -350,6 +378,11 @@ export default function WidgetDesigner({
   initialOffsetY,
   initialLauncherSize,
   initialBorderRadius,
+  initialLauncherStyle,
+  initialBubbleSubtitle,
+  initialBubbleUseThree,
+  initialBubbleWidth,
+  initialBubbleRadius,
   initialColorHeaderBg,
   initialColorHeaderText,
   initialColorChatBg,
@@ -359,6 +392,11 @@ export default function WidgetDesigner({
   initialColorBotBubbleText,
   initialColorToggleBg,
   initialColorToggleText,
+  initialColorBubbleBg,
+  initialColorBubbleText,
+  initialColorBubbleSubtext,
+  initialColorBubbleBorder,
+  initialColorBubbleGlow,
   initialLauncherIcon,
   initialLauncherLogoUrl,
 }: WidgetDesignerProps) {
@@ -369,8 +407,17 @@ export default function WidgetDesigner({
   const [humanSupportTextInput, setHumanSupportTextInput] = useState(
     initialHumanSupportText ?? "",
   );
+  const [bubbleSubtitleInput, setBubbleSubtitleInput] = useState(
+    initialBubbleSubtitle ?? "",
+  );
   const [format, setFormat] = useState<WidgetFormat>(
     normalizeWidgetFormat(initialFormat),
+  );
+  const [launcherStyle, setLauncherStyle] = useState<WidgetLauncherStyle>(
+    normalizeLauncherStyle(initialLauncherStyle),
+  );
+  const [bubbleUseThree, setBubbleUseThree] = useState(
+    initialBubbleUseThree ?? widgetDefaults.bubbleUseThree,
   );
   const [position, setPosition] = useState<WidgetPosition>(
     initialPosition ?? widgetDefaults.position,
@@ -388,6 +435,12 @@ export default function WidgetDesigner({
   );
   const [borderRadius, setBorderRadius] = useState(
     initialBorderRadius ?? widgetDefaults.borderRadius,
+  );
+  const [bubbleWidth, setBubbleWidth] = useState(
+    initialBubbleWidth ?? widgetDefaults.bubbleWidth,
+  );
+  const [bubbleRadius, setBubbleRadius] = useState(
+    initialBubbleRadius ?? widgetDefaults.bubbleRadius,
   );
 
   const [colorHeaderBg, setColorHeaderBg] = useState(
@@ -415,6 +468,21 @@ export default function WidgetDesigner({
   const [colorToggleText, setColorToggleText] = useState(
     initialColorToggleText ?? "",
   );
+  const [colorBubbleBg, setColorBubbleBg] = useState(
+    initialColorBubbleBg ?? "",
+  );
+  const [colorBubbleText, setColorBubbleText] = useState(
+    initialColorBubbleText ?? "",
+  );
+  const [colorBubbleSubtext, setColorBubbleSubtext] = useState(
+    initialColorBubbleSubtext ?? "",
+  );
+  const [colorBubbleBorder, setColorBubbleBorder] = useState(
+    initialColorBubbleBorder ?? "",
+  );
+  const [colorBubbleGlow, setColorBubbleGlow] = useState(
+    initialColorBubbleGlow ?? "",
+  );
   const [launcherIcon, setLauncherIcon] = useState<WidgetLauncherIcon>(
     normalizeLauncherIcon(initialLauncherIcon),
   );
@@ -437,7 +505,10 @@ export default function WidgetDesigner({
       greetingInput,
       initialLanguage,
       humanSupportTextInput,
+      bubbleSubtitleInput,
       format,
+      launcherStyle,
+      bubbleUseThree,
       position,
       width,
       height,
@@ -445,6 +516,8 @@ export default function WidgetDesigner({
       offsetY,
       launcherSize,
       borderRadius,
+      bubbleWidth,
+      bubbleRadius,
       colorHeaderBg,
       colorHeaderText,
       colorChatBg,
@@ -454,6 +527,11 @@ export default function WidgetDesigner({
       colorBotBubbleText,
       colorToggleBg,
       colorToggleText,
+      colorBubbleBg,
+      colorBubbleText,
+      colorBubbleSubtext,
+      colorBubbleBorder,
+      colorBubbleGlow,
       launcherIcon,
       launcherLogoUrl,
     }),
@@ -466,7 +544,10 @@ export default function WidgetDesigner({
       greetingInput,
       initialLanguage,
       humanSupportTextInput,
+      bubbleSubtitleInput,
       format,
+      launcherStyle,
+      bubbleUseThree,
       position,
       width,
       height,
@@ -474,6 +555,8 @@ export default function WidgetDesigner({
       offsetY,
       launcherSize,
       borderRadius,
+      bubbleWidth,
+      bubbleRadius,
       colorHeaderBg,
       colorHeaderText,
       colorChatBg,
@@ -483,6 +566,11 @@ export default function WidgetDesigner({
       colorBotBubbleText,
       colorToggleBg,
       colorToggleText,
+      colorBubbleBg,
+      colorBubbleText,
+      colorBubbleSubtext,
+      colorBubbleBorder,
+      colorBubbleGlow,
       launcherIcon,
       launcherLogoUrl,
     ],
@@ -515,7 +603,16 @@ export default function WidgetDesigner({
         widgetLimits.humanSupportText,
       ) ?? "",
     );
+    params.set(
+      "bubbleSubtitle",
+      trimmedOrNull(
+        liveState.bubbleSubtitleInput,
+        widgetLimits.bubbleSubtitle,
+      ) ?? "",
+    );
     params.set("format", liveState.format);
+    params.set("launcherStyle", liveState.launcherStyle);
+    params.set("bubbleUseThree", liveState.bubbleUseThree ? "1" : "0");
     params.set("position", liveState.position);
     params.set("width", String(liveState.width));
     params.set("height", String(liveState.height));
@@ -523,6 +620,8 @@ export default function WidgetDesigner({
     params.set("offsetY", String(liveState.offsetY));
     params.set("launcherSize", String(liveState.launcherSize));
     params.set("borderRadius", String(liveState.borderRadius));
+    params.set("bubbleWidth", String(liveState.bubbleWidth));
+    params.set("bubbleRadius", String(liveState.bubbleRadius));
 
     params.set("colorHeaderBg", toParamHex(liveState.colorHeaderBg) ?? "");
     params.set("colorHeaderText", toParamHex(liveState.colorHeaderText) ?? "");
@@ -545,6 +644,17 @@ export default function WidgetDesigner({
     );
     params.set("colorToggleBg", toParamHex(liveState.colorToggleBg) ?? "");
     params.set("colorToggleText", toParamHex(liveState.colorToggleText) ?? "");
+    params.set("colorBubbleBg", toParamHex(liveState.colorBubbleBg) ?? "");
+    params.set("colorBubbleText", toParamHex(liveState.colorBubbleText) ?? "");
+    params.set(
+      "colorBubbleSubtext",
+      toParamHex(liveState.colorBubbleSubtext) ?? "",
+    );
+    params.set(
+      "colorBubbleBorder",
+      toParamHex(liveState.colorBubbleBorder) ?? "",
+    );
+    params.set("colorBubbleGlow", toParamHex(liveState.colorBubbleGlow) ?? "");
     params.set("launcherIcon", liveState.launcherIcon);
     params.set(
       "launcherLogoUrl",
@@ -573,7 +683,10 @@ export default function WidgetDesigner({
       liveState.greetingInput,
       liveState.initialLanguage,
       liveState.humanSupportTextInput,
+      liveState.bubbleSubtitleInput,
       liveState.format,
+      liveState.launcherStyle,
+      liveState.bubbleUseThree,
       liveState.position,
       liveState.width,
       liveState.height,
@@ -581,6 +694,13 @@ export default function WidgetDesigner({
       liveState.offsetY,
       liveState.launcherSize,
       liveState.borderRadius,
+      liveState.bubbleWidth,
+      liveState.bubbleRadius,
+      liveState.colorBubbleBg,
+      liveState.colorBubbleText,
+      liveState.colorBubbleSubtext,
+      liveState.colorBubbleBorder,
+      liveState.colorBubbleGlow,
     ].join("|");
   }, [liveState]);
 
@@ -590,7 +710,10 @@ export default function WidgetDesigner({
     setLabelInput("");
     setGreetingInput("");
     setHumanSupportTextInput("");
+    setBubbleSubtitleInput("");
     setFormat(widgetDefaults.format);
+    setLauncherStyle(widgetDefaults.launcherStyle);
+    setBubbleUseThree(widgetDefaults.bubbleUseThree);
     setPosition(widgetDefaults.position);
     setWidth(widgetDefaults.width);
     setHeight(widgetDefaults.height);
@@ -598,6 +721,8 @@ export default function WidgetDesigner({
     setOffsetY(widgetDefaults.offsetY);
     setLauncherSize(widgetDefaults.launcherSize);
     setBorderRadius(widgetDefaults.borderRadius);
+    setBubbleWidth(widgetDefaults.bubbleWidth);
+    setBubbleRadius(widgetDefaults.bubbleRadius);
     setColorHeaderBg("");
     setColorHeaderText("");
     setColorChatBg("");
@@ -607,6 +732,11 @@ export default function WidgetDesigner({
     setColorBotBubbleText("");
     setColorToggleBg("");
     setColorToggleText("");
+    setColorBubbleBg("");
+    setColorBubbleText("");
+    setColorBubbleSubtext("");
+    setColorBubbleBorder("");
+    setColorBubbleGlow("");
     setLauncherIcon(widgetDefaults.launcherIcon);
     setLauncherLogoUrl("");
   }
@@ -791,6 +921,138 @@ export default function WidgetDesigner({
           title="Choose the button icon"
         >
           <div className="space-y-4">
+            <fieldset>
+              <legend className="sr-only">Launcher bubble style</legend>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {widgetLauncherStyles.map((option) => (
+                  <label
+                    key={option}
+                    className={`flex min-h-[84px] cursor-pointer flex-col justify-between rounded-xl border px-3 py-3 transition ${
+                      launcherStyle === option
+                        ? "border-emerald-400/70 text-emerald-100"
+                        : "border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-100"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="widget_launcher_style"
+                      value={option}
+                      checked={launcherStyle === option}
+                      onChange={() => setLauncherStyle(option)}
+                      className="sr-only"
+                    />
+                    <span className="flex items-center gap-2 text-sm font-semibold">
+                      <Sparkles className="h-4 w-4" aria-hidden="true" />
+                      {launcherStyleLabels[option]}
+                    </span>
+                    <span className="mt-2 text-xs leading-5 text-slate-500">
+                      {launcherStyleHelp[option]}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <FieldInput
+              label="Bubble subtitle"
+              name="widget_bubble_subtitle"
+              maxLength={widgetLimits.bubbleSubtitle}
+              placeholder={widgetDefaults.bubbleSubtitle}
+              value={bubbleSubtitleInput}
+              onChange={setBubbleSubtitleInput}
+              helper="Shown under the launcher title when AI bubble card is selected."
+            />
+
+            <fieldset>
+              <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                Three.js effect
+              </legend>
+              <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-slate-800 p-1.5">
+                {[
+                  { label: "3D glow", value: true },
+                  { label: "Static", value: false },
+                ].map((option) => (
+                  <label
+                    key={option.label}
+                    className={`flex cursor-pointer items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+                      bubbleUseThree === option.value
+                        ? "bg-emerald-400 text-slate-950 shadow-sm shadow-emerald-950/40"
+                        : "text-slate-400 hover:bg-slate-900 hover:text-slate-100"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="widget_bubble_use_three"
+                      value={option.value ? "1" : "0"}
+                      checked={bubbleUseThree === option.value}
+                      onChange={() => setBubbleUseThree(option.value)}
+                      className="sr-only"
+                    />
+                    {option.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <RangeInput
+                label="Bubble width"
+                name="widget_bubble_width"
+                value={bubbleWidth}
+                onChange={setBubbleWidth}
+                min={widgetLimits.bubbleWidth.min}
+                max={widgetLimits.bubbleWidth.max}
+              />
+              <RangeInput
+                label="Bubble radius"
+                name="widget_bubble_radius"
+                value={bubbleRadius}
+                onChange={setBubbleRadius}
+                min={widgetLimits.bubbleRadius.min}
+                max={widgetLimits.bubbleRadius.max}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-800 p-3 sm:grid-cols-2">
+              <ColorInput
+                label="Bubble bg"
+                name="widget_color_bubble_bg"
+                value={colorBubbleBg}
+                onChange={setColorBubbleBg}
+                defaultValue={appearanceDefaults.colorBubbleBg}
+              />
+              <ColorInput
+                label="Bubble title"
+                name="widget_color_bubble_text"
+                value={colorBubbleText}
+                onChange={setColorBubbleText}
+                defaultValue={appearanceDefaults.colorBubbleText}
+              />
+              <ColorInput
+                label="Bubble subtitle"
+                name="widget_color_bubble_subtext"
+                value={colorBubbleSubtext}
+                onChange={setColorBubbleSubtext}
+                defaultValue={appearanceDefaults.colorBubbleSubtext}
+              />
+              <ColorInput
+                label="Bubble border"
+                name="widget_color_bubble_border"
+                value={colorBubbleBorder}
+                onChange={setColorBubbleBorder}
+                defaultValue={appearanceDefaults.colorBubbleBorder}
+              />
+              <div className="sm:col-span-2">
+                <ColorInput
+                  label="Bubble glow"
+                  name="widget_color_bubble_glow"
+                  value={colorBubbleGlow}
+                  onChange={setColorBubbleGlow}
+                  defaultValue={appearanceDefaults.colorBubbleGlow}
+                />
+              </div>
+            </div>
+
             <fieldset>
               <legend className="sr-only">Launcher icon</legend>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">

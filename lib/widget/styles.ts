@@ -23,6 +23,13 @@ export const STATIC_STYLES = `
   --ai-toggle-shadow-hover: rgba(37, 211, 102, 0.42);
   --ai-toggle-status-bg: #25d366;
   --ai-toggle-status-border: #ffffff;
+  --ai-bubble-bg: #111827;
+  --ai-bubble-text: #ffffff;
+  --ai-bubble-subtext: #cbd5e1;
+  --ai-bubble-border: #273244;
+  --ai-bubble-glow: rgba(139, 92, 246, 0.38);
+  --ai-bubble-width: 224px;
+  --ai-bubble-radius: 22px;
   --ai-widget-width: 420px;
   --ai-widget-height: 640px;
   --ai-widget-offset-x: 18px;
@@ -134,12 +141,37 @@ export const STATIC_STYLES = `
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.22), transparent 36%),
+    rgba(255, 255, 255, 0.08);
 }
 
 #ai-saas-toggle .ai-saas-icon svg {
+  position: relative;
+  z-index: 2;
   width: 34px;
   height: 34px;
   filter: drop-shadow(0 2px 3px rgba(15, 23, 42, 0.16));
+}
+
+#ai-saas-toggle .ai-saas-three-canvas {
+  position: absolute;
+  inset: -10px;
+  z-index: 1;
+  width: calc(100% + 20px);
+  height: calc(100% + 20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.24s ease;
+}
+
+#ai-saas-anchor.ai-three-enabled #ai-saas-toggle .ai-saas-three-canvas {
+  opacity: 0.86;
+}
+
+#ai-saas-anchor.ai-three-ready #ai-saas-toggle .ai-saas-icon svg {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.22));
 }
 
 #ai-saas-toggle .ai-saas-icon.has-logo {
@@ -149,6 +181,8 @@ export const STATIC_STYLES = `
 }
 
 #ai-saas-toggle .ai-saas-launcher-logo {
+  position: relative;
+  z-index: 2;
   width: 100%;
   height: 100%;
   display: block;
@@ -156,6 +190,8 @@ export const STATIC_STYLES = `
 }
 
 #ai-saas-toggle .ai-saas-icon-fallback {
+  position: relative;
+  z-index: 2;
   display: inline-flex;
 }
 
@@ -185,6 +221,103 @@ export const STATIC_STYLES = `
   pointer-events: none;
   transform: translateY(-50%) scale(0.96);
   transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+#ai-saas-toggle .ai-saas-bubble-copy {
+  display: none;
+}
+
+#ai-saas-toggle .ai-saas-bubble-title,
+#ai-saas-toggle .ai-saas-bubble-subtitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#ai-saas-toggle .ai-saas-bubble-title {
+  color: var(--ai-bubble-text);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.18;
+}
+
+#ai-saas-toggle .ai-saas-bubble-subtitle {
+  margin-top: 2px;
+  color: var(--ai-bubble-subtext);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+#ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle {
+  width: min(var(--ai-bubble-width), calc(100vw - 36px));
+  height: auto;
+  min-height: var(--ai-launcher-size);
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 14px 10px 10px;
+  overflow: hidden;
+  color: var(--ai-bubble-text);
+  border: 1px solid var(--ai-bubble-border);
+  border-radius: var(--ai-bubble-radius);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02)),
+    radial-gradient(circle at 16% 18%, var(--ai-bubble-glow), transparent 34%),
+    var(--ai-bubble-bg);
+  box-shadow:
+    0 20px 54px var(--ai-bubble-glow),
+    0 10px 28px rgba(2, 6, 23, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+#ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle::after {
+  display: none;
+}
+
+#ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle::before {
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.14), transparent 42%),
+    radial-gradient(circle at 78% 18%, rgba(255, 255, 255, 0.1), transparent 28%);
+}
+
+#ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle:hover {
+  box-shadow:
+    0 26px 68px var(--ai-bubble-glow),
+    0 12px 32px rgba(2, 6, 23, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+#ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle .ai-saas-icon {
+  width: var(--ai-launcher-size);
+  height: var(--ai-launcher-size);
+  flex: 0 0 var(--ai-launcher-size);
+  color: var(--ai-toggle-text);
+  background:
+    radial-gradient(circle at 36% 24%, rgba(255, 255, 255, 0.24), transparent 34%),
+    var(--ai-toggle-bg);
+  box-shadow:
+    0 0 26px var(--ai-bubble-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+#ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle .ai-saas-bubble-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+#ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle .ai-saas-label {
+  display: none;
 }
 
 #ai-saas-anchor.ai-pos-right #ai-saas-toggle .ai-saas-label {
@@ -956,6 +1089,19 @@ export const STATIC_STYLES = `
   border-color: var(--ai-toggle-status-border);
 }
 
+#ai-saas-anchor.ai-format-assistant.ai-launcher-style-card #ai-saas-toggle {
+  color: var(--ai-bubble-text);
+  border-color: var(--ai-bubble-border);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02)),
+    radial-gradient(circle at 16% 18%, var(--ai-bubble-glow), transparent 34%),
+    var(--ai-bubble-bg);
+  box-shadow:
+    0 20px 54px var(--ai-bubble-glow),
+    0 10px 28px rgba(2, 6, 23, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
 #ai-saas-anchor.ai-format-assistant #ai-saas-widget {
   background: var(--ai-chat-bg);
   border: 1px solid rgba(17, 24, 39, 0.12);
@@ -1179,6 +1325,12 @@ export const STATIC_STYLES = `
   #ai-saas-toggle {
     width: 60px;
     height: 60px;
+  }
+
+  #ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle {
+    width: min(var(--ai-bubble-width), calc(100vw - 32px));
+    height: auto;
+    min-height: 60px;
   }
 
   #ai-saas-toggle .ai-saas-icon {

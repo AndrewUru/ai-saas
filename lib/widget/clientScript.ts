@@ -389,12 +389,24 @@ export function renderWidgetScript(
     setVar(root, "--ai-toggle-status-bg", toggleBg);
     setVar(root, "--ai-toggle-status-border", toggleText);
     setVar(root, "--ai-toggle-text", toggleText);
+    const bubbleBg = normalizeHex(appearance.colorBubbleBg) || "#111827";
+    const bubbleText = normalizeHex(appearance.colorBubbleText) || "#ffffff";
+    const bubbleSubtext = normalizeHex(appearance.colorBubbleSubtext) || "#cbd5e1";
+    const bubbleBorder = normalizeHex(appearance.colorBubbleBorder) || "#273244";
+    const bubbleGlow = normalizeHex(appearance.colorBubbleGlow) || toggleBg;
+    setVar(root, "--ai-bubble-bg", bubbleBg);
+    setVar(root, "--ai-bubble-text", bubbleText);
+    setVar(root, "--ai-bubble-subtext", bubbleSubtext);
+    setVar(root, "--ai-bubble-border", bubbleBorder);
+    setVar(root, "--ai-bubble-glow", rgba(bubbleGlow, 0.38));
     setVar(root, "--ai-widget-width", cfg.width ? cfg.width + "px" : null);
     setVar(root, "--ai-widget-height", cfg.height ? cfg.height + "px" : null);
     setVar(root, "--ai-widget-offset-x", cfg.offsetX !== undefined ? cfg.offsetX + "px" : null);
     setVar(root, "--ai-widget-offset-y", cfg.offsetY !== undefined ? cfg.offsetY + "px" : null);
     setVar(root, "--ai-launcher-size", cfg.launcherSize ? cfg.launcherSize + "px" : null);
     setVar(root, "--ai-widget-radius", cfg.borderRadius ? cfg.borderRadius + "px" : null);
+    setVar(root, "--ai-bubble-width", cfg.bubbleWidth ? cfg.bubbleWidth + "px" : null);
+    setVar(root, "--ai-bubble-radius", cfg.bubbleRadius ? cfg.bubbleRadius + "px" : null);
   };
 
   const applyPosition = (root, position) => {
@@ -409,6 +421,16 @@ export function renderWidgetScript(
   const applyFormat = (root, format) => {
     root.classList.remove("ai-format-classic", "ai-format-assistant");
     root.classList.add(\`ai-format-\${normalizeFormat(format)}\`);
+  };
+
+  const normalizeLauncherStyle = (style) => {
+    return style === "card" ? "card" : "icon";
+  };
+
+  const applyLauncherStyle = (root, cfg) => {
+    root.classList.remove("ai-launcher-style-icon", "ai-launcher-style-card");
+    root.classList.add(\`ai-launcher-style-\${normalizeLauncherStyle(cfg?.launcherStyle)}\`);
+    root.classList.toggle("ai-three-enabled", cfg?.bubbleUseThree !== false);
   };
 
   const getStockMeta = (status, copy) => {
@@ -559,6 +581,7 @@ export function renderWidgetScript(
         (brandName.charAt(0).toUpperCase() || "A").slice(0, 1);
       const collapsedLabel = fullConfig.collapsedLabel || copy.collapsedLabel;
       const humanSupportText = fullConfig.humanSupportText || copy.humanSupportText;
+      const bubbleSubtitle = fullConfig.bubbleSubtitle || "I'm here to assist you.";
       const greeting = fullConfig.greeting || copy.greeting;
       const launcherIcon = ["whatsapp", "chat", "bot", "store", "logo"].includes(fullConfig.launcherIcon)
         ? fullConfig.launcherIcon
@@ -577,6 +600,7 @@ export function renderWidgetScript(
       anchor.id = "ai-saas-anchor";
       applyPosition(anchor, fullConfig.position);
       applyFormat(anchor, fullConfig.format);
+      applyLauncherStyle(anchor, fullConfig);
       applyTheme(anchor, fullConfig);
 
       
@@ -597,12 +621,13 @@ export function renderWidgetScript(
         const fallbackIcon = launcherIcon === "logo" ? "whatsapp" : launcherIcon;
         if (launcherIcon === "logo" && launcherLogoUrl) {
           return \`<div class="ai-saas-icon has-logo" aria-hidden="true">
+            <canvas class="ai-saas-three-canvas"></canvas>
             <img class="ai-saas-launcher-logo" src="\${escapeHtml(launcherLogoUrl)}" alt="" loading="eager" decoding="async" onerror="this.closest('.ai-saas-icon').classList.remove('has-logo');this.remove();" />
             <span class="ai-saas-icon-fallback">\${renderLauncherSvg(fallbackIcon)}</span>
           </div>\`;
         }
 
-        return \`<div class="ai-saas-icon" aria-hidden="true">\${renderLauncherSvg(fallbackIcon)}</div>\`;
+        return \`<div class="ai-saas-icon" aria-hidden="true"><canvas class="ai-saas-three-canvas"></canvas>\${renderLauncherSvg(fallbackIcon)}</div>\`;
       };
 
       const renderCloseButton = (className) => \`
@@ -729,6 +754,10 @@ export function renderWidgetScript(
       anchor.innerHTML = \`
         <button id="ai-saas-toggle" type="button" aria-controls="ai-saas-widget" aria-expanded="false" aria-label="\${escapeHtml(copy.openChat)}">
           \${renderBrandIcon()}
+          <span class="ai-saas-bubble-copy">
+            <span class="ai-saas-bubble-title">\${escapeHtml(collapsedLabel)}</span>
+            <span class="ai-saas-bubble-subtitle">\${escapeHtml(bubbleSubtitle)}</span>
+          </span>
           <span class="ai-saas-label">\${escapeHtml(collapsedLabel)}</span>
         </button>
         \${isAssistantFormat ? renderAssistantWidget() : renderClassicWidget()}
@@ -743,6 +772,7 @@ export function renderWidgetScript(
           fullConfig = mergeConfig(freshConfig || {});
           copy = getCopy(fullConfig.language);
           applyFormat(anchor, fullConfig.format);
+          applyLauncherStyle(anchor, fullConfig);
           applyTheme(anchor, fullConfig);
         } catch (err) {
           console.warn("Widget theme refresh failed");
@@ -758,6 +788,115 @@ export function renderWidgetScript(
       const submitBtn = form.querySelector("button");
       const chatBox = document.getElementById("ai-saas-chat-box");
       const suggestionLabels = copy.suggestions;
+
+      const setupThreeLauncher = async () => {
+        const canvas = toggleBtn?.querySelector(".ai-saas-three-canvas");
+        if (!canvas || canvas.dataset.aiThree === "ready" || canvas.dataset.aiThree === "loading") return;
+        if (fullConfig.bubbleUseThree === false) return;
+        if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return;
+
+        canvas.dataset.aiThree = "loading";
+
+        try {
+          const THREE = await import(new URL("/api/widget/three", API_BASE).toString());
+          const renderer = new THREE.WebGLRenderer({
+            canvas,
+            alpha: true,
+            antialias: true,
+            powerPreference: "low-power",
+          });
+          renderer.setClearColor(0x000000, 0);
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+          const scene = new THREE.Scene();
+          const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+          camera.position.z = 5.8;
+
+          const group = new THREE.Group();
+          scene.add(group);
+
+          const accent = normalizeHex(fullConfig.accent) || normalizeHex(fullConfig.appearance?.colorBubbleGlow) || "#8b5cf6";
+          const iconColor = normalizeHex(fullConfig.appearance?.colorToggleText) || "#ffffff";
+
+          const ringMaterial = new THREE.MeshBasicMaterial({
+            color: accent,
+            transparent: true,
+            opacity: 0.28,
+          });
+          const ringOne = new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.018, 8, 80), ringMaterial);
+          const ringTwo = new THREE.Mesh(new THREE.TorusGeometry(0.86, 0.014, 8, 64), ringMaterial.clone());
+          ringTwo.material.opacity = 0.2;
+          ringOne.rotation.x = 0.8;
+          ringTwo.rotation.x = -0.72;
+          ringTwo.rotation.y = 0.8;
+          group.add(ringOne, ringTwo);
+
+          const points = 34;
+          const positions = new Float32Array(points * 3);
+          for (let i = 0; i < points; i += 1) {
+            const angle = (i / points) * Math.PI * 2;
+            const radius = 0.35 + ((i * 37) % 100) / 100 * 1.25;
+            positions[i * 3] = Math.cos(angle) * radius;
+            positions[i * 3 + 1] = Math.sin(angle * 1.7) * radius * 0.62;
+            positions[i * 3 + 2] = (((i * 19) % 100) / 100 - 0.5) * 1.8;
+          }
+
+          const sparkleGeometry = new THREE.BufferGeometry();
+          sparkleGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+          const sparkleMaterial = new THREE.PointsMaterial({
+            color: iconColor,
+            size: 0.085,
+            transparent: true,
+            opacity: 0.88,
+            depthWrite: false,
+          });
+          const sparkles = new THREE.Points(sparkleGeometry, sparkleMaterial);
+          group.add(sparkles);
+
+          const resize = () => {
+            const rect = canvas.getBoundingClientRect();
+            const width = Math.max(1, Math.round(rect.width));
+            const height = Math.max(1, Math.round(rect.height));
+            renderer.setSize(width, height, false);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+          };
+
+          resize();
+          const observer = "ResizeObserver" in window ? new ResizeObserver(resize) : null;
+          observer?.observe(canvas);
+
+          let frame = 0;
+          const animate = (time) => {
+            frame = window.requestAnimationFrame(animate);
+            group.rotation.z = time * 0.00034;
+            group.rotation.y = Math.sin(time * 0.00045) * 0.26;
+            sparkles.rotation.z = -time * 0.00022;
+            renderer.render(scene, camera);
+          };
+
+          canvas.dataset.aiThree = "ready";
+          anchor.classList.add("ai-three-ready");
+          frame = window.requestAnimationFrame(animate);
+
+          window.addEventListener("pagehide", () => {
+            if (frame) window.cancelAnimationFrame(frame);
+            observer?.disconnect();
+            renderer.dispose();
+            ringOne.geometry.dispose();
+            ringTwo.geometry.dispose();
+            ringMaterial.dispose();
+            ringTwo.material.dispose();
+            sparkleGeometry.dispose();
+            sparkleMaterial.dispose();
+          }, { once: true });
+        } catch (err) {
+          canvas.dataset.aiThree = "failed";
+          anchor.classList.remove("ai-three-ready");
+        }
+      };
+
+      setupThreeLauncher();
 
       const scrollChatToBottom = () => {
         chatBox.scrollTop = chatBox.scrollHeight;

@@ -8,7 +8,9 @@ import {
   sanitizeWidgetLanguage,
   sanitizeWidgetFormat,
   sanitizeLauncherIcon,
+  sanitizeLauncherStyle,
   sanitizePosition,
+  sanitizeWidgetBoolean,
   sanitizeWidgetNumber,
   widgetDefaults,
   widgetLimits,
@@ -141,6 +143,28 @@ function buildPreviewOverrides(
     overrides.launcherLogoUrl = normalizeImageUrl(launcherLogoUrlParam);
   }
 
+  const launcherStyleParam = getParam(params, "launcherStyle");
+  if (launcherStyleParam !== null) {
+    overrides.launcherStyle = sanitizeLauncherStyle(launcherStyleParam);
+  }
+
+  const bubbleSubtitleParam = getParam(params, "bubbleSubtitle");
+  if (bubbleSubtitleParam !== null) {
+    overrides.bubbleSubtitle = sanitizeText(
+      bubbleSubtitleParam,
+      widgetDefaults.bubbleSubtitle,
+      widgetLimits.bubbleSubtitle
+    );
+  }
+
+  const bubbleUseThreeParam = getParam(params, "bubbleUseThree");
+  if (bubbleUseThreeParam !== null) {
+    overrides.bubbleUseThree = sanitizeWidgetBoolean(
+      bubbleUseThreeParam,
+      widgetDefaults.bubbleUseThree
+    );
+  }
+
   const positionParam = getParam(params, "position");
   if (positionParam !== null) {
     overrides.position = sanitizePosition(positionParam);
@@ -206,6 +230,26 @@ function buildPreviewOverrides(
     );
   }
 
+  const bubbleWidthParam = getParam(params, "bubbleWidth");
+  if (bubbleWidthParam !== null) {
+    overrides.bubbleWidth = sanitizeWidgetNumber(
+      bubbleWidthParam,
+      widgetDefaults.bubbleWidth,
+      widgetLimits.bubbleWidth.min,
+      widgetLimits.bubbleWidth.max
+    );
+  }
+
+  const bubbleRadiusParam = getParam(params, "bubbleRadius");
+  if (bubbleRadiusParam !== null) {
+    overrides.bubbleRadius = sanitizeWidgetNumber(
+      bubbleRadiusParam,
+      widgetDefaults.bubbleRadius,
+      widgetLimits.bubbleRadius.min,
+      widgetLimits.bubbleRadius.max
+    );
+  }
+
   const colorHeaderBg = getParam(params, "colorHeaderBg");
   const colorHeaderText = getParam(params, "colorHeaderText");
   const colorChatBg = getParam(params, "colorChatBg");
@@ -215,6 +259,11 @@ function buildPreviewOverrides(
   const colorBotBubbleText = getParam(params, "colorBotBubbleText");
   const colorToggleBg = getParam(params, "colorToggleBg");
   const colorToggleText = getParam(params, "colorToggleText");
+  const colorBubbleBg = getParam(params, "colorBubbleBg");
+  const colorBubbleText = getParam(params, "colorBubbleText");
+  const colorBubbleSubtext = getParam(params, "colorBubbleSubtext");
+  const colorBubbleBorder = getParam(params, "colorBubbleBorder");
+  const colorBubbleGlow = getParam(params, "colorBubbleGlow");
   const appearanceDefaults = getWidgetAppearanceDefaults(previewFormat);
 
   const hasAppearanceOverrides = [
@@ -228,6 +277,11 @@ function buildPreviewOverrides(
     colorBotBubbleText,
     colorToggleBg,
     colorToggleText,
+    colorBubbleBg,
+    colorBubbleText,
+    colorBubbleSubtext,
+    colorBubbleBorder,
+    colorBubbleGlow,
   ].some((value) => value !== null);
 
   if (hasAppearanceOverrides) {
@@ -267,6 +321,26 @@ function buildPreviewOverrides(
       colorToggleText: normalizeHex(
         colorToggleText,
         appearanceDefaults.colorToggleText
+      ),
+      colorBubbleBg: normalizeHex(
+        colorBubbleBg,
+        appearanceDefaults.colorBubbleBg
+      ),
+      colorBubbleText: normalizeHex(
+        colorBubbleText,
+        appearanceDefaults.colorBubbleText
+      ),
+      colorBubbleSubtext: normalizeHex(
+        colorBubbleSubtext,
+        appearanceDefaults.colorBubbleSubtext
+      ),
+      colorBubbleBorder: normalizeHex(
+        colorBubbleBorder,
+        appearanceDefaults.colorBubbleBorder
+      ),
+      colorBubbleGlow: normalizeHex(
+        colorBubbleGlow,
+        appearanceDefaults.colorBubbleGlow
       ),
     };
   }

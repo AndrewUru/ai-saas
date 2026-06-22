@@ -2,6 +2,7 @@ export type WidgetPosition = "left" | "right";
 export type WidgetLanguage = "auto" | "en" | "es" | "pt" | "fr";
 export type WidgetLauncherIcon = "whatsapp" | "chat" | "bot" | "store" | "logo";
 export type WidgetFormat = "classic" | "assistant";
+export type WidgetLauncherStyle = "icon" | "card";
 
 export interface WidgetAppearance {
   format: WidgetFormat;
@@ -18,6 +19,11 @@ export interface WidgetAppearance {
   greeting: string;
   launcherIcon: WidgetLauncherIcon;
   launcherLogoUrl: string | null;
+  launcherStyle: WidgetLauncherStyle;
+  bubbleSubtitle: string;
+  bubbleUseThree: boolean;
+  bubbleWidth: number;
+  bubbleRadius: number;
   position: WidgetPosition;
   width: number;
   height: number;
@@ -35,6 +41,11 @@ export interface WidgetAppearance {
   colorBotBubbleText: string;
   colorToggleBg: string;
   colorToggleText: string;
+  colorBubbleBg: string;
+  colorBubbleText: string;
+  colorBubbleSubtext: string;
+  colorBubbleBorder: string;
+  colorBubbleGlow: string;
 }
 
 export interface WidgetConfig {
@@ -50,6 +61,11 @@ export interface WidgetConfig {
   humanSupportText?: string;
   launcherIcon?: WidgetLauncherIcon | string | null;
   launcherLogoUrl?: string | null;
+  launcherStyle?: WidgetLauncherStyle | string | null;
+  bubbleSubtitle?: string;
+  bubbleUseThree?: boolean;
+  bubbleWidth?: number;
+  bubbleRadius?: number;
   position: WidgetPosition;
   width?: number;
   height?: number;
@@ -67,6 +83,11 @@ export interface WidgetConfig {
     colorBotBubbleText: string;
     colorToggleBg: string;
     colorToggleText: string;
+    colorBubbleBg: string;
+    colorBubbleText: string;
+    colorBubbleSubtext: string;
+    colorBubbleBorder: string;
+    colorBubbleGlow: string;
   };
 }
 
@@ -82,6 +103,11 @@ export interface AgentRecord {
   widget_format: WidgetFormat | string | null;
   widget_launcher_icon: WidgetLauncherIcon | string | null;
   widget_launcher_logo_url: string | null;
+  widget_launcher_style: WidgetLauncherStyle | string | null;
+  widget_bubble_subtitle: string | null;
+  widget_bubble_use_three: boolean | null;
+  widget_bubble_width: number | null;
+  widget_bubble_radius: number | null;
   language: WidgetLanguage | string | null;
   widget_position: WidgetPosition | null;
   widget_width: number | null;
@@ -99,4 +125,9 @@ export interface AgentRecord {
   widget_color_bot_bubble_text: string | null;
   widget_color_toggle_bg: string | null;
   widget_color_toggle_text: string | null;
+  widget_color_bubble_bg: string | null;
+  widget_color_bubble_text: string | null;
+  widget_color_bubble_subtext: string | null;
+  widget_color_bubble_border: string | null;
+  widget_color_bubble_glow: string | null;
 }
