@@ -1,6 +1,12 @@
 export type WidgetPosition = "left" | "right";
 export type WidgetLanguage = "auto" | "en" | "es" | "pt" | "fr";
-export type WidgetLauncherIcon = "whatsapp" | "chat" | "bot" | "store" | "logo";
+export type WidgetLauncherIcon =
+  | "whatsapp"
+  | "chat"
+  | "sparkles"
+  | "bot"
+  | "store"
+  | "logo";
 export type WidgetFormat = "classic" | "assistant";
 export type WidgetLauncherStyle = "icon" | "card";
 

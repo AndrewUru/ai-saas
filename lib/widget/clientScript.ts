@@ -583,7 +583,7 @@ export function renderWidgetScript(
       const humanSupportText = fullConfig.humanSupportText || copy.humanSupportText;
       const bubbleSubtitle = fullConfig.bubbleSubtitle || "I'm here to assist you.";
       const greeting = fullConfig.greeting || copy.greeting;
-      const launcherIcon = ["whatsapp", "chat", "bot", "store", "logo"].includes(fullConfig.launcherIcon)
+      const launcherIcon = ["whatsapp", "chat", "sparkles", "bot", "store", "logo"].includes(fullConfig.launcherIcon)
         ? fullConfig.launcherIcon
         : "whatsapp";
       const launcherLogoUrl = sanitizeUrl(fullConfig.launcherLogoUrl);
@@ -605,6 +605,9 @@ export function renderWidgetScript(
 
       
       const renderLauncherSvg = (icon) => {
+        if (icon === "sparkles") {
+          return \`<svg viewBox="0 0 32 32" fill="none" role="img"><path fill="currentColor" d="M13.5 4.8a1 1 0 0 1 1.9 0l1.18 3.64a5.2 5.2 0 0 0 3.28 3.28l3.64 1.18a1 1 0 0 1 0 1.9l-3.64 1.18a5.2 5.2 0 0 0-3.28 3.28l-1.18 3.64a1 1 0 0 1-1.9 0l-1.18-3.64a5.2 5.2 0 0 0-3.28-3.28L5.4 14.8a1 1 0 0 1 0-1.9l3.64-1.18a5.2 5.2 0 0 0 3.28-3.28L13.5 4.8Zm.95 3.58-.23.7a7.2 7.2 0 0 1-4.54 4.54l-.7.23.7.23a7.2 7.2 0 0 1 4.54 4.54l.23.7.23-.7a7.2 7.2 0 0 1 4.54-4.54l.7-.23-.7-.23a7.2 7.2 0 0 1-4.54-4.54l-.23-.7ZM23.6 19.2a.8.8 0 0 1 1.52 0l.42 1.28a2 2 0 0 0 1.26 1.26l1.28.42a.8.8 0 0 1 0 1.52l-1.28.42a2 2 0 0 0-1.26 1.26l-.42 1.28a.8.8 0 0 1-1.52 0l-.42-1.28a2 2 0 0 0-1.26-1.26l-1.28-.42a.8.8 0 0 1 0-1.52l1.28-.42a2 2 0 0 0 1.26-1.26l.42-1.28ZM6.94 21.2a.72.72 0 0 1 1.37 0l.24.74a1.3 1.3 0 0 0 .82.82l.74.24a.72.72 0 0 1 0 1.37l-.74.24a1.3 1.3 0 0 0-.82.82l-.24.74a.72.72 0 0 1-1.37 0l-.24-.74a1.3 1.3 0 0 0-.82-.82l-.74-.24a.72.72 0 0 1 0-1.37l.74-.24a1.3 1.3 0 0 0 .82-.82l.24-.74Z"/></svg>\`;
+        }
         if (icon === "chat") {
           return \`<svg viewBox="0 0 32 32" fill="none" role="img"><path fill="currentColor" d="M16 5C9.37 5 4 9.8 4 15.7c0 3.06 1.46 5.82 3.8 7.77l-.77 3.83a.8.8 0 0 0 1.1.9l4.66-2.05c1.02.25 2.1.38 3.21.38 6.63 0 12-4.8 12-10.83C28 9.8 22.63 5 16 5Zm-5.2 12.4a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4Zm5.2 0a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4Zm5.2 0a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4Z"/></svg>\`;
         }

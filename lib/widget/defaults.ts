@@ -1,7 +1,13 @@
 //C:\ai-saas\lib\widget\defaults.ts
 export type WidgetPosition = "left" | "right";
 export type WidgetLanguage = "auto" | "en" | "es" | "pt" | "fr";
-export type WidgetLauncherIcon = "whatsapp" | "chat" | "bot" | "store" | "logo";
+export type WidgetLauncherIcon =
+  | "whatsapp"
+  | "chat"
+  | "sparkles"
+  | "bot"
+  | "store"
+  | "logo";
 export type WidgetFormat = "classic" | "assistant";
 export type WidgetLauncherStyle = "icon" | "card";
 
@@ -142,6 +148,7 @@ export const widgetLauncherStyles: WidgetLauncherStyle[] = ["icon", "card"];
 export const widgetLauncherIcons: WidgetLauncherIcon[] = [
   "whatsapp",
   "chat",
+  "sparkles",
   "bot",
   "store",
   "logo",
@@ -201,6 +208,7 @@ export function sanitizeLauncherIcon(
   icon?: string | null
 ): WidgetLauncherIcon {
   return icon === "chat" ||
+    icon === "sparkles" ||
     icon === "bot" ||
     icon === "store" ||
     icon === "logo" ||

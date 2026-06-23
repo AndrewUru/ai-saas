@@ -121,6 +121,7 @@ const inputClass =
 const launcherIconLabels: Record<WidgetLauncherIcon, string> = {
   whatsapp: "WhatsApp",
   chat: "Chat",
+  sparkles: "AI sparkles",
   bot: "Bot",
   store: "Store",
   logo: "Logo URL",
@@ -129,6 +130,7 @@ const launcherIconLabels: Record<WidgetLauncherIcon, string> = {
 const launcherIconHelp: Record<WidgetLauncherIcon, string> = {
   whatsapp: "Familiar green support launcher.",
   chat: "Neutral chat bubble for compact launchers.",
+  sparkles: "AI shine for assistant cards.",
   bot: "Assistant style icon.",
   store: "Commerce storefront icon.",
   logo: "Use an image or SVG URL.",
@@ -173,7 +175,9 @@ function normalizeLauncherStyle(value: string | null): WidgetLauncherStyle {
 }
 
 function getAssistantCardIcon(icon: WidgetLauncherIcon): WidgetLauncherIcon {
-  return icon === "chat" || icon === "whatsapp" ? "bot" : icon;
+  return icon === "chat" || icon === "whatsapp" || icon === "bot"
+    ? "sparkles"
+    : icon;
 }
 
 function SectionCard({
@@ -1078,7 +1082,9 @@ export default function WidgetDesigner({
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {widgetLauncherIcons.map((option) => {
                   const OptionIcon =
-                    option === "bot"
+                    option === "sparkles"
+                      ? Sparkles
+                      : option === "bot"
                       ? Bot
                       : option === "store"
                         ? Store
