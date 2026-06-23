@@ -1298,7 +1298,7 @@ export default function WidgetDesigner({
               key={iframeKey}
               title="Widget preview"
               src={previewPageUrl}
-              sandbox="allow-scripts allow-same-origin"
+              sandbox="allow-scripts"
               className="block h-[640px] w-full rounded-[22px] border-0 bg-slate-100"
             />
           </div>
