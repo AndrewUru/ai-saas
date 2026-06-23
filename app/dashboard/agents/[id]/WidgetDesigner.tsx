@@ -128,7 +128,7 @@ const launcherIconLabels: Record<WidgetLauncherIcon, string> = {
 
 const launcherIconHelp: Record<WidgetLauncherIcon, string> = {
   whatsapp: "Familiar green support launcher.",
-  chat: "Neutral chat bubble.",
+  chat: "Neutral chat bubble for compact launchers.",
   bot: "Assistant style icon.",
   store: "Commerce storefront icon.",
   logo: "Use an image or SVG URL.",
@@ -141,7 +141,7 @@ const launcherStyleLabels: Record<WidgetLauncherStyle, string> = {
 
 const launcherStyleHelp: Record<WidgetLauncherStyle, string> = {
   icon: "Round launcher with hover label.",
-  card: "Always-visible title, subtitle, glow, and 3D orb.",
+  card: "Assistant card with title, subtitle, glow, and 3D orb.",
 };
 
 const widgetFormatLabels: Record<WidgetFormat, string> = {
@@ -170,6 +170,10 @@ function normalizeLauncherStyle(value: string | null): WidgetLauncherStyle {
   return widgetLauncherStyles.includes(value as WidgetLauncherStyle)
     ? (value as WidgetLauncherStyle)
     : widgetDefaults.launcherStyle;
+}
+
+function getAssistantCardIcon(icon: WidgetLauncherIcon): WidgetLauncherIcon {
+  return icon === "chat" || icon === "whatsapp" ? "bot" : icon;
 }
 
 function SectionCard({
@@ -400,6 +404,13 @@ export default function WidgetDesigner({
   initialLauncherIcon,
   initialLauncherLogoUrl,
 }: WidgetDesignerProps) {
+  const initialNormalizedLauncherStyle = normalizeLauncherStyle(
+    initialLauncherStyle,
+  );
+  const initialNormalizedLauncherIcon = normalizeLauncherIcon(
+    initialLauncherIcon,
+  );
+
   const [accentInput, setAccentInput] = useState(initialAccent ?? "");
   const [brandInput, setBrandInput] = useState(initialBrand ?? "");
   const [labelInput, setLabelInput] = useState(initialLabel ?? "");
@@ -414,7 +425,7 @@ export default function WidgetDesigner({
     normalizeWidgetFormat(initialFormat),
   );
   const [launcherStyle, setLauncherStyle] = useState<WidgetLauncherStyle>(
-    normalizeLauncherStyle(initialLauncherStyle),
+    initialNormalizedLauncherStyle,
   );
   const [bubbleUseThree, setBubbleUseThree] = useState(
     initialBubbleUseThree ?? widgetDefaults.bubbleUseThree,
@@ -484,7 +495,9 @@ export default function WidgetDesigner({
     initialColorBubbleGlow ?? "",
   );
   const [launcherIcon, setLauncherIcon] = useState<WidgetLauncherIcon>(
-    normalizeLauncherIcon(initialLauncherIcon),
+    initialNormalizedLauncherStyle === "card"
+      ? getAssistantCardIcon(initialNormalizedLauncherIcon)
+      : initialNormalizedLauncherIcon,
   );
   const [launcherLogoUrl, setLauncherLogoUrl] = useState(
     initialLauncherLogoUrl ?? "",
@@ -494,6 +507,13 @@ export default function WidgetDesigner({
   const embedSnippet = getEmbedSnippet(apiKey);
   const accentDefault = getWidgetAccentDefault(format);
   const appearanceDefaults = getWidgetAppearanceDefaults(format);
+
+  const handleLauncherStyleChange = (nextStyle: WidgetLauncherStyle) => {
+    setLauncherStyle(nextStyle);
+    if (nextStyle === "card") {
+      setLauncherIcon((currentIcon) => getAssistantCardIcon(currentIcon));
+    }
+  };
 
   const liveStateInput = useMemo(
     () => ({
@@ -938,7 +958,7 @@ export default function WidgetDesigner({
                       name="widget_launcher_style"
                       value={option}
                       checked={launcherStyle === option}
-                      onChange={() => setLauncherStyle(option)}
+                      onChange={() => handleLauncherStyleChange(option)}
                       className="sr-only"
                     />
                     <span className="flex items-center gap-2 text-sm font-semibold">
