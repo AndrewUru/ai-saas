@@ -164,7 +164,7 @@ export default async function AgentsPage(props: {
                 </p>
               </div>
               <Link
-                href="/docs"
+                href="/dashboard/docs"
                 className="ui-button ui-button--subtle text-xs"
                 data-oid="-smml4."
               >

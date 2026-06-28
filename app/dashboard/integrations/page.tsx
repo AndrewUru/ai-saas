@@ -309,7 +309,7 @@ export default async function IntegrationsPage() {
           </p>
         </div>
         <Link
-          href="/docs"
+          href="/dashboard/docs"
           className="ui-button ui-button--ghost"
           data-oid="p54o2z1"
         >
