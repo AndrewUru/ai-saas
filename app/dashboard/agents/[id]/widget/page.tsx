@@ -370,7 +370,7 @@ export default async function AgentWidgetPage({
         </div>
       ) : null}
 
-      <article className="ui-card glass-pane p-2">
+      <article className="ui-card glass-pane p-4 sm:p-2">
         <WidgetDesigner
           apiKey={agent.api_key}
           siteUrl={siteUrl}
