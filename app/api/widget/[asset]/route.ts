@@ -10,6 +10,10 @@ type WidgetAssetRouteContext = {
   params: Promise<{ asset: string }>;
 };
 
+export function generateStaticParams() {
+  return [{ asset: "three.core.min.js" }];
+}
+
 export async function GET(_req: Request, context: WidgetAssetRouteContext) {
   const { asset } = await context.params;
 
