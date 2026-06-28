@@ -338,7 +338,7 @@ export default async function AgentWidgetPage({
   return (
     <form action={updateWidget} className="space-y-6">
       <input type="hidden" name="agent_id" value={agent.id} />
-      <header className="ui-card--strong p-6">
+      <header className="ui-card--strong p-4 sm:p-6">
         <p className="ui-badge">Widget</p>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -349,11 +349,11 @@ export default async function AgentWidgetPage({
               Customize colors, copy, position, and preview before publishing.
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
             <SubmitButton label="Save widget" />
             <Link
               href={`/dashboard/agents/${agent.id}`}
-              className="ui-button ui-button--ghost"
+              className="ui-button ui-button--ghost w-full sm:w-auto"
             >
               Back to setup
             </Link>
