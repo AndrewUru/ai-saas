@@ -252,9 +252,10 @@ export const STATIC_STYLES = `
 }
 
 #ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle {
+  --ai-card-icon-size: clamp(46px, calc(var(--ai-launcher-size) * 0.68), 56px);
   width: min(var(--ai-bubble-width), calc(100vw - 36px));
   height: auto;
-  min-height: var(--ai-launcher-size);
+  min-height: calc(var(--ai-card-icon-size) + 20px);
   justify-content: flex-start;
   gap: 12px;
   padding: 10px 14px 10px 10px;
@@ -293,9 +294,9 @@ export const STATIC_STYLES = `
 }
 
 #ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle .ai-saas-icon {
-  width: var(--ai-launcher-size);
-  height: var(--ai-launcher-size);
-  flex: 0 0 var(--ai-launcher-size);
+  width: var(--ai-card-icon-size);
+  height: var(--ai-card-icon-size);
+  flex: 0 0 var(--ai-card-icon-size);
   color: var(--ai-toggle-text);
   background:
     radial-gradient(circle at 36% 24%, rgba(255, 255, 255, 0.24), transparent 34%),
@@ -303,6 +304,11 @@ export const STATIC_STYLES = `
   box-shadow:
     0 0 26px var(--ai-bubble-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+#ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle .ai-saas-icon svg {
+  width: clamp(24px, calc(var(--ai-card-icon-size) * 0.5), 30px);
+  height: clamp(24px, calc(var(--ai-card-icon-size) * 0.5), 30px);
 }
 
 #ai-saas-anchor.ai-launcher-style-card #ai-saas-toggle .ai-saas-bubble-copy {
