@@ -29,7 +29,7 @@
     },
     {
       "id": "integration-empty-state-cta",
-      "status": "ready",
+      "status": "proposed",
       "priority": "P1",
       "area": "Integrations",
       "title": "Upgrade integration empty states with provider-specific CTAs",
@@ -38,6 +38,10 @@
         "WooCommerce and Shopify empty states include a clear action.",
         "The action label names the provider.",
         "The panel still works with existing connection summaries."
+      ],
+      "proposedAt": "2026-06-29T12:41:05.702Z",
+      "files": [
+        "app/dashboard/integrations/page.tsx"
       ]
     },
     {

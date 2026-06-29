@@ -22,3 +22,21 @@ Applied changes:
 - components/ui/EmptyState.tsx: created
 - app/dashboard/AgentsSection.tsx: import added
 - app/dashboard/AgentsSection.tsx: updated
+
+## 2026-06-29 - Upgrade integration empty states with provider-specific CTAs
+
+Priority: P1
+Area: Integrations
+
+Design reason: When no store is connected, users need a direct next step, not only a passive message.
+
+Files:
+- app/dashboard/integrations/page.tsx
+
+Acceptance:
+- WooCommerce and Shopify empty states include a clear action.
+- The action label names the provider.
+- The panel still works with existing connection summaries.
+
+Applied changes:
+- app/dashboard/integrations/page.tsx: updated
