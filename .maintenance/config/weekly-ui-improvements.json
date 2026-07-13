@@ -46,7 +46,7 @@
     },
     {
       "id": "button-mobile-stability",
-      "status": "ready",
+      "status": "proposed",
       "priority": "P2",
       "area": "Design system",
       "title": "Improve button sizing and label stability on narrow screens",
@@ -55,6 +55,10 @@
         "Buttons have stable minimum dimensions.",
         "Icon and text alignment stays predictable.",
         "Focus styles remain visible."
+      ],
+      "proposedAt": "2026-07-13T11:21:41.859Z",
+      "files": [
+        "app/globals.css"
       ]
     }
   ]
