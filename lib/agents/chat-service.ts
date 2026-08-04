@@ -509,12 +509,21 @@ export async function chatWithAgent(
   }
 
   if (params.persistConversation !== false) {
-    await deps.supabase.from("agent_messages").insert({
-      agent_id: validAgent.id,
-      message,
-      reply,
-      created_at: deps.now ? deps.now() : new Date().toISOString(),
-    });
+    const { error: persistenceError } = await deps.supabase
+      .from("agent_messages")
+      .insert({
+        agent_id: validAgent.id,
+        message,
+        reply,
+        created_at: deps.now ? deps.now() : new Date().toISOString(),
+      });
+    if (persistenceError) {
+      logger.error("[AI SaaS] conversation persistence failed:", {
+        agentId: validAgent.id,
+        code: persistenceError.code,
+        message: persistenceError.message,
+      });
+    }
   }
 
   return {

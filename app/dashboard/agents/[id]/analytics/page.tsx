@@ -53,10 +53,9 @@ function getDomain(value: string | null) {
 
 function groupByDay(
   events: WidgetEventRow[],
-  messages: MessageRow[],
   startDate: Date,
 ) {
-  const days = new Map<string, { label: string; events: number; messages: number }>();
+  const days = new Map<string, { label: string; events: number }>();
 
   for (let index = 6; index >= 0; index -= 1) {
     const day = new Date();
@@ -65,7 +64,6 @@ function groupByDay(
     days.set(key, {
       label: new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(day),
       events: 0,
-      messages: 0,
     });
   }
 
@@ -76,15 +74,6 @@ function groupByDay(
     const key = date.toISOString().slice(0, 10);
     const bucket = days.get(key);
     if (bucket) bucket.events += 1;
-  }
-
-  for (const message of messages) {
-    if (!message.created_at) continue;
-    const date = new Date(message.created_at);
-    if (date < startDate) continue;
-    const key = date.toISOString().slice(0, 10);
-    const bucket = days.get(key);
-    if (bucket) bucket.messages += 1;
   }
 
   return Array.from(days.values());
@@ -173,6 +162,7 @@ export default async function AgentAnalyticsPage({
   const failedEvents = events.filter(
     (event) => event.event_type === "message_failed",
   ).length;
+  const interactionCount = Math.max(messages.length, sentEvents.length);
   const userWordsFromMessages = messages.reduce(
     (total, row) => total + countWords(row.message),
     0,
@@ -188,13 +178,13 @@ export default async function AgentAnalyticsPage({
   const userWords = Math.max(userWordsFromMessages, userWordsFromEvents);
   const totalWords = userWords + assistantWords;
   const openRate = loads > 0 ? Math.round((opens / loads) * 100) : 0;
-  const messageRate = opens > 0 ? Math.round((messages.length / opens) * 100) : 0;
+  const messageRate = opens > 0 ? Math.round((interactionCount / opens) * 100) : 0;
   const avgUserWords =
-    messages.length > 0 ? Math.round(userWords / messages.length) : 0;
-  const activity = groupByDay(events, messages, startDate);
+    interactionCount > 0 ? Math.round(userWords / interactionCount) : 0;
+  const activity = groupByDay(events, startDate);
   const maxActivity = Math.max(
     1,
-    ...activity.map((day) => day.events + day.messages),
+    ...activity.map((day) => day.events),
   );
   const topPages = Array.from(
     events.reduce((acc, event) => {
@@ -246,7 +236,7 @@ export default async function AgentAnalyticsPage({
         <MetricCard
           icon={MessageSquare}
           label="Interactions"
-          value={formatNumber(messages.length)}
+          value={formatNumber(interactionCount)}
           helper={`${messageRate}% of opens became conversations.`}
         />
         <MetricCard
@@ -277,7 +267,7 @@ export default async function AgentAnalyticsPage({
 
           <div className="mt-6 grid h-56 grid-cols-7 items-end gap-3">
             {activity.map((day) => {
-              const total = day.events + day.messages;
+              const total = day.events;
               const height = Math.max(8, Math.round((total / maxActivity) * 100));
               return (
                 <div key={day.label} className="flex h-full flex-col justify-end gap-2">
@@ -386,6 +376,17 @@ export default async function AgentAnalyticsPage({
                 </p>
               </article>
             ))
+          ) : interactionCount > 0 ? (
+            <div className="rounded-2xl border border-dashed border-border bg-surface/20 p-8 text-center">
+              <BarChart3 className="mx-auto h-6 w-6 text-[var(--foreground-muted)]" />
+              <p className="mt-3 font-semibold text-foreground">
+                Interaction recorded
+              </p>
+              <p className="mt-1 text-sm text-[var(--foreground-muted)]">
+                This interaction was counted from widget events, but its
+                conversation text was not stored.
+              </p>
+            </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-border bg-surface/20 p-8 text-center">
               <BarChart3 className="mx-auto h-6 w-6 text-[var(--foreground-muted)]" />
