@@ -119,7 +119,7 @@ export default async function AgentsPage(props: {
             </span>
             <div className="flex items-center gap-2 mt-1" data-oid="ztt1prf">
               <div
-                className="h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_#34d399]"
+                className="h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_#d4d4d8]"
                 data-oid="gy.ecsl"
               />
 
@@ -238,7 +238,7 @@ export default async function AgentsPage(props: {
                   return (
                     <li
                       key={agent.id}
-                      className="ui-card group p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-accent/30 hover:shadow-[0_0_20px_rgba(52,211,153,0.05)]"
+                      className="ui-card group p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-accent/30 hover:shadow-[0_0_20px_rgba(212,212,216,0.05)]"
                       data-oid="vzbymf5"
                     >
                       <div className="space-y-2" data-oid="4y-q5r7">

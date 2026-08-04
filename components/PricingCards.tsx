@@ -73,7 +73,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
             key={plan.id}
             className={`ui-card relative flex flex-col gap-6 p-6 transition sm:p-8 ${
               plan.highlight
-                ? "border-accent/40 bg-accent/5 shadow-[0_0_30px_rgba(52,211,153,0.06)]"
+                ? "border-accent/40 bg-accent/5 shadow-[0_0_30px_rgba(212,212,216,0.06)]"
                 : "bg-surface/30"
             }`}
           >

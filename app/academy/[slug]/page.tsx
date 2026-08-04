@@ -60,7 +60,7 @@ export default async function AcademyPostPage({ params }: PageProps) {
         <div className="space-y-6" data-oid="9_xf2bk">
           <Link
             href="/academy"
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
+            className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="w8sq9hf"
           >
             ← Back to Academy
@@ -102,7 +102,7 @@ export default async function AcademyPostPage({ params }: PageProps) {
           </header>
 
           <article
-            className="prose prose-invert max-w-none prose-headings:text-white prose-a:text-emerald-300 prose-strong:text-white"
+            className="prose prose-invert max-w-none prose-headings:text-white prose-a:text-neutral-300 prose-strong:text-white"
             data-oid="dmbtbwb"
           >
             <MDXRemote source={post.content} data-oid="ie83lr9" />
@@ -116,7 +116,7 @@ export default async function AcademyPostPage({ params }: PageProps) {
           {previous ? (
             <Link
               href={`/academy/${previous.slug}`}
-              className="rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 transition hover:border-emerald-400/40 hover:text-emerald-200"
+              className="rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 transition hover:border-neutral-400/40 hover:text-neutral-200"
               data-oid="i2piie:"
             >
               ← Previous: {previous.title}
@@ -127,7 +127,7 @@ export default async function AcademyPostPage({ params }: PageProps) {
           {next ? (
             <Link
               href={`/academy/${next.slug}`}
-              className="rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 transition hover:border-emerald-400/40 hover:text-emerald-200"
+              className="rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 transition hover:border-neutral-400/40 hover:text-neutral-200"
               data-oid="k9rq740"
             >
               Next: {next.title} →

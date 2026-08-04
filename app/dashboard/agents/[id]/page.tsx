@@ -92,7 +92,7 @@ function SectionHeading({
 }) {
   return (
     <div className="space-y-1">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-200">
         {eyebrow}
       </p>
       <h2 className="text-xl font-semibold text-white">{title}</h2>
@@ -134,7 +134,7 @@ function StatusRow({
       <span className="flex min-w-0 items-center gap-2 text-right font-medium text-slate-200">
         <span
           className={`h-2 w-2 shrink-0 rounded-full ${
-            good ? "bg-emerald-400" : "bg-amber-300"
+            good ? "bg-neutral-400" : "bg-amber-300"
           }`}
         />
         <span className="truncate">{value}</span>
@@ -157,7 +157,7 @@ function ChecklistItem({
       <span
         className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
           done
-            ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200"
+            ? "border-neutral-400/40 bg-neutral-400/10 text-neutral-200"
             : "border-slate-700  text-slate-500"
         }`}
       >
@@ -640,7 +640,7 @@ export default async function AgentDetailPage({
           <aside className="min-w-0 space-y-4 2xl:sticky 2xl:top-24">
             <article className="rounded-3xl border border-border bg-surface/45 p-4">
               <div className="flex items-start gap-3">
-                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 text-emerald-200">
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-neutral-400/25 bg-neutral-400/10 text-neutral-200">
                   <Bot className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <div className="min-w-0">
@@ -679,7 +679,7 @@ export default async function AgentDetailPage({
               className="rounded-3xl border border-border bg-surface/35 p-3"
             >
               <div className="px-2 pb-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-200">
                   Editor
                 </p>
                 <p className="mt-1 text-xs leading-5 text-slate-400">
@@ -743,7 +743,7 @@ export default async function AgentDetailPage({
 
             <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-t-3xl border-b border-border bg-background/90 px-4 py-3 backdrop-blur-md sm:px-5">
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-200">
                   Setup
                 </p>
                 <h2 className="truncate text-lg font-semibold text-white">
@@ -759,25 +759,25 @@ export default async function AgentDetailPage({
             </div>
 
             <div className="max-h-none space-y-5 overflow-visible p-4 sm:p-5 2xl:max-h-[calc(100dvh-10rem)] 2xl:overflow-y-auto">
-              <section className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
+              <section className="rounded-2xl border border-neutral-400/20 bg-neutral-400/10 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-200">
                       Workspace
                     </p>
-                    <p className="mt-1 text-sm text-emerald-50">
+                    <p className="mt-1 text-sm text-neutral-50">
                       Configure the assistant here. Open the widget editor from
                       the left sidebar when you want to tune the customer-facing
                       launcher and preview.
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-xs text-emerald-100/75">
+                    <p className="text-xs text-neutral-100/75">
                       Next: {nextStep}
                     </p>
                     <Link
                       href={`${AGENTS_BASE}/${agent.id}/widget`}
-                      className="rounded-full border border-emerald-300/35 bg-emerald-300/10 px-3 py-1.5 text-xs font-semibold text-emerald-50 transition hover:bg-emerald-300/20"
+                      className="rounded-full border border-neutral-300/35 bg-neutral-300/10 px-3 py-1.5 text-xs font-semibold text-neutral-50 transition hover:bg-neutral-300/20"
                     >
                       Edit widget
                     </Link>
@@ -836,7 +836,7 @@ export default async function AgentDetailPage({
                     Manage your WooCommerce credentials from{" "}
                     <Link
                       href="/integrations/woo"
-                      className="text-emerald-300 hover:text-emerald-200"
+                      className="text-neutral-300 hover:text-neutral-200"
                       data-oid="7.y9isq"
                     >
                       Integrations
@@ -889,7 +889,7 @@ export default async function AgentDetailPage({
                     Manage your Shopify credentials from{" "}
                     <Link
                       href="/integrations/shopify"
-                      className="text-emerald-300 hover:text-emerald-200"
+                      className="text-neutral-300 hover:text-neutral-200"
                       data-oid="ce3adea"
                     >
                       Integrations
@@ -1006,7 +1006,7 @@ export default async function AgentDetailPage({
                     <p className="text-xs text-slate-400" data-oid="c8jvf_7">
                       Current domains:{" "}
                       <span
-                        className="font-mono text-emerald-200"
+                        className="font-mono text-neutral-200"
                         data-oid="s7mgxhf"
                       >
                         {allowedDomains.join(", ")}
@@ -1021,7 +1021,7 @@ export default async function AgentDetailPage({
 
               <article className="rounded-2xl border border-slate-800/80 p-5">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-200">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-neutral-400/30 bg-neutral-400/10 text-neutral-200">
                     <ShieldCheck className="h-4 w-4" />
                   </span>
                   <div>
@@ -1140,15 +1140,15 @@ function SidebarLink({
       href={href}
       className={`group flex gap-3 rounded-2xl border p-3 transition ${
         active
-          ? "border-emerald-400/35 bg-emerald-400/10 text-white"
-          : "border-slate-800/80 bg-slate-950/30 text-slate-300 hover:border-emerald-400/35 hover:bg-slate-950/55 hover:text-white"
+          ? "border-neutral-400/35 bg-neutral-400/10 text-white"
+          : "border-slate-800/80 bg-slate-950/30 text-slate-300 hover:border-neutral-400/35 hover:bg-slate-950/55 hover:text-white"
       }`}
     >
       <span
         className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${
           active
-            ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
-            : "border-slate-700 bg-slate-900/60 text-slate-400 group-hover:text-emerald-200"
+            ? "border-neutral-400/30 bg-neutral-400/10 text-neutral-200"
+            : "border-slate-700 bg-slate-900/60 text-slate-400 group-hover:text-neutral-200"
         }`}
       >
         <Icon className="h-4 w-4" aria-hidden="true" />

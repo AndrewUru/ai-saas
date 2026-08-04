@@ -10,7 +10,7 @@ export default function BlogPage() {
           data-oid="8z8_t-t"
         >
           <p
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
+            className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="-9_s3v."
           >
             Blog para agencias
@@ -30,7 +30,7 @@ export default function BlogPage() {
             data-oid="wlipncb"
           >
             <p
-              className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
+              className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
               data-oid="qt-br5l"
             >
               Destacado
@@ -66,13 +66,13 @@ export default function BlogPage() {
               <input
                 type="email"
                 placeholder="tuemail@agencia.com"
-                className="w-full rounded-full border border-slate-700 bg-slate-950/80 px-5 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
+                className="w-full rounded-full border border-slate-700 bg-slate-950/80 px-5 py-3 text-sm text-white placeholder:text-slate-500 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400/30"
                 data-oid="soe:afm"
               />
 
               <button
                 type="submit"
-                className="rounded-full bg-emerald-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+                className="rounded-full bg-neutral-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-neutral-300"
                 data-oid="_mrxg-g"
               >
                 Avisame

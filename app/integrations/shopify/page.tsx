@@ -127,7 +127,7 @@ export default async function ShopifyIntegrationPage({
       >
         <header className="space-y-4" data-oid="ibe_wer">
           <p
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
+            className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="rvy:23u"
           >
             Integrations
@@ -146,7 +146,7 @@ export default async function ShopifyIntegrationPage({
             className={[
               "mt-6 rounded-3xl border px-5 py-4 text-sm",
               status?.intent === "success" &&
-                "border-emerald-500/40 bg-emerald-500/10 text-emerald-100",
+                "border-neutral-500/40 bg-neutral-500/10 text-neutral-100",
               errorMsg && "border-rose-500/40 bg-rose-500/10 text-rose-100",
             ]
               .filter(Boolean)
@@ -197,7 +197,7 @@ export default async function ShopifyIntegrationPage({
                     required
                     maxLength={80}
                     placeholder="Main Shopify"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-400/40"
                     data-oid="_9_:qw5"
                   />
                 </label>
@@ -213,7 +213,7 @@ export default async function ShopifyIntegrationPage({
                     type="text"
                     required
                     placeholder="mystore.myshopify.com"
-                    className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                    className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-400/40"
                     data-oid="ls.rs7j"
                   />
                 </label>
@@ -227,7 +227,7 @@ export default async function ShopifyIntegrationPage({
                   name="is_active"
                   type="checkbox"
                   defaultChecked
-                  className="h-4 w-4 rounded border border-slate-600 bg-transparent text-emerald-400 focus:ring-emerald-400"
+                  className="h-4 w-4 rounded border border-slate-600 bg-transparent text-neutral-400 focus:ring-neutral-400"
                   data-oid="fzwbdjm"
                 />
                 Mark as active on creation
@@ -235,7 +235,7 @@ export default async function ShopifyIntegrationPage({
 
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 sm:w-auto"
+                className="inline-flex w-full items-center justify-center rounded-full bg-neutral-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-neutral-300 sm:w-auto"
                 data-oid="5excbtm"
               >
                 Connect Shopify
@@ -289,7 +289,7 @@ export default async function ShopifyIntegrationPage({
                 </div>
                 <Link
                   href="/dashboard/agents"
-                  className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200 transition hover:bg-emerald-500/20"
+                  className="rounded-full border border-neutral-400/40 bg-neutral-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-neutral-200 transition hover:bg-neutral-500/20"
                   data-oid=":2i6-.c"
                 >
                   View agents
@@ -326,7 +326,7 @@ export default async function ShopifyIntegrationPage({
                           className={[
                             "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em]",
                             integration.is_active
-                              ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-200"
+                              ? "border-neutral-400/40 bg-neutral-500/10 text-neutral-200"
                               : "border-slate-700 bg-slate-800/70 text-slate-300",
                           ].join(" ")}
                           data-oid="fu_72:m"
@@ -372,7 +372,7 @@ export default async function ShopifyIntegrationPage({
                                 name="label"
                                 defaultValue={integration.label ?? ""}
                                 required
-                                className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                                className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-400/40"
                                 data-oid="svoumsz"
                               />
                             </label>
@@ -388,7 +388,7 @@ export default async function ShopifyIntegrationPage({
                                 type="text"
                                 defaultValue={integration.shop_domain ?? ""}
                                 required
-                                className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40"
+                                className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-400/40"
                                 data-oid="mhpu_7u"
                               />
                             </label>
@@ -402,7 +402,7 @@ export default async function ShopifyIntegrationPage({
                               name="is_active"
                               type="checkbox"
                               defaultChecked={integration.is_active ?? false}
-                              className="h-4 w-4 rounded border border-slate-600 bg-transparent text-emerald-400 focus:ring-emerald-400"
+                              className="h-4 w-4 rounded border border-slate-600 bg-transparent text-neutral-400 focus:ring-neutral-400"
                               data-oid="i9u7qeg"
                             />
                             Keep active
@@ -414,7 +414,7 @@ export default async function ShopifyIntegrationPage({
                           >
                             <button
                               type="submit"
-                              className="inline-flex items-center justify-center rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+                              className="inline-flex items-center justify-center rounded-full bg-neutral-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-neutral-300"
                               data-oid="jie6vfh"
                             >
                               Save changes

@@ -35,7 +35,7 @@ export default function EmbedSnippet({ apiKey }: Props) {
         <button
           type="button"
           onClick={copy}
-          className="rounded-full bg-emerald-400 px-4 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-emerald-300"
+          className="rounded-full bg-neutral-400 px-4 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-neutral-300"
           data-oid="37itwtt"
         >
           {copied ? "Copied" : "Copy code"}
@@ -48,7 +48,7 @@ export default function EmbedSnippet({ apiKey }: Props) {
       </p>
 
       <pre
-        className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-emerald-200 whitespace-pre-wrap"
+        className="mt-4 max-h-64 overflow-auto rounded-2xl bg-slate-950/80 p-4 text-[11px] leading-relaxed text-neutral-200 whitespace-pre-wrap"
         data-oid="flh5:kq"
       >
         {snippet}

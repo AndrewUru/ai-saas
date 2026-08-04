@@ -109,7 +109,7 @@ export function renderWidgetScript(
   };
 
   const buildAccentVars = (accent) => {
-    const baseAccent = normalizeHex(accent) || "#34d399";
+    const baseAccent = normalizeHex(accent) || "#d4d4d8";
     const luminance = relativeLuminance(baseAccent);
     const accentContrast = luminance > 0.55 ? "#0f172a" : "#f8fafc";
     const accentShadow = rgba(baseAccent, 0.32);
@@ -355,19 +355,19 @@ export function renderWidgetScript(
     const appearance = cfg.appearance || {};
     const accentVars = buildAccentVars(cfg.accent || appearance.accent);
 
-    setVar(root, "--ai-accent", accentVars.accent, "#34d399");
+    setVar(root, "--ai-accent", accentVars.accent, "#d4d4d8");
     setVar(root, "--ai-accent-contrast", accentVars.accentContrast, "#0b1220");
     setVar(
       root,
       "--ai-accent-shadow",
       accentVars.accentShadow,
-      "rgba(52,211,153,.25)"
+      "rgba(212,212,216,.25)"
     );
     setVar(
       root,
       "--ai-accent-light",
       accentVars.accentLight,
-      "rgba(52,211,153,.18)"
+      "rgba(212,212,216,.18)"
     );
     setVar(
       root,
@@ -385,7 +385,7 @@ export function renderWidgetScript(
     setVar(root, "--ai-user-text", appearance.colorUserBubbleText);
     setVar(root, "--ai-bot-bg", appearance.colorBotBubbleBg);
     setVar(root, "--ai-bot-text", appearance.colorBotBubbleText);
-    const toggleBg = normalizeHex(appearance.colorToggleBg) || "#25d366";
+    const toggleBg = normalizeHex(appearance.colorToggleBg) || "#d4d4d8";
     const toggleText = normalizeHex(appearance.colorToggleText) || "#ffffff";
     setVar(root, "--ai-toggle-bg", toggleBg);
     setVar(root, "--ai-toggle-shadow", rgba(toggleBg, 0.34));

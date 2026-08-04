@@ -10,7 +10,7 @@ export default function AboutPage() {
           data-oid="a3ni6fy"
         >
           <p
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
+            className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="7qatfon"
           >
             About us

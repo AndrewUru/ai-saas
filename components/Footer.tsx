@@ -112,11 +112,11 @@ export default function Footer() {
             <div className="flex items-center gap-2 pt-2" data-oid="kz7x-d4">
               <span className="relative flex h-2 w-2" data-oid="f06f415">
                 <span           
-                  className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+                  className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neutral-400 opacity-75"
                   data-oid="t68q3-h"
                 ></span>
                 <span
-                  className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"
+                  className="relative inline-flex rounded-full h-2 w-2 bg-neutral-500"
                   data-oid="q.jc0mc"
                 ></span>
               </span>

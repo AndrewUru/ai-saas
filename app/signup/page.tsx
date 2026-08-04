@@ -287,7 +287,7 @@ export default function SignupPage() {
               className={[
                 "mt-6 rounded-lg border px-4 py-3 text-sm",
                 status.intent === "success" &&
-                  "border-emerald-500/40 bg-emerald-500/10 text-emerald-200",
+                  "border-neutral-500/40 bg-neutral-500/10 text-neutral-200",
                 status.intent === "error" &&
                   "border-rose-500/40 bg-rose-500/10 text-rose-200",
                 status.intent === "info" &&

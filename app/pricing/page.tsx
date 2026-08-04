@@ -148,7 +148,7 @@ function InfoCard({
       <ul
         className={
           highlighted
-            ? "mt-3 space-y-2 text-xs text-emerald-100/80"
+            ? "mt-3 space-y-2 text-xs text-neutral-100/80"
             : "mt-3 space-y-2 text-xs text-[var(--foreground-muted)]"
         }
       >

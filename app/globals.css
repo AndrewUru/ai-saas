@@ -32,11 +32,11 @@
   --border-strong: rgba(255, 255, 255, 0.15);
 
   /* Rings & Focus */
-  --ring: rgba(52, 211, 153, 0.5); /* Emerald 400 with opacity */
+  --ring: rgba(212, 212, 216, 0.5); /* Zinc 300 with opacity */
 
   /* Accents */
-  --accent: #34d399; /* Emerald 400 - Electric Green */
-  --accent-strong: #10b981; /* Emerald 500 */
+  --accent: #d4d4d8; /* Zinc 300 - Soft Silver */
+  --accent-strong: #a1a1aa; /* Zinc 400 */
   --accent-secondary: #8b5cf6; /* Violet 500 - Cyber styling */
 
   /* Surfaces */
@@ -49,7 +49,7 @@
 
   /* Shadows */
   --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 20px rgba(52, 211, 153, 0.15);
+  --shadow-glow: 0 0 20px rgba(212, 212, 216, 0.15);
 }
 
 html {
@@ -70,7 +70,7 @@ body {
   /* Complex modern background with dual glow points */
   background: radial-gradient(
       circle at 50% 0%,
-      rgba(52, 211, 153, 0.08),
+      rgba(212, 212, 216, 0.08),
       transparent 40%
     ),
     radial-gradient(
@@ -124,7 +124,7 @@ a:focus-visible {
 }
 
 ::selection {
-  background: rgba(52, 211, 153, 0.2);
+  background: rgba(212, 212, 216, 0.2);
   color: #fff;
 }
 
@@ -194,12 +194,12 @@ a:focus-visible {
   background: var(--accent);
   color: #000;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.3);
+  box-shadow: 0 4px 12px rgba(212, 212, 216, 0.3);
 }
 
 .ui-button--primary:hover {
   background: var(--accent-strong);
-  box-shadow: 0 6px 16px rgba(52, 211, 153, 0.4);
+  box-shadow: 0 6px 16px rgba(212, 212, 216, 0.4);
   transform: translateY(-1px);
 }
 
@@ -244,8 +244,8 @@ a:focus-visible {
   gap: 6px;
   border-radius: var(--pill-radius);
   padding: 4px 12px;
-  border: 1px solid rgba(52, 211, 153, 0.3);
-  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(212, 212, 216, 0.3);
+  background: rgba(212, 212, 216, 0.08);
   color: var(--accent);
   font-size: 0.75rem;
   letter-spacing: 0.05em;
@@ -368,9 +368,9 @@ a:focus-visible {
 }
 
 .ui-alert--success {
-  background: rgba(52, 211, 153, 0.1);
-  border-color: rgba(52, 211, 153, 0.3);
-  color: #a7f3d0; /* emerald-100 */
+  background: rgba(212, 212, 216, 0.1);
+  border-color: rgba(212, 212, 216, 0.3);
+  color: #e4e4e7; /* neutral-100 */
   box-shadow: var(--shadow-glow);
 }
 
@@ -451,7 +451,7 @@ a:focus-visible {
   }
 
   .prose :where(blockquote) {
-    border-left-color: rgba(52, 211, 153, 0.4);
+    border-left-color: rgba(212, 212, 216, 0.4);
     color: #cbd5e1;
   }
 }

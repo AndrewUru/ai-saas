@@ -32,7 +32,7 @@ export default function ChangelogPage() {
       >
         <header className="space-y-3" data-oid="u9596i:">
           <p
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
+            className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="8quh773"
           >
             Novedades
@@ -65,7 +65,7 @@ export default function ChangelogPage() {
                   {entry.title}
                 </h2>
                 <span
-                  className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
+                  className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
                   data-oid="a2wivy8"
                 >
                   {entry.date}

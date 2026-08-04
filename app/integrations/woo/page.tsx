@@ -29,7 +29,7 @@ export const runtime = "nodejs";
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 const inputClass =
-  "w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/40";
+  "w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-400/40";
 
 function statusMessage(status: string | null) {
   switch (status) {
@@ -124,7 +124,7 @@ function AlertBanner({
       className={cn(
         "rounded-2xl border px-4 py-3 text-sm",
         status?.intent === "success" &&
-          "border-emerald-500/35 bg-emerald-500/10 text-emerald-100",
+          "border-neutral-500/35 bg-neutral-500/10 text-neutral-100",
         error && "border-rose-500/35 bg-rose-500/10 text-rose-100",
       )}
       role={error ? "alert" : "status"}
@@ -163,7 +163,7 @@ function StatTile({
             {value}
           </p>
         </div>
-        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-800 bg-slate-900/70 text-emerald-200">
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-800 bg-slate-900/70 text-neutral-200">
           <Icon className="h-4 w-4" aria-hidden="true" />
         </span>
       </div>
@@ -183,7 +183,7 @@ function SetupStep({
 }) {
   return (
     <li className="flex gap-3 rounded-2xl border border-slate-800/70 bg-slate-950/35 p-3">
-      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-emerald-400/25 bg-emerald-400/10 text-xs font-semibold text-emerald-200">
+      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-neutral-400/25 bg-neutral-400/10 text-xs font-semibold text-neutral-200">
         {step}
       </span>
       <span className="min-w-0">
@@ -260,13 +260,13 @@ export default async function WooIntegrationPage({
           <div className="min-w-0">
             <Link
               href="/dashboard/integrations"
-              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 transition hover:text-emerald-200"
+              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 transition hover:text-neutral-200"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               Integrations
             </Link>
             <div className="mt-4 flex items-center gap-3">
-              <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-400/25 bg-emerald-400/10 text-emerald-200">
+              <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-neutral-400/25 bg-neutral-400/10 text-neutral-200">
                 <Store className="h-5 w-5" aria-hidden="true" />
               </span>
               <div className="min-w-0">
@@ -316,7 +316,7 @@ export default async function WooIntegrationPage({
           <aside className="space-y-5 xl:sticky xl:top-24">
             <section className="rounded-3xl border border-slate-800/80 bg-slate-900/45 p-5 shadow-xl shadow-black/20">
               <div className="flex items-start gap-3">
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-400/10 text-emerald-200">
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-neutral-400/25 bg-neutral-400/10 text-neutral-200">
                   <PlugZap className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <div>
@@ -394,7 +394,7 @@ export default async function WooIntegrationPage({
                     name="is_active"
                     type="checkbox"
                     defaultChecked
-                    className="mt-0.5 h-4 w-4 rounded border border-slate-600 bg-transparent text-emerald-400 focus:ring-emerald-400"
+                    className="mt-0.5 h-4 w-4 rounded border border-slate-600 bg-transparent text-neutral-400 focus:ring-neutral-400"
                   />
                   <span>
                     <span className="block font-semibold text-slate-200">
@@ -413,7 +413,7 @@ export default async function WooIntegrationPage({
 
             <section className="rounded-3xl border border-slate-800/80 bg-slate-900/35 p-5">
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-800 bg-slate-950/60 text-emerald-200">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-800 bg-slate-950/60 text-neutral-200">
                   <ShieldCheck className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <h2 className="text-lg font-semibold text-white">Setup guide</h2>
@@ -441,7 +441,7 @@ export default async function WooIntegrationPage({
           <section className="rounded-3xl border border-slate-800/80 bg-slate-900/45 p-4 shadow-xl shadow-black/20 sm:p-5">
             <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-800/80 pb-5">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-200">
                   Connected stores
                 </p>
                 <h2 className="mt-2 text-xl font-semibold text-white">
@@ -471,7 +471,7 @@ export default async function WooIntegrationPage({
                             className={cn(
                               "inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]",
                               integration.is_active
-                                ? "border-emerald-400/35 bg-emerald-500/10 text-emerald-200"
+                                ? "border-neutral-400/35 bg-neutral-500/10 text-neutral-200"
                                 : "border-slate-700 bg-slate-800/70 text-slate-300",
                             )}
                           >
@@ -576,7 +576,7 @@ export default async function WooIntegrationPage({
                             name="is_active"
                             type="checkbox"
                             defaultChecked={integration.is_active ?? false}
-                            className="h-4 w-4 rounded border border-slate-600 bg-transparent text-emerald-400 focus:ring-emerald-400"
+                            className="h-4 w-4 rounded border border-slate-600 bg-transparent text-neutral-400 focus:ring-neutral-400"
                           />
                           Keep active
                         </label>

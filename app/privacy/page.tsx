@@ -7,7 +7,7 @@ export default function PrivacyPage() {
       >
         <header className="space-y-3" data-oid="m6xwru:">
           <p
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
+            className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="zl3ndeo"
           >
             Legal Documentation

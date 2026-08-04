@@ -36,7 +36,7 @@ export function ThreeBackground() {
     const particleCount = 520;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
-    const colorA = new THREE.Color("#34d399");
+    const colorA = new THREE.Color("#d4d4d8");
     const colorB = new THREE.Color("#38bdf8");
     const colorC = new THREE.Color("#e2e8f0");
 
@@ -82,7 +82,7 @@ export function ThreeBackground() {
 
     const ringGeometry = new THREE.TorusGeometry(2.65, 0.006, 8, 160);
     const ringMaterial = new THREE.MeshBasicMaterial({
-      color: "#34d399",
+      color: "#d4d4d8",
       transparent: true,
       opacity: 0.18,
     });

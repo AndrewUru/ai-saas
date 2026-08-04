@@ -42,7 +42,7 @@ function renderPreviewHtml(scriptSrc: string) {
         background:
           linear-gradient(180deg, rgba(255,255,255,.9), rgba(248,250,252,.78)),
           radial-gradient(circle at 14% 16%, rgba(37,99,235,.12), transparent 28%),
-          radial-gradient(circle at 86% 10%, rgba(16,185,129,.13), transparent 24%),
+          radial-gradient(circle at 86% 10%, rgba(161,161,170,.13), transparent 24%),
           #eef2f7;
       }
       .preview-shell {
@@ -154,7 +154,7 @@ function renderPreviewHtml(scriptSrc: string) {
         height: 80px;
         border-radius: 14px;
         background:
-          linear-gradient(135deg, rgba(37,99,235,.18), rgba(16,185,129,.18)),
+          linear-gradient(135deg, rgba(37,99,235,.18), rgba(161,161,170,.18)),
           #e2e8f0;
       }
       .preview-line {

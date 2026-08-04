@@ -76,7 +76,7 @@ export default function RotateApiKeyButton({
       >
         Rotate API key
       </button>
-      {notice && <p className="text-xs text-emerald-200">{notice}</p>}
+      {notice && <p className="text-xs text-neutral-200">{notice}</p>}
       {error && <p className="text-xs text-rose-200">{error}</p>}
     </div>
   );

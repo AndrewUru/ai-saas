@@ -13,7 +13,7 @@ export type WidgetLauncherStyle = "icon" | "card";
 
 export const widgetDefaults = {
   format: "classic" as WidgetFormat,
-  accent: "#25d366",
+  accent: "#d4d4d8",
   brand: "AI Widget",
   label: "Chat with us",
   greeting: "How can I help you today?",
@@ -34,20 +34,20 @@ export const widgetDefaults = {
 } as const;
 
 export const widgetAccentDefaults = {
-  classic: "#25d366",
+  classic: "#d4d4d8",
   assistant: "#111827",
 } as const satisfies Record<WidgetFormat, string>;
 
 export const widgetAppearanceDefaults = {
   classic: {
-    colorHeaderBg: "#075e54",
+    colorHeaderBg: "#18181b",
     colorHeaderText: "#ffffff",
     colorChatBg: "#efeae2",
     colorUserBubbleBg: "#d9fdd3",
-    colorUserBubbleText: "#0b2f20",
+    colorUserBubbleText: "#18181b",
     colorBotBubbleBg: "#ffffff",
     colorBotBubbleText: "#0f172a",
-    colorToggleBg: "#25d366",
+    colorToggleBg: "#d4d4d8",
     colorToggleText: "#ffffff",
     colorBubbleBg: "#111827",
     colorBubbleText: "#ffffff",

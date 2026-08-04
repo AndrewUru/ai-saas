@@ -167,7 +167,7 @@ export default function DashboardShell({
                 >
                   <span className="font-medium">{item.label}</span>
                   {active(item.href) ? (
-                    <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_10px_rgba(52,211,153,0.7)]" />
+                    <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_10px_rgba(212,212,216,0.7)]" />
                   ) : null}
                 </Link>
               ))}
@@ -191,7 +191,7 @@ export default function DashboardShell({
                   >
                     <span className="font-medium">{item.label}</span>
                     {pathname === item.href ? (
-                      <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_10px_rgba(52,211,153,0.7)]" />
+                      <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_10px_rgba(212,212,216,0.7)]" />
                     ) : null}
                   </Link>
                 ))}

@@ -167,7 +167,7 @@ export default function Navbar() {
                 href={link.href}
                 className={`relative px-4 py-1.5 text-sm font-medium transition-all duration-300 ${
                   isActive
-                    ? "text-emerald-300"
+                    ? "text-neutral-300"
                     : "text-slate-400 hover:text-slate-100"
                 }`}
                 data-oid="oj0k0lk"
@@ -175,7 +175,7 @@ export default function Navbar() {
                 {link.label}
                 {isActive && (
                   <span
-                    className="absolute inset-x-0 -bottom-px mx-auto h-px w-3/4 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                    className="absolute inset-x-0 -bottom-px mx-auto h-px w-3/4 bg-neutral-500 shadow-[0_0_10px_rgba(161,161,170,0.5)]"
                     data-oid="7_nw72t"
                   />
                 )}
@@ -198,11 +198,11 @@ export default function Navbar() {
             >
               {/* User Capsule */}
               <div
-                className="flex items-center gap-2 rounded-full border border-slate-700/50 bg-slate-800/50 pl-1 pr-3 py-1 text-xs font-medium text-slate-300 transition hover:border-emerald-500/30 hover:bg-slate-800"
+                className="flex items-center gap-2 rounded-full border border-slate-700/50 bg-slate-800/50 pl-1 pr-3 py-1 text-xs font-medium text-slate-300 transition hover:border-neutral-500/30 hover:bg-slate-800"
                 data-oid="d5jqbbm"
               >
                 <div
-                  className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-b from-emerald-400 to-emerald-600 text-[10px] font-bold text-slate-950 shadow-sm"
+                  className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-b from-neutral-400 to-neutral-600 text-[10px] font-bold text-slate-950 shadow-sm"
                   data-oid="lmlvjzv"
                 >
                   {userEmail?.[0]?.toUpperCase()}
@@ -234,7 +234,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/signup"
-                className="group relative inline-flex items-center justify-center rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-slate-950 hover:text-amber-50 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]"
+                className="group relative inline-flex items-center justify-center rounded-full bg-neutral-500 px-5 py-2 text-sm font-semibold text-slate-950 hover:text-amber-50 shadow-[0_0_20px_rgba(161,161,170,0.3)] transition-all hover:bg-neutral-400 hover:shadow-[0_0_25px_rgba(161,161,170,0.5)]"
                 data-oid="gjrst2r"
               >
                 Start for free
@@ -300,7 +300,7 @@ export default function Navbar() {
                 onClick={() => setIsMenuOpen(false)}
                 className={`block rounded-lg px-4 py-3 text-base font-medium transition-colors ${
                   isActive
-                    ? "bg-emerald-500/10 text-emerald-300"
+                    ? "bg-neutral-500/10 text-neutral-300"
                     : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
                 }`}
                 data-oid="a_c:t2k"
@@ -324,7 +324,7 @@ export default function Navbar() {
             <div className="space-y-4" data-oid="hxz:g89">
               <div className="flex items-center gap-3 px-2" data-oid="tuyxhl9">
                 <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-slate-950 font-bold"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-500 text-slate-950 font-bold"
                   data-oid="1b:5azd"
                 >
                   {userEmail?.[0]?.toUpperCase()}
@@ -336,7 +336,7 @@ export default function Navbar() {
                   >
                     {userEmail}
                   </p>
-                  <p className="text-xs text-emerald-400" data-oid="qopy3av">
+                  <p className="text-xs text-neutral-400" data-oid="qopy3av">
                     Sesión iniciada
                   </p>
                 </div>
@@ -364,7 +364,7 @@ export default function Navbar() {
               <Link
                 href="/signup"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex w-full justify-center rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-900/20 transition active:scale-95"
+                className="flex w-full justify-center rounded-xl bg-neutral-500 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-neutral-900/20 transition active:scale-95"
                 data-oid="4330jov"
               >
                 Start for free

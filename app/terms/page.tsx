@@ -7,7 +7,7 @@ export default function TermsPage() {
       >
         <header className="space-y-3" data-oid="skmnyi1">
           <p
-            className="text-xs font-semibold uppercase tracking-[0.3em] text-emerald-300"
+            className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid=":gv9g6_"
           >
             Documentación legal

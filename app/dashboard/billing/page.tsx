@@ -140,7 +140,7 @@ export default async function BillingPage() {
             </span>
             <div className="flex items-center gap-2 mt-1" data-oid=".u1y_t5">
               <div
-                className="h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_#34d399]"
+                className="h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_#d4d4d8]"
                 data-oid="p_2gtk7"
               />
 
@@ -168,7 +168,7 @@ export default async function BillingPage() {
                 key={plan.id}
                 className={`ui-card flex flex-col p-8 transition-all duration-300 hover:bg-surface/50 ${
                   isActive
-                    ? "border-accent/40 bg-accent/5 shadow-[0_0_30px_rgba(52,211,153,0.05)]"
+                    ? "border-accent/40 bg-accent/5 shadow-[0_0_30px_rgba(212,212,216,0.05)]"
                     : "bg-surface/20"
                 }`}
                 data-oid="0ey.r95"
@@ -193,7 +193,7 @@ export default async function BillingPage() {
                   </div>
                   {isActive && (
                     <span
-                      className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-accent shadow-[0_0_10px_rgba(52,211,153,0.2)]"
+                      className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-accent shadow-[0_0_10px_rgba(212,212,216,0.2)]"
                       data-oid="whifer1"
                     >
                       Active

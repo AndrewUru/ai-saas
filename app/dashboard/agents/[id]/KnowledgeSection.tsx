@@ -41,7 +41,7 @@ const STATUS_LABELS: Record<string, string> = {
 const STATUS_STYLES: Record<string, string> = {
   uploaded: "border-border bg-surface text-slate-200",
   processing: "border-amber-500/30 bg-amber-500/10 text-amber-200",
-  ready: "border-emerald-500/30 bg-emerald-500/10 text-emerald-200",
+  ready: "border-neutral-500/30 bg-neutral-500/10 text-neutral-200",
   failed: "border-rose-500/30 bg-rose-500/10 text-rose-200",
 };
 

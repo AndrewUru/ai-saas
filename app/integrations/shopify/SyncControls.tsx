@@ -116,7 +116,7 @@ export default function SyncControls({
 
   const toastTone =
     statusParam === "sync_ok"
-      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-100"
+      ? "border-neutral-500/40 bg-neutral-500/10 text-neutral-100"
       : "border-rose-500/40 bg-rose-500/10 text-rose-100";
 
   const syncLabel =
@@ -217,7 +217,7 @@ export default function SyncControls({
             data-oid="a9dp5ja"
           >
             <div
-              className="flex items-center gap-2 text-emerald-200"
+              className="flex items-center gap-2 text-neutral-200"
               data-oid="_ukhhl0"
             >
               <Spinner data-oid="hsm_vni" />
@@ -239,7 +239,7 @@ export default function SyncControls({
               data-oid="54.6t0f"
             >
               <div
-                className="h-full rounded-full bg-emerald-400 transition-all duration-500"
+                className="h-full rounded-full bg-neutral-400 transition-all duration-500"
                 style={{ width: `${progress}%` }}
                 data-oid="zgrp7pv"
               />
@@ -285,7 +285,7 @@ export default function SyncControls({
               Webhook URL
             </p>
             <p
-              className="mt-1 break-all font-mono text-[11px] text-emerald-200"
+              className="mt-1 break-all font-mono text-[11px] text-neutral-200"
               data-oid="pf6r-b:"
             >
               {webhookUrl}
@@ -316,7 +316,7 @@ export default function SyncControls({
           <PendingButton
             label={integration.is_active ? "Pause" : "Activate"}
             disabled={globalDisabled}
-            className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-neutral-400/60 hover:text-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
             data-oid=".m:qbi3"
           />
         </form>
@@ -334,7 +334,7 @@ export default function SyncControls({
             pendingLabel="Testing..."
             disabled={globalDisabled}
             onPendingChange={setIsTesting}
-            className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-emerald-400/60 hover:text-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-neutral-400/60 hover:text-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
             data-oid="9p8xl4k"
           />
         </form>
@@ -352,7 +352,7 @@ export default function SyncControls({
             pendingLabel="Syncing..."
             disabled={globalDisabled}
             onPendingChange={setIsSyncing}
-            className="inline-flex items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 font-semibold text-emerald-200 transition hover:border-emerald-400/70 hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-full border border-neutral-400/40 bg-neutral-500/10 px-4 py-2 font-semibold text-neutral-200 transition hover:border-neutral-400/70 hover:bg-neutral-500/20 disabled:cursor-not-allowed disabled:opacity-60"
             data-oid="e804va8"
           />
         </form>

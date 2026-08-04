@@ -149,7 +149,7 @@ function FeatureCard({ feature }: { feature: Feature }) {
 
 function CodeBlock({ children }: { children: string }) {
   return (
-    <pre className="overflow-auto rounded-lg border border-white/10 bg-black/40 p-4 text-xs leading-6 text-emerald-200">
+    <pre className="overflow-auto rounded-lg border border-white/10 bg-black/40 p-4 text-xs leading-6 text-neutral-200">
       <code>{children}</code>
     </pre>
   );

@@ -17,7 +17,7 @@ export function Hero() {
       <div className="relative z-10 mx-auto grid max-w-7xl gap-12 px-6 py-24 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center lg:px-8">
         <div className="max-w-4xl space-y-10 text-center lg:text-left">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/80 backdrop-blur-xl">
-            <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
+            <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_12px_rgba(212,212,216,0.8)]" />
             Commerce Copilot for WooCommerce and Shopify
           </div>
 
@@ -95,11 +95,11 @@ export function Hero() {
             ))}
           </div>
 
-          <div className="mt-5 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
-            <p className="text-sm font-semibold text-emerald-100">
+          <div className="mt-5 rounded-2xl border border-neutral-400/20 bg-neutral-400/10 p-4">
+            <p className="text-sm font-semibold text-neutral-100">
               Suggested improvement
             </p>
-            <p className="mt-2 text-sm leading-6 text-emerald-100/75">
+            <p className="mt-2 text-sm leading-6 text-neutral-100/75">
               Add an approved answer for shipping thresholds and recommend free
               shipping bundles when carts are close to the limit.
             </p>
