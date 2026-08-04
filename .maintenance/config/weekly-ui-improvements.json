@@ -39,14 +39,14 @@
         "The action label names the provider.",
         "The panel still works with existing connection summaries."
       ],
-      "proposedAt": "2026-08-04T15:18:50.608Z",
+      "proposedAt": "2026-07-06T12:11:29.666Z",
       "files": [
         "app/dashboard/integrations/page.tsx"
       ]
     },
     {
       "id": "button-mobile-stability",
-      "status": "ready",
+      "status": "proposed",
       "priority": "P2",
       "area": "Design system",
       "title": "Improve button sizing and label stability on narrow screens",
@@ -55,6 +55,10 @@
         "Buttons have stable minimum dimensions.",
         "Icon and text alignment stays predictable.",
         "Focus styles remain visible."
+      ],
+      "proposedAt": "2026-07-13T11:21:41.859Z",
+      "files": [
+        "app/globals.css"
       ]
     }
   ]

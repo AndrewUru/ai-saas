@@ -23,7 +23,7 @@ Applied changes:
 - app/dashboard/AgentsSection.tsx: import added
 - app/dashboard/AgentsSection.tsx: updated
 
-## 2026-08-04 - Upgrade integration empty states with provider-specific CTAs
+## 2026-07-06 - Upgrade integration empty states with provider-specific CTAs
 
 Priority: P1
 Area: Integrations
@@ -40,3 +40,21 @@ Acceptance:
 
 Applied changes:
 - app/dashboard/integrations/page.tsx: updated
+
+## 2026-07-13 - Improve button sizing and label stability on narrow screens
+
+Priority: P2
+Area: Design system
+
+Design reason: Buttons should not shift, clip, or feel inconsistent across dense SaaS panels.
+
+Files:
+- app/globals.css
+
+Acceptance:
+- Buttons have stable minimum dimensions.
+- Icon and text alignment stays predictable.
+- Focus styles remain visible.
+
+Applied changes:
+- app/globals.css: updated

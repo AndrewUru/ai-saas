@@ -167,16 +167,27 @@ a:focus-visible {
 
 .ui-button {
   display: inline-flex;
+  min-height: 40px;
   align-items: center;
   justify-content: center;
   gap: 8px;
   border-radius: var(--pill-radius);
   font-weight: 500;
   font-size: 0.925rem;
+  line-height: 1;
   padding: 10px 20px;
+  text-align: center;
   cursor: pointer;
   transition: all 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
   border: 1px solid transparent;
+}
+
+.ui-button > svg {
+  flex: 0 0 auto;
+}
+
+.ui-button > span {
+  min-width: 0;
 }
 
 .ui-button--primary {
