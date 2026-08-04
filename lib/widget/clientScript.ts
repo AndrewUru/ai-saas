@@ -655,11 +655,11 @@ export function renderWidgetScript(
         </form>
       \`;
 
-      const renderAssistantSidebarItem = (label, icon) => \`
-        <div class="ai-assistant-sidebar-item">
+      const renderAssistantSidebarItem = (label, icon, action, prompt) => \`
+        <button class="ai-assistant-sidebar-item" type="button" data-sidebar-action="\${escapeHtml(action)}"\${prompt ? \` data-sidebar-prompt="\${escapeHtml(prompt)}"\` : ""}>
           <span class="ai-assistant-sidebar-icon" aria-hidden="true">\${icon}</span>
           <span>\${escapeHtml(label)}</span>
-        </div>
+        </button>
       \`;
 
       const renderAssistantSidebar = () => \`
@@ -670,22 +670,16 @@ export function renderWidgetScript(
               <span aria-hidden="true">[]</span>
             </div>
             <nav class="ai-assistant-sidebar-nav" aria-label="Assistant shortcuts">
-              \${renderAssistantSidebarItem("Nuevo chat", "+")}
-              \${renderAssistantSidebarItem("Buscar chats", "?")}
-              \${renderAssistantSidebarItem("Biblioteca", "[]")}
-              \${renderAssistantSidebarItem("Programadas", "o")}
-              \${renderAssistantSidebarItem("Aplicaciones", "*")}
+              \${renderAssistantSidebarItem("Nuevo chat", "+", "new-chat")}
+              \${renderAssistantSidebarItem("Buscar chats", "?", "toggle-search")}
+              \${renderAssistantSidebarItem("Biblioteca", "[]", "prompt", "Muéstrame la información y los recursos que tienes disponibles.")}
+              \${renderAssistantSidebarItem("Programadas", "o", "prompt", "¿Qué tareas, citas o acciones puedo programar contigo?")}
+              \${renderAssistantSidebarItem("Aplicaciones", "*", "prompt", "¿Con qué aplicaciones e integraciones puedes ayudarme?")}
             </nav>
-            <div class="ai-assistant-sidebar-group">
-              <p>Anclado</p>
-              \${renderAssistantSidebarItem("Soporte y ventas", "[]")}
-              \${renderAssistantSidebarItem("Pedidos recientes", "[]")}
-              \${renderAssistantSidebarItem("Catalogo 2026", "[]")}
-            </div>
-            <div class="ai-assistant-sidebar-group">
-              <p>Proyectos</p>
-              \${renderAssistantSidebarItem("Ecommerce", "[]")}
-              \${renderAssistantSidebarItem("Clientes", "[]")}
+            <div id="ai-assistant-chat-search" class="ai-assistant-chat-search" hidden>
+              <label for="ai-assistant-chat-search-input">Buscar en tus chats</label>
+              <input id="ai-assistant-chat-search-input" type="search" placeholder="Escribe para buscar..." autocomplete="off" />
+              <div id="ai-assistant-chat-history" class="ai-assistant-chat-history" role="list"></div>
             </div>
           </div>
           <div class="ai-assistant-sidebar-account">
@@ -949,6 +943,134 @@ export function renderWidgetScript(
         submitBtn.setAttribute("aria-busy", sending ? "true" : "false");
         form.classList.toggle("is-sending", sending);
       };
+
+      const historyStorageKey = \`ai-saas-widget-history:\${CONFIG_KEY || brandName}\`;
+      const createSessionId = () =>
+        Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+      const readChatHistory = () => {
+        if (IS_PREVIEW) return [];
+        try {
+          const stored = JSON.parse(localStorage.getItem(historyStorageKey) || "[]");
+          return Array.isArray(stored) ? stored.slice(0, 20) : [];
+        } catch (err) {
+          return [];
+        }
+      };
+      let chatHistory = readChatHistory();
+      let activeSessionId = createSessionId();
+      let activeMessages = [];
+
+      const persistActiveSession = () => {
+        if (IS_PREVIEW || activeMessages.length === 0) return;
+        const firstUserMessage = activeMessages.find((message) => message.role === "user");
+        const session = {
+          id: activeSessionId,
+          title: (firstUserMessage?.content || "Nuevo chat").slice(0, 60),
+          updatedAt: Date.now(),
+          messages: activeMessages.slice(-30),
+        };
+        chatHistory = [
+          session,
+          ...chatHistory.filter((item) => item?.id !== activeSessionId),
+        ].slice(0, 20);
+        try {
+          localStorage.setItem(historyStorageKey, JSON.stringify(chatHistory));
+        } catch (err) {
+          // Storage can be unavailable in private or embedded contexts.
+        }
+      };
+
+      const resetChatView = () => {
+        chatBox.replaceChildren();
+        if (isAssistantFormat) {
+          const hero = document.createElement("div");
+          hero.id = "ai-saas-assistant-hero";
+          hero.className = "ai-assistant-hero";
+          const heading = document.createElement("h2");
+          heading.innerText = greeting;
+          hero.appendChild(heading);
+          chatBox.appendChild(hero);
+        } else {
+          appendBotMessage(greeting);
+        }
+        appendSuggestions();
+        setSending(false);
+      };
+
+      const startNewChat = () => {
+        persistActiveSession();
+        activeSessionId = createSessionId();
+        activeMessages = [];
+        resetChatView();
+        input.value = "";
+        input.focus();
+      };
+
+      const restoreChat = (sessionId) => {
+        const session = chatHistory.find((item) => item?.id === sessionId);
+        if (!session || !Array.isArray(session.messages)) return;
+        persistActiveSession();
+        activeSessionId = session.id;
+        activeMessages = session.messages.filter(
+          (message) =>
+            (message?.role === "user" || message?.role === "assistant") &&
+            typeof message?.content === "string",
+        );
+        chatBox.replaceChildren();
+        activeMessages.forEach((message) => {
+          const bubble = document.createElement("div");
+          bubble.className =
+            "ai-saas-bubble " +
+            (message.role === "user" ? "user" : "bot") +
+            " ai-saas-enter";
+          bubble.innerText = message.content;
+          chatBox.appendChild(bubble);
+        });
+        removeSuggestions();
+        scrollChatToBottom();
+        input.focus();
+      };
+
+      const searchPanel = document.getElementById("ai-assistant-chat-search");
+      const searchInput = document.getElementById("ai-assistant-chat-search-input");
+      const historyList = document.getElementById("ai-assistant-chat-history");
+      const searchToggle = anchor.querySelector('[data-sidebar-action="toggle-search"]');
+
+      const renderChatHistory = (query = "") => {
+        if (!historyList) return;
+        persistActiveSession();
+        const normalizedQuery = query.trim().toLocaleLowerCase();
+        const matches = chatHistory.filter((session) => {
+          if (!normalizedQuery) return true;
+          const searchable = [
+            session?.title,
+            ...(Array.isArray(session?.messages)
+              ? session.messages.map((message) => message?.content)
+              : []),
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLocaleLowerCase();
+          return searchable.includes(normalizedQuery);
+        });
+        historyList.replaceChildren();
+        if (matches.length === 0) {
+          const empty = document.createElement("p");
+          empty.className = "ai-assistant-history-empty";
+          empty.innerText = normalizedQuery ? "No se encontraron chats." : "Todavía no hay chats guardados.";
+          historyList.appendChild(empty);
+          return;
+        }
+        matches.forEach((session) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "ai-assistant-history-item";
+          button.innerText = session.title || "Chat sin título";
+          button.title = session.title || "Chat sin título";
+          button.addEventListener("click", () => restoreChat(session.id));
+          historyList.appendChild(button);
+        });
+      };
       
       let isOpen = false;
       const setPageScrollLock = (locked) => {
@@ -988,6 +1110,35 @@ export function renderWidgetScript(
       toggleBtn.addEventListener("click", () => setOpen(true));
       closeBtn.addEventListener("click", () => setOpen(false));
       input.addEventListener("input", () => setSending(false));
+      anchor.querySelector(".ai-assistant-sidebar")?.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-sidebar-action]");
+        if (!button) return;
+        const action = button.dataset.sidebarAction;
+        if (action === "new-chat") {
+          startNewChat();
+          return;
+        }
+        if (action === "toggle-search" && searchPanel && searchInput) {
+          const willOpen = searchPanel.hidden;
+          searchPanel.hidden = !willOpen;
+          searchToggle?.setAttribute("aria-pressed", willOpen ? "true" : "false");
+          if (willOpen) {
+            renderChatHistory(searchInput.value);
+            searchInput.focus();
+          }
+          return;
+        }
+        if (action === "prompt") {
+          const prompt = button.dataset.sidebarPrompt?.trim();
+          if (!prompt) return;
+          input.value = prompt;
+          setSending(false);
+          form.requestSubmit();
+        }
+      });
+      searchInput?.addEventListener("input", () => {
+        renderChatHistory(searchInput.value);
+      });
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && isOpen) {
           setOpen(false);
@@ -998,6 +1149,7 @@ export function renderWidgetScript(
         e.preventDefault();
         const text = input.value.trim();
         if (!text) return;
+        const requestSessionId = activeSessionId;
         const userWordCount = countWords(text);
         const assistantHero = document.getElementById("ai-saas-assistant-hero");
         if (assistantHero) assistantHero.remove();
@@ -1011,6 +1163,8 @@ export function renderWidgetScript(
         scrollChatToBottom();
         input.value = "";
         setSending(true);
+        activeMessages.push({ role: "user", content: text });
+        persistActiveSession();
 
         // Typing indicator
         const typingDiv = document.createElement("div");
@@ -1031,7 +1185,7 @@ export function renderWidgetScript(
 
           const payload = {
             message: text,
-            messages: [{ role: "user", content: text }],
+            messages: activeMessages.slice(-20),
           };
           if (agentKey) payload.api_key = agentKey;
 
@@ -1042,6 +1196,7 @@ export function renderWidgetScript(
           });
 
           if (chatBox.contains(typingDiv)) chatBox.removeChild(typingDiv);
+          if (activeSessionId !== requestSessionId) return;
           setSending(false);
           input.focus();
 
@@ -1070,9 +1225,12 @@ export function renderWidgetScript(
             }
           }
           chatBox.appendChild(botDiv);
+          activeMessages.push({ role: "assistant", content: replyRaw });
+          persistActiveSession();
           scrollChatToBottom();
 
         } catch (err) {
+          if (activeSessionId !== requestSessionId) return;
           trackWidgetEvent("message_failed", {
             wordCount: userWordCount,
           });
