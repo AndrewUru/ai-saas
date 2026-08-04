@@ -1,5 +1,6 @@
 "use client";
 
+import { Sparkles } from "lucide-react";
 import { useFormStatus } from "react-dom";
 
 type SubmitButtonProps = {
@@ -27,13 +28,11 @@ export default function SubmitButton({ label, className }: SubmitButtonProps) {
       )}
       data-oid="fj3-1bw"
     >
-      {pending && (
-        <span
-          className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900/30 border-t-slate-900"
-          aria-hidden="true"
-          data-oid="96rc:ol"
-        />
-      )}
+      {pending ? (
+        <span className="ui-button-loader" aria-hidden="true">
+          <Sparkles className="h-3.5 w-3.5" />
+        </span>
+      ) : null}
       <span data-oid=":8wy4dg">{pending ? "Saving\u2026" : label}</span>
     </button>
   );

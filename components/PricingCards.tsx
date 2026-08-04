@@ -142,7 +142,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                       <span className="inline-flex items-center gap-2">
                         {isProcessing ? (
                           <Loader2
-                            className="h-3.5 w-3.5 animate-spin text-accent"
+                            className="ui-loader-icon h-3.5 w-3.5 text-accent"
                             aria-hidden="true"
                           />
                         ) : (

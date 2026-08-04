@@ -173,6 +173,7 @@ export function renderWidgetScript(
       chatOpen: "Chat open",
       closeChat: "Close chat",
       assistantTyping: "Assistant is typing",
+      thinkingSteps: ["Understanding your request", "Checking relevant information", "Preparing a helpful answer"],
       suggestionsLabel: "Suggested questions",
       suggestions: ["Browse products", "Shipping info", "Talk to support"],
       poweredBy: "Powered by",
@@ -203,6 +204,7 @@ export function renderWidgetScript(
       chatOpen: "Chat abierto",
       closeChat: "Cerrar chat",
       assistantTyping: "El asistente esta escribiendo",
+      thinkingSteps: ["Entendiendo tu solicitud", "Consultando información relevante", "Preparando una respuesta útil"],
       suggestionsLabel: "Preguntas sugeridas",
       suggestions: ["Ver productos", "Informacion de envio", "Hablar con soporte"],
       poweredBy: "Con tecnologia de",
@@ -233,6 +235,7 @@ export function renderWidgetScript(
       chatOpen: "Chat aberto",
       closeChat: "Fechar chat",
       assistantTyping: "O assistente esta digitando",
+      thinkingSteps: ["Entendendo sua solicitação", "Consultando informações relevantes", "Preparando uma resposta útil"],
       suggestionsLabel: "Perguntas sugeridas",
       suggestions: ["Ver produtos", "Informacoes de envio", "Falar com suporte"],
       poweredBy: "Desenvolvido por",
@@ -263,6 +266,7 @@ export function renderWidgetScript(
       chatOpen: "Chat ouvert",
       closeChat: "Fermer le chat",
       assistantTyping: "L'assistant est en train d'ecrire",
+      thinkingSteps: ["Analyse de votre demande", "Recherche des informations utiles", "Préparation de la réponse"],
       suggestionsLabel: "Questions suggerees",
       suggestions: ["Voir les produits", "Infos livraison", "Parler au support"],
       poweredBy: "Propulse par",
@@ -1168,11 +1172,28 @@ export function renderWidgetScript(
 
         // Typing indicator
         const typingDiv = document.createElement("div");
-        typingDiv.className = "ai-saas-bubble bot typing ai-saas-enter";
+        typingDiv.className = "ai-saas-bubble bot typing ai-saas-thinking ai-saas-enter";
         typingDiv.setAttribute("aria-label", copy.assistantTyping);
-        typingDiv.innerHTML = \`<span class="ai-saas-sr-only">\${escapeHtml(copy.assistantTyping)}</span><div class="ai-saas-typing" aria-hidden="true"><span></span><span></span><span></span></div>\`;
+        const thinkingSteps = Array.isArray(copy.thinkingSteps) && copy.thinkingSteps.length
+          ? copy.thinkingSteps
+          : [copy.assistantTyping];
+        typingDiv.innerHTML = \`
+          <span class="ai-saas-sr-only">\${escapeHtml(copy.assistantTyping)}</span>
+          <span class="ai-saas-thinking-orb" aria-hidden="true"><span></span></span>
+          <span class="ai-saas-thinking-copy" aria-hidden="true">\${escapeHtml(thinkingSteps[0])}</span>
+        \`;
         chatBox.appendChild(typingDiv);
         scrollChatToBottom();
+        let thinkingStepIndex = 0;
+        const thinkingTimer = window.setInterval(() => {
+          if (!document.body.contains(typingDiv)) {
+            window.clearInterval(thinkingTimer);
+            return;
+          }
+          thinkingStepIndex = (thinkingStepIndex + 1) % thinkingSteps.length;
+          const thinkingCopy = typingDiv.querySelector(".ai-saas-thinking-copy");
+          if (thinkingCopy) thinkingCopy.textContent = thinkingSteps[thinkingStepIndex];
+        }, 1800);
 
         // Send to API
         try {
@@ -1195,6 +1216,7 @@ export function renderWidgetScript(
             body: JSON.stringify(payload),
           });
 
+          window.clearInterval(thinkingTimer);
           if (chatBox.contains(typingDiv)) chatBox.removeChild(typingDiv);
           if (activeSessionId !== requestSessionId) return;
           setSending(false);
@@ -1230,6 +1252,7 @@ export function renderWidgetScript(
           scrollChatToBottom();
 
         } catch (err) {
+          window.clearInterval(thinkingTimer);
           if (activeSessionId !== requestSessionId) return;
           trackWidgetEvent("message_failed", {
             wordCount: userWordCount,

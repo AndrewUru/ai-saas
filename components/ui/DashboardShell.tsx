@@ -339,8 +339,8 @@ function AccountPanel({
   if (isLoadingUser) {
     return (
       <div className="rounded-xl border border-border bg-surface/40 p-3">
-        <div className="h-4 w-24 animate-pulse rounded bg-border/50" />
-        <div className="mt-3 h-9 w-full animate-pulse rounded-full bg-border/30" />
+        <div className="ui-skeleton h-4 w-24 rounded" />
+        <div className="ui-skeleton mt-3 h-9 w-full rounded-full" />
       </div>
     );
   }

@@ -27,10 +27,10 @@ export function PayPalUpgradeButton({
           className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-slate-900/50 backdrop-blur-sm"
           data-oid="k:jhztc"
         >
-          <div
-            className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent"
-            data-oid="8s2t3ka"
-          />
+          <div className="ui-ai-loader ui-ai-loader--compact" role="status">
+            <span className="ui-ai-orb" aria-hidden="true" />
+            <span>Securing checkout</span>
+          </div>
         </div>
       )}
 

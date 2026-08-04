@@ -404,7 +404,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
           className="ui-button ui-button--primary min-h-11 justify-center px-5"
         >
           {uploading ? (
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <Loader2 className="ui-loader-icon h-4 w-4" aria-hidden="true" />
           ) : (
             <Upload className="h-4 w-4" aria-hidden="true" />
           )}
@@ -461,7 +461,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
       <div className="mt-6 space-y-2">
         {loading && (
           <p className="flex items-center gap-2 rounded-2xl border border-border bg-surface/35 px-4 py-3 text-sm text-slate-400">
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <Loader2 className="ui-loader-icon h-4 w-4" aria-hidden="true" />
             Loading knowledge files...
           </p>
         )}
@@ -522,7 +522,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                   >
                     <StatusIcon
                       className={`h-3.5 w-3.5 ${
-                        isIndexing ? "animate-spin" : ""
+                        isIndexing ? "ui-loader-icon" : ""
                       }`}
                       aria-hidden="true"
                     />
@@ -548,7 +548,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                   >
                     {isProcessing ? (
                       <Loader2
-                        className="h-3.5 w-3.5 animate-spin"
+                        className="ui-loader-icon h-3.5 w-3.5"
                         aria-hidden="true"
                       />
                     ) : (
@@ -599,7 +599,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                   >
                     <StatusIcon
                       className={`h-3.5 w-3.5 ${
-                        isIndexing ? "animate-spin" : ""
+                        isIndexing ? "ui-loader-icon" : ""
                       }`}
                       aria-hidden="true"
                     />
@@ -613,7 +613,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                   >
                     {isProcessing ? (
                       <Loader2
-                        className="h-3.5 w-3.5 animate-spin"
+                        className="ui-loader-icon h-3.5 w-3.5"
                         aria-hidden="true"
                       />
                     ) : (
@@ -664,7 +664,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                     >
                       {isDeleting ? (
                         <Loader2
-                          className="h-3.5 w-3.5 animate-spin"
+                          className="ui-loader-icon h-3.5 w-3.5"
                           aria-hidden="true"
                         />
                       ) : (

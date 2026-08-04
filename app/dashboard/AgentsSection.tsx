@@ -127,9 +127,9 @@ function AgentSkeleton() {
       <div className="w-full space-y-2">
         <div className="flex items-center gap-3">
           <span className="h-2 w-2 rounded-full bg-border" />
-          <span className="h-4 w-32 animate-pulse rounded bg-border/50" />
+          <span className="ui-skeleton h-4 w-32 rounded" />
         </div>
-        <div className="h-3 w-48 animate-pulse rounded bg-border/30" />
+        <div className="ui-skeleton h-3 w-48 rounded" />
       </div>
     </li>
   );

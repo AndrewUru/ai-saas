@@ -269,6 +269,95 @@ a:focus-visible {
   outline: none;
 }
 
+.ui-ai-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--foreground-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.ui-ai-loader--compact {
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.ui-ai-orb,
+.ui-button-loader {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 25%, #fff 0, var(--accent) 32%, color-mix(in srgb, var(--accent) 35%, transparent) 72%);
+  color: #07110d;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 35%, transparent);
+  animation: ui-ai-pulse 1.8s ease-in-out infinite;
+}
+
+.ui-loader-icon {
+  animation: ui-loader-icon 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.ui-ai-orb {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.ui-ai-loader--compact .ui-ai-orb,
+.ui-button-loader {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.ui-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface) 78%, var(--border));
+}
+
+.ui-skeleton::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(100deg, transparent 20%, color-mix(in srgb, var(--accent) 14%, transparent) 48%, transparent 76%);
+  transform: translateX(-100%);
+  animation: ui-skeleton-shimmer 1.7s ease-in-out infinite;
+}
+
+@keyframes ui-ai-pulse {
+  0%, 100% {
+    transform: scale(0.94);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 32%, transparent);
+  }
+  50% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0.45rem transparent;
+  }
+}
+
+@keyframes ui-skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes ui-loader-icon {
+  0% { transform: rotate(0deg) scale(0.92); opacity: 0.65; }
+  50% { transform: rotate(180deg) scale(1); opacity: 1; }
+  100% { transform: rotate(360deg) scale(0.92); opacity: 0.65; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-ai-orb,
+  .ui-button-loader,
+  .ui-loader-icon,
+  .ui-skeleton::after {
+    animation: none;
+  }
+}
+
 /* Alerts */
 .ui-alert {
   border-radius: var(--card-radius);

@@ -188,7 +188,7 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 md:flex" data-oid="gs2q_g_">
           {isLoadingUser ? (
             <div
-              className="h-9 w-28 animate-pulse rounded-full bg-slate-800"
+              className="ui-skeleton h-9 w-28 rounded-full"
               data-oid="3jt:z8w"
             />
           ) : isLoggedIn ? (
@@ -317,7 +317,7 @@ export default function Navbar() {
         >
           {isLoadingUser ? (
             <div
-              className="h-12 w-full animate-pulse rounded-lg bg-slate-800"
+              className="ui-skeleton h-12 w-full rounded-lg"
               data-oid="2_seiv_"
             />
           ) : isLoggedIn ? (

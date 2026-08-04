@@ -590,6 +590,42 @@ export const STATIC_STYLES = `
   padding: 12px 14px;
 }
 
+.ai-saas-bubble.ai-saas-thinking {
+  min-width: min(250px, 82%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-saas-thinking-orb {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #fff 0, var(--ai-accent) 34%, var(--ai-accent-light) 78%);
+  box-shadow: 0 0 0 0 var(--ai-accent-shadow);
+  animation: aiThinkingPulse 1.7s ease-in-out infinite;
+}
+
+.ai-saas-thinking-orb span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ai-accent-contrast);
+  opacity: 0.8;
+}
+
+.ai-saas-thinking-copy {
+  min-width: 0;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+  animation: aiThinkingCopy 1.8s ease-in-out infinite;
+}
+
 .ai-saas-enter {
   animation: bubbleIn 0.24s ease both;
 }
@@ -787,6 +823,22 @@ export const STATIC_STYLES = `
   cursor: default;
   filter: saturate(0.82);
   box-shadow: 0 6px 14px var(--ai-accent-light);
+}
+
+@keyframes aiThinkingPulse {
+  0%, 100% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 var(--ai-accent-shadow);
+  }
+  50% {
+    transform: scale(1);
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
+
+@keyframes aiThinkingCopy {
+  0%, 100% { opacity: 0.62; }
+  50% { opacity: 1; }
 }
 
 @keyframes aiSendLoading {
@@ -1862,6 +1914,10 @@ body.ai-saas-page-locked {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble.ai-saas-thinking {
+  min-width: min(250px, 82%);
+}
+
 #ai-saas-anchor.ai-format-assistant .ai-saas-typing span {
   background: rgba(255, 255, 255, 0.62);
 }
@@ -1932,6 +1988,11 @@ body.ai-saas-page-locked {
   }
 
   .ai-saas-typing span {
+    animation: none !important;
+  }
+
+  .ai-saas-thinking-orb,
+  .ai-saas-thinking-copy {
     animation: none !important;
   }
 
