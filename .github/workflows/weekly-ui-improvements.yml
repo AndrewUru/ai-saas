@@ -17,16 +17,30 @@ jobs:
   propose-ui-ux-improvement:
     runs-on: ubuntu-latest
 
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
+
+      - name: Show checkout info
+        run: |
+          echo "GitHub SHA: $GITHUB_SHA"
+          echo "GitHub REF: $GITHUB_REF"
+          git log -1 --oneline
+          echo "Lucide version:"
+          node -p "require('./package.json').dependencies['lucide-react']"
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Stop if a weekly UI/UX PR is already open
         id: open-pr
@@ -38,7 +52,9 @@ jobs:
             --state open \
             --json headRefName \
             --jq '[.[] | select(.headRefName | startswith("automation/weekly-ui-ux-"))] | length')"
+
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
           if [ "$COUNT" != "0" ]; then
             echo "A weekly UI/UX PR is already open. Skipping this run."
           fi
@@ -63,6 +79,7 @@ jobs:
             echo ""
             echo "## Automation validation"
             echo ""
+
             if [ "${{ steps.validation.outcome }}" = "success" ]; then
               echo "- GitHub Actions validation passed: npm ci, lint, build."
             else
@@ -89,19 +106,24 @@ jobs:
         shell: bash
         run: |
           BRANCH="automation/weekly-ui-ux-${GITHUB_RUN_ID}"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git switch -c "$BRANCH"
           git add .
           git commit -m "chore: propose weekly UI/UX improvement"
           git push --set-upstream origin "$BRANCH"
+
           PR_URL="https://github.com/${GITHUB_REPOSITORY}/pull/new/${BRANCH}"
+
           if ! gh pr create \
             --draft \
             --base "$DEFAULT_BRANCH" \
             --head "$BRANCH" \
             --title "Weekly UI/UX improvement" \
             --body-file .maintenance/reports/weekly-ui-improvement-pr.md 2> pr-create-error.log; then
+
             cat pr-create-error.log
 
             if grep -q "GitHub Actions is not permitted to create or approve pull requests" pr-create-error.log; then
@@ -115,6 +137,7 @@ jobs:
                 echo ""
                 echo "To enable automatic PR creation, open repository Settings > Actions > General > Workflow permissions, enable read/write permissions, and allow GitHub Actions to create and approve pull requests."
               } >> "$GITHUB_STEP_SUMMARY"
+
               echo "Branch pushed. Create the PR manually: $PR_URL"
               exit 0
             fi
