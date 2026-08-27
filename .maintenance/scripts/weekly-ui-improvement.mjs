@@ -189,7 +189,12 @@ export function validateConfig(config) {
   }
 
   assertNonEmptyString(config.queueDirectory, "queueDirectory");
-  normalizeRepoPath(config.queueDirectory);
+  const queueDirectory = normalizeRepoPath(config.queueDirectory);
+  if (!queueDirectory.startsWith(".maintenance/improvements/")) {
+    throw new Error(
+      "queueDirectory must stay inside .maintenance/improvements/.",
+    );
+  }
   assertStringArray(config.focus, "focus", { min: 1, max: 12 });
   assertObject(config.selection, "selection");
   assertOnlyKeys(config.selection, ["priorities", "strategy"], "selection");

@@ -15,6 +15,7 @@ import {
   main,
   prepareImprovement,
   selectNextImprovement,
+  validateConfig,
 } from "./weekly-ui-improvement.mjs";
 
 const policy = {
@@ -85,6 +86,28 @@ test("rejects protected and escaping paths", () => {
   assert.throws(
     () => assertPathAllowed("supabase/migration.sql", policy),
     /outside allowed UI roots/,
+  );
+});
+
+test("keeps the queue inside the maintenance proposal area", () => {
+  assert.throws(
+    () =>
+      validateConfig({
+        schemaVersion: 2,
+        cadence: "weekly",
+        mode: "create-reviewable-draft-pr",
+        queueDirectory: "app/proposals",
+        focus: ["accessibility"],
+        selection: {
+          strategy: "priority-then-oldest",
+          priorities: ["P1", "P2"],
+        },
+        policy: {
+          ...policy,
+          allowedCategories: ["accessibility"],
+        },
+      }),
+    /must stay inside \.maintenance\/improvements/,
   );
 });
 
