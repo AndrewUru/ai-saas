@@ -9,6 +9,7 @@
     "lint": "eslint",
     "improve:weekly": "node .maintenance/scripts/weekly-ui-improvement.mjs --apply",
     "improve:weekly:dry": "node .maintenance/scripts/weekly-ui-improvement.mjs --dry-run",
+    "improve:weekly:test": "node --test .maintenance/scripts/weekly-ui-improvement.test.mjs",
     "improve:quality": "node .maintenance/scripts/quality-gates.mjs",
     "improve:quality:full": "node .maintenance/scripts/quality-gates.mjs --start-server",
     "improve:visual": "node .maintenance/scripts/quality-gates.mjs --skip-lint --skip-build --skip-security --start-server",

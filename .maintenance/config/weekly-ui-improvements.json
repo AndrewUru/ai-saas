@@ -1,65 +1,38 @@
 {
+  "schemaVersion": 2,
   "cadence": "weekly",
-  "mode": "create-reviewable-pr",
+  "mode": "create-reviewable-draft-pr",
+  "queueDirectory": ".maintenance/improvements/queue",
   "focus": [
     "UI/UX clarity",
     "responsive behavior",
     "accessibility",
     "empty, loading, and error states",
-    "small product features that reduce user friction"
+    "interface copy",
+    "small friction reductions"
   ],
-  "improvements": [
-    {
-      "id": "dashboard-empty-state-system",
-      "status": "proposed",
-      "priority": "P1",
-      "area": "Dashboard",
-      "title": "Create a reusable EmptyState component and use it for agent workspaces",
-      "why": "Repeated empty states should feel intentional and guide the next action clearly.",
-      "acceptance": [
-        "A reusable EmptyState UI component exists.",
-        "The dashboard agent empty state uses the shared component.",
-        "The call to action remains visible on mobile and desktop."
-      ],
-      "proposedAt": "2026-06-18T15:04:46.945Z",
-      "files": [
-        "components/ui/EmptyState.tsx",
-        "app/dashboard/AgentsSection.tsx"
-      ]
-    },
-    {
-      "id": "integration-empty-state-cta",
-      "status": "proposed",
-      "priority": "P1",
-      "area": "Integrations",
-      "title": "Upgrade integration empty states with provider-specific CTAs",
-      "why": "When no store is connected, users need a direct next step, not only a passive message.",
-      "acceptance": [
-        "WooCommerce and Shopify empty states include a clear action.",
-        "The action label names the provider.",
-        "The panel still works with existing connection summaries."
-      ],
-      "proposedAt": "2026-07-06T12:11:29.666Z",
-      "files": [
-        "app/dashboard/integrations/page.tsx"
-      ]
-    },
-    {
-      "id": "button-mobile-stability",
-      "status": "proposed",
-      "priority": "P2",
-      "area": "Design system",
-      "title": "Improve button sizing and label stability on narrow screens",
-      "why": "Buttons should not shift, clip, or feel inconsistent across dense SaaS panels.",
-      "acceptance": [
-        "Buttons have stable minimum dimensions.",
-        "Icon and text alignment stays predictable.",
-        "Focus styles remain visible."
-      ],
-      "proposedAt": "2026-07-13T11:21:41.859Z",
-      "files": [
-        "app/globals.css"
-      ]
-    }
-  ]
+  "selection": {
+    "strategy": "priority-then-oldest",
+    "priorities": ["P1", "P2"]
+  },
+  "policy": {
+    "allowedCategories": [
+      "ui-clarity",
+      "accessibility",
+      "responsive",
+      "empty-state",
+      "loading-state",
+      "error-state",
+      "interface-copy",
+      "friction"
+    ],
+    "allowedPathPrefixes": ["app/", "components/"],
+    "allowedExtensions": [".css", ".mdx", ".tsx"],
+    "blockedPathPrefixes": [],
+    "blockedPaths": [],
+    "maxFiles": 3,
+    "maxOperations": 6,
+    "maxChangedLines": 160,
+    "maxFileBytes": 500000
+  }
 }

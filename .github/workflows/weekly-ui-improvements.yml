@@ -22,7 +22,7 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
     steps:
-      - name: Checkout
+      - name: Checkout default branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.repository.default_branch }}
@@ -33,8 +33,6 @@ jobs:
           echo "GitHub SHA: $GITHUB_SHA"
           echo "GitHub REF: $GITHUB_REF"
           git log -1 --oneline
-          echo "Lucide version:"
-          node -p "require('./package.json').dependencies['lucide-react']"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -59,59 +57,121 @@ jobs:
             echo "A weekly UI/UX PR is already open. Skipping this run."
           fi
 
-      - name: Apply next weekly UI/UX improvement
+      - name: Apply next queued UI/UX improvement
         if: steps.open-pr.outputs.count == '0'
+        id: improvement
         run: npm run improve:weekly
 
-      - name: Try validation
-        if: steps.open-pr.outputs.count == '0'
-        id: validation
+      - name: Install dependencies reproducibly
+        if: always() && steps.improvement.outputs.applied == 'true'
+        id: install
         continue-on-error: true
-        run: |
-          npm ci
-          npm run lint
-          npm run build
+        run: npm ci
 
-      - name: Record validation note
-        if: always() && steps.open-pr.outputs.count == '0'
+      - name: Run lint
+        if: always() && steps.improvement.outputs.applied == 'true'
+        id: lint
+        continue-on-error: true
+        run: npm run lint
+
+      - name: Run production build
+        if: always() && steps.improvement.outputs.applied == 'true'
+        id: build
+        continue-on-error: true
+        run: npm run build
+
+      - name: Record validation results
+        if: always() && steps.improvement.outputs.applied == 'true'
+        id: validation_report
+        env:
+          INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          LINT_OUTCOME: ${{ steps.lint.outcome }}
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+        shell: bash
         run: |
           {
             echo ""
-            echo "## Automation validation"
+            echo "### Validation performed"
+            echo ""
+            echo "- \`npm ci\`: **$INSTALL_OUTCOME**"
+            echo "- \`npm run lint\`: **$LINT_OUTCOME**"
+            echo "- \`npm run build\`: **$BUILD_OUTCOME**"
             echo ""
 
-            if [ "${{ steps.validation.outcome }}" = "success" ]; then
-              echo "- GitHub Actions validation passed: npm ci, lint, build."
+            if [ "$INSTALL_OUTCOME" != "success" ] || \
+               [ "$LINT_OUTCOME" != "success" ] || \
+               [ "$BUILD_OUTCOME" != "success" ]; then
+              echo "> At least one required validation failed. Keep this PR in draft until the failure is resolved."
             else
-              echo "- GitHub Actions validation did not pass. Review package manager/dependency state before merge."
+              echo "All required automated validations passed."
             fi
           } >> .maintenance/reports/weekly-ui-improvement-pr.md
 
-      - name: Check for changes
-        if: steps.open-pr.outputs.count == '0'
-        id: changes
+          {
+            echo ""
+            echo "Validation result: npm ci=$INSTALL_OUTCOME; npm run lint=$LINT_OUTCOME; npm run build=$BUILD_OUTCOME."
+          } >> .maintenance/IMPROVEMENT_LOG.md
+
+          {
+            echo "## Weekly UI/UX validation"
+            echo ""
+            echo "- npm ci: $INSTALL_OUTCOME"
+            echo "- npm run lint: $LINT_OUTCOME"
+            echo "- npm run build: $BUILD_OUTCOME"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify changed-file scope
+        if: always() && steps.improvement.outputs.applied == 'true'
+        id: scope
+        env:
+          EXPECTED_PATHS: ${{ steps.improvement.outputs.expected_paths }}
         shell: bash
         run: |
-          if git diff --quiet; then
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          mapfile -t CHANGED_FILES < <(
+            {
+              git diff --name-only
+              git ls-files --others --exclude-standard
+            } | sort -u
+          )
+
+          if [ "${#CHANGED_FILES[@]}" -eq 0 ]; then
+            echo "The engine reported an improvement but produced no changes." >&2
+            exit 1
           fi
 
+          for FILE in "${CHANGED_FILES[@]}"; do
+            if ! jq -e --arg file "$FILE" 'index($file) != null' \
+              <<< "$EXPECTED_PATHS" > /dev/null; then
+              echo "Unexpected changed file outside the approved improvement: $FILE" >&2
+              exit 1
+            fi
+          done
+
       - name: Create draft pull request
-        if: steps.open-pr.outputs.count == '0' && steps.changes.outputs.has_changes == 'true'
+        if: >-
+          always() &&
+          steps.improvement.outputs.applied == 'true' &&
+          steps.validation_report.outcome == 'success' &&
+          steps.scope.outcome == 'success' &&
+          steps.install.outcome != 'skipped' &&
+          steps.lint.outcome != 'skipped' &&
+          steps.build.outcome != 'skipped'
         env:
           GH_TOKEN: ${{ github.token }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          EXPECTED_PATHS: ${{ steps.improvement.outputs.expected_paths }}
+          IMPROVEMENT_ID: ${{ steps.improvement.outputs.improvement_id }}
+          PR_TITLE: ${{ steps.improvement.outputs.pr_title }}
         shell: bash
         run: |
-          BRANCH="automation/weekly-ui-ux-${GITHUB_RUN_ID}"
+          BRANCH="automation/weekly-ui-ux-${GITHUB_RUN_ID}-${IMPROVEMENT_ID}"
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git switch -c "$BRANCH"
-          git add .
+          mapfile -t FILES_TO_COMMIT < <(jq -r '.[]' <<< "$EXPECTED_PATHS")
+          git add -- "${FILES_TO_COMMIT[@]}"
           git commit -m "chore: propose weekly UI/UX improvement"
           git push --set-upstream origin "$BRANCH"
 
@@ -121,8 +181,9 @@ jobs:
             --draft \
             --base "$DEFAULT_BRANCH" \
             --head "$BRANCH" \
-            --title "Weekly UI/UX improvement" \
-            --body-file .maintenance/reports/weekly-ui-improvement-pr.md 2> pr-create-error.log; then
+            --title "$PR_TITLE" \
+            --body-file .maintenance/reports/weekly-ui-improvement-pr.md \
+            2> pr-create-error.log; then
 
             cat pr-create-error.log
 
@@ -130,21 +191,34 @@ jobs:
               {
                 echo "### Pull request was not created automatically"
                 echo ""
-                echo "The automation pushed the branch, but this repository has not enabled GitHub Actions to create pull requests."
+                echo "The reviewed improvement branch was pushed, but this repository does not allow GitHub Actions to create pull requests."
                 echo ""
                 echo "- Branch: \`$BRANCH\`"
                 echo "- Manual PR URL: $PR_URL"
-                echo ""
-                echo "To enable automatic PR creation, open repository Settings > Actions > General > Workflow permissions, enable read/write permissions, and allow GitHub Actions to create and approve pull requests."
               } >> "$GITHUB_STEP_SUMMARY"
 
-              echo "Branch pushed. Create the PR manually: $PR_URL"
+              echo "Branch pushed. Create the draft PR manually: $PR_URL"
               exit 0
             fi
 
             exit 1
           fi
 
-      - name: No ready improvement
-        if: steps.open-pr.outputs.count == '0' && steps.changes.outputs.has_changes != 'true'
-        run: echo "No weekly UI/UX improvement changes were generated."
+      - name: Report an empty queue
+        if: >-
+          steps.open-pr.outputs.count == '0' &&
+          steps.improvement.outputs.reason == 'queue-empty'
+        run: |
+          echo "No ready UI/UX improvement is available. Add a validated manifest to .maintenance/improvements/queue." \
+            >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Mark failed validation
+        if: >-
+          always() &&
+          steps.improvement.outputs.applied == 'true' &&
+          (steps.install.outcome != 'success' ||
+           steps.lint.outcome != 'success' ||
+           steps.build.outcome != 'success')
+        run: |
+          echo "The draft PR was prepared, but one or more required validations failed." >&2
+          exit 1

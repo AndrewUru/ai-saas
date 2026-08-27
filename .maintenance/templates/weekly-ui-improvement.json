@@ -1,0 +1,25 @@
+{
+  "$schema": "../schemas/weekly-ui-improvement.schema.json",
+  "id": "short-kebab-case-id",
+  "status": "paused",
+  "priority": "P2",
+  "area": "Product area",
+  "category": "ui-clarity",
+  "title": "Small user-facing improvement",
+  "problem": "Describe the concrete user problem observed in the current product.",
+  "solution": "Describe the small, reversible UI/UX change to apply.",
+  "acceptance": [
+    "State an observable acceptance criterion."
+  ],
+  "createdAt": "2026-08-27T00:00:00.000Z",
+  "operations": [
+    {
+      "type": "replace_text",
+      "path": "components/Example.tsx",
+      "description": "Describe this exact text replacement.",
+      "expectedOccurrences": 1,
+      "before": "exact current text",
+      "after": "exact replacement text"
+    }
+  ]
+}
