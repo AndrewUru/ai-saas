@@ -130,19 +130,26 @@ export default function AcademyLibrary({ posts }: Props) {
             <Search className="h-5 w-5" aria-hidden="true" />
           </span>
           <h3 className="mt-4 font-semibold text-foreground">
-            No resources found
+            {hasActiveFilters ? "No resources match your filters" : "No resources available yet"}
           </h3>
           <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--foreground-muted)]">
-            Try a broader search or clear the active filters to see the full
-            Academy library.
+            {hasActiveFilters
+              ? "Try a broader search or clear the active filters to see the full Academy library."
+              : "New practical guides are being prepared. Tell us which topic would help you most."}
           </p>
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="ui-button ui-button--ghost mt-6"
-          >
-            Clear filters
-          </button>
+          {hasActiveFilters ? (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="ui-button ui-button--ghost mt-6"
+            >
+              Clear filters
+            </button>
+          ) : (
+            <Link href="/contact" className="ui-button ui-button--ghost mt-6">
+              Suggest a topic
+            </Link>
+          )}
         </div>
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
