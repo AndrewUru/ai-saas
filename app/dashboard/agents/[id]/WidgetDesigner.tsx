@@ -16,6 +16,7 @@ import {
   SlidersHorizontal,
   Sparkles,
   Store,
+  WandSparkles,
   Type,
 } from "lucide-react";
 import {
@@ -33,6 +34,10 @@ import {
   WidgetPosition,
 } from "@/lib/widget/defaults";
 import { getEmbedSnippet } from "@/lib/widget/embedSnippet";
+import {
+  type WidgetTemplateId,
+  widgetTemplates,
+} from "@/lib/widget/templates";
 
 function useDebouncedValue<T>(value: T, delay = 300) {
   const [debounced, setDebounced] = useState(value);
@@ -507,6 +512,8 @@ export default function WidgetDesigner({
     initialLauncherLogoUrl ?? "",
   );
   const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
+  const [selectedTemplateId, setSelectedTemplateId] =
+    useState<WidgetTemplateId | null>(null);
 
   const embedSnippet = getEmbedSnippet(apiKey);
   const accentDefault = getWidgetAccentDefault(format);
@@ -517,6 +524,48 @@ export default function WidgetDesigner({
     if (nextStyle === "card") {
       setLauncherIcon((currentIcon) => getAssistantCardIcon(currentIcon));
     }
+  };
+
+  const handleTemplateSelect = (templateId: WidgetTemplateId) => {
+    const template = widgetTemplates.find((item) => item.id === templateId);
+    if (!template) return;
+
+    const settings = template.settings;
+    setSelectedTemplateId(templateId);
+    setFormat(settings.format);
+    setAccentInput(settings.accent);
+    setBrandInput(settings.brandName);
+    setLabelInput(settings.collapsedLabel);
+    setGreetingInput(settings.greeting);
+    setHumanSupportTextInput(settings.humanSupportText);
+    setLauncherIcon(settings.launcherIcon);
+    setLauncherLogoUrl(settings.launcherLogoUrl);
+    setLauncherStyle(settings.launcherStyle);
+    setBubbleSubtitleInput(settings.bubbleSubtitle);
+    setBubbleUseThree(settings.bubbleUseThree);
+    setBubbleWidth(settings.bubbleWidth);
+    setBubbleRadius(settings.bubbleRadius);
+    setPosition(settings.position);
+    setWidth(settings.width);
+    setHeight(settings.height);
+    setOffsetX(settings.offsetX);
+    setOffsetY(settings.offsetY);
+    setLauncherSize(settings.launcherSize);
+    setBorderRadius(settings.borderRadius);
+    setColorHeaderBg(settings.appearance.colorHeaderBg);
+    setColorHeaderText(settings.appearance.colorHeaderText);
+    setColorChatBg(settings.appearance.colorChatBg);
+    setColorUserBubbleBg(settings.appearance.colorUserBubbleBg);
+    setColorUserBubbleText(settings.appearance.colorUserBubbleText);
+    setColorBotBubbleBg(settings.appearance.colorBotBubbleBg);
+    setColorBotBubbleText(settings.appearance.colorBotBubbleText);
+    setColorToggleBg(settings.appearance.colorToggleBg);
+    setColorToggleText(settings.appearance.colorToggleText);
+    setColorBubbleBg(settings.appearance.colorBubbleBg);
+    setColorBubbleText(settings.appearance.colorBubbleText);
+    setColorBubbleSubtext(settings.appearance.colorBubbleSubtext);
+    setColorBubbleBorder(settings.appearance.colorBubbleBorder);
+    setColorBubbleGlow(settings.appearance.colorBubbleGlow);
   };
 
   const liveStateInput = useMemo(
@@ -729,6 +778,7 @@ export default function WidgetDesigner({
   }, [liveState]);
 
   function handleReset() {
+    setSelectedTemplateId(null);
     setAccentInput("");
     setBrandInput("");
     setLabelInput("");
@@ -806,6 +856,70 @@ export default function WidgetDesigner({
             </button>
           </div>
         </div>
+
+        <SectionCard
+          icon={WandSparkles}
+          eyebrow="Templates"
+          title="Start with a complete style"
+        >
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {widgetTemplates.map((template) => {
+              const isSelected = selectedTemplateId === template.id;
+
+              return (
+                <button
+                  key={template.id}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => handleTemplateSelect(template.id)}
+                  className={`group flex min-h-[132px] flex-col rounded-xl border p-3 text-left transition ${
+                    isSelected
+                      ? "border-neutral-300 bg-white/[0.06] text-white"
+                      : "border-slate-800 text-slate-300 hover:border-slate-600 hover:bg-white/[0.03]"
+                  }`}
+                >
+                  <span className="flex items-center justify-between gap-3">
+                    <span
+                      className="h-8 w-8 rounded-full border border-white/15 shadow-inner"
+                      style={{ backgroundColor: template.settings.accent }}
+                      aria-hidden="true"
+                    />
+                    <span className="flex gap-1" aria-hidden="true">
+                      {[
+                        template.settings.appearance.colorHeaderBg,
+                        template.settings.appearance.colorChatBg,
+                        template.settings.appearance.colorUserBubbleBg,
+                      ].map((color, index) => (
+                        <span
+                          key={`${color}-${index}`}
+                          className="h-4 w-4 rounded-full border border-white/15"
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                    </span>
+                  </span>
+                  <span className="mt-3 flex items-center justify-between gap-2">
+                    <span className="text-sm font-semibold">
+                      {template.name}
+                    </span>
+                    {isSelected ? (
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-300">
+                        Applied
+                      </span>
+                    ) : null}
+                  </span>
+                  <span className="mt-1 text-xs leading-5 text-slate-500 group-hover:text-slate-400">
+                    {template.description}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-xs leading-5 text-slate-500">
+            A template updates every design field. You can customize it before
+            saving.
+          </p>
+        </SectionCard>
 
         <SectionCard
           icon={Sparkles}
