@@ -413,6 +413,36 @@ a:focus-visible {
   animation: gradient-x 4s ease infinite;
 }
 
+/* Landing experience */
+.landing-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, black, transparent 92%);
+}
+
+@keyframes landing-stage-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.landing-stage-in {
+  animation: landing-stage-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-stage-in {
+    animation: none;
+  }
+}
+
 @layer base {
   .prose {
     color: #cbd5e1;
