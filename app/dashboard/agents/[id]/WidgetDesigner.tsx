@@ -151,16 +151,6 @@ const launcherStyleHelp: Record<WidgetLauncherStyle, string> = {
   card: "Assistant card with title, subtitle, glow, and 3D orb.",
 };
 
-const widgetFormatLabels: Record<WidgetFormat, string> = {
-  classic: "Classic",
-  assistant: "AI assistant",
-};
-
-const widgetFormatHelp: Record<WidgetFormat, string> = {
-  classic: "Compact support chat with a branded header.",
-  assistant: "Neutral workspace inspired by modern AI apps.",
-};
-
 function normalizeWidgetFormat(value: string | null): WidgetFormat {
   return widgetFormats.includes(value as WidgetFormat)
     ? (value as WidgetFormat)
@@ -830,6 +820,7 @@ export default function WidgetDesigner({
         w-full min-w-0
       "
     >
+      <input type="hidden" name="widget_format" value={format} />
       <div className="space-y-4 min-w-0">
         <div className="rounded-2xl border border-slate-800/80 p-4 sm:p-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -919,48 +910,6 @@ export default function WidgetDesigner({
             A template updates every design field. You can customize it before
             saving.
           </p>
-        </SectionCard>
-
-        <SectionCard
-          icon={Sparkles}
-          eyebrow="Format"
-          title="Choose the chat interface"
-        >
-          <fieldset>
-            <legend className="sr-only">Widget format</legend>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {widgetFormats.map((option) => (
-                <label
-                  key={option}
-                  className={`flex min-h-[92px] cursor-pointer flex-col justify-between rounded-xl border px-3 py-3 transition ${
-                    format === option
-                      ? "border-neutral-400/70 text-neutral-100"
-                      : "border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-100"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="widget_format"
-                    value={option}
-                    checked={format === option}
-                    onChange={() => setFormat(option)}
-                    className="sr-only"
-                  />
-                  <span className="flex items-center gap-2 text-sm font-semibold">
-                    {option === "assistant" ? (
-                      <Sparkles className="h-4 w-4" aria-hidden="true" />
-                    ) : (
-                      <MessageSquare className="h-4 w-4" aria-hidden="true" />
-                    )}
-                    {widgetFormatLabels[option]}
-                  </span>
-                  <span className="mt-2 text-xs leading-5 text-slate-500">
-                    {widgetFormatHelp[option]}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
         </SectionCard>
 
         <SectionCard
