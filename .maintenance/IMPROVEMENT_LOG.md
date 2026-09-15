@@ -58,3 +58,27 @@ Acceptance:
 
 Applied changes:
 - app/globals.css: updated
+
+## 2026-08-27 - Make the Academy empty state match its cause
+
+ID: academy-empty-state-context
+Priority: P1
+Area: Academy
+Category: empty-state
+
+Problem: The Academy always tells users to clear filters and shows a Clear filters button, even when the library itself has no published resources and there are no filters to clear.
+
+Solution: Show filter-recovery guidance only when filters are active, and show a distinct no-content message with a contact action when the library is genuinely empty.
+
+Files:
+- app/academy/AcademyLibrary.tsx
+
+Acceptance:
+- Active filters produce a no-results message with a working Clear filters action.
+- An empty unfiltered library explains that resources are not available yet.
+- The unfiltered empty state offers a relevant contact action instead of a no-op button.
+
+Applied changes:
+- Split the Academy empty state into filtered-no-results and genuinely-empty variants with relevant actions.
+
+Validation: Pending GitHub Actions (`npm ci`, lint, build).
