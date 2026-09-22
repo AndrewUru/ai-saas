@@ -1,0 +1,7 @@
+Inspect the current repository and propose exactly one small, useful UI/UX improvement for a draft pull request. Focus on user-facing clarity, accessibility, responsive layout, empty/loading/error states, or interface copy. Ground the problem in code you actually read. Check the existing improvement log and queue so you do not repeat a completed or proposed change.
+
+Return only a JSON object matching `.maintenance/schemas/weekly-ui-improvement.schema.json`, with `status: "ready"`. Use the current UTC time for `createdAt`, a unique lowercase kebab-case id, and one to three narrowly scoped operations. Every `replace_text.before` must exactly match current file content; set `expectedOccurrences` accurately. Keep the proposed change under the limits in `.maintenance/config/weekly-ui-improvements.json` and the hard restrictions in `.maintenance/scripts/weekly-ui-improvement.mjs`. Do not edit repository files, execute repository scripts, install dependencies, access external services, or include Markdown fences in the response.
+
+Choose only files under `app/` or `components/` that contain no auth, payment, Supabase, API key, environment, or server action logic. Avoid API routes, billing, login, signup, and integrations. Do not add URLs, fetches, or sensitive behavior. State acceptance criteria that a reviewer can observe.
+
+If you cannot identify a concrete safe improvement that meets these rules, return only `{"noImprovement":"A short reason grounded in the repository."}`.

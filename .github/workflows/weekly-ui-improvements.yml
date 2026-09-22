@@ -14,7 +14,77 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  generate-candidate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      open_pr_count: ${{ steps.open-pr.outputs.count }}
+      ready: ${{ steps.queue.outputs.ready }}
+      generated: ${{ steps.validate.outputs.generated }}
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Stop if a weekly UI/UX PR is already open
+        id: open-pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          COUNT="$(gh pr list \
+            --state open \
+            --json headRefName \
+            --jq '[.[] | select(.headRefName | startswith("automation/weekly-ui-ux-"))] | length')"
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Check for a ready proposal
+        if: steps.open-pr.outputs.count == '0'
+        id: queue
+        run: node .maintenance/scripts/weekly-ui-proposal.mjs --queue-status
+
+      - name: Ask Codex for one small improvement
+        if: steps.queue.outputs.ready == 'false'
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          permission-profile: ":read-only"
+          prompt-file: .github/codex/prompts/weekly-ui-proposal.md
+          output-file: weekly-ui-candidate.json
+
+      - name: Validate Codex proposal
+        if: steps.queue.outputs.ready == 'false'
+        id: validate
+        run: node .maintenance/scripts/weekly-ui-proposal.mjs --validate weekly-ui-candidate.json
+
+      - name: Check Codex changed no repository files
+        if: steps.validate.outputs.generated == 'true'
+        run: |
+          mapfile -t CHANGES < <(git status --porcelain --untracked-files=all)
+          if [ "${#CHANGES[@]}" -ne 1 ] || [ "${CHANGES[0]}" != '?? weekly-ui-candidate.json' ]; then
+            printf '%s\n' "${CHANGES[@]}" >&2
+            exit 1
+          fi
+
+      - name: Upload validated proposal
+        if: steps.validate.outputs.generated == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-ui-candidate
+          path: weekly-ui-candidate.json
+          if-no-files-found: error
+
   propose-ui-ux-improvement:
+    needs: generate-candidate
+    if: needs['generate-candidate'].outputs.open_pr_count == '0'
     runs-on: ubuntu-latest
 
     env:
@@ -56,6 +126,17 @@ jobs:
           if [ "$COUNT" != "0" ]; then
             echo "A weekly UI/UX PR is already open. Skipping this run."
           fi
+
+      - name: Download Codex proposal
+        if: steps.open-pr.outputs.count == '0' && needs['generate-candidate'].outputs.generated == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: weekly-ui-candidate
+          path: ${{ runner.temp }}/weekly-ui-candidate
+
+      - name: Stage validated Codex proposal
+        if: steps.open-pr.outputs.count == '0' && needs['generate-candidate'].outputs.generated == 'true'
+        run: node .maintenance/scripts/weekly-ui-proposal.mjs --stage "${{ runner.temp }}/weekly-ui-candidate/weekly-ui-candidate.json"
 
       - name: Apply next queued UI/UX improvement
         if: steps.open-pr.outputs.count == '0'
@@ -209,7 +290,7 @@ jobs:
           steps.open-pr.outputs.count == '0' &&
           steps.improvement.outputs.reason == 'queue-empty'
         run: |
-          echo "No ready UI/UX improvement is available. Add a validated manifest to .maintenance/improvements/queue." \
+          echo "No safe UI/UX improvement was available from the queue or Codex this week." \
             >> "$GITHUB_STEP_SUMMARY"
 
       - name: Mark failed validation

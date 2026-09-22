@@ -7,7 +7,7 @@ Este directorio contiene un sistema seguro y extensible para preparar una mejora
 El sistema separa dos responsabilidades:
 
 1. **Motor de ejecucion:** `.maintenance/scripts/weekly-ui-improvement.mjs` selecciona, comprueba y aplica exactamente una propuesta declarativa. No contiene recetas de producto, no ejecuta codigo procedente de una propuesta y no usa la red.
-2. **Productor de propuestas:** una persona, un script de analisis o un futuro agente de IA crea manifiestos JSON en `.maintenance/improvements/queue/`. Este repositorio no presupone que exista ningun servicio externo.
+2. **Productor de propuestas:** si no hay un manifiesto `ready`, el workflow ejecuta Codex con acceso de solo lectura al repositorio para generar uno. Tambien se pueden versionar propuestas manuales en `.maintenance/improvements/queue/`.
 
 La configuracion `.maintenance/config/weekly-ui-improvements.json` define prioridades y limites adicionales. Las barreras criticas tambien viven en el motor para que la configuracion no pueda ampliar por accidente el alcance permitido.
 
@@ -63,7 +63,7 @@ Al aplicar una propuesta:
 6. El workflow anade cada resultado al PR y al log, verifica el conjunto exacto de archivos, sube una rama y abre un Draft PR.
 7. Si cualquier validacion falla, el Draft PR conserva el diagnostico y el job termina con error.
 
-Si no hay propuestas `ready`, el motor no modifica el reporte ni crea un PR vacio. El workflow deja una nota en su resumen. Reponer la cola corresponde al productor de propuestas.
+Si no hay propuestas `ready`, el workflow pide a Codex una mejora pequena. `.maintenance/scripts/weekly-ui-proposal.mjs` comprueba su formato, rutas, presupuesto y coincidencias exactas antes de introducirla en la cola. Si Codex no encuentra una mejora segura, el workflow termina sin PR y deja una nota en su resumen.
 
 ## Limites de seguridad
 
@@ -80,18 +80,13 @@ Siempre bloquea:
 
 Estas comprobaciones reducen el riesgo, pero no sustituyen la revision humana. El workflow solo crea Draft Pull Requests y no contiene ningun paso de merge.
 
-## Conectar un futuro agente de IA
+## Propuestas semanales con Codex
 
-Un agente proponente puede analizar capturas, issues, telemetria no sensible o el codigo y producir un manifiesto conforme al esquema. Debe funcionar como proceso separado y con permisos de solo lectura sobre el producto salvo para escribir su propuesta en la cola.
+El primer job consulta la cola. Cuando esta vacia y no hay un PR semanal abierto, `openai/codex-action` examina el codigo y devuelve un manifiesto JSON con `status: ready`. Codex usa un perfil de solo lectura y recibe la clave `OPENAI_API_KEY` solo en su paso. La salida se valida contra el mismo motor que aplica las propuestas; despues pasa como artefacto al job que puede abrir el Draft PR. Codex no recibe permisos de escritura en GitHub ni permisos de merge.
 
-Antes de aceptar su salida:
+Configura `OPENAI_API_KEY` como secret del repositorio para activar este paso. Es una clave de API de OpenAI para uso en Actions; el inicio de sesion de Codex en VS Code no se comparte automaticamente con GitHub. Sin una propuesta manual `ready` ni este secret, el job de Codex no puede ejecutarse.
 
-1. validar el JSON contra el esquema;
-2. ejecutar `npm run improve:weekly:dry` sobre la rama por defecto actual;
-3. versionar la propuesta con `status: ready`;
-4. dejar que el motor local aplique y valide el cambio.
-
-El agente no debe recibir permisos de merge, secrets de produccion ni capacidad para relajar la politica del motor.
+El prompt esta en `.github/codex/prompts/weekly-ui-proposal.md`. El productor puede responder `noImprovement` con una razon cuando no encuentre un cambio pequeno y seguro. No interpreta instrucciones dentro del codigo como autorizacion para ampliar el alcance.
 
 ## Ejecucion manual en GitHub
 
