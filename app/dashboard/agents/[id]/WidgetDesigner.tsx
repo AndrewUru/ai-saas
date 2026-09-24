@@ -24,6 +24,7 @@ import {
 import {
   getWidgetAccentDefault,
   getWidgetAppearanceDefaults,
+  getWidgetCopyDefaults,
   type WidgetFormat,
   type WidgetLauncherIcon,
   type WidgetLauncherStyle,
@@ -40,17 +41,6 @@ import {
   type WidgetTemplateId,
   widgetTemplates,
 } from "@/lib/widget/templates";
-
-function useDebouncedValue<T>(value: T, delay = 300) {
-  const [debounced, setDebounced] = useState(value);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(timeoutId);
-  }, [value, delay]);
-
-  return debounced;
-}
 
 type WidgetDesignerProps = {
   apiKey: string;
@@ -178,18 +168,6 @@ function normalizeHex(value: string): string | null {
 
   if (!/^[0-9a-f]{6}$/i.test(hex)) return null;
   return `#${hex.toLowerCase()}`;
-}
-
-function toParamHex(value: string): string | null {
-  const normalized = normalizeHex(value);
-  if (!normalized) return null;
-  return normalized.slice(1);
-}
-
-function trimmedOrNull(value: string, max: number): string | null {
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  return trimmed.slice(0, max);
 }
 
 const inputClass =
@@ -400,7 +378,6 @@ function RangeInput({
 
 export default function WidgetDesigner({
   apiKey,
-  siteUrl,
   initialAccent,
   initialBrand,
   initialLabel,
@@ -543,26 +520,6 @@ export default function WidgetDesigner({
     useState<PreviewViewport>("desktop");
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  useEffect(() => {
-    const handlePreviewMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) return;
-      if (event.source !== iframeRef.current?.contentWindow) return;
-      if (event.data?.type === "ai-widget-editor:ready") {
-        iframeRef.current?.contentWindow?.postMessage(
-          { type: "ai-widget-editor:select", part: selectedPart },
-          window.location.origin,
-        );
-        return;
-      }
-      if (event.data?.type !== "ai-widget-editor:select") return;
-      if (!editablePartMap.has(event.data.part as EditablePart)) return;
-      setSelectedPart(event.data.part as EditablePart);
-    };
-
-    window.addEventListener("message", handlePreviewMessage);
-    return () => window.removeEventListener("message", handlePreviewMessage);
-  }, [selectedPart]);
-
   const embedSnippet = getEmbedSnippet(apiKey);
   const accentDefault = getWidgetAccentDefault(format);
   const appearanceDefaults = getWidgetAppearanceDefaults(format);
@@ -616,214 +573,203 @@ export default function WidgetDesigner({
     setColorBubbleGlow(settings.appearance.colorBubbleGlow);
   };
 
-  const liveStateInput = useMemo(
-    () => ({
-      apiKey,
-      siteUrl,
-      accentInput,
-      brandInput,
-      labelInput,
-      greetingInput,
-      initialLanguage,
-      humanSupportTextInput,
-      bubbleSubtitleInput,
-      format,
-      launcherStyle,
-      bubbleUseThree,
-      position,
-      width,
-      height,
-      offsetX,
-      offsetY,
-      launcherSize,
-      borderRadius,
-      bubbleWidth,
-      bubbleRadius,
-      colorHeaderBg,
-      colorHeaderText,
-      colorChatBg,
-      colorUserBubbleBg,
-      colorUserBubbleText,
-      colorBotBubbleBg,
-      colorBotBubbleText,
-      colorToggleBg,
-      colorToggleText,
-      colorBubbleBg,
-      colorBubbleText,
-      colorBubbleSubtext,
-      colorBubbleBorder,
-      colorBubbleGlow,
-      launcherIcon,
-      launcherLogoUrl,
-    }),
-    [
-      apiKey,
-      siteUrl,
-      accentInput,
-      brandInput,
-      labelInput,
-      greetingInput,
-      initialLanguage,
-      humanSupportTextInput,
-      bubbleSubtitleInput,
-      format,
-      launcherStyle,
-      bubbleUseThree,
-      position,
-      width,
-      height,
-      offsetX,
-      offsetY,
-      launcherSize,
-      borderRadius,
-      bubbleWidth,
-      bubbleRadius,
-      colorHeaderBg,
-      colorHeaderText,
-      colorChatBg,
-      colorUserBubbleBg,
-      colorUserBubbleText,
-      colorBotBubbleBg,
-      colorBotBubbleText,
-      colorToggleBg,
-      colorToggleText,
-      colorBubbleBg,
-      colorBubbleText,
-      colorBubbleSubtext,
-      colorBubbleBorder,
-      colorBubbleGlow,
-      launcherIcon,
-      launcherLogoUrl,
-    ],
-  );
+  const copyDefaults = getWidgetCopyDefaults(initialLanguage);
+  const livePreviewConfig = useMemo(() => {
+    const resolvedBrand =
+      brandInput.trim().slice(0, widgetLimits.brand) || widgetDefaults.brand;
 
-  const liveState = useDebouncedValue(liveStateInput, 300);
+    return {
+      format,
+      language: initialLanguage ?? "auto",
+      accent: normalizeHex(accentInput) ?? accentDefault,
+      brandName: resolvedBrand,
+      brandInitial: (resolvedBrand.charAt(0).toUpperCase() || "A").slice(0, 1),
+      collapsedLabel:
+        labelInput.trim().slice(0, widgetLimits.label) || copyDefaults.label,
+      greeting:
+        greetingInput.trim().slice(0, widgetLimits.greeting) ||
+        copyDefaults.greeting,
+      humanSupportText:
+        humanSupportTextInput
+          .trim()
+          .slice(0, widgetLimits.humanSupportText) ||
+        copyDefaults.humanSupportText,
+      launcherIcon,
+      launcherLogoUrl:
+        launcherLogoUrl.trim().slice(0, widgetLimits.launcherLogoUrl) || null,
+      launcherStyle,
+      bubbleSubtitle:
+        bubbleSubtitleInput.trim().slice(0, widgetLimits.bubbleSubtitle) ||
+        widgetDefaults.bubbleSubtitle,
+      bubbleUseThree,
+      bubbleWidth,
+      bubbleRadius,
+      position,
+      width,
+      height,
+      offsetX,
+      offsetY,
+      launcherSize,
+      borderRadius,
+      appearance: {
+        colorHeaderBg:
+          normalizeHex(colorHeaderBg) ?? appearanceDefaults.colorHeaderBg,
+        colorHeaderText:
+          normalizeHex(colorHeaderText) ?? appearanceDefaults.colorHeaderText,
+        colorChatBg:
+          normalizeHex(colorChatBg) ?? appearanceDefaults.colorChatBg,
+        colorUserBubbleBg:
+          normalizeHex(colorUserBubbleBg) ??
+          appearanceDefaults.colorUserBubbleBg,
+        colorUserBubbleText:
+          normalizeHex(colorUserBubbleText) ??
+          appearanceDefaults.colorUserBubbleText,
+        colorBotBubbleBg:
+          normalizeHex(colorBotBubbleBg) ?? appearanceDefaults.colorBotBubbleBg,
+        colorBotBubbleText:
+          normalizeHex(colorBotBubbleText) ??
+          appearanceDefaults.colorBotBubbleText,
+        colorToggleBg:
+          normalizeHex(colorToggleBg) ?? appearanceDefaults.colorToggleBg,
+        colorToggleText:
+          normalizeHex(colorToggleText) ?? appearanceDefaults.colorToggleText,
+        colorBubbleBg:
+          normalizeHex(colorBubbleBg) ?? appearanceDefaults.colorBubbleBg,
+        colorBubbleText:
+          normalizeHex(colorBubbleText) ?? appearanceDefaults.colorBubbleText,
+        colorBubbleSubtext:
+          normalizeHex(colorBubbleSubtext) ??
+          appearanceDefaults.colorBubbleSubtext,
+        colorBubbleBorder:
+          normalizeHex(colorBubbleBorder) ??
+          appearanceDefaults.colorBubbleBorder,
+        colorBubbleGlow:
+          normalizeHex(colorBubbleGlow) ?? appearanceDefaults.colorBubbleGlow,
+      },
+    };
+  }, [
+    accentDefault,
+    accentInput,
+    appearanceDefaults,
+    borderRadius,
+    brandInput,
+    bubbleRadius,
+    bubbleSubtitleInput,
+    bubbleUseThree,
+    bubbleWidth,
+    colorBotBubbleBg,
+    colorBotBubbleText,
+    colorBubbleBg,
+    colorBubbleBorder,
+    colorBubbleGlow,
+    colorBubbleSubtext,
+    colorBubbleText,
+    colorChatBg,
+    colorHeaderBg,
+    colorHeaderText,
+    colorToggleBg,
+    colorToggleText,
+    colorUserBubbleBg,
+    colorUserBubbleText,
+    copyDefaults,
+    format,
+    greetingInput,
+    height,
+    humanSupportTextInput,
+    initialLanguage,
+    labelInput,
+    launcherIcon,
+    launcherLogoUrl,
+    launcherSize,
+    launcherStyle,
+    offsetX,
+    offsetY,
+    position,
+    width,
+  ]);
 
   const previewPageUrl = useMemo(() => {
-    const params = new URLSearchParams();
-    params.set("key", liveState.apiKey);
-    params.set("preview", "1");
-    params.set("accent", toParamHex(liveState.accentInput) ?? "");
-    params.set(
-      "brandName",
-      trimmedOrNull(liveState.brandInput, widgetLimits.brand) ?? "",
-    );
-    params.set(
-      "collapsedLabel",
-      trimmedOrNull(liveState.labelInput, widgetLimits.label) ?? "",
-    );
-    params.set(
-      "greeting",
-      trimmedOrNull(liveState.greetingInput, widgetLimits.greeting) ?? "",
-    );
-    params.set("language", liveState.initialLanguage ?? "auto");
-    params.set(
-      "humanSupportText",
-      trimmedOrNull(
-        liveState.humanSupportTextInput,
-        widgetLimits.humanSupportText,
-      ) ?? "",
-    );
-    params.set(
-      "bubbleSubtitle",
-      trimmedOrNull(
-        liveState.bubbleSubtitleInput,
-        widgetLimits.bubbleSubtitle,
-      ) ?? "",
-    );
-    params.set("format", liveState.format);
-    params.set("launcherStyle", liveState.launcherStyle);
-    params.set("bubbleUseThree", liveState.bubbleUseThree ? "1" : "0");
-    params.set("position", liveState.position);
-    params.set("width", String(liveState.width));
-    params.set("height", String(liveState.height));
-    params.set("offsetX", String(liveState.offsetX));
-    params.set("offsetY", String(liveState.offsetY));
-    params.set("launcherSize", String(liveState.launcherSize));
-    params.set("borderRadius", String(liveState.borderRadius));
-    params.set("bubbleWidth", String(liveState.bubbleWidth));
-    params.set("bubbleRadius", String(liveState.bubbleRadius));
-
-    params.set("colorHeaderBg", toParamHex(liveState.colorHeaderBg) ?? "");
-    params.set("colorHeaderText", toParamHex(liveState.colorHeaderText) ?? "");
-    params.set("colorChatBg", toParamHex(liveState.colorChatBg) ?? "");
-    params.set(
-      "colorUserBubbleBg",
-      toParamHex(liveState.colorUserBubbleBg) ?? "",
-    );
-    params.set(
-      "colorUserBubbleText",
-      toParamHex(liveState.colorUserBubbleText) ?? "",
-    );
-    params.set(
-      "colorBotBubbleBg",
-      toParamHex(liveState.colorBotBubbleBg) ?? "",
-    );
-    params.set(
-      "colorBotBubbleText",
-      toParamHex(liveState.colorBotBubbleText) ?? "",
-    );
-    params.set("colorToggleBg", toParamHex(liveState.colorToggleBg) ?? "");
-    params.set("colorToggleText", toParamHex(liveState.colorToggleText) ?? "");
-    params.set("colorBubbleBg", toParamHex(liveState.colorBubbleBg) ?? "");
-    params.set("colorBubbleText", toParamHex(liveState.colorBubbleText) ?? "");
-    params.set(
-      "colorBubbleSubtext",
-      toParamHex(liveState.colorBubbleSubtext) ?? "",
-    );
-    params.set(
-      "colorBubbleBorder",
-      toParamHex(liveState.colorBubbleBorder) ?? "",
-    );
-    params.set("colorBubbleGlow", toParamHex(liveState.colorBubbleGlow) ?? "");
-    params.set("launcherIcon", liveState.launcherIcon);
-    params.set(
-      "launcherLogoUrl",
-      liveState.launcherLogoUrl.trim().slice(0, widgetLimits.launcherLogoUrl),
-    );
-
+    const params = new URLSearchParams({
+      key: apiKey,
+      preview: "1",
+      open: "1",
+      format,
+    });
     return `/widget/preview?${params.toString()}`;
-  }, [liveState]);
+  }, [apiKey, format]);
 
-  const iframeKey = useMemo(() => {
-    return [
-      liveState.colorHeaderBg,
-      liveState.colorHeaderText,
-      liveState.colorChatBg,
-      liveState.colorUserBubbleBg,
-      liveState.colorUserBubbleText,
-      liveState.colorBotBubbleBg,
-      liveState.colorBotBubbleText,
-      liveState.colorToggleBg,
-      liveState.colorToggleText,
-      liveState.launcherIcon,
-      liveState.launcherLogoUrl,
-      liveState.accentInput,
-      liveState.brandInput,
-      liveState.labelInput,
-      liveState.greetingInput,
-      liveState.initialLanguage,
-      liveState.humanSupportTextInput,
-      liveState.bubbleSubtitleInput,
-      liveState.format,
-      liveState.launcherStyle,
-      liveState.bubbleUseThree,
-      liveState.position,
-      liveState.width,
-      liveState.height,
-      liveState.offsetX,
-      liveState.offsetY,
-      liveState.launcherSize,
-      liveState.borderRadius,
-      liveState.bubbleWidth,
-      liveState.bubbleRadius,
-      liveState.colorBubbleBg,
-      liveState.colorBubbleText,
-      liveState.colorBubbleSubtext,
-      liveState.colorBubbleBorder,
-      liveState.colorBubbleGlow,
-    ].join("|");
-  }, [liveState]);
+  const livePreviewConfigRef = useRef(livePreviewConfig);
+  const selectedPartRef = useRef(selectedPart);
+
+  useEffect(() => {
+    livePreviewConfigRef.current = livePreviewConfig;
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "ai-widget-editor:update", config: livePreviewConfig },
+      window.location.origin,
+    );
+  }, [livePreviewConfig]);
+
+  useEffect(() => {
+    selectedPartRef.current = selectedPart;
+  }, [selectedPart]);
+
+  useEffect(() => {
+    const handlePreviewMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.source !== iframeRef.current?.contentWindow) return;
+
+      if (event.data?.type === "ai-widget-editor:ready") {
+        iframeRef.current?.contentWindow?.postMessage(
+          {
+            type: "ai-widget-editor:update",
+            config: livePreviewConfigRef.current,
+          },
+          window.location.origin,
+        );
+        iframeRef.current?.contentWindow?.postMessage(
+          { type: "ai-widget-editor:select", part: selectedPartRef.current },
+          window.location.origin,
+        );
+        return;
+      }
+
+      if (event.data?.type === "ai-widget-editor:text-change") {
+        const value = String(event.data.value ?? "");
+        switch (event.data.field) {
+          case "brandName":
+            setBrandInput(value.slice(0, widgetLimits.brand));
+            setSelectedPart("header");
+            break;
+          case "humanSupportText":
+            setHumanSupportTextInput(
+              value.slice(0, widgetLimits.humanSupportText),
+            );
+            setSelectedPart("header");
+            break;
+          case "collapsedLabel":
+            setLabelInput(value.slice(0, widgetLimits.label));
+            setSelectedPart("launcher");
+            break;
+          case "bubbleSubtitle":
+            setBubbleSubtitleInput(value.slice(0, widgetLimits.bubbleSubtitle));
+            setSelectedPart("launcher");
+            break;
+          case "greeting":
+            setGreetingInput(value.slice(0, widgetLimits.greeting));
+            setSelectedPart("composer");
+            break;
+        }
+        return;
+      }
+
+      if (event.data?.type !== "ai-widget-editor:select") return;
+      if (!editablePartMap.has(event.data.part as EditablePart)) return;
+      setSelectedPart(event.data.part as EditablePart);
+    };
+
+    window.addEventListener("message", handlePreviewMessage);
+    return () => window.removeEventListener("message", handlePreviewMessage);
+  }, []);
 
   function handleReset() {
     setSelectedTemplateId(null);
@@ -922,9 +868,9 @@ export default function WidgetDesigner({
             <MousePointer2 className="h-4 w-4" aria-hidden="true" />
           </span>
           <div>
-            <p className="text-sm font-semibold text-white">Click the widget to edit it</p>
+            <p className="text-sm font-semibold text-white">Click to style. Double-click text to rewrite it.</p>
             <p className="mt-1 text-xs leading-5 text-slate-400">
-              Select any highlighted area. Only its relevant controls will appear.
+              Changes now appear instantly without reloading the preview.
             </p>
           </div>
         </div>
@@ -943,7 +889,7 @@ export default function WidgetDesigner({
           <div className="flex flex-col gap-3 border-b border-slate-800/80 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-200">Live canvas</p>
-              <p className="mt-1 text-sm text-slate-400">Tap a part of the widget to customize it.</p>
+              <p className="mt-1 text-sm text-slate-400">Select any area, or double-click visible text to edit in place.</p>
             </div>
             <div className="inline-flex self-start rounded-xl border border-slate-800 bg-slate-950 p-1">
               {([
@@ -983,11 +929,15 @@ export default function WidgetDesigner({
               ) : null}
               <iframe
                 ref={iframeRef}
-                key={iframeKey}
+                key={format}
                 title="Interactive widget preview"
                 src={previewPageUrl}
                 sandbox="allow-scripts allow-same-origin"
                 onLoad={() => {
+                  iframeRef.current?.contentWindow?.postMessage(
+                    { type: "ai-widget-editor:update", config: livePreviewConfig },
+                    window.location.origin,
+                  );
                   iframeRef.current?.contentWindow?.postMessage(
                     { type: "ai-widget-editor:select", part: selectedPart },
                     window.location.origin,

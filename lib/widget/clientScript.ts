@@ -579,18 +579,18 @@ export function renderWidgetScript(
       // We do a shallow merge of the top level, and deep merge of appearance
       let fullConfig = mergeConfig(config || {});
       let copy = getCopy(fullConfig.language);
-      const brandName = fullConfig.brandName || "AI Widget";
-      const brandInitial =
+      let brandName = fullConfig.brandName || "AI Widget";
+      let brandInitial =
         fullConfig.brandInitial ||
         (brandName.charAt(0).toUpperCase() || "A").slice(0, 1);
-      const collapsedLabel = fullConfig.collapsedLabel || copy.collapsedLabel;
-      const humanSupportText = fullConfig.humanSupportText || copy.humanSupportText;
-      const bubbleSubtitle = fullConfig.bubbleSubtitle || "I'm here to assist you.";
-      const greeting = fullConfig.greeting || copy.greeting;
-      const launcherIcon = ["whatsapp", "chat", "sparkles", "bot", "store", "logo"].includes(fullConfig.launcherIcon)
+      let collapsedLabel = fullConfig.collapsedLabel || copy.collapsedLabel;
+      let humanSupportText = fullConfig.humanSupportText || copy.humanSupportText;
+      let bubbleSubtitle = fullConfig.bubbleSubtitle || "I'm here to assist you.";
+      let greeting = fullConfig.greeting || copy.greeting;
+      let launcherIcon = ["whatsapp", "chat", "sparkles", "bot", "store", "logo"].includes(fullConfig.launcherIcon)
         ? fullConfig.launcherIcon
         : "whatsapp";
-      const launcherLogoUrl = sanitizeUrl(fullConfig.launcherLogoUrl);
+      let launcherLogoUrl = sanitizeUrl(fullConfig.launcherLogoUrl);
 
       // 3. Inject CSS
       // We rely on STATIC_STYLES which uses variables.
@@ -699,8 +699,8 @@ export function renderWidgetScript(
              <div class="ai-saas-brand">
                <div class="ai-saas-brand-icon" aria-hidden="true">\${escapeHtml(brandInitial)}</div>
                <div class="ai-saas-brand-text">
-                 <strong id="ai-saas-title">\${escapeHtml(brandName)}</strong>
-                 <span><span class="ai-saas-status-dot" aria-hidden="true"></span>\${escapeHtml(humanSupportText)}</span>
+                 <strong id="ai-saas-title" data-ai-editor-field="brandName">\${escapeHtml(brandName)}</strong>
+                 <span><span class="ai-saas-status-dot" aria-hidden="true"></span><span class="ai-saas-status-text" data-ai-editor-field="humanSupportText">\${escapeHtml(humanSupportText)}</span></span>
                </div>
              </div>
              \${renderCloseButton("")}
@@ -725,8 +725,8 @@ export function renderWidgetScript(
               <div class="ai-saas-brand">
                 <div class="ai-saas-brand-icon" aria-hidden="true">\${escapeHtml(brandInitial)}</div>
                 <div class="ai-saas-brand-text">
-                  <strong id="ai-saas-title">\${escapeHtml(brandName)}</strong>
-                  <span><span class="ai-saas-status-dot" aria-hidden="true"></span>\${escapeHtml(humanSupportText)}</span>
+                  <strong id="ai-saas-title" data-ai-editor-field="brandName">\${escapeHtml(brandName)}</strong>
+                  <span><span class="ai-saas-status-dot" aria-hidden="true"></span><span class="ai-saas-status-text" data-ai-editor-field="humanSupportText">\${escapeHtml(humanSupportText)}</span></span>
                 </div>
               </div>
               \${renderCloseButton("ai-assistant-close")}
@@ -734,7 +734,7 @@ export function renderWidgetScript(
             <div class="ai-assistant-stage">
               <div id="ai-saas-chat-box" role="log" aria-live="polite" aria-relevant="additions">
                 <div id="ai-saas-assistant-hero" class="ai-assistant-hero">
-                  <h2>\${escapeHtml(greeting)}</h2>
+                  <h2 data-ai-editor-field="greeting">\${escapeHtml(greeting)}</h2>
                 </div>
               </div>
               <div class="ai-assistant-composer">
@@ -756,10 +756,10 @@ export function renderWidgetScript(
         <button id="ai-saas-toggle" type="button" aria-controls="ai-saas-widget" aria-expanded="false" aria-label="\${escapeHtml(copy.openChat)}">
           \${renderBrandIcon()}
           <span class="ai-saas-bubble-copy">
-            <span class="ai-saas-bubble-title">\${escapeHtml(collapsedLabel)}</span>
-            <span class="ai-saas-bubble-subtitle">\${escapeHtml(bubbleSubtitle)}</span>
+            <span class="ai-saas-bubble-title" data-ai-editor-field="collapsedLabel">\${escapeHtml(collapsedLabel)}</span>
+            <span class="ai-saas-bubble-subtitle" data-ai-editor-field="bubbleSubtitle">\${escapeHtml(bubbleSubtitle)}</span>
           </span>
-          <span class="ai-saas-label">\${escapeHtml(collapsedLabel)}</span>
+          <span class="ai-saas-label" data-ai-editor-field="collapsedLabel">\${escapeHtml(collapsedLabel)}</span>
         </button>
         \${isAssistantFormat ? renderAssistantWidget() : renderClassicWidget()}
       \`;
@@ -799,6 +799,7 @@ export function renderWidgetScript(
         chat: "#ai-saas-chat-box",
         layout: "#ai-saas-widget",
       };
+      let selectedPreviewPart = null;
 
       const getPreviewEditorPart = (target) => {
         if (!(target instanceof Element)) return null;
@@ -810,6 +811,7 @@ export function renderWidgetScript(
 
       const selectPreviewEditorPart = (part, notifyParent = true) => {
         if (!IS_PREVIEW || !previewEditorSelectors[part]) return;
+        selectedPreviewPart = part;
 
         anchor
           .querySelectorAll("[data-ai-editor-selected]")
@@ -843,12 +845,25 @@ export function renderWidgetScript(
             outline-offset: 3px !important;
             box-shadow: 0 0 0 7px rgba(139, 92, 246, .16) !important;
           }
+          #ai-saas-anchor [data-ai-editor-field] {
+            cursor: text !important;
+          }
+          #ai-saas-anchor [data-ai-inline-editing="true"] {
+            min-width: 28px;
+            border-radius: 5px;
+            outline: 2px solid #f8fafc !important;
+            outline-offset: 2px !important;
+            background: rgba(15, 23, 42, .86) !important;
+            color: #fff !important;
+            caret-color: #fff;
+          }
         \`;
         document.head.appendChild(editorStyle);
 
         anchor.addEventListener(
           "click",
           (event) => {
+            if (event.target.closest?.('[contenteditable="true"]')) return;
             const part = getPreviewEditorPart(event.target);
             if (!part) return;
             event.preventDefault();
@@ -858,18 +873,68 @@ export function renderWidgetScript(
           true,
         );
 
+        anchor.addEventListener(
+          "dblclick",
+          (event) => {
+            const target = event.target.closest?.("[data-ai-editor-field]");
+            if (!target) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            const field = target.dataset.aiEditorField;
+            const originalValue = target.textContent || "";
+            let cancelled = false;
+            target.contentEditable = "true";
+            target.setAttribute("data-ai-inline-editing", "true");
+            target.focus();
+
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(target);
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+
+            const handleInlineKeyDown = (keyboardEvent) => {
+              if (keyboardEvent.key === "Escape") {
+                cancelled = true;
+                target.textContent = originalValue;
+                target.blur();
+                return;
+              }
+              if (keyboardEvent.key === "Enter") {
+                keyboardEvent.preventDefault();
+                target.blur();
+              }
+            };
+            target.addEventListener("keydown", handleInlineKeyDown);
+
+            target.addEventListener(
+              "blur",
+              () => {
+                target.removeEventListener("keydown", handleInlineKeyDown);
+                target.contentEditable = "false";
+                target.removeAttribute("data-ai-inline-editing");
+                if (cancelled || window.parent === window) return;
+                window.parent.postMessage(
+                  {
+                    type: "ai-widget-editor:text-change",
+                    field,
+                    value: (target.textContent || "").trim(),
+                  },
+                  window.location.origin,
+                );
+              },
+              { once: true },
+            );
+          },
+          true,
+        );
+
         window.addEventListener("message", (event) => {
           if (event.origin !== window.location.origin) return;
           if (event.data?.type !== "ai-widget-editor:select") return;
           selectPreviewEditorPart(event.data.part, false);
         });
-
-        if (window.parent !== window) {
-          window.parent.postMessage(
-            { type: "ai-widget-editor:ready" },
-            window.location.origin,
-          );
-        }
       }
 
       const setupThreeLauncher = async () => {
@@ -985,14 +1050,107 @@ export function renderWidgetScript(
         chatBox.scrollTop = chatBox.scrollHeight;
       };
 
-      const appendBotMessage = (text) => {
+      const appendBotMessage = (text, options = {}) => {
         if (!text) return;
         const botDiv = document.createElement("div");
         botDiv.className = "ai-saas-bubble bot ai-saas-enter";
+        if (options.isGreeting) {
+          botDiv.dataset.aiEditorField = "greeting";
+        }
         botDiv.innerText = text;
         chatBox.appendChild(botDiv);
         scrollChatToBottom();
       };
+
+      const setPreviewText = (selector, value) => {
+        anchor.querySelectorAll(selector).forEach((element) => {
+          if (element.getAttribute("contenteditable") === "true") return;
+          element.textContent = value;
+        });
+      };
+
+      const applyLivePreviewConfig = (nextConfig) => {
+        if (!IS_PREVIEW || !nextConfig || typeof nextConfig !== "object") return;
+
+        const previousLauncherIcon = launcherIcon;
+        const previousLauncherLogoUrl = launcherLogoUrl;
+        fullConfig = {
+          ...fullConfig,
+          ...nextConfig,
+          appearance: {
+            ...(fullConfig.appearance || {}),
+            ...(nextConfig.appearance || {}),
+          },
+        };
+        copy = getCopy(fullConfig.language);
+        brandName = fullConfig.brandName || "AI Widget";
+        brandInitial =
+          fullConfig.brandInitial ||
+          (brandName.charAt(0).toUpperCase() || "A").slice(0, 1);
+        collapsedLabel = fullConfig.collapsedLabel || copy.collapsedLabel;
+        humanSupportText = fullConfig.humanSupportText || copy.humanSupportText;
+        bubbleSubtitle = fullConfig.bubbleSubtitle || "I'm here to assist you.";
+        greeting = fullConfig.greeting || copy.greeting;
+        launcherIcon = ["whatsapp", "chat", "sparkles", "bot", "store", "logo"].includes(fullConfig.launcherIcon)
+          ? fullConfig.launcherIcon
+          : "whatsapp";
+        launcherLogoUrl = sanitizeUrl(fullConfig.launcherLogoUrl);
+
+        applyPosition(anchor, fullConfig.position);
+        applyFormat(anchor, fullConfig.format);
+        applyLauncherStyle(anchor, fullConfig);
+        applyTheme(anchor, fullConfig);
+
+        setPreviewText('[data-ai-editor-field="brandName"]', brandName);
+        setPreviewText('[data-ai-editor-field="humanSupportText"]', humanSupportText);
+        setPreviewText('[data-ai-editor-field="collapsedLabel"]', collapsedLabel);
+        setPreviewText('[data-ai-editor-field="bubbleSubtitle"]', bubbleSubtitle);
+        setPreviewText('[data-ai-editor-field="greeting"]', greeting);
+        setPreviewText(".ai-saas-brand-icon", brandInitial);
+        setPreviewText(".ai-assistant-avatar", brandInitial);
+        setPreviewText(".ai-assistant-sidebar-brand strong", brandName);
+        const accountName = anchor.querySelector(".ai-assistant-sidebar-account span:last-child");
+        if (accountName) accountName.textContent = brandName;
+
+        input.placeholder = copy.inputPlaceholder;
+        input.setAttribute("aria-label", copy.inputLabel);
+        submitBtn.setAttribute("aria-label", copy.sendMessage);
+        setPreviewText(".ai-saas-send-label", copy.send);
+
+        if (
+          previousLauncherIcon !== launcherIcon ||
+          previousLauncherLogoUrl !== launcherLogoUrl
+        ) {
+          const currentIcon = toggleBtn.querySelector(".ai-saas-icon");
+          const iconHost = document.createElement("div");
+          iconHost.innerHTML = renderBrandIcon().trim();
+          const nextIcon = iconHost.firstElementChild;
+          if (currentIcon && nextIcon) currentIcon.replaceWith(nextIcon);
+        }
+
+        if (fullConfig.bubbleUseThree === false) {
+          anchor.classList.remove("ai-three-ready");
+        } else {
+          const canvas = toggleBtn.querySelector(".ai-saas-three-canvas");
+          if (canvas?.dataset.aiThree === "ready") {
+            anchor.classList.add("ai-three-ready");
+          } else {
+            setupThreeLauncher();
+          }
+        }
+
+        if (selectedPreviewPart) {
+          selectPreviewEditorPart(selectedPreviewPart, false);
+        }
+      };
+
+      if (IS_PREVIEW) {
+        window.addEventListener("message", (event) => {
+          if (event.origin !== window.location.origin) return;
+          if (event.data?.type !== "ai-widget-editor:update") return;
+          applyLivePreviewConfig(event.data.config);
+        });
+      }
 
       const removeSuggestions = () => {
         const suggestions = document.getElementById("ai-saas-suggestions");
@@ -1077,7 +1235,7 @@ export function renderWidgetScript(
           hero.appendChild(heading);
           chatBox.appendChild(hero);
         } else {
-          appendBotMessage(greeting);
+          appendBotMessage(greeting, { isGreeting: true });
         }
         appendSuggestions();
         setSending(false);
@@ -1172,7 +1330,7 @@ export function renderWidgetScript(
         setPageScrollLock(state);
         if (state) {
           trackWidgetEvent("open");
-          refreshTheme();
+          if (!IS_PREVIEW) refreshTheme();
           anchor.classList.add("open");
           widget.setAttribute("aria-hidden", "false");
           window.setTimeout(() => input.focus(), 0);
@@ -1185,7 +1343,7 @@ export function renderWidgetScript(
       };
 
       if (!isAssistantFormat) {
-        appendBotMessage(greeting);
+        appendBotMessage(greeting, { isGreeting: true });
         if (IS_PREVIEW) {
           const previewUserMessage = document.createElement("div");
           previewUserMessage.className = "ai-saas-bubble user ai-saas-enter";
@@ -1197,6 +1355,13 @@ export function renderWidgetScript(
 
       if (SHOULD_AUTO_OPEN) {
         window.setTimeout(() => setOpen(true), 0);
+      }
+
+      if (IS_PREVIEW && window.parent !== window) {
+        window.parent.postMessage(
+          { type: "ai-widget-editor:ready" },
+          window.location.origin,
+        );
       }
 
       toggleBtn.addEventListener("click", () => setOpen(true));
