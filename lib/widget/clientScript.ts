@@ -790,6 +790,88 @@ export function renderWidgetScript(
       const chatBox = document.getElementById("ai-saas-chat-box");
       const suggestionLabels = copy.suggestions;
 
+      const previewEditorSelectors = {
+        launcher: "#ai-saas-toggle",
+        header: "#ai-saas-header",
+        botBubble: ".ai-saas-bubble.bot",
+        userBubble: ".ai-saas-bubble.user",
+        composer: "#ai-saas-form",
+        chat: "#ai-saas-chat-box",
+        layout: "#ai-saas-widget",
+      };
+
+      const getPreviewEditorPart = (target) => {
+        if (!(target instanceof Element)) return null;
+        for (const [part, selector] of Object.entries(previewEditorSelectors)) {
+          if (target.closest(selector)) return part;
+        }
+        return null;
+      };
+
+      const selectPreviewEditorPart = (part, notifyParent = true) => {
+        if (!IS_PREVIEW || !previewEditorSelectors[part]) return;
+
+        anchor
+          .querySelectorAll("[data-ai-editor-selected]")
+          .forEach((element) => element.removeAttribute("data-ai-editor-selected"));
+
+        anchor
+          .querySelectorAll(previewEditorSelectors[part])
+          .forEach((element) => element.setAttribute("data-ai-editor-selected", "true"));
+
+        if (notifyParent && window.parent !== window) {
+          window.parent.postMessage(
+            { type: "ai-widget-editor:select", part },
+            window.location.origin,
+          );
+        }
+      };
+
+      if (IS_PREVIEW) {
+        const editorStyle = document.createElement("style");
+        editorStyle.textContent = \`
+          #ai-saas-anchor #ai-saas-toggle,
+          #ai-saas-anchor #ai-saas-header,
+          #ai-saas-anchor #ai-saas-chat-box,
+          #ai-saas-anchor #ai-saas-form,
+          #ai-saas-anchor .ai-saas-bubble,
+          #ai-saas-anchor #ai-saas-widget {
+            cursor: pointer !important;
+          }
+          #ai-saas-anchor [data-ai-editor-selected="true"] {
+            outline: 3px solid #8b5cf6 !important;
+            outline-offset: 3px !important;
+            box-shadow: 0 0 0 7px rgba(139, 92, 246, .16) !important;
+          }
+        \`;
+        document.head.appendChild(editorStyle);
+
+        anchor.addEventListener(
+          "click",
+          (event) => {
+            const part = getPreviewEditorPart(event.target);
+            if (!part) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            selectPreviewEditorPart(part);
+          },
+          true,
+        );
+
+        window.addEventListener("message", (event) => {
+          if (event.origin !== window.location.origin) return;
+          if (event.data?.type !== "ai-widget-editor:select") return;
+          selectPreviewEditorPart(event.data.part, false);
+        });
+
+        if (window.parent !== window) {
+          window.parent.postMessage(
+            { type: "ai-widget-editor:ready" },
+            window.location.origin,
+          );
+        }
+      }
+
       const setupThreeLauncher = async () => {
         const canvas = toggleBtn?.querySelector(".ai-saas-three-canvas");
         if (!canvas || canvas.dataset.aiThree === "ready" || canvas.dataset.aiThree === "loading") return;
@@ -1104,10 +1186,16 @@ export function renderWidgetScript(
 
       if (!isAssistantFormat) {
         appendBotMessage(greeting);
+        if (IS_PREVIEW) {
+          const previewUserMessage = document.createElement("div");
+          previewUserMessage.className = "ai-saas-bubble user ai-saas-enter";
+          previewUserMessage.innerText = "Can you help me choose?";
+          chatBox.appendChild(previewUserMessage);
+        }
       }
       appendSuggestions();
 
-      if (isAssistantFormat && SHOULD_AUTO_OPEN) {
+      if (SHOULD_AUTO_OPEN) {
         window.setTimeout(() => setOpen(true), 0);
       }
 

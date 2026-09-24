@@ -1,19 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bot,
   Check,
   Clipboard,
+  Frame,
   Image as ImageIcon,
   Maximize2,
   type LucideIcon,
   MessageSquare,
-  MonitorSmartphone,
+  Monitor,
+  MousePointer2,
   Move,
   Palette,
   RotateCcw,
-  SlidersHorizontal,
+  Smartphone,
   Sparkles,
   Store,
   WandSparkles,
@@ -92,6 +94,76 @@ type WidgetDesignerProps = {
   initialLauncherLogoUrl: string | null;
 };
 
+type EditablePart =
+  | "presets"
+  | "header"
+  | "chat"
+  | "botBubble"
+  | "userBubble"
+  | "composer"
+  | "launcher"
+  | "layout";
+
+type PreviewViewport = "desktop" | "mobile";
+
+const editableParts: Array<{
+  id: EditablePart;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+}> = [
+  {
+    id: "presets",
+    label: "Styles",
+    description: "Apply a complete visual direction.",
+    icon: WandSparkles,
+  },
+  {
+    id: "header",
+    label: "Header",
+    description: "Edit the identity shown at the top.",
+    icon: Type,
+  },
+  {
+    id: "chat",
+    label: "Canvas",
+    description: "Set the chat background and main accent.",
+    icon: Palette,
+  },
+  {
+    id: "botBubble",
+    label: "Assistant",
+    description: "Style assistant messages.",
+    icon: Bot,
+  },
+  {
+    id: "userBubble",
+    label: "Customer",
+    description: "Style customer messages.",
+    icon: MessageSquare,
+  },
+  {
+    id: "composer",
+    label: "Welcome",
+    description: "Change the first message customers see.",
+    icon: Sparkles,
+  },
+  {
+    id: "launcher",
+    label: "Launcher",
+    description: "Customize the button that opens the chat.",
+    icon: ImageIcon,
+  },
+  {
+    id: "layout",
+    label: "Size & position",
+    description: "Control placement, dimensions, and corners.",
+    icon: Maximize2,
+  },
+];
+
+const editablePartMap = new Map(editableParts.map((part) => [part.id, part]));
+
 function normalizeHex(value: string): string | null {
   const trimmed = value.trim();
   if (!trimmed) return null;
@@ -132,15 +204,6 @@ const launcherIconLabels: Record<WidgetLauncherIcon, string> = {
   logo: "Logo URL",
 };
 
-const launcherIconHelp: Record<WidgetLauncherIcon, string> = {
-  whatsapp: "Familiar green support launcher.",
-  chat: "Neutral chat bubble for compact launchers.",
-  sparkles: "AI shine for assistant cards.",
-  bot: "Assistant style icon.",
-  store: "Commerce storefront icon.",
-  logo: "Use an image or SVG URL.",
-};
-
 const launcherStyleLabels: Record<WidgetLauncherStyle, string> = {
   icon: "Compact icon",
   card: "AI bubble card",
@@ -173,35 +236,6 @@ function getAssistantCardIcon(icon: WidgetLauncherIcon): WidgetLauncherIcon {
   return icon === "chat" || icon === "whatsapp" || icon === "bot"
     ? "sparkles"
     : icon;
-}
-
-function SectionCard({
-  icon: Icon,
-  eyebrow,
-  title,
-  children,
-}: {
-  icon: LucideIcon;
-  eyebrow: string;
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="rounded-2xl border border-slate-800/80 p-4 shadow-sm shadow-slate-950/20">
-      <div className="mb-4 flex items-start gap-3">
-        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-neutral-400/25 bg-neutral-400/10 text-neutral-200">
-          <Icon className="h-4 w-4" aria-hidden="true" />
-        </span>
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-200">
-            {eyebrow}
-          </p>
-          <h3 className="mt-1 text-sm font-semibold text-white">{title}</h3>
-        </div>
-      </div>
-      {children}
-    </section>
-  );
 }
 
 function FieldInput({
@@ -504,6 +538,30 @@ export default function WidgetDesigner({
   const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
   const [selectedTemplateId, setSelectedTemplateId] =
     useState<WidgetTemplateId | null>(null);
+  const [selectedPart, setSelectedPart] = useState<EditablePart>("launcher");
+  const [previewViewport, setPreviewViewport] =
+    useState<PreviewViewport>("desktop");
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const handlePreviewMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.source !== iframeRef.current?.contentWindow) return;
+      if (event.data?.type === "ai-widget-editor:ready") {
+        iframeRef.current?.contentWindow?.postMessage(
+          { type: "ai-widget-editor:select", part: selectedPart },
+          window.location.origin,
+        );
+        return;
+      }
+      if (event.data?.type !== "ai-widget-editor:select") return;
+      if (!editablePartMap.has(event.data.part as EditablePart)) return;
+      setSelectedPart(event.data.part as EditablePart);
+    };
+
+    window.addEventListener("message", handlePreviewMessage);
+    return () => window.removeEventListener("message", handlePreviewMessage);
+  }, [selectedPart]);
 
   const embedSnippet = getEmbedSnippet(apiKey);
   const accentDefault = getWidgetAccentDefault(format);
@@ -811,622 +869,490 @@ export default function WidgetDesigner({
     window.setTimeout(() => setCopyState("idle"), 1600);
   }
 
-  return (
-    <div
-      className="
-        mt-6 grid grid-cols-1 gap-5
-        lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)]
-        xl:grid-cols-[minmax(0,1.15fr)_minmax(380px,0.85fr)]
-        w-full min-w-0
-      "
-    >
-      <input type="hidden" name="widget_format" value={format} />
-      <div className="space-y-4 min-w-0">
-        <div className="rounded-2xl border border-slate-800/80 p-4 sm:p-5">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-200">
-                Widget studio
-              </p>
-              <h2 className="mt-2 text-lg font-semibold text-white">
-                Tune the chat experience
-              </h2>
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-400">
-                Changes update the preview automatically. Leave a field empty to
-                keep the default value.
-              </p>
-            </div>
+  function selectEditorPart(part: EditablePart) {
+    setSelectedPart(part);
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "ai-widget-editor:select", part },
+      window.location.origin,
+    );
+  }
 
-            <button
-              type="button"
-              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:border-neutral-400/60 hover:text-neutral-100"
-              onClick={handleReset}
-            >
-              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-              Defaults
-            </button>
+  const activePart = editablePartMap.get(selectedPart) ?? editableParts[0];
+
+  return (
+    <div className="mt-6 min-w-0 space-y-4">
+      <input type="hidden" name="widget_format" value={format} />
+      <input type="hidden" name="widget_accent" value={accentInput} />
+      <input type="hidden" name="widget_brand" value={brandInput} />
+      <input type="hidden" name="widget_label" value={labelInput} />
+      <input type="hidden" name="widget_greeting" value={greetingInput} />
+      <input type="hidden" name="widget_human_support_text" value={humanSupportTextInput} />
+      <input type="hidden" name="widget_launcher_style" value={launcherStyle} />
+      <input type="hidden" name="widget_bubble_subtitle" value={bubbleSubtitleInput} />
+      <input type="hidden" name="widget_bubble_use_three" value={bubbleUseThree ? "1" : "0"} />
+      <input type="hidden" name="widget_bubble_width" value={bubbleWidth} />
+      <input type="hidden" name="widget_bubble_radius" value={bubbleRadius} />
+      <input type="hidden" name="widget_position" value={position} />
+      <input type="hidden" name="widget_width" value={width} />
+      <input type="hidden" name="widget_height" value={height} />
+      <input type="hidden" name="widget_offset_x" value={offsetX} />
+      <input type="hidden" name="widget_offset_y" value={offsetY} />
+      <input type="hidden" name="widget_launcher_size" value={launcherSize} />
+      <input type="hidden" name="widget_border_radius" value={borderRadius} />
+      <input type="hidden" name="widget_color_header_bg" value={colorHeaderBg} />
+      <input type="hidden" name="widget_color_header_text" value={colorHeaderText} />
+      <input type="hidden" name="widget_color_chat_bg" value={colorChatBg} />
+      <input type="hidden" name="widget_color_user_bubble_bg" value={colorUserBubbleBg} />
+      <input type="hidden" name="widget_color_user_bubble_text" value={colorUserBubbleText} />
+      <input type="hidden" name="widget_color_bot_bubble_bg" value={colorBotBubbleBg} />
+      <input type="hidden" name="widget_color_bot_bubble_text" value={colorBotBubbleText} />
+      <input type="hidden" name="widget_color_toggle_bg" value={colorToggleBg} />
+      <input type="hidden" name="widget_color_toggle_text" value={colorToggleText} />
+      <input type="hidden" name="widget_color_bubble_bg" value={colorBubbleBg} />
+      <input type="hidden" name="widget_color_bubble_text" value={colorBubbleText} />
+      <input type="hidden" name="widget_color_bubble_subtext" value={colorBubbleSubtext} />
+      <input type="hidden" name="widget_color_bubble_border" value={colorBubbleBorder} />
+      <input type="hidden" name="widget_color_bubble_glow" value={colorBubbleGlow} />
+      <input type="hidden" name="widget_launcher_icon" value={launcherIcon} />
+      <input type="hidden" name="widget_launcher_logo_url" value={launcherLogoUrl} />
+
+      <div className="flex flex-col gap-4 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-400/25 bg-violet-400/10 text-violet-200">
+            <MousePointer2 className="h-4 w-4" aria-hidden="true" />
+          </span>
+          <div>
+            <p className="text-sm font-semibold text-white">Click the widget to edit it</p>
+            <p className="mt-1 text-xs leading-5 text-slate-400">
+              Select any highlighted area. Only its relevant controls will appear.
+            </p>
           </div>
         </div>
-
-        <SectionCard
-          icon={WandSparkles}
-          eyebrow="Templates"
-          title="Start with a complete style"
+        <button
+          type="button"
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:border-neutral-400/60 hover:text-white"
+          onClick={handleReset}
         >
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {widgetTemplates.map((template) => {
-              const isSelected = selectedTemplateId === template.id;
-
-              return (
-                <button
-                  key={template.id}
-                  type="button"
-                  aria-pressed={isSelected}
-                  onClick={() => handleTemplateSelect(template.id)}
-                  className={`group flex min-h-[132px] flex-col rounded-xl border p-3 text-left transition ${
-                    isSelected
-                      ? "border-neutral-300 bg-white/[0.06] text-white"
-                      : "border-slate-800 text-slate-300 hover:border-slate-600 hover:bg-white/[0.03]"
-                  }`}
-                >
-                  <span className="flex items-center justify-between gap-3">
-                    <span
-                      className="h-8 w-8 rounded-full border border-white/15 shadow-inner"
-                      style={{ backgroundColor: template.settings.accent }}
-                      aria-hidden="true"
-                    />
-                    <span className="flex gap-1" aria-hidden="true">
-                      {[
-                        template.settings.appearance.colorHeaderBg,
-                        template.settings.appearance.colorChatBg,
-                        template.settings.appearance.colorUserBubbleBg,
-                      ].map((color, index) => (
-                        <span
-                          key={`${color}-${index}`}
-                          className="h-4 w-4 rounded-full border border-white/15"
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
-                    </span>
-                  </span>
-                  <span className="mt-3 flex items-center justify-between gap-2">
-                    <span className="text-sm font-semibold">
-                      {template.name}
-                    </span>
-                    {isSelected ? (
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-300">
-                        Applied
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className="mt-1 text-xs leading-5 text-slate-500 group-hover:text-slate-400">
-                    {template.description}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="mt-3 text-xs leading-5 text-slate-500">
-            A template updates every design field. You can customize it before
-            saving.
-          </p>
-        </SectionCard>
-
-        <SectionCard
-          icon={Palette}
-          eyebrow="Colors"
-          title="Set the widget palette"
-        >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2 rounded-xl border border-neutral-400/20 p-3">
-              <ColorInput
-                label="Main accent"
-                name="widget_accent"
-                value={accentInput}
-                onChange={setAccentInput}
-                defaultValue={accentDefault}
-                errorMessage="Use a 3- or 6-character hex value."
-              />
-            </div>
-            <ColorInput
-              label="Header bg"
-              name="widget_color_header_bg"
-              value={colorHeaderBg}
-              onChange={setColorHeaderBg}
-              defaultValue={appearanceDefaults.colorHeaderBg}
-            />
-
-            <ColorInput
-              label="Header text"
-              name="widget_color_header_text"
-              value={colorHeaderText}
-              onChange={setColorHeaderText}
-              defaultValue={appearanceDefaults.colorHeaderText}
-            />
-
-            <ColorInput
-              label="Chat background"
-              name="widget_color_chat_bg"
-              value={colorChatBg}
-              onChange={setColorChatBg}
-              defaultValue={appearanceDefaults.colorChatBg}
-            />
-
-            <ColorInput
-              label="User bubble bg"
-              name="widget_color_user_bubble_bg"
-              value={colorUserBubbleBg}
-              onChange={setColorUserBubbleBg}
-              defaultValue={appearanceDefaults.colorUserBubbleBg}
-            />
-
-            <ColorInput
-              label="User text"
-              name="widget_color_user_bubble_text"
-              value={colorUserBubbleText}
-              onChange={setColorUserBubbleText}
-              defaultValue={appearanceDefaults.colorUserBubbleText}
-            />
-
-            <ColorInput
-              label="Bot bubble bg"
-              name="widget_color_bot_bubble_bg"
-              value={colorBotBubbleBg}
-              onChange={setColorBotBubbleBg}
-              defaultValue={appearanceDefaults.colorBotBubbleBg}
-            />
-
-            <ColorInput
-              label="Bot text"
-              name="widget_color_bot_bubble_text"
-              value={colorBotBubbleText}
-              onChange={setColorBotBubbleText}
-              defaultValue={appearanceDefaults.colorBotBubbleText}
-            />
-
-            <ColorInput
-              label="Launcher bg"
-              name="widget_color_toggle_bg"
-              value={colorToggleBg}
-              onChange={setColorToggleBg}
-              defaultValue={appearanceDefaults.colorToggleBg}
-            />
-
-            <ColorInput
-              label="Launcher icon"
-              name="widget_color_toggle_text"
-              value={colorToggleText}
-              onChange={setColorToggleText}
-              defaultValue={appearanceDefaults.colorToggleText}
-            />
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          icon={ImageIcon}
-          eyebrow="Launcher"
-          title="Choose the button icon"
-        >
-          <div className="space-y-4">
-            <fieldset>
-              <legend className="sr-only">Launcher bubble style</legend>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {widgetLauncherStyles.map((option) => (
-                  <label
-                    key={option}
-                    className={`flex min-h-[84px] cursor-pointer flex-col justify-between rounded-xl border px-3 py-3 transition ${
-                      launcherStyle === option
-                        ? "border-neutral-400/70 text-neutral-100"
-                        : "border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-100"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="widget_launcher_style"
-                      value={option}
-                      checked={launcherStyle === option}
-                      onChange={() => handleLauncherStyleChange(option)}
-                      className="sr-only"
-                    />
-                    <span className="flex items-center gap-2 text-sm font-semibold">
-                      <Sparkles className="h-4 w-4" aria-hidden="true" />
-                      {launcherStyleLabels[option]}
-                    </span>
-                    <span className="mt-2 text-xs leading-5 text-slate-500">
-                      {launcherStyleHelp[option]}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <FieldInput
-              label="Bubble subtitle"
-              name="widget_bubble_subtitle"
-              maxLength={widgetLimits.bubbleSubtitle}
-              placeholder={widgetDefaults.bubbleSubtitle}
-              value={bubbleSubtitleInput}
-              onChange={setBubbleSubtitleInput}
-              helper="Shown under the launcher title when AI bubble card is selected."
-            />
-
-            <fieldset>
-              <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-                Three.js effect
-              </legend>
-              <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-slate-800 p-1.5">
-                {[
-                  { label: "3D glow", value: true },
-                  { label: "Static", value: false },
-                ].map((option) => (
-                  <label
-                    key={option.label}
-                    className={`flex cursor-pointer items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
-                      bubbleUseThree === option.value
-                        ? "bg-neutral-400 text-slate-950 shadow-sm shadow-neutral-950/40"
-                        : "text-slate-400 hover:bg-slate-900 hover:text-slate-100"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="widget_bubble_use_three"
-                      value={option.value ? "1" : "0"}
-                      checked={bubbleUseThree === option.value}
-                      onChange={() => setBubbleUseThree(option.value)}
-                      className="sr-only"
-                    />
-                    {option.label}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <RangeInput
-                label="Bubble width"
-                name="widget_bubble_width"
-                value={bubbleWidth}
-                onChange={setBubbleWidth}
-                min={widgetLimits.bubbleWidth.min}
-                max={widgetLimits.bubbleWidth.max}
-              />
-              <RangeInput
-                label="Bubble radius"
-                name="widget_bubble_radius"
-                value={bubbleRadius}
-                onChange={setBubbleRadius}
-                min={widgetLimits.bubbleRadius.min}
-                max={widgetLimits.bubbleRadius.max}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-800 p-3 sm:grid-cols-2">
-              <ColorInput
-                label="Bubble bg"
-                name="widget_color_bubble_bg"
-                value={colorBubbleBg}
-                onChange={setColorBubbleBg}
-                defaultValue={appearanceDefaults.colorBubbleBg}
-              />
-              <ColorInput
-                label="Bubble title"
-                name="widget_color_bubble_text"
-                value={colorBubbleText}
-                onChange={setColorBubbleText}
-                defaultValue={appearanceDefaults.colorBubbleText}
-              />
-              <ColorInput
-                label="Bubble subtitle"
-                name="widget_color_bubble_subtext"
-                value={colorBubbleSubtext}
-                onChange={setColorBubbleSubtext}
-                defaultValue={appearanceDefaults.colorBubbleSubtext}
-              />
-              <ColorInput
-                label="Bubble border"
-                name="widget_color_bubble_border"
-                value={colorBubbleBorder}
-                onChange={setColorBubbleBorder}
-                defaultValue={appearanceDefaults.colorBubbleBorder}
-              />
-              <div className="sm:col-span-2">
-                <ColorInput
-                  label="Bubble glow"
-                  name="widget_color_bubble_glow"
-                  value={colorBubbleGlow}
-                  onChange={setColorBubbleGlow}
-                  defaultValue={appearanceDefaults.colorBubbleGlow}
-                />
-              </div>
-            </div>
-
-            <fieldset>
-              <legend className="sr-only">Launcher icon</legend>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {widgetLauncherIcons.map((option) => {
-                  const OptionIcon =
-                    option === "sparkles"
-                      ? Sparkles
-                      : option === "bot"
-                      ? Bot
-                      : option === "store"
-                        ? Store
-                        : option === "logo"
-                          ? ImageIcon
-                          : MessageSquare;
-
-                  return (
-                    <label
-                      key={option}
-                      className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-3 transition ${
-                        launcherIcon === option
-                          ? "border-neutral-400/70  text-neutral-100"
-                          : "border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-100"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="widget_launcher_icon"
-                        value={option}
-                        checked={launcherIcon === option}
-                        onChange={() => setLauncherIcon(option)}
-                        className="sr-only"
-                      />
-                      <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-current/20 bg-black/20">
-                        <OptionIcon className="h-5 w-5" aria-hidden="true" />
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block text-sm font-semibold">
-                          {launcherIconLabels[option]}
-                        </span>
-                        <span className="mt-0.5 block text-xs text-slate-500">
-                          {launcherIconHelp[option]}
-                        </span>
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-            </fieldset>
-
-            <div className="space-y-2">
-              <label
-                htmlFor="widget_launcher_logo_url"
-                className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400"
-              >
-                Logo image URL
-              </label>
-              <input
-                id="widget_launcher_logo_url"
-                name="widget_launcher_logo_url"
-                type="url"
-                inputMode="url"
-                maxLength={widgetLimits.launcherLogoUrl}
-                placeholder="https://example.com/logo.svg"
-                value={launcherLogoUrl}
-                onChange={(event) => setLauncherLogoUrl(event.target.value)}
-                className={inputClass}
-              />
-              <p className="text-xs leading-relaxed text-slate-500">
-                Used only when Logo URL is selected. Supports normal image URLs,
-                including hosted SVG files.
-              </p>
-            </div>
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          icon={Type}
-          eyebrow="Copy"
-          title="Customize visible text"
-        >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FieldInput
-              label="Visible name"
-              name="widget_brand"
-              maxLength={widgetLimits.brand}
-              placeholder={widgetDefaults.brand}
-              value={brandInput}
-              onChange={setBrandInput}
-              helper={`Default: "${widgetDefaults.brand}".`}
-            />
-            <FieldInput
-              label="Button text"
-              name="widget_label"
-              maxLength={widgetLimits.label}
-              placeholder={widgetDefaults.label}
-              value={labelInput}
-              onChange={setLabelInput}
-              helper={`Default: "${widgetDefaults.label}".`}
-            />
-            <div className="sm:col-span-2">
-              <FieldInput
-                label="Initial message"
-                name="widget_greeting"
-                maxLength={widgetLimits.greeting}
-                placeholder={widgetDefaults.greeting}
-                value={greetingInput}
-                onChange={setGreetingInput}
-                helper={`Default: "${widgetDefaults.greeting}".`}
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <FieldInput
-                label="Header subtitle"
-                name="widget_human_support_text"
-                maxLength={widgetLimits.humanSupportText}
-                placeholder={widgetDefaults.humanSupportText}
-                value={humanSupportTextInput}
-                onChange={setHumanSupportTextInput}
-                helper={`Default: "${widgetDefaults.humanSupportText}".`}
-              />
-            </div>
-          </div>
-        </SectionCard>
-
-        <SectionCard
-          icon={SlidersHorizontal}
-          eyebrow="Behavior"
-          title="Choose where the launcher sits"
-        >
-          <fieldset>
-            <legend className="sr-only">Screen position</legend>
-            <div className="grid grid-cols-2 gap-2 rounded-xl border border-slate-800  p-1.5">
-              {widgetPositions.map((option) => (
-                <label
-                  key={option}
-                  className={`flex cursor-pointer items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
-                    position === option
-                      ? "bg-neutral-400 text-slate-950 shadow-sm shadow-neutral-950/40"
-                      : "text-slate-400 hover:bg-slate-900 hover:text-slate-100"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="widget_position"
-                    value={option}
-                    checked={position === option}
-                    onChange={() => setPosition(option)}
-                    className="sr-only"
-                  />
-
-                  {option === "right" ? "Right" : "Left"}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-        </SectionCard>
-
-        <SectionCard
-          icon={Maximize2}
-          eyebrow="Pro layout"
-          title="Control size, spacing, and shape"
-        >
-          <div className="space-y-5">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <RangeInput
-                label="Widget width"
-                name="widget_width"
-                value={width}
-                onChange={setWidth}
-                min={widgetLimits.width.min}
-                max={widgetLimits.width.max}
-              />
-              <RangeInput
-                label="Widget height"
-                name="widget_height"
-                value={height}
-                onChange={setHeight}
-                min={widgetLimits.height.min}
-                max={widgetLimits.height.max}
-              />
-              <RangeInput
-                label="Side offset"
-                name="widget_offset_x"
-                value={offsetX}
-                onChange={setOffsetX}
-                min={widgetLimits.offsetX.min}
-                max={widgetLimits.offsetX.max}
-              />
-              <RangeInput
-                label="Bottom offset"
-                name="widget_offset_y"
-                value={offsetY}
-                onChange={setOffsetY}
-                min={widgetLimits.offsetY.min}
-                max={widgetLimits.offsetY.max}
-              />
-              <RangeInput
-                label="Launcher size"
-                name="widget_launcher_size"
-                value={launcherSize}
-                onChange={setLauncherSize}
-                min={widgetLimits.launcherSize.min}
-                max={widgetLimits.launcherSize.max}
-              />
-              <RangeInput
-                label="Corner radius"
-                name="widget_border_radius"
-                value={borderRadius}
-                onChange={setBorderRadius}
-                min={widgetLimits.borderRadius.min}
-                max={widgetLimits.borderRadius.max}
-              />
-            </div>
-            <div className="flex items-center gap-3 rounded-xl border border-slate-800 p-3 text-xs leading-5 text-slate-400">
-              <Move className="h-4 w-4 shrink-0 text-neutral-200" aria-hidden="true" />
-              Mobile keeps a safe full-width layout automatically while desktop uses these Pro controls.
-            </div>
-          </div>
-        </SectionCard>
+          <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+          Reset design
+        </button>
       </div>
 
-      <div
-        className="min-w-0 space-y-5 rounded-2xl border border-slate-800/70 p-4 shadow-xl shadow-slate-950/40 sm:p-5 lg:sticky lg:top-6 lg:self-start"
-      >
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-200">
-              Preview
-            </p>
-            <p className="text-sm text-slate-300">
-              Live mobile preview with your current styling.
-            </p>
-          </div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs font-semibold text-slate-300">
-            <MonitorSmartphone className="h-3.5 w-3.5" aria-hidden="true" />
-            320 x 640
-          </span>
-        </div>
-
-        <div className="mx-auto w-[320px] max-w-full sm:w-[360px]">
-          <div className="relative overflow-hidden rounded-[30px] border border-white/10 bg-black p-2 shadow-[0_24px_70px_rgba(0,0,0,.55)]">
-            <div className="absolute left-1/2 top-3 z-10 h-5 w-24 -translate-x-1/2 rounded-full border border-white/10 bg-black/70" />
-
-            <iframe
-              key={iframeKey}
-              title="Widget preview"
-              src={previewPageUrl}
-              sandbox="allow-scripts"
-              className="block h-[640px] w-full rounded-[22px] border-0 bg-slate-100"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-3 min-w-0 rounded-2xl border border-slate-800 p-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-2">
-              <MessageSquare
-                className="h-4 w-4 shrink-0 text-neutral-200"
-                aria-hidden="true"
-              />
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                Install before &lt;/body&gt;
-              </p>
+      <div className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
+        <section className="min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-[#070b12] shadow-2xl shadow-black/25">
+          <div className="flex flex-col gap-3 border-b border-slate-800/80 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-200">Live canvas</p>
+              <p className="mt-1 text-sm text-slate-400">Tap a part of the widget to customize it.</p>
             </div>
-            <button
-              type="button"
-              onClick={handleCopySnippet}
-              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-neutral-400/60 hover:text-neutral-100"
-            >
-              {copyState === "copied" ? (
-                <Check className="h-3.5 w-3.5" aria-hidden="true" />
-              ) : (
-                <Clipboard className="h-3.5 w-3.5" aria-hidden="true" />
-              )}
-              {copyState === "copied" ? "Copied" : "Copy"}
-            </button>
+            <div className="inline-flex self-start rounded-xl border border-slate-800 bg-slate-950 p-1">
+              {([
+                { id: "desktop" as const, label: "Desktop", icon: Monitor },
+                { id: "mobile" as const, label: "Mobile", icon: Smartphone },
+              ]).map((viewport) => {
+                const ViewportIcon = viewport.icon;
+                const isActive = previewViewport === viewport.id;
+                return (
+                  <button
+                    key={viewport.id}
+                    type="button"
+                    aria-pressed={isActive}
+                    onClick={() => setPreviewViewport(viewport.id)}
+                    className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                      isActive ? "bg-white text-slate-950" : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    <ViewportIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                    {viewport.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <code className="block max-h-36 overflow-auto rounded-xl border border-slate-800 p-3 font-mono text-[11px] leading-relaxed text-neutral-200 break-all">
-            {embedSnippet}
-          </code>
+          <div className="flex min-h-[760px] items-center justify-center overflow-auto bg-[radial-gradient(circle_at_top,rgba(139,92,246,.13),transparent_36%)] p-3 sm:p-6">
+            <div
+              className={`relative overflow-hidden border border-white/10 bg-black p-2 shadow-[0_26px_90px_rgba(0,0,0,.6)] transition-[width,border-radius] duration-300 ${
+                previewViewport === "mobile"
+                  ? "w-[390px] max-w-full rounded-[32px]"
+                  : "w-full max-w-[980px] rounded-2xl"
+              }`}
+            >
+              {previewViewport === "mobile" ? (
+                <div className="absolute left-1/2 top-3 z-10 h-5 w-24 -translate-x-1/2 rounded-full border border-white/10 bg-black/80" />
+              ) : null}
+              <iframe
+                ref={iframeRef}
+                key={iframeKey}
+                title="Interactive widget preview"
+                src={previewPageUrl}
+                sandbox="allow-scripts allow-same-origin"
+                onLoad={() => {
+                  iframeRef.current?.contentWindow?.postMessage(
+                    { type: "ai-widget-editor:select", part: selectedPart },
+                    window.location.origin,
+                  );
+                }}
+                className={`block w-full border-0 bg-slate-100 ${
+                  previewViewport === "mobile" ? "h-[720px] rounded-[24px]" : "h-[720px] rounded-xl"
+                }`}
+              />
+            </div>
+          </div>
+        </section>
 
-          <p className="text-xs leading-relaxed text-slate-500">
-            This snippet is stable. You don&apos;t need to update it when
-            changing settings.
-          </p>
-        </div>
+        <aside className="min-w-0 space-y-4 xl:sticky xl:top-6 xl:self-start">
+          <section className="overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-950/60 shadow-xl shadow-black/20">
+            <div className="border-b border-slate-800/80 p-4">
+              <div className="flex items-start gap-3">
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-slate-950">
+                  <activePart.icon className="h-4 w-4" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-200">Editing</p>
+                  <h2 className="mt-1 text-base font-semibold text-white">{activePart.label}</h2>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">{activePart.description}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-1 border-b border-slate-800/80 p-2" aria-label="Widget parts">
+              {editableParts.map((part) => {
+                const PartIcon = part.icon;
+                const isActive = selectedPart === part.id;
+                return (
+                  <button
+                    key={part.id}
+                    type="button"
+                    title={part.label}
+                    aria-label={`Edit ${part.label}`}
+                    aria-pressed={isActive}
+                    onClick={() => selectEditorPart(part.id)}
+                    className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-[10px] font-semibold transition ${
+                      isActive
+                        ? "bg-violet-400 text-slate-950"
+                        : "text-slate-500 hover:bg-slate-900 hover:text-slate-200"
+                    }`}
+                  >
+                    <PartIcon className="h-4 w-4" aria-hidden="true" />
+                    <span className="max-w-full truncate">{part.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="max-h-[calc(100vh-260px)] min-h-[360px] overflow-y-auto p-4">
+              {selectedPart === "presets" ? (
+                <div className="space-y-5">
+                  <fieldset>
+                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Experience</legend>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      {widgetFormats.map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          aria-pressed={format === option}
+                          onClick={() => setFormat(option)}
+                          className={`rounded-xl border px-3 py-3 text-sm font-semibold capitalize transition ${
+                            format === option
+                              ? "border-violet-300 bg-violet-400/15 text-white"
+                              : "border-slate-800 text-slate-400 hover:border-slate-700 hover:text-white"
+                          }`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  <div className="space-y-2">
+                    {widgetTemplates.map((template) => {
+                      const isSelected = selectedTemplateId === template.id;
+                      return (
+                        <button
+                          key={template.id}
+                          type="button"
+                          aria-pressed={isSelected}
+                          onClick={() => handleTemplateSelect(template.id)}
+                          className={`group flex w-full items-center gap-3 rounded-xl border p-3 text-left transition ${
+                            isSelected
+                              ? "border-violet-300 bg-violet-400/10 text-white"
+                              : "border-slate-800 text-slate-300 hover:border-slate-600"
+                          }`}
+                        >
+                          <span className="flex shrink-0 -space-x-1" aria-hidden="true">
+                            {[
+                              template.settings.appearance.colorHeaderBg,
+                              template.settings.appearance.colorChatBg,
+                              template.settings.appearance.colorUserBubbleBg,
+                            ].map((color, index) => (
+                              <span
+                                key={`${color}-${index}`}
+                                className="h-7 w-7 rounded-full border-2 border-slate-950"
+                                style={{ backgroundColor: color }}
+                              />
+                            ))}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-sm font-semibold">{template.name}</span>
+                            <span className="mt-0.5 block truncate text-xs text-slate-500">{template.description}</span>
+                          </span>
+                          {isSelected ? <Check className="h-4 w-4 text-violet-200" aria-hidden="true" /> : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+
+              {selectedPart === "header" ? (
+                <div className="space-y-5">
+                  <FieldInput
+                    label="Visible name"
+                    name="editor_widget_brand"
+                    maxLength={widgetLimits.brand}
+                    placeholder={widgetDefaults.brand}
+                    value={brandInput}
+                    onChange={setBrandInput}
+                    helper="The name customers see in the widget header."
+                  />
+                  <FieldInput
+                    label="Status line"
+                    name="editor_widget_human_support_text"
+                    maxLength={widgetLimits.humanSupportText}
+                    placeholder={widgetDefaults.humanSupportText}
+                    value={humanSupportTextInput}
+                    onChange={setHumanSupportTextInput}
+                    helper="Short availability or support message."
+                  />
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                    <ColorInput label="Background" name="editor_header_bg" value={colorHeaderBg} onChange={setColorHeaderBg} defaultValue={appearanceDefaults.colorHeaderBg} />
+                    <ColorInput label="Text" name="editor_header_text" value={colorHeaderText} onChange={setColorHeaderText} defaultValue={appearanceDefaults.colorHeaderText} />
+                  </div>
+                </div>
+              ) : null}
+
+              {selectedPart === "chat" ? (
+                <div className="space-y-5">
+                  <ColorInput
+                    label="Main accent"
+                    name="editor_accent"
+                    value={accentInput}
+                    onChange={setAccentInput}
+                    defaultValue={accentDefault}
+                    errorMessage="Use a 3- or 6-character hex value."
+                  />
+                  <ColorInput label="Chat background" name="editor_chat_bg" value={colorChatBg} onChange={setColorChatBg} defaultValue={appearanceDefaults.colorChatBg} />
+                  <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-3 text-xs leading-5 text-slate-400">
+                    The accent is reused for active controls and subtle highlights to keep the design coherent.
+                  </p>
+                </div>
+              ) : null}
+
+              {selectedPart === "botBubble" ? (
+                <div className="space-y-5">
+                  <ColorInput label="Bubble background" name="editor_bot_bg" value={colorBotBubbleBg} onChange={setColorBotBubbleBg} defaultValue={appearanceDefaults.colorBotBubbleBg} />
+                  <ColorInput label="Message text" name="editor_bot_text" value={colorBotBubbleText} onChange={setColorBotBubbleText} defaultValue={appearanceDefaults.colorBotBubbleText} />
+                </div>
+              ) : null}
+
+              {selectedPart === "userBubble" ? (
+                <div className="space-y-5">
+                  <ColorInput label="Bubble background" name="editor_user_bg" value={colorUserBubbleBg} onChange={setColorUserBubbleBg} defaultValue={appearanceDefaults.colorUserBubbleBg} />
+                  <ColorInput label="Message text" name="editor_user_text" value={colorUserBubbleText} onChange={setColorUserBubbleText} defaultValue={appearanceDefaults.colorUserBubbleText} />
+                </div>
+              ) : null}
+
+              {selectedPart === "composer" ? (
+                <div className="space-y-5">
+                  <FieldInput
+                    label="Welcome message"
+                    name="editor_widget_greeting"
+                    maxLength={widgetLimits.greeting}
+                    placeholder={widgetDefaults.greeting}
+                    value={greetingInput}
+                    onChange={setGreetingInput}
+                    helper="The first message shown when the conversation opens."
+                  />
+                </div>
+              ) : null}
+
+              {selectedPart === "launcher" ? (
+                <div className="space-y-5">
+                  <FieldInput
+                    label="Button text"
+                    name="editor_widget_label"
+                    maxLength={widgetLimits.label}
+                    placeholder={widgetDefaults.label}
+                    value={labelInput}
+                    onChange={setLabelInput}
+                    helper="Shown beside the launcher icon."
+                  />
+                  <fieldset>
+                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Launcher style</legend>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      {widgetLauncherStyles.map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          aria-pressed={launcherStyle === option}
+                          onClick={() => handleLauncherStyleChange(option)}
+                          className={`rounded-xl border px-3 py-3 text-left transition ${
+                            launcherStyle === option
+                              ? "border-violet-300 bg-violet-400/10 text-white"
+                              : "border-slate-800 text-slate-400 hover:border-slate-700"
+                          }`}
+                        >
+                          <span className="block text-sm font-semibold">{launcherStyleLabels[option]}</span>
+                          <span className="mt-1 block text-[11px] leading-4 text-slate-500">{launcherStyleHelp[option]}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  {launcherStyle === "card" ? (
+                    <FieldInput
+                      label="Subtitle"
+                      name="editor_bubble_subtitle"
+                      maxLength={widgetLimits.bubbleSubtitle}
+                      placeholder={widgetDefaults.bubbleSubtitle}
+                      value={bubbleSubtitleInput}
+                      onChange={setBubbleSubtitleInput}
+                      helper="Secondary line inside the launcher card."
+                    />
+                  ) : null}
+
+                  <fieldset>
+                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Icon</legend>
+                    <div className="mt-2 grid grid-cols-3 gap-2">
+                      {widgetLauncherIcons.map((option) => {
+                        const OptionIcon = option === "sparkles" ? Sparkles : option === "bot" ? Bot : option === "store" ? Store : option === "logo" ? ImageIcon : MessageSquare;
+                        return (
+                          <button
+                            key={option}
+                            type="button"
+                            title={launcherIconLabels[option]}
+                            aria-label={launcherIconLabels[option]}
+                            aria-pressed={launcherIcon === option}
+                            onClick={() => setLauncherIcon(option)}
+                            className={`flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl border text-[10px] font-semibold transition ${
+                              launcherIcon === option
+                                ? "border-violet-300 bg-violet-400/15 text-white"
+                                : "border-slate-800 text-slate-500 hover:border-slate-700 hover:text-white"
+                            }`}
+                          >
+                            <OptionIcon className="h-5 w-5" aria-hidden="true" />
+                            {launcherIconLabels[option]}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+
+                  {launcherIcon === "logo" ? (
+                    <div className="space-y-2">
+                      <label htmlFor="editor_launcher_logo_url" className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Logo image URL</label>
+                      <input
+                        id="editor_launcher_logo_url"
+                        type="url"
+                        inputMode="url"
+                        maxLength={widgetLimits.launcherLogoUrl}
+                        placeholder="https://example.com/logo.svg"
+                        value={launcherLogoUrl}
+                        onChange={(event) => setLauncherLogoUrl(event.target.value)}
+                        className={inputClass}
+                      />
+                    </div>
+                  ) : null}
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-1">
+                    <ColorInput label="Background" name="editor_toggle_bg" value={colorToggleBg} onChange={setColorToggleBg} defaultValue={appearanceDefaults.colorToggleBg} />
+                    <ColorInput label="Icon color" name="editor_toggle_text" value={colorToggleText} onChange={setColorToggleText} defaultValue={appearanceDefaults.colorToggleText} />
+                  </div>
+
+                  {launcherStyle === "card" ? (
+                    <details className="rounded-xl border border-slate-800 p-3">
+                      <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.15em] text-slate-300">Card details</summary>
+                      <div className="mt-4 space-y-5">
+                        <div className="grid grid-cols-2 gap-4">
+                          <RangeInput label="Width" name="editor_bubble_width" value={bubbleWidth} onChange={setBubbleWidth} min={widgetLimits.bubbleWidth.min} max={widgetLimits.bubbleWidth.max} />
+                          <RangeInput label="Corners" name="editor_bubble_radius" value={bubbleRadius} onChange={setBubbleRadius} min={widgetLimits.bubbleRadius.min} max={widgetLimits.bubbleRadius.max} />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[{ label: "3D glow", value: true }, { label: "Static", value: false }].map((option) => (
+                            <button
+                              key={option.label}
+                              type="button"
+                              aria-pressed={bubbleUseThree === option.value}
+                              onClick={() => setBubbleUseThree(option.value)}
+                              className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${bubbleUseThree === option.value ? "bg-white text-slate-950" : "bg-slate-900 text-slate-400"}`}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                        <ColorInput label="Card background" name="editor_bubble_bg" value={colorBubbleBg} onChange={setColorBubbleBg} defaultValue={appearanceDefaults.colorBubbleBg} />
+                        <ColorInput label="Title" name="editor_bubble_text" value={colorBubbleText} onChange={setColorBubbleText} defaultValue={appearanceDefaults.colorBubbleText} />
+                        <ColorInput label="Subtitle" name="editor_bubble_subtext" value={colorBubbleSubtext} onChange={setColorBubbleSubtext} defaultValue={appearanceDefaults.colorBubbleSubtext} />
+                        <ColorInput label="Border" name="editor_bubble_border" value={colorBubbleBorder} onChange={setColorBubbleBorder} defaultValue={appearanceDefaults.colorBubbleBorder} />
+                        <ColorInput label="Glow" name="editor_bubble_glow" value={colorBubbleGlow} onChange={setColorBubbleGlow} defaultValue={appearanceDefaults.colorBubbleGlow} />
+                      </div>
+                    </details>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {selectedPart === "layout" ? (
+                <div className="space-y-5">
+                  <fieldset>
+                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Screen side</legend>
+                    <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-slate-800 p-1.5">
+                      {widgetPositions.map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          aria-pressed={position === option}
+                          onClick={() => setPosition(option)}
+                          className={`rounded-lg px-4 py-2.5 text-sm font-semibold capitalize transition ${position === option ? "bg-white text-slate-950" : "text-slate-400 hover:text-white"}`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                  <RangeInput label="Widget width" name="editor_width" value={width} onChange={setWidth} min={widgetLimits.width.min} max={widgetLimits.width.max} />
+                  <RangeInput label="Widget height" name="editor_height" value={height} onChange={setHeight} min={widgetLimits.height.min} max={widgetLimits.height.max} />
+                  <RangeInput label="Side spacing" name="editor_offset_x" value={offsetX} onChange={setOffsetX} min={widgetLimits.offsetX.min} max={widgetLimits.offsetX.max} />
+                  <RangeInput label="Bottom spacing" name="editor_offset_y" value={offsetY} onChange={setOffsetY} min={widgetLimits.offsetY.min} max={widgetLimits.offsetY.max} />
+                  <RangeInput label="Launcher size" name="editor_launcher_size" value={launcherSize} onChange={setLauncherSize} min={widgetLimits.launcherSize.min} max={widgetLimits.launcherSize.max} />
+                  <RangeInput label="Widget corners" name="editor_border_radius" value={borderRadius} onChange={setBorderRadius} min={widgetLimits.borderRadius.min} max={widgetLimits.borderRadius.max} />
+                  <div className="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-900/40 p-3 text-xs leading-5 text-slate-400">
+                    <Move className="mt-0.5 h-4 w-4 shrink-0 text-violet-200" aria-hidden="true" />
+                    Mobile automatically keeps a safe full-width layout.
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </section>
+
+          <details className="rounded-2xl border border-slate-800/80 bg-slate-950/45 p-4">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+              <span className="flex items-center gap-2"><Frame className="h-4 w-4 text-violet-200" aria-hidden="true" />Installation code</span>
+              <span className="text-slate-600">Advanced</span>
+            </summary>
+            <div className="mt-4 space-y-3">
+              <code className="block max-h-28 overflow-auto rounded-xl border border-slate-800 bg-slate-950 p-3 font-mono text-[10px] leading-relaxed text-slate-300 break-all">{embedSnippet}</code>
+              <button
+                type="button"
+                onClick={handleCopySnippet}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-violet-400/60 hover:text-white"
+              >
+                {copyState === "copied" ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Clipboard className="h-3.5 w-3.5" aria-hidden="true" />}
+                {copyState === "copied" ? "Copied" : "Copy code"}
+              </button>
+            </div>
+          </details>
+        </aside>
       </div>
     </div>
   );

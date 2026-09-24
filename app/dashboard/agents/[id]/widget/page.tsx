@@ -343,10 +343,10 @@ export default async function AgentWidgetPage({
         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold text-white">
-              {agent.name} widget
+              Design {agent.name}
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-300">
-              Customize colors, copy, position, and preview before publishing.
+              Click any part of the live widget to customize it, then save when it feels right.
             </p>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
