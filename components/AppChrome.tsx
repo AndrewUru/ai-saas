@@ -37,9 +37,7 @@ export default function AppChrome({ children, widgetSrc }: AppChromeProps) {
       </main>
       <Footer data-oid=":1v7d4h" />
       <CookieBanner data-oid="lkdky9x" />
-      {pathname === "/" ? null : (
-        <Script src={widgetSrc} strategy="afterInteractive" data-oid="gf3b1-j" />
-      )}
+      <Script src={widgetSrc} strategy="afterInteractive" data-oid="gf3b1-j" />
     </>
   );
 }
