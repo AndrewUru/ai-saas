@@ -1,69 +1,40 @@
-// app/login/page.tsx
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight, LockKeyhole, Mail, WandSparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+
+import {
+  AuthDivider,
+  AuthStatus,
+  type AuthStatusValue,
+  GoogleAuthButton,
+  authInputClassName,
+  authPrimaryButtonClassName,
+} from "@/components/auth/AuthControls";
+import AuthExperience from "@/components/auth/AuthExperience";
 import { createClient } from "@/lib/supabase/client";
 
-type Status = {
-  intent: "info" | "success" | "error";
-  message: string;
-} | null;
+type PendingAction = "password" | "magic" | "google" | null;
 
-type AuthMode = "magic" | "password";
-
+function getCallbackUrl() {
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+  return `${origin}/auth/callback?next=/dashboard`;
+}
 export default function LoginPage() {
-  const supabase = createClient();
   const router = useRouter();
-
+  const supabase = useMemo(() => createClient(), []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [authMode, setAuthMode] = useState<AuthMode>("magic");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState<Status>(null);
+  const [pending, setPending] = useState<PendingAction>(null);
+  const [status, setStatus] = useState<AuthStatusValue>(null);
+  const isBusy = pending !== null;
 
-  const signInEmail = async (event: React.FormEvent<HTMLFormElement>) => {
+  async function signInWithPassword(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsSubmitting(true);
-    setStatus({ intent: "info", message: "Sending your magic link..." });
-
-    try {
-      const redirectUrl = `${
-        process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
-      }/auth/callback?next=/dashboard`;
-
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: redirectUrl },
-      });
-
-      if (error) {
-        setStatus({ intent: "error", message: error.message });
-        return;
-      }
-
-      setStatus({
-        intent: "success",
-        message: "Check your inbox to finish signing in.",
-      });
-    } catch (error) {
-      setStatus({
-        intent: "error",
-        message: error instanceof Error ? error.message : "Unexpected error.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const signInPassword = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsSubmitting(true);
-    setStatus({ intent: "info", message: "Checking your credentials..." });
+    setPending("password");
+    setStatus({ intent: "info", message: "Comprobando tus datos..." });
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -76,227 +47,158 @@ export default function LoginPage() {
         return;
       }
 
-      setStatus({
-        intent: "success",
-        message: "Logged in. Redirecting to your dashboard...",
-      });
-
-      router.push("/dashboard");
+      setStatus({ intent: "success", message: "Acceso correcto." });
+      router.replace("/dashboard");
+      router.refresh();
     } catch (error) {
       setStatus({
         intent: "error",
-        message: error instanceof Error ? error.message : "Unexpected error.",
+        message: error instanceof Error ? error.message : "No se pudo iniciar sesión.",
       });
     } finally {
-      setIsSubmitting(false);
+      setPending(null);
     }
-  };
+  }
 
-  const signInGoogle = async () => {
-    setStatus({ intent: "info", message: "Redirecting to Google..." });
+  async function sendMagicLink() {
+    if (!email.trim()) {
+      setStatus({
+        intent: "error",
+        message: "Escribe tu email para recibir el enlace de acceso.",
+      });
+      return;
+    }
 
-    const origin =
-      typeof window !== "undefined"
-        ? window.location.origin
-        : (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000");
+    setPending("magic");
+    setStatus({ intent: "info", message: "Enviando tu enlace seguro..." });
 
-    const redirectUrl = `${origin}/auth/callback?next=/dashboard`;
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: getCallbackUrl() },
+      });
+
+      if (error) {
+        setStatus({ intent: "error", message: error.message });
+        return;
+      }
+
+      setStatus({
+        intent: "success",
+        message: "Revisa tu bandeja de entrada para continuar.",
+      });
+    } catch (error) {
+      setStatus({
+        intent: "error",
+        message: error instanceof Error ? error.message : "No se pudo enviar el enlace.",
+      });
+    } finally {
+      setPending(null);
+    }
+  }
+
+  async function signInWithGoogle() {
+    setPending("google");
+    setStatus({ intent: "info", message: "Conectando con Google..." });
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: redirectUrl },
+      options: { redirectTo: getCallbackUrl() },
     });
 
     if (error) {
       setStatus({ intent: "error", message: error.message });
+      setPending(null);
     }
-  };
-
-  const statusClassName =
-    status?.intent === "success"
-      ? "ui-alert ui-alert--success"
-      : status?.intent === "error"
-        ? "ui-alert ui-alert--error"
-        : "ui-alert border-border bg-[var(--surface)] text-foreground";
+  }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-16 text-foreground">
-      <section className="w-full max-w-sm">
-        <div className="mb-8 flex justify-center">
-          <Link href="/" aria-label="AI SaaS home">
-            <Image
-              src="/logo.svg"
-              alt="AICommerce"
-              width={132}
-              height={36}
-              priority
-              className="h-8 w-auto"
-            />
-          </Link>
-        </div>
-
-        <div className="ui-card p-6">
-          <div className="space-y-1 text-center">
-            <h1 className="text-xl font-semibold text-foreground">Sign in</h1>
-            <p className="text-sm text-[var(--foreground-muted)]">
-              Access your dashboard.
-            </p>
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 rounded-full border border-border bg-[var(--surface)] p-1 text-xs font-medium">
-            <button
-              type="button"
-              onClick={() => setAuthMode("magic")}
-              className={`rounded-full px-3 py-2 transition ${
-                authMode === "magic"
-                  ? "bg-accent text-black"
-                  : "text-[var(--foreground-muted)] hover:text-foreground"
-              }`}
-              aria-pressed={authMode === "magic"}
-            >
-              Magic link
-            </button>
-            <button
-              type="button"
-              onClick={() => setAuthMode("password")}
-              className={`rounded-full px-3 py-2 transition ${
-                authMode === "password"
-                  ? "bg-accent text-black"
-                  : "text-[var(--foreground-muted)] hover:text-foreground"
-              }`}
-              aria-pressed={authMode === "password"}
-            >
-              Password
-            </button>
-          </div>
-
-          <div className="mt-6">
-            {authMode === "magic" ? (
-              <form onSubmit={signInEmail} className="space-y-4">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="email-magic"
-                    className="text-sm font-medium text-foreground"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="email-magic"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    placeholder="you@store.com"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    className="ui-input"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="ui-button ui-button--primary w-full disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isSubmitting ? "Sending..." : "Send magic link"}
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={signInPassword} className="space-y-4">
-                <div className="space-y-2">
-                  <label
-                    htmlFor="email-password"
-                    className="text-sm font-medium text-foreground"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="email-password"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    placeholder="you@store.com"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    className="ui-input"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="password"
-                    className="text-sm font-medium text-foreground"
-                  >
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    placeholder="Password"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    className="ui-input"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="ui-button ui-button--primary w-full disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isSubmitting ? "Signing in..." : "Sign in"}
-                </button>
-              </form>
-            )}
-          </div>
-
-          <div className="my-6 flex items-center gap-3 text-xs text-[var(--foreground-muted)]">
-            <span className="h-px flex-1 bg-border" />
-            Or
-            <span className="h-px flex-1 bg-border" />
-          </div>
-
-          <button
-            type="button"
-            onClick={signInGoogle}
-            className="ui-button ui-button--secondary w-full"
+    <AuthExperience
+      eyebrow="Bienvenido de nuevo"
+      title="Entra en tu espacio."
+      description="Continúa donde lo dejaste y gestiona tus agentes desde un único lugar."
+      footer={
+        <p className="text-center text-sm text-zinc-500">
+          ¿Aún no tienes cuenta?{" "}
+          <Link
+            href="/signup"
+            className="font-semibold text-zinc-200 hover:text-violet-300"
           >
-            <Image
-              src="/google.svg"
-              alt=""
-              width={20}
-              height={20}
-              className="h-5 w-5"
-              aria-hidden="true"
+            Crear cuenta
+          </Link>
+        </p>
+      }
+    >
+      <GoogleAuthButton
+        label={pending === "google" ? "Conectando..." : "Continuar con Google"}
+        onClick={signInWithGoogle}
+        disabled={isBusy}
+      />
+
+      <AuthDivider />
+
+      <form onSubmit={signInWithPassword} className="space-y-4">
+        <div>
+          <label htmlFor="login-email" className="mb-2 block text-xs font-semibold text-zinc-400">
+            Email
+          </label>
+          <div className="relative">
+            <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" aria-hidden="true" />
+            <input
+              id="login-email"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder="tu@empresa.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              className={`${authInputClassName} pl-11`}
             />
-            Continue with Google
-          </button>
-
-          {status && (
-            <p
-              className={`${statusClassName} mt-5`}
-              role="status"
-              aria-live="polite"
-            >
-              {status.message}
-            </p>
-          )}
-
-          <div className="mt-6 flex items-center justify-center gap-4 text-xs text-[var(--foreground-muted)]">
-            <Link
-              href="/signup"
-              className="font-medium text-accent hover:text-accent-strong"
-            >
-              Create account
-            </Link>
-            <span className="h-1 w-1 rounded-full bg-border" />
-            <Link href="/contact" className="font-medium hover:text-foreground">
-              Need help?
-            </Link>
           </div>
         </div>
-      </section>
-    </main>
+
+        <div>
+          <label htmlFor="login-password" className="mb-2 block text-xs font-semibold text-zinc-400">
+            Contraseña
+          </label>
+          <div className="relative">
+            <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" aria-hidden="true" />
+            <input
+              id="login-password"
+              type="password"
+              autoComplete="current-password"
+              required
+              placeholder="Tu contraseña"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className={`${authInputClassName} pl-11`}
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={isBusy}
+          aria-busy={pending === "password"}
+          className={authPrimaryButtonClassName}
+        >
+          {pending === "password" ? "Entrando..." : "Entrar"}
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </form>
+
+      <button
+        type="button"
+        onClick={sendMagicLink}
+        disabled={isBusy}
+        aria-busy={pending === "magic"}
+        className="mt-4 inline-flex w-full items-center justify-center gap-2 py-2 text-xs font-semibold text-zinc-500 transition hover:text-violet-300 disabled:opacity-50"
+      >
+        <WandSparkles className="h-3.5 w-3.5" aria-hidden="true" />
+        {pending === "magic" ? "Enviando enlace..." : "Entrar sin contraseña"}
+      </button>
+
+      <AuthStatus status={status} />
+    </AuthExperience>
   );
 }

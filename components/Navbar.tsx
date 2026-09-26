@@ -108,16 +108,9 @@ export default function Navbar() {
     };
   }, [supabase]);
 
-  const handleSignOut = async () => {
-    try {
-      setIsSigningOut(true);
-      await supabase?.auth.signOut();
-      setUserEmail(null);
-      window.location.href = "/login";
-    } catch (error) {
-      console.error("Error signing out", error);
-      setIsSigningOut(false);
-    }
+  const handleSignOut = () => {
+    setIsSigningOut(true);
+    window.location.assign("/logout");
   };
 
   const isLoggedIn = Boolean(userEmail);

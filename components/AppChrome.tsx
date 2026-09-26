@@ -18,7 +18,10 @@ function isDashboardPath(pathname: string | null) {
 
 function isStandalonePath(pathname: string | null) {
   return (
-    isDashboardPath(pathname) || pathname === "/login" || pathname === "/signup"
+    isDashboardPath(pathname) ||
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname === "/logout"
   );
 }
 
