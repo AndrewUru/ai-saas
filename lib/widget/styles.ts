@@ -1943,6 +1943,478 @@ body.ai-saas-page-locked {
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* Full-screen assistant experience */
+#ai-saas-anchor.ai-format-assistant.open #ai-saas-widget {
+  grid-template-columns: 292px minmax(0, 1fr);
+  background:
+    radial-gradient(circle at 55% 18%, var(--ai-accent-light), transparent 26%),
+    radial-gradient(circle at 88% 88%, rgba(255, 255, 255, 0.035), transparent 25%),
+    #090a0e;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar {
+  gap: 28px;
+  padding: 20px 16px 16px;
+  background: linear-gradient(180deg, #11131a 0%, #0c0e13 100%);
+  border-right-color: rgba(255, 255, 255, 0.075);
+  box-shadow: 18px 0 50px rgba(0, 0, 0, 0.16);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-top {
+  gap: 30px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-brand {
+  min-height: 44px;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 0 6px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-brand-mark,
+#ai-saas-anchor.ai-format-assistant .ai-assistant-topbar-mark,
+#ai-saas-anchor.ai-format-assistant .ai-assistant-hero-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ai-accent-contrast);
+  background: var(--ai-accent-gradient);
+  box-shadow: 0 10px 30px var(--ai-accent-shadow);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-brand-mark {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-brand-mark svg {
+  width: 22px;
+  height: 22px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-brand-copy,
+#ai-saas-anchor.ai-format-assistant .ai-assistant-account-copy {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-brand-copy strong,
+#ai-saas-anchor.ai-format-assistant .ai-assistant-account-copy strong {
+  width: 100%;
+  overflow: hidden;
+  color: #f8fafc;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-brand-copy strong {
+  font-size: 15px;
+  font-weight: 720;
+  letter-spacing: -0.01em;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-brand-copy small,
+#ai-saas-anchor.ai-format-assistant .ai-assistant-account-copy small {
+  color: rgba(226, 232, 240, 0.52);
+  font-size: 11px;
+  font-weight: 560;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-nav {
+  gap: 6px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-label {
+  margin: 0 10px 7px;
+  color: rgba(226, 232, 240, 0.38);
+  font-size: 10px;
+  font-weight: 760;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-item {
+  min-height: 44px;
+  gap: 11px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: rgba(241, 245, 249, 0.72);
+  font-size: 13px;
+  font-weight: 590;
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-item:first-of-type {
+  margin-bottom: 8px;
+  border-color: color-mix(in srgb, var(--ai-accent) 22%, transparent);
+  background: color-mix(in srgb, var(--ai-accent) 12%, rgba(255, 255, 255, 0.035));
+  color: #ffffff;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-item:hover,
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-item:focus-visible,
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-item[aria-pressed="true"] {
+  border-color: rgba(255, 255, 255, 0.075);
+  background: rgba(255, 255, 255, 0.065);
+  color: #ffffff;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-item:hover {
+  transform: translateX(2px);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-icon {
+  width: 20px;
+  height: 20px;
+  flex-basis: 20px;
+  align-items: center;
+  color: currentColor;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-chat-search {
+  padding: 3px 5px 0;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-chat-search label {
+  margin: 0 4px 8px;
+  color: rgba(226, 232, 240, 0.48);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-chat-search input {
+  min-height: 42px;
+  padding: 0 12px;
+  border-color: rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.045);
+  font-size: 13px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-chat-history {
+  gap: 5px;
+  margin-top: 9px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-history-item {
+  min-height: 40px;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: rgba(241, 245, 249, 0.74);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-history-item:hover,
+#ai-saas-anchor.ai-format-assistant .ai-assistant-history-item:focus-visible {
+  border-color: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-sidebar-account {
+  min-height: 62px;
+  gap: 11px;
+  padding: 9px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-avatar {
+  width: 34px;
+  height: 34px;
+  flex-basis: 34px;
+  border: 1px solid color-mix(in srgb, var(--ai-accent) 30%, transparent);
+  background: var(--ai-accent-light);
+  color: #ffffff;
+  font-size: 12px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-account-copy strong {
+  font-size: 12px;
+  font-weight: 680;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-account-chevron {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  color: rgba(226, 232, 240, 0.32);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-account-chevron svg {
+  width: 16px;
+  height: 16px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-main {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-header.ai-assistant-topbar {
+  min-height: 70px;
+  justify-content: space-between;
+  padding: 10px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+  background: rgba(9, 10, 14, 0.76);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-topbar-context {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-topbar-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  box-shadow: 0 8px 22px var(--ai-accent-shadow);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-topbar-mark svg {
+  width: 18px;
+  height: 18px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-topbar-context > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-topbar-context strong {
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 680;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-topbar-context div > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(226, 232, 240, 0.46);
+  font-size: 10px;
+  font-weight: 570;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-topbar-context .ai-saas-status-dot {
+  width: 6px;
+  height: 6px;
+  background: #34d399;
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-close.ai-assistant-close {
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  background: rgba(255, 255, 255, 0.035);
+  color: rgba(241, 245, 249, 0.68);
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-close.ai-assistant-close:hover {
+  border-color: rgba(255, 255, 255, 0.13);
+  background: rgba(255, 255, 255, 0.085);
+  color: #ffffff;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-stage {
+  justify-content: center;
+  gap: 30px;
+  padding: clamp(28px, 5vh, 64px) clamp(24px, 6vw, 84px) 42px;
+}
+
+#ai-saas-anchor.ai-format-assistant #ai-saas-chat-box {
+  width: min(860px, 100%);
+  max-height: min(60dvh, 620px);
+  gap: 16px;
+  padding: 4px 6px 8px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-hero {
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 8px 0 4px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-hero-mark {
+  width: 68px;
+  height: 68px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 22px;
+  transform: rotate(-3deg);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-hero-mark svg {
+  width: 31px;
+  height: 31px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-hero-eyebrow {
+  margin-bottom: 10px;
+  color: color-mix(in srgb, var(--ai-accent) 70%, #ffffff);
+  font-size: 11px;
+  font-weight: 760;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-hero h2 {
+  max-width: 720px;
+  color: #f8fafc;
+  font-size: clamp(30px, 3.25vw, 48px);
+  font-weight: 680;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-hero p {
+  max-width: 560px;
+  margin: 14px 0 0;
+  color: rgba(226, 232, 240, 0.56);
+  font-size: 14px;
+  line-height: 1.6;
+  text-wrap: balance;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-composer {
+  width: min(820px, 100%);
+  gap: 18px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-input-wrapper {
+  min-height: 64px;
+  padding: 8px 9px 8px 21px;
+  border-color: rgba(255, 255, 255, 0.105);
+  border-radius: 21px;
+  background: rgba(25, 28, 36, 0.86);
+  box-shadow: 0 22px 65px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-input-wrapper:focus-within {
+  border-color: color-mix(in srgb, var(--ai-accent) 46%, rgba(255, 255, 255, 0.12));
+  box-shadow: 0 0 0 4px var(--ai-accent-light), 0 24px 70px rgba(0, 0, 0, 0.32);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-input-wrapper input {
+  font-size: 14px;
+  font-weight: 470;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-input-wrapper button {
+  width: 46px;
+  min-width: 46px;
+  height: 46px;
+  min-height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 15px;
+  background: var(--ai-accent-gradient);
+  color: var(--ai-accent-contrast);
+  box-shadow: 0 10px 26px var(--ai-accent-shadow);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-input-wrapper button:not(:disabled):hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 14px 32px var(--ai-accent-shadow);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-input-wrapper button:disabled {
+  border-color: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.3);
+  box-shadow: none;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-assistant-suggestions-mount {
+  min-height: 44px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-suggestions {
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-suggestion-chip {
+  min-height: 42px;
+  padding: 0 16px;
+  border-color: rgba(255, 255, 255, 0.09);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(241, 245, 249, 0.72);
+  font-size: 12px;
+  font-weight: 590;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-suggestion-chip::after {
+  content: "→";
+  margin-left: 9px;
+  color: color-mix(in srgb, var(--ai-accent) 72%, #ffffff);
+  transition: transform 160ms ease;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-suggestion-chip:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--ai-accent) 34%, rgba(255, 255, 255, 0.1));
+  background: color-mix(in srgb, var(--ai-accent) 8%, rgba(255, 255, 255, 0.035));
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-suggestion-chip:hover::after {
+  transform: translateX(2px);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble.user {
+  max-width: min(76%, 640px);
+  padding: 12px 16px;
+  border: 1px solid color-mix(in srgb, var(--ai-accent) 20%, rgba(255, 255, 255, 0.08));
+  border-radius: 18px 18px 5px 18px;
+  background: color-mix(in srgb, var(--ai-accent) 11%, #20232b);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble.bot {
+  align-self: stretch;
+  padding: 17px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 18px 18px 18px 5px;
+  background: rgba(255, 255, 255, 0.035);
+  color: rgba(248, 250, 252, 0.88);
+  line-height: 1.65;
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-saas-bubble.typing {
+  min-width: 82px;
+  padding: 13px 15px;
+  border-color: rgba(255, 255, 255, 0.075);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-pl-item {
+  border-color: rgba(255, 255, 255, 0.075);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
 @media (max-width: 760px) {
   #ai-saas-anchor.ai-format-assistant.open #ai-saas-widget {
     grid-template-columns: 1fr;
@@ -1954,6 +2426,8 @@ body.ai-saas-page-locked {
 
   #ai-saas-anchor.ai-format-assistant #ai-saas-header.ai-assistant-topbar {
     justify-content: space-between;
+    min-height: 64px;
+    padding: 9px 14px;
   }
 
   #ai-saas-anchor.ai-format-assistant #ai-saas-header.ai-assistant-topbar .ai-saas-brand {
@@ -1966,12 +2440,64 @@ body.ai-saas-page-locked {
   }
 
   #ai-saas-anchor.ai-format-assistant .ai-assistant-stage {
-    padding: 18px 14px 30px;
+    gap: 22px;
+    padding: 20px 14px 24px;
   }
 
   #ai-saas-anchor.ai-format-assistant #ai-saas-chat-box,
   #ai-saas-anchor.ai-format-assistant .ai-assistant-composer {
     width: min(100%, 680px);
+  }
+
+  #ai-saas-anchor.ai-format-assistant .ai-assistant-hero-mark {
+    width: 58px;
+    height: 58px;
+    margin-bottom: 18px;
+    border-radius: 19px;
+  }
+
+  #ai-saas-anchor.ai-format-assistant .ai-assistant-hero h2 {
+    font-size: clamp(28px, 9vw, 38px);
+  }
+
+  #ai-saas-anchor.ai-format-assistant .ai-assistant-hero p {
+    max-width: 360px;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  #ai-saas-anchor.ai-format-assistant .ai-saas-input-wrapper {
+    min-height: 58px;
+    padding: 6px 7px 6px 16px;
+    border-radius: 18px;
+  }
+
+  #ai-saas-anchor.ai-format-assistant .ai-saas-input-wrapper button {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+    border-radius: 13px;
+  }
+
+  #ai-saas-anchor.ai-format-assistant .ai-saas-suggestions {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding: 2px 1px 8px;
+    scrollbar-width: none;
+  }
+
+  #ai-saas-anchor.ai-format-assistant .ai-saas-suggestions::-webkit-scrollbar {
+    display: none;
+  }
+
+  #ai-saas-anchor.ai-format-assistant .ai-saas-suggestion-chip {
+    flex: 0 0 auto;
+  }
+
+  #ai-saas-anchor.ai-format-assistant .ai-saas-bubble.user {
+    max-width: 88%;
   }
 }
 

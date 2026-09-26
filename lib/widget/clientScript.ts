@@ -176,6 +176,23 @@ export function renderWidgetScript(
       thinkingSteps: ["Understanding your request", "Checking relevant information", "Preparing a helpful answer"],
       suggestionsLabel: "Suggested questions",
       suggestions: ["Browse products", "Shipping info", "Talk to support"],
+      assistantLabel: "AI assistant",
+      assistantDescription: "Ask about products, orders, or anything you need help with.",
+      workspaceLabel: "Workspace",
+      newChat: "New chat",
+      searchChats: "Search chats",
+      library: "Library",
+      scheduled: "Scheduled",
+      applications: "Applications",
+      libraryPrompt: "Show me the information and resources you have available.",
+      scheduledPrompt: "What tasks, appointments, or actions can I schedule with you?",
+      applicationsPrompt: "Which applications and integrations can you help me with?",
+      searchLabel: "Search your chats",
+      searchPlaceholder: "Search conversations...",
+      historyEmpty: "No conversations yet.",
+      historyNoResults: "No conversations found.",
+      conversationLabel: "New conversation",
+      privateLabel: "Private and secure",
       poweredBy: "Powered by",
       contactSupport: "Contact support",
       errorSending: "Error sending message. Please try again.",
@@ -207,6 +224,23 @@ export function renderWidgetScript(
       thinkingSteps: ["Entendiendo tu solicitud", "Consultando información relevante", "Preparando una respuesta útil"],
       suggestionsLabel: "Preguntas sugeridas",
       suggestions: ["Ver productos", "Informacion de envio", "Hablar con soporte"],
+      assistantLabel: "Asistente con IA",
+      assistantDescription: "Pregunta por productos, pedidos o cualquier cosa en la que necesites ayuda.",
+      workspaceLabel: "Espacio de trabajo",
+      newChat: "Nuevo chat",
+      searchChats: "Buscar chats",
+      library: "Biblioteca",
+      scheduled: "Programadas",
+      applications: "Aplicaciones",
+      libraryPrompt: "Muestrame la informacion y los recursos que tienes disponibles.",
+      scheduledPrompt: "Que tareas, citas o acciones puedo programar contigo?",
+      applicationsPrompt: "Con que aplicaciones e integraciones puedes ayudarme?",
+      searchLabel: "Buscar en tus chats",
+      searchPlaceholder: "Buscar conversaciones...",
+      historyEmpty: "Todavia no hay conversaciones.",
+      historyNoResults: "No se encontraron conversaciones.",
+      conversationLabel: "Nueva conversacion",
+      privateLabel: "Privado y seguro",
       poweredBy: "Con tecnologia de",
       contactSupport: "Contactar con soporte",
       errorSending: "Error al enviar el mensaje. Intentalo de nuevo.",
@@ -238,6 +272,23 @@ export function renderWidgetScript(
       thinkingSteps: ["Entendendo sua solicitação", "Consultando informações relevantes", "Preparando uma resposta útil"],
       suggestionsLabel: "Perguntas sugeridas",
       suggestions: ["Ver produtos", "Informacoes de envio", "Falar com suporte"],
+      assistantLabel: "Assistente de IA",
+      assistantDescription: "Pergunte sobre produtos, pedidos ou qualquer assunto em que precise de ajuda.",
+      workspaceLabel: "Espaco de trabalho",
+      newChat: "Nova conversa",
+      searchChats: "Pesquisar conversas",
+      library: "Biblioteca",
+      scheduled: "Agendadas",
+      applications: "Aplicacoes",
+      libraryPrompt: "Mostre as informacoes e os recursos que voce tem disponiveis.",
+      scheduledPrompt: "Que tarefas, compromissos ou acoes posso agendar com voce?",
+      applicationsPrompt: "Com quais aplicativos e integracoes voce pode me ajudar?",
+      searchLabel: "Pesquisar nas conversas",
+      searchPlaceholder: "Pesquisar conversas...",
+      historyEmpty: "Ainda nao ha conversas.",
+      historyNoResults: "Nenhuma conversa encontrada.",
+      conversationLabel: "Nova conversa",
+      privateLabel: "Privado e seguro",
       poweredBy: "Desenvolvido por",
       contactSupport: "Contactar suporte",
       errorSending: "Erro ao enviar a mensagem. Tente novamente.",
@@ -269,6 +320,23 @@ export function renderWidgetScript(
       thinkingSteps: ["Analyse de votre demande", "Recherche des informations utiles", "Préparation de la réponse"],
       suggestionsLabel: "Questions suggerees",
       suggestions: ["Voir les produits", "Infos livraison", "Parler au support"],
+      assistantLabel: "Assistant IA",
+      assistantDescription: "Posez vos questions sur les produits, les commandes ou tout autre besoin.",
+      workspaceLabel: "Espace de travail",
+      newChat: "Nouvelle discussion",
+      searchChats: "Rechercher",
+      library: "Bibliotheque",
+      scheduled: "Planifiees",
+      applications: "Applications",
+      libraryPrompt: "Montrez-moi les informations et ressources disponibles.",
+      scheduledPrompt: "Quelles taches ou actions puis-je planifier avec vous ?",
+      applicationsPrompt: "Avec quelles applications et integrations pouvez-vous m'aider ?",
+      searchLabel: "Rechercher dans vos discussions",
+      searchPlaceholder: "Rechercher une discussion...",
+      historyEmpty: "Aucune discussion pour le moment.",
+      historyNoResults: "Aucune discussion trouvee.",
+      conversationLabel: "Nouvelle discussion",
+      privateLabel: "Prive et securise",
       poweredBy: "Propulse par",
       contactSupport: "Contacter le support",
       errorSending: "Erreur lors de l'envoi du message. Reessayez.",
@@ -659,38 +727,68 @@ export function renderWidgetScript(
         </form>
       \`;
 
+      const renderAssistantIcon = (icon) => {
+        const icons = {
+          plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+          search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>',
+          library: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h11.5A2.5 2.5 0 0 1 19 7v12H7.5A2.5 2.5 0 0 1 5 16.5z"/><path d="M8.5 4.5v12M5 16.5h14"/></svg>',
+          clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.2 2"/></svg>',
+          apps: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>',
+          sparkles: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.2 3.3L16.5 7.5l-3.3 1.2L12 12l-1.2-3.3-3.3-1.2 3.3-1.2z"/><path d="m18.5 13 .7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7zM6.2 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg>',
+          chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+        };
+        return icons[icon] || icons.sparkles;
+      };
+
       const renderAssistantSidebarItem = (label, icon, action, prompt) => \`
         <button class="ai-assistant-sidebar-item" type="button" data-sidebar-action="\${escapeHtml(action)}"\${prompt ? \` data-sidebar-prompt="\${escapeHtml(prompt)}"\` : ""}>
-          <span class="ai-assistant-sidebar-icon" aria-hidden="true">\${icon}</span>
+          <span class="ai-assistant-sidebar-icon" aria-hidden="true">\${renderAssistantIcon(icon)}</span>
           <span>\${escapeHtml(label)}</span>
         </button>
       \`;
 
       const renderAssistantSidebar = () => \`
-        <aside class="ai-assistant-sidebar" aria-label="Assistant navigation">
+        <aside class="ai-assistant-sidebar" aria-label="\${escapeHtml(copy.assistantLabel)}">
           <div class="ai-assistant-sidebar-top">
             <div class="ai-assistant-sidebar-brand">
-              <strong>\${escapeHtml(brandName)}</strong>
-              <span aria-hidden="true">[]</span>
+              <span class="ai-assistant-brand-mark" aria-hidden="true">\${renderAssistantIcon("sparkles")}</span>
+              <span class="ai-assistant-brand-copy">
+                <strong>\${escapeHtml(brandName)}</strong>
+                <small>\${escapeHtml(copy.assistantLabel)}</small>
+              </span>
             </div>
-            <nav class="ai-assistant-sidebar-nav" aria-label="Assistant shortcuts">
-              \${renderAssistantSidebarItem("Nuevo chat", "+", "new-chat")}
-              \${renderAssistantSidebarItem("Buscar chats", "?", "toggle-search")}
-              \${renderAssistantSidebarItem("Biblioteca", "[]", "prompt", "Muéstrame la información y los recursos que tienes disponibles.")}
-              \${renderAssistantSidebarItem("Programadas", "o", "prompt", "¿Qué tareas, citas o acciones puedo programar contigo?")}
-              \${renderAssistantSidebarItem("Aplicaciones", "*", "prompt", "¿Con qué aplicaciones e integraciones puedes ayudarme?")}
+            <nav class="ai-assistant-sidebar-nav" aria-label="\${escapeHtml(copy.workspaceLabel)}">
+              <p class="ai-assistant-sidebar-label">\${escapeHtml(copy.workspaceLabel)}</p>
+              \${renderAssistantSidebarItem(copy.newChat, "plus", "new-chat")}
+              \${renderAssistantSidebarItem(copy.searchChats, "search", "toggle-search")}
+              \${renderAssistantSidebarItem(copy.library, "library", "prompt", copy.libraryPrompt)}
+              \${renderAssistantSidebarItem(copy.scheduled, "clock", "prompt", copy.scheduledPrompt)}
+              \${renderAssistantSidebarItem(copy.applications, "apps", "prompt", copy.applicationsPrompt)}
             </nav>
             <div id="ai-assistant-chat-search" class="ai-assistant-chat-search" hidden>
-              <label for="ai-assistant-chat-search-input">Buscar en tus chats</label>
-              <input id="ai-assistant-chat-search-input" type="search" placeholder="Escribe para buscar..." autocomplete="off" />
+              <label for="ai-assistant-chat-search-input">\${escapeHtml(copy.searchLabel)}</label>
+              <input id="ai-assistant-chat-search-input" type="search" placeholder="\${escapeHtml(copy.searchPlaceholder)}" autocomplete="off" />
               <div id="ai-assistant-chat-history" class="ai-assistant-chat-history" role="list"></div>
             </div>
           </div>
           <div class="ai-assistant-sidebar-account">
             <span class="ai-assistant-avatar" aria-hidden="true">\${escapeHtml(brandInitial)}</span>
-            <span>\${escapeHtml(brandName)}</span>
+            <span class="ai-assistant-account-copy">
+              <strong>\${escapeHtml(brandName)}</strong>
+              <small>\${escapeHtml(humanSupportText)}</small>
+            </span>
+            <span class="ai-assistant-account-chevron" aria-hidden="true">\${renderAssistantIcon("chevron")}</span>
           </div>
         </aside>
+      \`;
+
+      const renderAssistantHero = () => \`
+        <div id="ai-saas-assistant-hero" class="ai-assistant-hero">
+          <span class="ai-assistant-hero-mark" aria-hidden="true">\${renderAssistantIcon("sparkles")}</span>
+          <span class="ai-assistant-hero-eyebrow">\${escapeHtml(copy.assistantLabel)}</span>
+          <h2 data-ai-editor-field="greeting">\${escapeHtml(greeting)}</h2>
+          <p>\${escapeHtml(copy.assistantDescription)}</p>
+        </div>
       \`;
 
       const renderClassicWidget = () => \`
@@ -722,20 +820,18 @@ export function renderWidgetScript(
           \${renderAssistantSidebar()}
           <main class="ai-assistant-main">
             <header id="ai-saas-header" class="ai-assistant-topbar">
-              <div class="ai-saas-brand">
-                <div class="ai-saas-brand-icon" aria-hidden="true">\${escapeHtml(brandInitial)}</div>
-                <div class="ai-saas-brand-text">
-                  <strong id="ai-saas-title" data-ai-editor-field="brandName">\${escapeHtml(brandName)}</strong>
-                  <span><span class="ai-saas-status-dot" aria-hidden="true"></span><span class="ai-saas-status-text" data-ai-editor-field="humanSupportText">\${escapeHtml(humanSupportText)}</span></span>
+              <div class="ai-assistant-topbar-context">
+                <span class="ai-assistant-topbar-mark" aria-hidden="true">\${renderAssistantIcon("sparkles")}</span>
+                <div>
+                  <strong id="ai-saas-title">\${escapeHtml(copy.conversationLabel)}</strong>
+                  <span><span class="ai-saas-status-dot" aria-hidden="true"></span><span class="ai-assistant-private-label">\${escapeHtml(copy.privateLabel)}</span></span>
                 </div>
               </div>
               \${renderCloseButton("ai-assistant-close")}
             </header>
             <div class="ai-assistant-stage">
               <div id="ai-saas-chat-box" role="log" aria-live="polite" aria-relevant="additions">
-                <div id="ai-saas-assistant-hero" class="ai-assistant-hero">
-                  <h2 data-ai-editor-field="greeting">\${escapeHtml(greeting)}</h2>
-                </div>
+                \${renderAssistantHero()}
               </div>
               <div class="ai-assistant-composer">
                 \${renderMessageForm()}
@@ -1108,9 +1204,36 @@ export function renderWidgetScript(
         setPreviewText('[data-ai-editor-field="greeting"]', greeting);
         setPreviewText(".ai-saas-brand-icon", brandInitial);
         setPreviewText(".ai-assistant-avatar", brandInitial);
-        setPreviewText(".ai-assistant-sidebar-brand strong", brandName);
-        const accountName = anchor.querySelector(".ai-assistant-sidebar-account span:last-child");
-        if (accountName) accountName.textContent = brandName;
+        setPreviewText(".ai-assistant-brand-copy strong", brandName);
+        setPreviewText(".ai-assistant-brand-copy small", copy.assistantLabel);
+        setPreviewText(".ai-assistant-account-copy strong", brandName);
+        setPreviewText(".ai-assistant-account-copy small", humanSupportText);
+        setPreviewText(".ai-assistant-sidebar-label", copy.workspaceLabel);
+        setPreviewText(".ai-assistant-topbar-context strong", copy.conversationLabel);
+        setPreviewText(".ai-assistant-private-label", copy.privateLabel);
+        setPreviewText(".ai-assistant-hero-eyebrow", copy.assistantLabel);
+        setPreviewText(".ai-assistant-hero p", copy.assistantDescription);
+
+        const sidebarItems = anchor.querySelectorAll(".ai-assistant-sidebar-item");
+        const sidebarCopy = [
+          [copy.newChat, ""],
+          [copy.searchChats, ""],
+          [copy.library, copy.libraryPrompt],
+          [copy.scheduled, copy.scheduledPrompt],
+          [copy.applications, copy.applicationsPrompt],
+        ];
+        sidebarItems.forEach((item, index) => {
+          const values = sidebarCopy[index];
+          if (!values) return;
+          const label = item.querySelector("span:last-child");
+          if (label) label.textContent = values[0];
+          if (values[1]) item.dataset.sidebarPrompt = values[1];
+        });
+
+        const searchLabel = anchor.querySelector('.ai-assistant-chat-search label');
+        if (searchLabel) searchLabel.textContent = copy.searchLabel;
+        const assistantSearchInput = anchor.querySelector('#ai-assistant-chat-search-input');
+        if (assistantSearchInput) assistantSearchInput.placeholder = copy.searchPlaceholder;
 
         input.placeholder = copy.inputPlaceholder;
         input.setAttribute("aria-label", copy.inputLabel);
@@ -1227,13 +1350,10 @@ export function renderWidgetScript(
       const resetChatView = () => {
         chatBox.replaceChildren();
         if (isAssistantFormat) {
-          const hero = document.createElement("div");
-          hero.id = "ai-saas-assistant-hero";
-          hero.className = "ai-assistant-hero";
-          const heading = document.createElement("h2");
-          heading.innerText = greeting;
-          hero.appendChild(heading);
-          chatBox.appendChild(hero);
+          const heroHost = document.createElement("div");
+          heroHost.innerHTML = renderAssistantHero().trim();
+          const hero = heroHost.firstElementChild;
+          if (hero) chatBox.appendChild(hero);
         } else {
           appendBotMessage(greeting, { isGreeting: true });
         }
@@ -1301,7 +1421,7 @@ export function renderWidgetScript(
         if (matches.length === 0) {
           const empty = document.createElement("p");
           empty.className = "ai-assistant-history-empty";
-          empty.innerText = normalizedQuery ? "No se encontraron chats." : "Todavía no hay chats guardados.";
+          empty.innerText = normalizedQuery ? copy.historyNoResults : copy.historyEmpty;
           historyList.appendChild(empty);
           return;
         }
@@ -1309,8 +1429,8 @@ export function renderWidgetScript(
           const button = document.createElement("button");
           button.type = "button";
           button.className = "ai-assistant-history-item";
-          button.innerText = session.title || "Chat sin título";
-          button.title = session.title || "Chat sin título";
+          button.innerText = session.title || copy.conversationLabel;
+          button.title = session.title || copy.conversationLabel;
           button.addEventListener("click", () => restoreChat(session.id));
           historyList.appendChild(button);
         });
