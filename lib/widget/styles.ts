@@ -2162,7 +2162,10 @@ body.ai-saas-page-locked {
 #ai-saas-anchor.ai-format-assistant .ai-assistant-main {
   position: relative;
   isolation: isolate;
-  background: transparent;
+  background:
+    radial-gradient(circle at 42% 16%, var(--ai-accent-light), transparent 28%),
+    radial-gradient(circle at 90% 86%, rgba(255, 255, 255, 0.03), transparent 26%),
+    #090a0e;
 }
 
 #ai-saas-anchor.ai-format-assistant #ai-saas-header.ai-assistant-topbar {
