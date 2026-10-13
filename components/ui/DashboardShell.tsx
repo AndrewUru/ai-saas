@@ -71,10 +71,9 @@ export default function DashboardShell({
     };
   }, [supabase]);
 
-  async function handleSignOut() {
+  function handleSignOut() {
     setIsSigningOut(true);
-    await supabase.auth.signOut();
-    window.location.href = "/login";
+    window.location.assign("/logout");
   }
 
   const active = useMemo(() => {

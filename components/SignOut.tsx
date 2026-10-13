@@ -1,18 +1,14 @@
 "use client";
-import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 export function SignOutButton() {
-  const supabase = createClient();
   return (
-    <button
-      className="rounded bg-gray-200 px-3 py-1 text-sm"
-      onClick={async () => {
-        await supabase.auth.signOut();
-        window.location.href = "/login";
-      }}
+    <Link
+      href="/logout"
+      className="inline-flex min-h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-semibold text-zinc-200 transition hover:border-white/20 hover:bg-white/[0.08]"
       data-oid=":u5wqnx"
     >
-      Sign Out
-    </button>
+      Cerrar sesión
+    </Link>
   );
 }

@@ -271,7 +271,7 @@ export default function Footer() {
             ))}
             <a
               href="mailto:atobio459@gmail.com"
-              className="text-zinc-500 hover:text-white transition-colors text-xs font-medium flex items-center"
+              className="text-zinc-400 hover:text-white transition-colors text-xs font-medium flex items-center"
               data-oid="efaw_da"
             >
               atobio459@gmail.com

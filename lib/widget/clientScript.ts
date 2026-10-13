@@ -176,6 +176,23 @@ export function renderWidgetScript(
       thinkingSteps: ["Understanding your request", "Checking relevant information", "Preparing a helpful answer"],
       suggestionsLabel: "Suggested questions",
       suggestions: ["Browse products", "Shipping info", "Talk to support"],
+      assistantLabel: "AI assistant",
+      assistantDescription: "Ask about products, orders, or anything you need help with.",
+      workspaceLabel: "Workspace",
+      newChat: "New chat",
+      searchChats: "Search chats",
+      library: "Library",
+      scheduled: "Scheduled",
+      applications: "Applications",
+      libraryPrompt: "Show me the information and resources you have available.",
+      scheduledPrompt: "What tasks, appointments, or actions can I schedule with you?",
+      applicationsPrompt: "Which applications and integrations can you help me with?",
+      searchLabel: "Search your chats",
+      searchPlaceholder: "Search conversations...",
+      historyEmpty: "No conversations yet.",
+      historyNoResults: "No conversations found.",
+      conversationLabel: "New conversation",
+      privateLabel: "Private and secure",
       poweredBy: "Powered by",
       contactSupport: "Contact support",
       errorSending: "Error sending message. Please try again.",
@@ -207,6 +224,23 @@ export function renderWidgetScript(
       thinkingSteps: ["Entendiendo tu solicitud", "Consultando información relevante", "Preparando una respuesta útil"],
       suggestionsLabel: "Preguntas sugeridas",
       suggestions: ["Ver productos", "Informacion de envio", "Hablar con soporte"],
+      assistantLabel: "Asistente con IA",
+      assistantDescription: "Pregunta por productos, pedidos o cualquier cosa en la que necesites ayuda.",
+      workspaceLabel: "Espacio de trabajo",
+      newChat: "Nuevo chat",
+      searchChats: "Buscar chats",
+      library: "Biblioteca",
+      scheduled: "Programadas",
+      applications: "Aplicaciones",
+      libraryPrompt: "Muestrame la informacion y los recursos que tienes disponibles.",
+      scheduledPrompt: "Que tareas, citas o acciones puedo programar contigo?",
+      applicationsPrompt: "Con que aplicaciones e integraciones puedes ayudarme?",
+      searchLabel: "Buscar en tus chats",
+      searchPlaceholder: "Buscar conversaciones...",
+      historyEmpty: "Todavia no hay conversaciones.",
+      historyNoResults: "No se encontraron conversaciones.",
+      conversationLabel: "Nueva conversacion",
+      privateLabel: "Privado y seguro",
       poweredBy: "Con tecnologia de",
       contactSupport: "Contactar con soporte",
       errorSending: "Error al enviar el mensaje. Intentalo de nuevo.",
@@ -238,6 +272,23 @@ export function renderWidgetScript(
       thinkingSteps: ["Entendendo sua solicitação", "Consultando informações relevantes", "Preparando uma resposta útil"],
       suggestionsLabel: "Perguntas sugeridas",
       suggestions: ["Ver produtos", "Informacoes de envio", "Falar com suporte"],
+      assistantLabel: "Assistente de IA",
+      assistantDescription: "Pergunte sobre produtos, pedidos ou qualquer assunto em que precise de ajuda.",
+      workspaceLabel: "Espaco de trabalho",
+      newChat: "Nova conversa",
+      searchChats: "Pesquisar conversas",
+      library: "Biblioteca",
+      scheduled: "Agendadas",
+      applications: "Aplicacoes",
+      libraryPrompt: "Mostre as informacoes e os recursos que voce tem disponiveis.",
+      scheduledPrompt: "Que tarefas, compromissos ou acoes posso agendar com voce?",
+      applicationsPrompt: "Com quais aplicativos e integracoes voce pode me ajudar?",
+      searchLabel: "Pesquisar nas conversas",
+      searchPlaceholder: "Pesquisar conversas...",
+      historyEmpty: "Ainda nao ha conversas.",
+      historyNoResults: "Nenhuma conversa encontrada.",
+      conversationLabel: "Nova conversa",
+      privateLabel: "Privado e seguro",
       poweredBy: "Desenvolvido por",
       contactSupport: "Contactar suporte",
       errorSending: "Erro ao enviar a mensagem. Tente novamente.",
@@ -269,6 +320,23 @@ export function renderWidgetScript(
       thinkingSteps: ["Analyse de votre demande", "Recherche des informations utiles", "Préparation de la réponse"],
       suggestionsLabel: "Questions suggerees",
       suggestions: ["Voir les produits", "Infos livraison", "Parler au support"],
+      assistantLabel: "Assistant IA",
+      assistantDescription: "Posez vos questions sur les produits, les commandes ou tout autre besoin.",
+      workspaceLabel: "Espace de travail",
+      newChat: "Nouvelle discussion",
+      searchChats: "Rechercher",
+      library: "Bibliotheque",
+      scheduled: "Planifiees",
+      applications: "Applications",
+      libraryPrompt: "Montrez-moi les informations et ressources disponibles.",
+      scheduledPrompt: "Quelles taches ou actions puis-je planifier avec vous ?",
+      applicationsPrompt: "Avec quelles applications et integrations pouvez-vous m'aider ?",
+      searchLabel: "Rechercher dans vos discussions",
+      searchPlaceholder: "Rechercher une discussion...",
+      historyEmpty: "Aucune discussion pour le moment.",
+      historyNoResults: "Aucune discussion trouvee.",
+      conversationLabel: "Nouvelle discussion",
+      privateLabel: "Prive et securise",
       poweredBy: "Propulse par",
       contactSupport: "Contacter le support",
       errorSending: "Erreur lors de l'envoi du message. Reessayez.",
@@ -579,18 +647,18 @@ export function renderWidgetScript(
       // We do a shallow merge of the top level, and deep merge of appearance
       let fullConfig = mergeConfig(config || {});
       let copy = getCopy(fullConfig.language);
-      const brandName = fullConfig.brandName || "AI Widget";
-      const brandInitial =
+      let brandName = fullConfig.brandName || "AI Widget";
+      let brandInitial =
         fullConfig.brandInitial ||
         (brandName.charAt(0).toUpperCase() || "A").slice(0, 1);
-      const collapsedLabel = fullConfig.collapsedLabel || copy.collapsedLabel;
-      const humanSupportText = fullConfig.humanSupportText || copy.humanSupportText;
-      const bubbleSubtitle = fullConfig.bubbleSubtitle || "I'm here to assist you.";
-      const greeting = fullConfig.greeting || copy.greeting;
-      const launcherIcon = ["whatsapp", "chat", "sparkles", "bot", "store", "logo"].includes(fullConfig.launcherIcon)
+      let collapsedLabel = fullConfig.collapsedLabel || copy.collapsedLabel;
+      let humanSupportText = fullConfig.humanSupportText || copy.humanSupportText;
+      let bubbleSubtitle = fullConfig.bubbleSubtitle || "I'm here to assist you.";
+      let greeting = fullConfig.greeting || copy.greeting;
+      let launcherIcon = ["whatsapp", "chat", "sparkles", "bot", "store", "logo"].includes(fullConfig.launcherIcon)
         ? fullConfig.launcherIcon
         : "whatsapp";
-      const launcherLogoUrl = sanitizeUrl(fullConfig.launcherLogoUrl);
+      let launcherLogoUrl = sanitizeUrl(fullConfig.launcherLogoUrl);
 
       // 3. Inject CSS
       // We rely on STATIC_STYLES which uses variables.
@@ -659,38 +727,68 @@ export function renderWidgetScript(
         </form>
       \`;
 
+      const renderAssistantIcon = (icon) => {
+        const icons = {
+          plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+          search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>',
+          library: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h11.5A2.5 2.5 0 0 1 19 7v12H7.5A2.5 2.5 0 0 1 5 16.5z"/><path d="M8.5 4.5v12M5 16.5h14"/></svg>',
+          clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.2 2"/></svg>',
+          apps: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>',
+          sparkles: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.2 3.3L16.5 7.5l-3.3 1.2L12 12l-1.2-3.3-3.3-1.2 3.3-1.2z"/><path d="m18.5 13 .7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7zM6.2 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg>',
+          chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+        };
+        return icons[icon] || icons.sparkles;
+      };
+
       const renderAssistantSidebarItem = (label, icon, action, prompt) => \`
         <button class="ai-assistant-sidebar-item" type="button" data-sidebar-action="\${escapeHtml(action)}"\${prompt ? \` data-sidebar-prompt="\${escapeHtml(prompt)}"\` : ""}>
-          <span class="ai-assistant-sidebar-icon" aria-hidden="true">\${icon}</span>
+          <span class="ai-assistant-sidebar-icon" aria-hidden="true">\${renderAssistantIcon(icon)}</span>
           <span>\${escapeHtml(label)}</span>
         </button>
       \`;
 
       const renderAssistantSidebar = () => \`
-        <aside class="ai-assistant-sidebar" aria-label="Assistant navigation">
+        <aside class="ai-assistant-sidebar" aria-label="\${escapeHtml(copy.assistantLabel)}">
           <div class="ai-assistant-sidebar-top">
             <div class="ai-assistant-sidebar-brand">
-              <strong>\${escapeHtml(brandName)}</strong>
-              <span aria-hidden="true">[]</span>
+              <span class="ai-assistant-brand-mark" aria-hidden="true">\${renderAssistantIcon("sparkles")}</span>
+              <span class="ai-assistant-brand-copy">
+                <strong>\${escapeHtml(brandName)}</strong>
+                <small>\${escapeHtml(copy.assistantLabel)}</small>
+              </span>
             </div>
-            <nav class="ai-assistant-sidebar-nav" aria-label="Assistant shortcuts">
-              \${renderAssistantSidebarItem("Nuevo chat", "+", "new-chat")}
-              \${renderAssistantSidebarItem("Buscar chats", "?", "toggle-search")}
-              \${renderAssistantSidebarItem("Biblioteca", "[]", "prompt", "Muéstrame la información y los recursos que tienes disponibles.")}
-              \${renderAssistantSidebarItem("Programadas", "o", "prompt", "¿Qué tareas, citas o acciones puedo programar contigo?")}
-              \${renderAssistantSidebarItem("Aplicaciones", "*", "prompt", "¿Con qué aplicaciones e integraciones puedes ayudarme?")}
+            <nav class="ai-assistant-sidebar-nav" aria-label="\${escapeHtml(copy.workspaceLabel)}">
+              <p class="ai-assistant-sidebar-label">\${escapeHtml(copy.workspaceLabel)}</p>
+              \${renderAssistantSidebarItem(copy.newChat, "plus", "new-chat")}
+              \${renderAssistantSidebarItem(copy.searchChats, "search", "toggle-search")}
+              \${renderAssistantSidebarItem(copy.library, "library", "prompt", copy.libraryPrompt)}
+              \${renderAssistantSidebarItem(copy.scheduled, "clock", "prompt", copy.scheduledPrompt)}
+              \${renderAssistantSidebarItem(copy.applications, "apps", "prompt", copy.applicationsPrompt)}
             </nav>
             <div id="ai-assistant-chat-search" class="ai-assistant-chat-search" hidden>
-              <label for="ai-assistant-chat-search-input">Buscar en tus chats</label>
-              <input id="ai-assistant-chat-search-input" type="search" placeholder="Escribe para buscar..." autocomplete="off" />
+              <label for="ai-assistant-chat-search-input">\${escapeHtml(copy.searchLabel)}</label>
+              <input id="ai-assistant-chat-search-input" type="search" placeholder="\${escapeHtml(copy.searchPlaceholder)}" autocomplete="off" />
               <div id="ai-assistant-chat-history" class="ai-assistant-chat-history" role="list"></div>
             </div>
           </div>
           <div class="ai-assistant-sidebar-account">
             <span class="ai-assistant-avatar" aria-hidden="true">\${escapeHtml(brandInitial)}</span>
-            <span>\${escapeHtml(brandName)}</span>
+            <span class="ai-assistant-account-copy">
+              <strong>\${escapeHtml(brandName)}</strong>
+              <small>\${escapeHtml(humanSupportText)}</small>
+            </span>
+            <span class="ai-assistant-account-chevron" aria-hidden="true">\${renderAssistantIcon("chevron")}</span>
           </div>
         </aside>
+      \`;
+
+      const renderAssistantHero = () => \`
+        <div id="ai-saas-assistant-hero" class="ai-assistant-hero">
+          <span class="ai-assistant-hero-mark" aria-hidden="true">\${renderAssistantIcon("sparkles")}</span>
+          <span class="ai-assistant-hero-eyebrow">\${escapeHtml(copy.assistantLabel)}</span>
+          <h2 data-ai-editor-field="greeting">\${escapeHtml(greeting)}</h2>
+          <p>\${escapeHtml(copy.assistantDescription)}</p>
+        </div>
       \`;
 
       const renderClassicWidget = () => \`
@@ -699,8 +797,8 @@ export function renderWidgetScript(
              <div class="ai-saas-brand">
                <div class="ai-saas-brand-icon" aria-hidden="true">\${escapeHtml(brandInitial)}</div>
                <div class="ai-saas-brand-text">
-                 <strong id="ai-saas-title">\${escapeHtml(brandName)}</strong>
-                 <span><span class="ai-saas-status-dot" aria-hidden="true"></span>\${escapeHtml(humanSupportText)}</span>
+                 <strong id="ai-saas-title" data-ai-editor-field="brandName">\${escapeHtml(brandName)}</strong>
+                 <span><span class="ai-saas-status-dot" aria-hidden="true"></span><span class="ai-saas-status-text" data-ai-editor-field="humanSupportText">\${escapeHtml(humanSupportText)}</span></span>
                </div>
              </div>
              \${renderCloseButton("")}
@@ -722,20 +820,18 @@ export function renderWidgetScript(
           \${renderAssistantSidebar()}
           <main class="ai-assistant-main">
             <header id="ai-saas-header" class="ai-assistant-topbar">
-              <div class="ai-saas-brand">
-                <div class="ai-saas-brand-icon" aria-hidden="true">\${escapeHtml(brandInitial)}</div>
-                <div class="ai-saas-brand-text">
-                  <strong id="ai-saas-title">\${escapeHtml(brandName)}</strong>
-                  <span><span class="ai-saas-status-dot" aria-hidden="true"></span>\${escapeHtml(humanSupportText)}</span>
+              <div class="ai-assistant-topbar-context">
+                <span class="ai-assistant-topbar-mark" aria-hidden="true">\${renderAssistantIcon("sparkles")}</span>
+                <div>
+                  <strong id="ai-saas-title">\${escapeHtml(copy.conversationLabel)}</strong>
+                  <span><span class="ai-saas-status-dot" aria-hidden="true"></span><span class="ai-assistant-private-label">\${escapeHtml(copy.privateLabel)}</span></span>
                 </div>
               </div>
               \${renderCloseButton("ai-assistant-close")}
             </header>
             <div class="ai-assistant-stage">
               <div id="ai-saas-chat-box" role="log" aria-live="polite" aria-relevant="additions">
-                <div id="ai-saas-assistant-hero" class="ai-assistant-hero">
-                  <h2>\${escapeHtml(greeting)}</h2>
-                </div>
+                \${renderAssistantHero()}
               </div>
               <div class="ai-assistant-composer">
                 \${renderMessageForm()}
@@ -756,10 +852,10 @@ export function renderWidgetScript(
         <button id="ai-saas-toggle" type="button" aria-controls="ai-saas-widget" aria-expanded="false" aria-label="\${escapeHtml(copy.openChat)}">
           \${renderBrandIcon()}
           <span class="ai-saas-bubble-copy">
-            <span class="ai-saas-bubble-title">\${escapeHtml(collapsedLabel)}</span>
-            <span class="ai-saas-bubble-subtitle">\${escapeHtml(bubbleSubtitle)}</span>
+            <span class="ai-saas-bubble-title" data-ai-editor-field="collapsedLabel">\${escapeHtml(collapsedLabel)}</span>
+            <span class="ai-saas-bubble-subtitle" data-ai-editor-field="bubbleSubtitle">\${escapeHtml(bubbleSubtitle)}</span>
           </span>
-          <span class="ai-saas-label">\${escapeHtml(collapsedLabel)}</span>
+          <span class="ai-saas-label" data-ai-editor-field="collapsedLabel">\${escapeHtml(collapsedLabel)}</span>
         </button>
         \${isAssistantFormat ? renderAssistantWidget() : renderClassicWidget()}
       \`;
@@ -789,6 +885,153 @@ export function renderWidgetScript(
       const submitBtn = form.querySelector("button");
       const chatBox = document.getElementById("ai-saas-chat-box");
       const suggestionLabels = copy.suggestions;
+
+      const previewEditorSelectors = {
+        launcher: "#ai-saas-toggle",
+        header: "#ai-saas-header",
+        botBubble: ".ai-saas-bubble.bot",
+        userBubble: ".ai-saas-bubble.user",
+        composer: "#ai-saas-form",
+        chat: "#ai-saas-chat-box",
+        layout: "#ai-saas-widget",
+      };
+      let selectedPreviewPart = null;
+
+      const getPreviewEditorPart = (target) => {
+        if (!(target instanceof Element)) return null;
+        for (const [part, selector] of Object.entries(previewEditorSelectors)) {
+          if (target.closest(selector)) return part;
+        }
+        return null;
+      };
+
+      const selectPreviewEditorPart = (part, notifyParent = true) => {
+        if (!IS_PREVIEW || !previewEditorSelectors[part]) return;
+        selectedPreviewPart = part;
+
+        anchor
+          .querySelectorAll("[data-ai-editor-selected]")
+          .forEach((element) => element.removeAttribute("data-ai-editor-selected"));
+
+        anchor
+          .querySelectorAll(previewEditorSelectors[part])
+          .forEach((element) => element.setAttribute("data-ai-editor-selected", "true"));
+
+        if (notifyParent && window.parent !== window) {
+          window.parent.postMessage(
+            { type: "ai-widget-editor:select", part },
+            window.location.origin,
+          );
+        }
+      };
+
+      if (IS_PREVIEW) {
+        const editorStyle = document.createElement("style");
+        editorStyle.textContent = \`
+          #ai-saas-anchor #ai-saas-toggle,
+          #ai-saas-anchor #ai-saas-header,
+          #ai-saas-anchor #ai-saas-chat-box,
+          #ai-saas-anchor #ai-saas-form,
+          #ai-saas-anchor .ai-saas-bubble,
+          #ai-saas-anchor #ai-saas-widget {
+            cursor: pointer !important;
+          }
+          #ai-saas-anchor [data-ai-editor-selected="true"] {
+            outline: 3px solid #8b5cf6 !important;
+            outline-offset: 3px !important;
+            box-shadow: 0 0 0 7px rgba(139, 92, 246, .16) !important;
+          }
+          #ai-saas-anchor [data-ai-editor-field] {
+            cursor: text !important;
+          }
+          #ai-saas-anchor [data-ai-inline-editing="true"] {
+            min-width: 28px;
+            border-radius: 5px;
+            outline: 2px solid #f8fafc !important;
+            outline-offset: 2px !important;
+            background: rgba(15, 23, 42, .86) !important;
+            color: #fff !important;
+            caret-color: #fff;
+          }
+        \`;
+        document.head.appendChild(editorStyle);
+
+        anchor.addEventListener(
+          "click",
+          (event) => {
+            if (event.target.closest?.('[contenteditable="true"]')) return;
+            const part = getPreviewEditorPart(event.target);
+            if (!part) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            selectPreviewEditorPart(part);
+          },
+          true,
+        );
+
+        anchor.addEventListener(
+          "dblclick",
+          (event) => {
+            const target = event.target.closest?.("[data-ai-editor-field]");
+            if (!target) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            const field = target.dataset.aiEditorField;
+            const originalValue = target.textContent || "";
+            let cancelled = false;
+            target.contentEditable = "true";
+            target.setAttribute("data-ai-inline-editing", "true");
+            target.focus();
+
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(target);
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+
+            const handleInlineKeyDown = (keyboardEvent) => {
+              if (keyboardEvent.key === "Escape") {
+                cancelled = true;
+                target.textContent = originalValue;
+                target.blur();
+                return;
+              }
+              if (keyboardEvent.key === "Enter") {
+                keyboardEvent.preventDefault();
+                target.blur();
+              }
+            };
+            target.addEventListener("keydown", handleInlineKeyDown);
+
+            target.addEventListener(
+              "blur",
+              () => {
+                target.removeEventListener("keydown", handleInlineKeyDown);
+                target.contentEditable = "false";
+                target.removeAttribute("data-ai-inline-editing");
+                if (cancelled || window.parent === window) return;
+                window.parent.postMessage(
+                  {
+                    type: "ai-widget-editor:text-change",
+                    field,
+                    value: (target.textContent || "").trim(),
+                  },
+                  window.location.origin,
+                );
+              },
+              { once: true },
+            );
+          },
+          true,
+        );
+
+        window.addEventListener("message", (event) => {
+          if (event.origin !== window.location.origin) return;
+          if (event.data?.type !== "ai-widget-editor:select") return;
+          selectPreviewEditorPart(event.data.part, false);
+        });
+      }
 
       const setupThreeLauncher = async () => {
         const canvas = toggleBtn?.querySelector(".ai-saas-three-canvas");
@@ -903,14 +1146,134 @@ export function renderWidgetScript(
         chatBox.scrollTop = chatBox.scrollHeight;
       };
 
-      const appendBotMessage = (text) => {
+      const appendBotMessage = (text, options = {}) => {
         if (!text) return;
         const botDiv = document.createElement("div");
         botDiv.className = "ai-saas-bubble bot ai-saas-enter";
+        if (options.isGreeting) {
+          botDiv.dataset.aiEditorField = "greeting";
+        }
         botDiv.innerText = text;
         chatBox.appendChild(botDiv);
         scrollChatToBottom();
       };
+
+      const setPreviewText = (selector, value) => {
+        anchor.querySelectorAll(selector).forEach((element) => {
+          if (element.getAttribute("contenteditable") === "true") return;
+          element.textContent = value;
+        });
+      };
+
+      const applyLivePreviewConfig = (nextConfig) => {
+        if (!IS_PREVIEW || !nextConfig || typeof nextConfig !== "object") return;
+
+        const previousLauncherIcon = launcherIcon;
+        const previousLauncherLogoUrl = launcherLogoUrl;
+        fullConfig = {
+          ...fullConfig,
+          ...nextConfig,
+          appearance: {
+            ...(fullConfig.appearance || {}),
+            ...(nextConfig.appearance || {}),
+          },
+        };
+        copy = getCopy(fullConfig.language);
+        brandName = fullConfig.brandName || "AI Widget";
+        brandInitial =
+          fullConfig.brandInitial ||
+          (brandName.charAt(0).toUpperCase() || "A").slice(0, 1);
+        collapsedLabel = fullConfig.collapsedLabel || copy.collapsedLabel;
+        humanSupportText = fullConfig.humanSupportText || copy.humanSupportText;
+        bubbleSubtitle = fullConfig.bubbleSubtitle || "I'm here to assist you.";
+        greeting = fullConfig.greeting || copy.greeting;
+        launcherIcon = ["whatsapp", "chat", "sparkles", "bot", "store", "logo"].includes(fullConfig.launcherIcon)
+          ? fullConfig.launcherIcon
+          : "whatsapp";
+        launcherLogoUrl = sanitizeUrl(fullConfig.launcherLogoUrl);
+
+        applyPosition(anchor, fullConfig.position);
+        applyFormat(anchor, fullConfig.format);
+        applyLauncherStyle(anchor, fullConfig);
+        applyTheme(anchor, fullConfig);
+
+        setPreviewText('[data-ai-editor-field="brandName"]', brandName);
+        setPreviewText('[data-ai-editor-field="humanSupportText"]', humanSupportText);
+        setPreviewText('[data-ai-editor-field="collapsedLabel"]', collapsedLabel);
+        setPreviewText('[data-ai-editor-field="bubbleSubtitle"]', bubbleSubtitle);
+        setPreviewText('[data-ai-editor-field="greeting"]', greeting);
+        setPreviewText(".ai-saas-brand-icon", brandInitial);
+        setPreviewText(".ai-assistant-avatar", brandInitial);
+        setPreviewText(".ai-assistant-brand-copy strong", brandName);
+        setPreviewText(".ai-assistant-brand-copy small", copy.assistantLabel);
+        setPreviewText(".ai-assistant-account-copy strong", brandName);
+        setPreviewText(".ai-assistant-account-copy small", humanSupportText);
+        setPreviewText(".ai-assistant-sidebar-label", copy.workspaceLabel);
+        setPreviewText(".ai-assistant-topbar-context strong", copy.conversationLabel);
+        setPreviewText(".ai-assistant-private-label", copy.privateLabel);
+        setPreviewText(".ai-assistant-hero-eyebrow", copy.assistantLabel);
+        setPreviewText(".ai-assistant-hero p", copy.assistantDescription);
+
+        const sidebarItems = anchor.querySelectorAll(".ai-assistant-sidebar-item");
+        const sidebarCopy = [
+          [copy.newChat, ""],
+          [copy.searchChats, ""],
+          [copy.library, copy.libraryPrompt],
+          [copy.scheduled, copy.scheduledPrompt],
+          [copy.applications, copy.applicationsPrompt],
+        ];
+        sidebarItems.forEach((item, index) => {
+          const values = sidebarCopy[index];
+          if (!values) return;
+          const label = item.querySelector("span:last-child");
+          if (label) label.textContent = values[0];
+          if (values[1]) item.dataset.sidebarPrompt = values[1];
+        });
+
+        const searchLabel = anchor.querySelector('.ai-assistant-chat-search label');
+        if (searchLabel) searchLabel.textContent = copy.searchLabel;
+        const assistantSearchInput = anchor.querySelector('#ai-assistant-chat-search-input');
+        if (assistantSearchInput) assistantSearchInput.placeholder = copy.searchPlaceholder;
+
+        input.placeholder = copy.inputPlaceholder;
+        input.setAttribute("aria-label", copy.inputLabel);
+        submitBtn.setAttribute("aria-label", copy.sendMessage);
+        setPreviewText(".ai-saas-send-label", copy.send);
+
+        if (
+          previousLauncherIcon !== launcherIcon ||
+          previousLauncherLogoUrl !== launcherLogoUrl
+        ) {
+          const currentIcon = toggleBtn.querySelector(".ai-saas-icon");
+          const iconHost = document.createElement("div");
+          iconHost.innerHTML = renderBrandIcon().trim();
+          const nextIcon = iconHost.firstElementChild;
+          if (currentIcon && nextIcon) currentIcon.replaceWith(nextIcon);
+        }
+
+        if (fullConfig.bubbleUseThree === false) {
+          anchor.classList.remove("ai-three-ready");
+        } else {
+          const canvas = toggleBtn.querySelector(".ai-saas-three-canvas");
+          if (canvas?.dataset.aiThree === "ready") {
+            anchor.classList.add("ai-three-ready");
+          } else {
+            setupThreeLauncher();
+          }
+        }
+
+        if (selectedPreviewPart) {
+          selectPreviewEditorPart(selectedPreviewPart, false);
+        }
+      };
+
+      if (IS_PREVIEW) {
+        window.addEventListener("message", (event) => {
+          if (event.origin !== window.location.origin) return;
+          if (event.data?.type !== "ai-widget-editor:update") return;
+          applyLivePreviewConfig(event.data.config);
+        });
+      }
 
       const removeSuggestions = () => {
         const suggestions = document.getElementById("ai-saas-suggestions");
@@ -987,15 +1350,12 @@ export function renderWidgetScript(
       const resetChatView = () => {
         chatBox.replaceChildren();
         if (isAssistantFormat) {
-          const hero = document.createElement("div");
-          hero.id = "ai-saas-assistant-hero";
-          hero.className = "ai-assistant-hero";
-          const heading = document.createElement("h2");
-          heading.innerText = greeting;
-          hero.appendChild(heading);
-          chatBox.appendChild(hero);
+          const heroHost = document.createElement("div");
+          heroHost.innerHTML = renderAssistantHero().trim();
+          const hero = heroHost.firstElementChild;
+          if (hero) chatBox.appendChild(hero);
         } else {
-          appendBotMessage(greeting);
+          appendBotMessage(greeting, { isGreeting: true });
         }
         appendSuggestions();
         setSending(false);
@@ -1061,7 +1421,7 @@ export function renderWidgetScript(
         if (matches.length === 0) {
           const empty = document.createElement("p");
           empty.className = "ai-assistant-history-empty";
-          empty.innerText = normalizedQuery ? "No se encontraron chats." : "Todavía no hay chats guardados.";
+          empty.innerText = normalizedQuery ? copy.historyNoResults : copy.historyEmpty;
           historyList.appendChild(empty);
           return;
         }
@@ -1069,8 +1429,8 @@ export function renderWidgetScript(
           const button = document.createElement("button");
           button.type = "button";
           button.className = "ai-assistant-history-item";
-          button.innerText = session.title || "Chat sin título";
-          button.title = session.title || "Chat sin título";
+          button.innerText = session.title || copy.conversationLabel;
+          button.title = session.title || copy.conversationLabel;
           button.addEventListener("click", () => restoreChat(session.id));
           historyList.appendChild(button);
         });
@@ -1090,7 +1450,7 @@ export function renderWidgetScript(
         setPageScrollLock(state);
         if (state) {
           trackWidgetEvent("open");
-          refreshTheme();
+          if (!IS_PREVIEW) refreshTheme();
           anchor.classList.add("open");
           widget.setAttribute("aria-hidden", "false");
           window.setTimeout(() => input.focus(), 0);
@@ -1103,12 +1463,25 @@ export function renderWidgetScript(
       };
 
       if (!isAssistantFormat) {
-        appendBotMessage(greeting);
+        appendBotMessage(greeting, { isGreeting: true });
+        if (IS_PREVIEW) {
+          const previewUserMessage = document.createElement("div");
+          previewUserMessage.className = "ai-saas-bubble user ai-saas-enter";
+          previewUserMessage.innerText = "Can you help me choose?";
+          chatBox.appendChild(previewUserMessage);
+        }
       }
       appendSuggestions();
 
-      if (isAssistantFormat && SHOULD_AUTO_OPEN) {
+      if (SHOULD_AUTO_OPEN) {
         window.setTimeout(() => setOpen(true), 0);
+      }
+
+      if (IS_PREVIEW && window.parent !== window) {
+        window.parent.postMessage(
+          { type: "ai-widget-editor:ready" },
+          window.location.origin,
+        );
       }
 
       toggleBtn.addEventListener("click", () => setOpen(true));
