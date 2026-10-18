@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useI18n } from "@/lib/i18n/client";
+import { format } from "@/lib/i18n/config";
 import { useAgents } from "./hooks/useAgents";
 
 type Props = {
@@ -10,6 +12,9 @@ type Props = {
 
 export default function AgentsSection({ planLimitLabel }: Props) {
   const { data, isLoading, isError } = useAgents();
+  const { t } = useI18n();
+  const s = t.home.section;
+  const c = t.dashCommon;
   const agents = data ?? [];
   const totalAgents = agents.length;
   const activeAgents = agents.filter((agent) => agent.is_active).length;
@@ -20,40 +25,40 @@ export default function AgentsSection({ planLimitLabel }: Props) {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
           <div>
             <h2 className="text-xl font-semibold text-foreground">
-              Agent workspaces
+              {s.title}
             </h2>
             <p className="mt-1 text-sm text-[var(--foreground-muted)]">
-              Open an assistant, test responses, and publish improvements.
+              {s.subtitle}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-[var(--foreground-muted)]">
-              {isLoading ? "Loading" : `${activeAgents}/${totalAgents} active`}
+              {isLoading ? c.loading : format(s.activeCount, { active: activeAgents, total: totalAgents })}
             </span>
             <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-[var(--foreground-muted)]">
-              {planLimitLabel} messages
+              {format(s.messages, { limit: planLimitLabel })}
             </span>
             <Link
               href="/dashboard/agents"
               className="ui-button ui-button--ghost text-xs"
             >
-              View all
+              {s.viewAll}
             </Link>
           </div>
         </div>
 
         {isError ? (
           <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-sm text-red-200">
-            Failed to load agents. Please refresh.
+            {s.loadError}
           </div>
         ) : null}
 
         {!isError && totalAgents === 0 && !isLoading ? (
           <EmptyState
-            title="No agents configured"
-            description="Create your first agent to connect store data and start replying to chats automatically."
+            title={s.emptyTitle}
+            description={s.emptyDescription}
             actionHref="/dashboard/agents"
-            actionLabel="Create agent"
+            actionLabel={s.createAgent}
           />
         ) : null}
 
@@ -67,7 +72,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                   const statusColor = agent.is_active
                     ? "bg-accent"
                     : "bg-[var(--foreground-muted)]";
-                  const statusText = agent.is_active ? "Active" : "Paused";
+                  const statusText = agent.is_active ? c.active : c.paused;
 
                   return (
                     <li
@@ -81,7 +86,7 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                           />
 
                           <span className="text-sm font-semibold text-foreground">
-                            {agent.name || "Unnamed Agent"}
+                            {agent.name || c.unnamedAgent}
                           </span>
                           <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]">
                             {statusText}
@@ -89,14 +94,14 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                         </div>
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--foreground-muted)]">
                           <span>
-                            Key:{" "}
+                            {s.key}{" "}
                             <span className="font-mono text-foreground/70">
                               {(agent.api_key ?? "N/A").slice(0, 6)}...
                             </span>
                           </span>
                           <span className="hidden sm:inline">/</span>
                           <span>
-                            Limit: {agent.messages_limit ?? "Unlimited"}
+                            {format(s.limit, { limit: agent.messages_limit ?? c.unlimited })}
                           </span>
                         </div>
                       </div>
@@ -104,14 +109,14 @@ export default function AgentsSection({ planLimitLabel }: Props) {
                         href={`/dashboard/agents/${agent.id}`}
                         className="ui-button ui-button--subtle px-3 py-1.5 text-xs sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
                       >
-                        Open workspace
+                        {c.openWorkspace}
                       </Link>
                     </li>
                   );
                 })}
             {totalAgents > 5 && !isLoading ? (
               <li className="pt-2 text-center text-xs text-[var(--foreground-muted)]">
-                Showing recent 5 agents
+                {s.showingRecent}
               </li>
             ) : null}
           </ul>

@@ -1,31 +1,35 @@
+"use client";
+
 import Link from "next/link";
 
-const navigation = [
+import { useI18n } from "@/lib/i18n/client";
+import type { Messages } from "@/lib/i18n/messages";
+
+type FooterLinkKey = keyof Messages["footer"]["links"];
+
+const navigation: { links: { key: FooterLinkKey; href: string }[] }[] = [
   {
-    title: "Product",
     links: [
-      { label: "Features", href: "/#features" },
-      { label: "Agents", href: "/dashboard/agents" },
-      { label: "Pricing", href: "/pricing" },
-      { label: "Integrations", href: "/integrations" },
+      { key: "features", href: "/#features" },
+      { key: "agents", href: "/dashboard/agents" },
+      { key: "pricing", href: "/pricing" },
+      { key: "integrations", href: "/integrations" },
     ],
   },
   {
-    title: "Resources",
     links: [
-      { label: "Documentation", href: "/dashboard/docs" },
-      { label: "Academy", href: "/academy" },
-      { label: "Changelog", href: "/changelog" },
-      { label: "Community", href: "/community" },
+      { key: "documentation", href: "/dashboard/docs" },
+      { key: "academy", href: "/academy" },
+      { key: "changelog", href: "/changelog" },
+      { key: "community", href: "/community" },
     ],
   },
   {
-    title: "Company",
     links: [
-      { label: "About us", href: "/about" },
-      { label: "Blog", href: "/blog" },
-      { label: "Contact", href: "/contact" },
-      { label: "Careers", href: "/careers" },
+      { key: "about", href: "/about" },
+      { key: "blog", href: "/blog" },
+      { key: "contact", href: "/contact" },
+      { key: "careers", href: "/careers" },
     ],
   },
 ];
@@ -34,6 +38,7 @@ const social = [{ label: "GitHub", href: "https://github.com/Andrewuru" }];
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { t } = useI18n();
 
   return (
     <footer
@@ -76,8 +81,7 @@ export default function Footer() {
               className="text-sm leading-6 text-zinc-400 max-w-sm"
               data-oid="t:dy127"
             >
-              Deploy intelligent support agents for WooCommerce. Automate
-              responses, scale your agency, and keep control.
+              {t.footer.tagline}
             </p>
 
             <div className="relative max-w-sm" data-oid="m0wi0ul">
@@ -86,7 +90,7 @@ export default function Footer() {
                 className="sr-only"
                 data-oid="ddfj5_-"
               >
-                Subscribe to newsletter
+                {t.footer.newsletterLabel}
               </label>
               <div className="flex gap-2" data-oid="paw-3gv">
                 <input
@@ -94,7 +98,7 @@ export default function Footer() {
                   name="newsletter"
                   id="newsletter"
                   className="w-full min-w-0 flex-auto rounded-lg border border-white/10 bg-white/5 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-white/5 placeholder:text-zinc-500 focus:ring-2 focus:ring-inset focus:ring-white/20 sm:text-sm sm:leading-6 transition-all hover:bg-white/10"
-                  placeholder="Enter your email"
+                  placeholder={t.footer.newsletterPlaceholder}
                   data-oid="f1ljexs"
                 />
 
@@ -103,7 +107,7 @@ export default function Footer() {
                   className="flex-none rounded-lg bg-white px-3.5 py-2 text-sm font-semibold text-black shadow-sm hover:bg-zinc-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-colors"
                   data-oid="tykmblw"
                 >
-                  Subscribe
+                  {t.footer.subscribe}
                 </button>
               </div>
             </div>
@@ -124,7 +128,7 @@ export default function Footer() {
                 className="text-xs font-medium text-zinc-400"
                 data-oid="iozf64x"
               >
-                All systems operational
+                {t.footer.status}
               </span>
             </div>
           </div>
@@ -140,17 +144,17 @@ export default function Footer() {
                   className="text-xs font-semibold uppercase tracking-wider text-white"
                   data-oid="-.po:5c"
                 >
-                  Product
+                  {t.footer.product}
                 </h3>
                 <ul role="list" className="mt-6 space-y-4" data-oid="k4x-2r0">
                   {navigation[0].links.map((item) => (
-                    <li key={item.label} data-oid="liz5j_r">
+                    <li key={item.key} data-oid="liz5j_r">
                       <Link
                         href={item.href}
                         className="text-sm leading-6 text-zinc-400 hover:text-white transition-colors"
                         data-oid="b2q9xvh"
                       >
-                        {item.label}
+                        {t.footer.links[item.key]}
                       </Link>
                     </li>
                   ))}
@@ -161,17 +165,17 @@ export default function Footer() {
                   className="text-xs font-semibold uppercase tracking-wider text-white"
                   data-oid="1h4.edo"
                 >
-                  Resources
+                  {t.footer.resources}
                 </h3>
                 <ul role="list" className="mt-6 space-y-4" data-oid="2ni.eu6">
                   {navigation[1].links.map((item) => (
-                    <li key={item.label} data-oid="e9sz2co">
+                    <li key={item.key} data-oid="e9sz2co">
                       <Link
                         href={item.href}
                         className="text-sm leading-6 text-zinc-400 hover:text-white transition-colors"
                         data-oid=":5is6x0"
                       >
-                        {item.label}
+                        {t.footer.links[item.key]}
                       </Link>
                     </li>
                   ))}
@@ -184,17 +188,17 @@ export default function Footer() {
                   className="text-xs font-semibold uppercase tracking-wider text-white"
                   data-oid="k5nu9an"
                 >
-                  Company
+                  {t.footer.company}
                 </h3>
                 <ul role="list" className="mt-6 space-y-4" data-oid="iu0ozfc">
                   {navigation[2].links.map((item) => (
-                    <li key={item.label} data-oid="ajcp0ly">
+                    <li key={item.key} data-oid="ajcp0ly">
                       <Link
                         href={item.href}
                         className="text-sm leading-6 text-zinc-400 hover:text-white transition-colors"
                         data-oid="vh5d2:w"
                       >
-                        {item.label}
+                        {t.footer.links[item.key]}
                       </Link>
                     </li>
                   ))}
@@ -205,7 +209,7 @@ export default function Footer() {
                   className="text-xs font-semibold uppercase tracking-wider text-white"
                   data-oid="idk7j8i"
                 >
-                  Legal
+                  {t.footer.legal}
                 </h3>
                 <ul role="list" className="mt-6 space-y-4" data-oid="1ll89te">
                   <li data-oid="7m8m48.">
@@ -214,7 +218,7 @@ export default function Footer() {
                       className="text-sm leading-6 text-zinc-400 hover:text-white transition-colors"
                       data-oid="foxjri8"
                     >
-                      Privacy Policy
+                      {t.footer.links.privacy}
                     </Link>
                   </li>
                   <li data-oid="v6utxtz">
@@ -223,7 +227,7 @@ export default function Footer() {
                       className="text-sm leading-6 text-zinc-400 hover:text-white transition-colors"
                       data-oid="3g7k.fc"
                     >
-                      Terms of Service
+                      {t.footer.links.terms}
                     </Link>
                   </li>
                 </ul>
@@ -238,7 +242,7 @@ export default function Footer() {
           data-oid="5lq500r"
         >
           <p className="text-xs leading-5 text-zinc-500" data-oid="giyn14f">
-            &copy; {year} AI Agents Inc. All rights reserved.
+            &copy; {year} {t.footer.rights}
           </p>
 
           <div className="flex space-x-6" data-oid="amuavl9">

@@ -1,4 +1,16 @@
-export default function AboutPage() {
+import type { Metadata } from "next";
+
+import { getI18n } from "@/lib/i18n/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.about.meta.title };
+}
+
+export default async function AboutPage() {
+  const { t } = await getI18n();
+  const a = t.about;
+
   return (
     <main className="text-slate-100" data-oid="472x0q2">
       <section
@@ -13,16 +25,13 @@ export default function AboutPage() {
             className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="7qatfon"
           >
-            About us
+            {a.eyebrow}
           </p>
           <h1 className="text-4xl font-bold sm:text-5xl" data-oid="vxp:wrl">
-            We empower agencies that build memorable ecommerce stores
+            {a.title}
           </h1>
           <p className="text-base text-slate-300 sm:text-lg" data-oid="urv3db7">
-            AI SaaS was born after working alongside web studios that needed to
-            scale support without losing each brand’s tone. We built the
-            platform so your team can deploy reliable agents, measure results,
-            and offer a recurring service to your clients.
+            {a.intro}
           </p>
         </header>
 
@@ -32,13 +41,10 @@ export default function AboutPage() {
             data-oid="odb3zup"
           >
             <h2 className="text-xl font-semibold text-white" data-oid="--ng9c3">
-              Our manifesto
+              {a.manifestoTitle}
             </h2>
             <p className="text-sm text-slate-300" data-oid="rco6808">
-              We believe automation should strengthen the relationship between
-              agency and brand, not replace it. That’s why we prioritize
-              granular controls, transparent analytics, and an onboarding flow
-              your team can replicate in a matter of hours.
+              {a.manifestoBody}
             </p>
           </article>
           <article
@@ -46,12 +52,10 @@ export default function AboutPage() {
             data-oid="4txaq9j"
           >
             <h2 className="text-xl font-semibold text-white" data-oid="g2.y:x3">
-              What’s next
+              {a.nextTitle}
             </h2>
             <p className="text-sm text-slate-300" data-oid="b82c0hc">
-              We’re expanding integrations with CRMs and payment platforms, plus
-              a marketplace of agency-verified prompts to speed up every new
-              ecommerce project.
+              {a.nextBody}
             </p>
           </article>
         </div>

@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
 import { createServer } from "@/lib/supabase/server";
 
 const PAYPAL_API =
@@ -37,6 +39,7 @@ async function getPayPalAccessToken() {
 }
 
 export async function POST(req: Request) {
+  const e = getMessages(getRequestLocale(req)).api;
   try {
     const supabase = await createServer();
     const {
@@ -44,7 +47,7 @@ export async function POST(req: Request) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: e.unauthorized }, { status: 401 });
     }
 
     // (Opcional) lee plan del body, pero NO uses amount del body
@@ -77,7 +80,7 @@ export async function POST(req: Request) {
 
     if (!orderRes.ok || !order?.id) {
       return NextResponse.json(
-        { error: order?.message || "Could not create order" },
+        { error: order?.message || e.paypal.createOrder },
         { status: 400 }
       );
     }
@@ -101,7 +104,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Server error" },
+      { error: err instanceof Error ? err.message : e.serverError },
       { status: 500 }
     );
   }

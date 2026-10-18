@@ -1,0 +1,37 @@
+---
+title: "Lanza tu primer widget"
+description: "Una checklist práctica para pasar de configurar el agente a tener el widget en vivo en la web de un cliente."
+date: "2025-11-18"
+tags: ["widget", "lanzamiento", "checklist"]
+level: "beginner"
+draft: false
+---
+
+# Lanza tu primer widget
+
+Usa esta checklist cuando quieras publicar rápido sin olvidarte de lo básico.
+
+## Qué necesitas
+
+- La API key de un agente activo
+- El dominio o dominios donde se insertará el widget
+- Un saludo breve y el nombre de la marca
+
+## Checklist
+
+1. Añade tu dominio a **Dominios permitidos**.
+2. Copia el snippet de instalación y colócalo antes de `</body>`.
+3. Prueba la vista previa con un saludo y el nombre de la marca.
+4. Cambia el agente a **Activo** y comprueba que el widget carga.
+
+## Snippet de ejemplo
+
+```html
+<script async src="https://tudominio.com/api/widget?key=agt_xxx"></script>
+```
+
+## Errores habituales
+
+- No haber autorizado el dominio.
+- Reglas CSP que bloquean la carga del script.
+- API key no válida (cópiala desde la página de detalle del agente).

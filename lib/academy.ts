@@ -4,6 +4,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
 
+import { defaultLocale, intlLocales, type Locale } from "@/lib/i18n/config";
+
 export type AcademyLevel = "beginner" | "intermediate" | "advanced";
 
 export type AcademyFrontmatter = {
@@ -27,6 +29,10 @@ export type AcademyPost = AcademyPostSummary & {
 };
 
 const CONTENT_DIR = path.join(process.cwd(), "content/academy");
+// Las traducciones viven en content/academy/<locale>/ con el mismo nombre de
+// archivo que el original en inglés, así el slug no cambia entre idiomas.
+const localizedDir = (locale: Locale) =>
+  locale === defaultLocale ? CONTENT_DIR : path.join(CONTENT_DIR, locale);
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const LEVELS: AcademyLevel[] = ["beginner", "intermediate", "advanced"];
 
@@ -93,7 +99,8 @@ function parseFrontmatter(
 
 function buildSummary(
   frontmatter: AcademyFrontmatter,
-  fileName: string
+  fileName: string,
+  locale: Locale
 ): AcademyPostSummary {
   const baseSlug = toSlug(frontmatter.slug || fileName);
   const slug = baseSlug || toSlug(fileName);
@@ -101,7 +108,7 @@ function buildSummary(
   if (Number.isNaN(dateSort)) {
     throw new Error(`Invalid date in ${fileName}. Use YYYY-MM-DD.`);
   }
-  const dateLabel = new Intl.DateTimeFormat("en-US", {
+  const dateLabel = new Intl.DateTimeFormat(intlLocales[locale], {
     month: "short",
     day: "2-digit",
     year: "numeric",
@@ -115,41 +122,68 @@ function buildSummary(
   };
 }
 
-async function getMdxFiles() {
-  const entries = await fs.readdir(CONTENT_DIR, { withFileTypes: true });
-  return entries
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".mdx"))
-    .map((entry) => entry.name);
+async function listMdx(dir: string) {
+  try {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".mdx"))
+      .map((entry) => entry.name);
+  } catch {
+    return [];
+  }
 }
 
-async function readPostSummary(fileName: string): Promise<AcademyPostSummary> {
-  const filePath = path.join(CONTENT_DIR, fileName);
+/**
+ * Rutas de los artículos para un idioma: usa la traducción cuando existe y
+ * el original en inglés como respaldo.
+ */
+async function getMdxFiles(locale: Locale) {
+  const baseFiles = await listMdx(CONTENT_DIR);
+  if (locale === defaultLocale) {
+    return baseFiles.map((name) => path.join(CONTENT_DIR, name));
+  }
+
+  const dir = localizedDir(locale);
+  const translated = new Set(await listMdx(dir));
+  return baseFiles.map((name) =>
+    path.join(translated.has(name) ? dir : CONTENT_DIR, name)
+  );
+}
+
+async function readPostSummary(
+  filePath: string,
+  locale: Locale
+): Promise<AcademyPostSummary> {
+  const fileName = path.basename(filePath);
   const raw = await fs.readFile(filePath, "utf8");
   const { data } = matter(raw);
   const frontmatter = parseFrontmatter(
     data as Record<string, unknown>,
     fileName
   );
-  return buildSummary(frontmatter, path.parse(fileName).name);
+  return buildSummary(frontmatter, path.parse(fileName).name, locale);
 }
 
-async function readPost(fileName: string): Promise<AcademyPost> {
-  const filePath = path.join(CONTENT_DIR, fileName);
+async function readPost(filePath: string, locale: Locale): Promise<AcademyPost> {
+  const fileName = path.basename(filePath);
   const raw = await fs.readFile(filePath, "utf8");
   const { data, content } = matter(raw);
   const frontmatter = parseFrontmatter(
     data as Record<string, unknown>,
     fileName
   );
-  const summary = buildSummary(frontmatter, path.parse(fileName).name);
+  const summary = buildSummary(frontmatter, path.parse(fileName).name, locale);
   return { ...summary, content };
 }
 
 export async function getAllAcademyPosts(
+  locale: Locale = defaultLocale,
   includeDrafts?: boolean
 ): Promise<AcademyPostSummary[]> {
-  const files = await getMdxFiles();
-  const posts = await Promise.all(files.map((file) => readPostSummary(file)));
+  const files = await getMdxFiles(locale);
+  const posts = await Promise.all(
+    files.map((file) => readPostSummary(file, locale))
+  );
   const visible = posts.filter(
     (post) => shouldIncludeDrafts(includeDrafts) || !post.draft
   );
@@ -158,13 +192,14 @@ export async function getAllAcademyPosts(
 
 export async function getAcademyPostBySlug(
   slug: string,
+  locale: Locale = defaultLocale,
   includeDrafts?: boolean
 ): Promise<AcademyPost | null> {
-  const files = await getMdxFiles();
+  const files = await getMdxFiles(locale);
   const include = shouldIncludeDrafts(includeDrafts);
 
   for (const file of files) {
-    const post = await readPost(file);
+    const post = await readPost(file, locale);
     if (post.slug !== slug) continue;
     if (!include && post.draft) return null;
     return post;
@@ -175,9 +210,10 @@ export async function getAcademyPostBySlug(
 
 export async function getAdjacentPosts(
   slug: string,
+  locale: Locale = defaultLocale,
   includeDrafts?: boolean
 ): Promise<{ previous: AcademyPostSummary | null; next: AcademyPostSummary | null }> {
-  const posts = await getAllAcademyPosts(includeDrafts);
+  const posts = await getAllAcademyPosts(locale, includeDrafts);
   const index = posts.findIndex((post) => post.slug === slug);
   if (index === -1) {
     return { previous: null, next: null };

@@ -6,6 +6,8 @@ import {
   resolveRequestHost,
 } from "@/lib/security/domains";
 import { createAdmin } from "@/lib/supabase/admin";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
 import { WidgetConfig } from "@/lib/widget/types";
 import {
   getWidgetAccentDefault,
@@ -92,12 +94,13 @@ function resolveRequestLanguage(
 }
 
 export async function GET(req: Request) {
+  const e = getMessages(getRequestLocale(req)).api;
   const url = new URL(req.url);
   const key = url.searchParams.get("key");
   const isPreview = url.searchParams.get("preview") === "1";
 
   if (!key) {
-    return NextResponse.json({ error: "Missing key" }, { status: 400 });
+    return NextResponse.json({ error: e.missingKey }, { status: 400 });
   }
 
   const supabase = createAdmin();
@@ -108,7 +111,7 @@ export async function GET(req: Request) {
     .maybeSingle();
 
   if (error || !agent) {
-    return NextResponse.json({ error: "Agent not found" }, { status: 404 });
+    return NextResponse.json({ error: e.agentNotFound }, { status: 404 });
   }
 
   try {
@@ -119,7 +122,7 @@ export async function GET(req: Request) {
     );
   } catch {
     return NextResponse.json(
-      { error: "This domain is not allowed for this agent." },
+      { error: e.domainNotAllowed },
       {
         status: 403,
         headers: {

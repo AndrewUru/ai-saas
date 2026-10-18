@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import { hasActivePlan } from "@/lib/plans";
 import { createServer } from "@/lib/supabase/server";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
 
 export async function POST(req: Request) {
+  const e = getMessages(getRequestLocale(req)).api;
   const supabase = await createServer();
   const { api_key } = await req.json();
   if (!api_key) {
     return NextResponse.json(
-      { ok: false, error: "Falta api_key" },
+      { ok: false, error: e.missingApiKey },
       { status: 400 }
     );
   }
@@ -19,7 +22,7 @@ export async function POST(req: Request) {
     .single();
   if (!agent || !agent.is_active) {
     return NextResponse.json(
-      { ok: false, error: "Agente inactivo" },
+      { ok: false, error: e.agentInactive },
       { status: 403 }
     );
   }
@@ -31,7 +34,7 @@ export async function POST(req: Request) {
     .single();
   if (!hasActivePlan(profile)) {
     return NextResponse.json(
-      { ok: false, error: "Suscripción inactiva" },
+      { ok: false, error: e.subscriptionInactive },
       { status: 402 }
     );
   }

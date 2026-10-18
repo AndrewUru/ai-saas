@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
 import { createAdmin } from "@/lib/supabase/admin";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
 
 export async function GET(req: Request) {
+  const e = getMessages(getRequestLocale(req)).api;
   const key = new URL(req.url).searchParams.get("key")?.trim() ?? "";
 
   if (!key)
     return NextResponse.json({
       ok: false,
       data: null,
-      error: { code: "missing_key", message: "Falta key" },
+      error: { code: "missing_key", message: e.missingKey },
     });
 
   const supabase = createAdmin();
@@ -33,7 +36,7 @@ export async function GET(req: Request) {
     return NextResponse.json({
       ok: false,
       data: null,
-      error: { code: "not_found", message: "Agente no encontrado" },
+      error: { code: "not_found", message: e.agentNotFound },
     });
   }
 

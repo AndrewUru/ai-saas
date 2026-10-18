@@ -1,0 +1,31 @@
+---
+title: "Guía del catálogo de Shopify"
+description: "Conecta una integración de Shopify y optimiza las respuestas sobre productos con precio, stock e imágenes."
+date: "2025-12-05"
+tags: ["shopify", "catálogo", "comercio"]
+level: "intermediate"
+draft: false
+---
+
+# Guía del catálogo de Shopify
+
+Usa los datos de Shopify para enriquecer las respuestas con productos, precios e inventario.
+
+## Preparación
+
+- Confirma que el propietario de la tienda aceptó la conexión OAuth.
+- Asegúrate de que la integración está **Activa**.
+- Lanza una sincronización inicial para crear el índice de productos.
+
+## Prompts recomendados
+
+```text
+Cuando un usuario pregunte por productos, responde de forma breve y sugiere 3 artículos relevantes.
+Incluye el precio, la moneda y la disponibilidad cuando estén disponibles.
+```
+
+## Pasos de validación
+
+1. Pregunta al widget por los "más vendidos".
+2. Confirma que las tarjetas de producto se muestran en el widget.
+3. Verifica que la moneda coincide con la configuración de la tienda.

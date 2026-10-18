@@ -12,59 +12,31 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-const stages = [
-  {
-    eyebrow: "01 · Listen",
-    title: "A shopper asks a real buying question.",
-    detail:
-      "The agent captures intent, urgency, budget, and the product context behind the message.",
-    metric: "Intent: delivery confidence",
-    icon: MessageCircle,
-    accent: "text-sky-300",
-    surface: "bg-sky-300",
-  },
-  {
-    eyebrow: "02 · Ground",
-    title: "The answer uses live store knowledge.",
-    detail:
-      "Catalog, stock, variants, shipping rules, and approved content are searched before the reply is composed.",
-    metric: "4 sources checked",
-    icon: PackageSearch,
-    accent: "text-violet-300",
-    surface: "bg-violet-300",
-  },
-  {
-    eyebrow: "03 · Detect",
-    title: "The conversation becomes a signal.",
-    detail:
-      "Repeated hesitation is grouped into an opportunity your team can understand instead of disappearing into chat history.",
-    metric: "Pattern: shipping threshold",
-    icon: BrainCircuit,
-    accent: "text-amber-300",
-    surface: "bg-amber-300",
-  },
-  {
-    eyebrow: "04 · Improve",
-    title: "Your team approves the next best action.",
-    detail:
-      "Turn the signal into a FAQ, prompt rule, recommendation, or human handoff without giving up control.",
-    metric: "Rule ready to publish",
-    icon: Check,
-    accent: "text-emerald-300",
-    surface: "bg-emerald-300",
-  },
+import { useI18n } from "@/lib/i18n/client";
+import { format } from "@/lib/i18n/config";
+
+const stageStyles = [
+  { icon: MessageCircle, accent: "text-sky-300", surface: "bg-sky-300" },
+  { icon: PackageSearch, accent: "text-violet-300", surface: "bg-violet-300" },
+  { icon: BrainCircuit, accent: "text-amber-300", surface: "bg-amber-300" },
+  { icon: Check, accent: "text-emerald-300", surface: "bg-emerald-300" },
 ] as const satisfies readonly {
-  eyebrow: string;
-  title: string;
-  detail: string;
-  metric: string;
   icon: LucideIcon;
   accent: string;
   surface: string;
 }[];
 
+const sourceIcons: LucideIcon[] = [Database, PackageSearch, Sparkles];
+
 export function Workflow() {
   const [activeStage, setActiveStage] = useState(0);
+  const { t } = useI18n();
+  const w = t.landing.workflow;
+  const stages = w.stages.map((stage, index) => ({
+    ...stage,
+    ...stageStyles[index],
+    eyebrow: `${stage.step} · ${stage.name}`,
+  }));
   const stageRefs = useRef<Array<HTMLDivElement | null>>([]);
   const active = stages[activeStage];
   const ActiveIcon = active.icon;
@@ -104,14 +76,13 @@ export function Workflow() {
       <div className="relative mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
         <div className="max-w-4xl">
           <span className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-500">
-            From conversation to action
+            {w.eyebrow}
           </span>
           <h2 className="mt-4 text-balance text-4xl font-semibold tracking-[-0.05em] text-white sm:text-6xl lg:text-7xl">
-            Watch one question improve the whole store.
+            {w.title}
           </h2>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-400">
-            The same interaction helps the shopper now and teaches your team
-            what to fix next.
+            {w.description}
           </p>
         </div>
 
@@ -122,11 +93,11 @@ export function Workflow() {
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-violet-300" aria-hidden="true" />
                   <span className="text-xs font-semibold text-white">
-                    Commerce signal trace
+                    {w.traceTitle}
                   </span>
                 </div>
                 <span className="text-[10px] text-zinc-600">
-                  Session #0842
+                  {w.session}
                 </span>
               </div>
 
@@ -142,7 +113,7 @@ export function Workflow() {
                       <button
                         key={stage.eyebrow}
                         type="button"
-                        aria-label={`Show ${stage.title}`}
+                        aria-label={format(w.showStageAria, { title: stage.title })}
                         aria-pressed={isCurrent}
                         onClick={() => setActiveStage(index)}
                         className="relative z-10 flex items-center gap-3 text-left"
@@ -167,7 +138,7 @@ export function Workflow() {
                             isCurrent ? stage.accent : "text-zinc-700"
                           }`}
                         >
-                          {stage.eyebrow.split(" · ")[1]}
+                          {stage.name}
                         </span>
                       </button>
                     );
@@ -192,33 +163,29 @@ export function Workflow() {
                       {activeStage === 0 ? (
                         <div className="w-full space-y-3">
                           <div className="ml-auto max-w-[78%] rounded-[1.25rem_1.25rem_.3rem_1.25rem] bg-white px-4 py-3 text-sm leading-6 text-zinc-900 shadow-xl">
-                            Will this arrive before Friday?
+                            {w.listenQuestion}
                           </div>
                           <div className="max-w-[88%] rounded-[1.25rem_1.25rem_1.25rem_.3rem] border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-zinc-300">
-                            Let me check delivery and stock for your location.
+                            {w.listenAnswer}
                           </div>
                         </div>
                       ) : activeStage === 1 ? (
                         <div className="w-full space-y-2">
-                          {[
-                            [Database, "Shipping policy", "Matched"],
-                            [PackageSearch, "Sand variant", "12 in stock"],
-                            [Sparkles, "Delivery estimate", "Thursday"],
-                          ].map(([Icon, label, status]) => {
-                            const SourceIcon = Icon as LucideIcon;
+                          {w.sources.map(({ label, status }, index) => {
+                            const SourceIcon = sourceIcons[index];
                             return (
                               <div
-                                key={label as string}
+                                key={label}
                                 className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.025] p-3"
                               >
                                 <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-300/10 text-violet-300">
                                   <SourceIcon className="h-4 w-4" aria-hidden="true" />
                                 </span>
                                 <span className="min-w-0 flex-1 text-xs text-zinc-300">
-                                  {label as string}
+                                  {label}
                                 </span>
                                 <span className="text-[10px] text-zinc-600">
-                                  {status as string}
+                                  {status}
                                 </span>
                               </div>
                             );
@@ -228,13 +195,13 @@ export function Workflow() {
                         <div className="w-full rounded-[1.5rem] border border-amber-300/15 bg-amber-300/[0.04] p-5">
                           <BrainCircuit className="h-7 w-7 text-amber-300" aria-hidden="true" />
                           <p className="mt-7 text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">
-                            Pattern found
+                            {w.patternFound}
                           </p>
                           <p className="mt-2 text-2xl font-semibold tracking-[-0.035em] text-white">
-                            Shipping confidence is blocking product decisions.
+                            {w.patternTitle}
                           </p>
                           <p className="mt-4 text-xs leading-5 text-zinc-500">
-                            Similar intent appeared in 18 recent conversations.
+                            {w.patternDetail}
                           </p>
                         </div>
                       ) : (
@@ -244,21 +211,20 @@ export function Workflow() {
                               <Check className="h-4 w-4" aria-hidden="true" />
                             </span>
                             <span className="text-[10px] font-semibold text-emerald-300">
-                              Ready to publish
+                              {w.readyToPublish}
                             </span>
                           </div>
                           <p className="mt-7 text-xs uppercase tracking-[0.18em] text-zinc-500">
-                            Suggested improvement
+                            {w.suggestedImprovement}
                           </p>
                           <p className="mt-2 text-xl font-semibold leading-7 text-white">
-                            Show the delivery promise on product pages and use it
-                            in recommendation replies.
+                            {w.improvementText}
                           </p>
                           <button
                             type="button"
                             className="mt-6 flex w-full items-center justify-between rounded-xl bg-white px-4 py-3 text-xs font-semibold text-black"
                           >
-                            Approve improvement
+                            {w.approve}
                             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                           </button>
                         </div>
@@ -267,7 +233,7 @@ export function Workflow() {
 
                     <div className="flex items-center gap-2 text-[10px] text-zinc-600">
                       <ActiveIcon className={`h-3.5 w-3.5 ${active.accent}`} aria-hidden="true" />
-                      Signal remains linked to the source conversation
+                      {w.linkedSignal}
                     </div>
                   </div>
                 </div>

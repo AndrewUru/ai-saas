@@ -3,12 +3,15 @@ import { z } from "zod";
 import { chatWithAgent, FALLBACK_AGENT_MODEL } from "@/lib/agents/chat-service";
 import { createAdmin } from "@/lib/supabase/admin";
 import { createServer } from "@/lib/supabase/server";
+import { getI18n } from "@/lib/i18n/server";
 
 const AGENT_MODEL = process.env.OPENAI_AGENT_MODEL ?? FALLBACK_AGENT_MODEL;
 
-const BodySchema = z.object({
-  message: z.string().trim().min(1, "Message is required.").max(2000),
-});
+function bodySchema(messageRequired: string) {
+  return z.object({
+    message: z.string().trim().min(1, messageRequired).max(2000),
+  });
+}
 
 type TestChatRouteContext = {
   params: Promise<{ id: string }>;
@@ -16,6 +19,8 @@ type TestChatRouteContext = {
 
 export async function POST(req: Request, context: TestChatRouteContext) {
   const { id } = await context.params;
+  const { locale, t } = await getI18n();
+  const e = t.api;
   const supabase = await createServer();
   const {
     data: { user },
@@ -23,20 +28,20 @@ export async function POST(req: Request, context: TestChatRouteContext) {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    return NextResponse.json({ error: "Not authenticated." }, { status: 401 });
+    return NextResponse.json({ error: e.notAuthenticated }, { status: 401 });
   }
 
   let body: unknown;
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+    return NextResponse.json({ error: e.invalidJson }, { status: 400 });
   }
 
-  const parsed = BodySchema.safeParse(body);
+  const parsed = bodySchema(e.messageRequired).safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid request." },
+      { error: parsed.error.issues[0]?.message ?? e.invalidRequest },
       { status: 400 },
     );
   }
@@ -49,12 +54,12 @@ export async function POST(req: Request, context: TestChatRouteContext) {
     .single();
 
   if (agentError || !agent) {
-    return NextResponse.json({ error: "Agent not found." }, { status: 404 });
+    return NextResponse.json({ error: e.agentNotFound }, { status: 404 });
   }
 
   if (!agent.api_key) {
     return NextResponse.json(
-      { error: "Agent is missing an API key." },
+      { error: e.agentMissingKey },
       { status: 409 },
     );
   }
@@ -84,6 +89,7 @@ export async function POST(req: Request, context: TestChatRouteContext) {
       currency,
       skipQuota: true,
       persistConversation: false,
+      locale,
     },
     {
       supabase: admin,

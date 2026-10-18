@@ -14,6 +14,7 @@ import {
   authPrimaryButtonClassName,
 } from "@/components/auth/AuthControls";
 import AuthExperience from "@/components/auth/AuthExperience";
+import { useI18n } from "@/lib/i18n/client";
 import { createClient } from "@/lib/supabase/client";
 
 type PendingAction = "password" | "magic" | "google" | null;
@@ -30,11 +31,14 @@ export default function SignupPage() {
   const [pending, setPending] = useState<PendingAction>(null);
   const [status, setStatus] = useState<AuthStatusValue>(null);
   const isBusy = pending !== null;
+  const { t } = useI18n();
+  const a = t.auth;
+  const s = a.signup;
 
   async function createAccount(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending("password");
-    setStatus({ intent: "info", message: "Creando tu espacio..." });
+    setStatus({ intent: "info", message: s.creating });
 
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -49,7 +53,7 @@ export default function SignupPage() {
       }
 
       if (data.session) {
-        setStatus({ intent: "success", message: "Tu cuenta está lista." });
+        setStatus({ intent: "success", message: s.ready });
         router.replace("/dashboard");
         router.refresh();
         return;
@@ -57,12 +61,12 @@ export default function SignupPage() {
 
       setStatus({
         intent: "success",
-        message: "Revisa tu email para confirmar la cuenta.",
+        message: s.confirmEmail,
       });
     } catch (error) {
       setStatus({
         intent: "error",
-        message: error instanceof Error ? error.message : "No se pudo crear la cuenta.",
+        message: error instanceof Error ? error.message : s.error,
       });
     } finally {
       setPending(null);
@@ -73,13 +77,13 @@ export default function SignupPage() {
     if (!email.trim()) {
       setStatus({
         intent: "error",
-        message: "Escribe tu email para crear la cuenta sin contraseña.",
+        message: s.magicNeedsEmail,
       });
       return;
     }
 
     setPending("magic");
-    setStatus({ intent: "info", message: "Enviando tu enlace seguro..." });
+    setStatus({ intent: "info", message: a.sendingLink });
 
     try {
       const { error } = await supabase.auth.signInWithOtp({
@@ -94,12 +98,12 @@ export default function SignupPage() {
 
       setStatus({
         intent: "success",
-        message: "Revisa tu email para terminar de crear la cuenta.",
+        message: s.magicSent,
       });
     } catch (error) {
       setStatus({
         intent: "error",
-        message: error instanceof Error ? error.message : "No se pudo enviar el enlace.",
+        message: error instanceof Error ? error.message : a.linkError,
       });
     } finally {
       setPending(null);
@@ -108,7 +112,7 @@ export default function SignupPage() {
 
   async function signUpWithGoogle() {
     setPending("google");
-    setStatus({ intent: "info", message: "Conectando con Google..." });
+    setStatus({ intent: "info", message: a.connectingGoogle });
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -123,46 +127,46 @@ export default function SignupPage() {
 
   return (
     <AuthExperience
-      eyebrow="Empieza ahora"
-      title="Crea tu espacio."
-      description="Una cuenta es todo lo que necesitas para diseñar, entrenar y publicar tu primer agente."
+      eyebrow={s.eyebrow}
+      title={s.title}
+      description={s.description}
       footer={
         <div className="space-y-4 text-center">
           <p className="text-[11px] leading-5 text-zinc-600">
-            Al continuar aceptas los{" "}
+            {s.termsPrefix}{" "}
             <Link href="/terms" className="hover:text-zinc-300">
-              términos
+              {s.terms}
             </Link>{" "}
-            y la{" "}
+            {s.termsAnd}{" "}
             <Link href="/privacy" className="hover:text-zinc-300">
-              política de privacidad
+              {s.privacy}
             </Link>
             .
           </p>
           <p className="text-sm text-zinc-500">
-            ¿Ya tienes una cuenta?{" "}
+            {s.hasAccount}{" "}
             <Link
               href="/login"
               className="font-semibold text-zinc-200 hover:text-violet-300"
             >
-              Entrar
+              {s.signIn}
             </Link>
           </p>
         </div>
       }
     >
       <GoogleAuthButton
-        label={pending === "google" ? "Conectando..." : "Continuar con Google"}
+        label={pending === "google" ? a.connecting : a.google}
         onClick={signUpWithGoogle}
         disabled={isBusy}
       />
 
-      <AuthDivider label="o crea tu cuenta con" />
+      <AuthDivider label={s.divider} />
 
       <form onSubmit={createAccount} className="space-y-4">
         <div>
           <label htmlFor="signup-email" className="mb-2 block text-xs font-semibold text-zinc-400">
-            Email de trabajo
+            {s.workEmail}
           </label>
           <div className="relative">
             <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" aria-hidden="true" />
@@ -171,7 +175,7 @@ export default function SignupPage() {
               type="email"
               autoComplete="email"
               required
-              placeholder="tu@empresa.com"
+              placeholder={a.emailPlaceholder}
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               className={`${authInputClassName} pl-11`}
@@ -181,7 +185,7 @@ export default function SignupPage() {
 
         <div>
           <label htmlFor="signup-password" className="mb-2 block text-xs font-semibold text-zinc-400">
-            Contraseña
+            {a.password}
           </label>
           <div className="relative">
             <LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-600" aria-hidden="true" />
@@ -191,7 +195,7 @@ export default function SignupPage() {
               autoComplete="new-password"
               minLength={8}
               required
-              placeholder="Mínimo 8 caracteres"
+              placeholder={s.passwordPlaceholder}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               className={`${authInputClassName} pl-11`}
@@ -205,7 +209,7 @@ export default function SignupPage() {
           aria-busy={pending === "password"}
           className={authPrimaryButtonClassName}
         >
-          {pending === "password" ? "Creando cuenta..." : "Crear cuenta"}
+          {pending === "password" ? s.submitting : s.submit}
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </button>
       </form>
@@ -218,7 +222,7 @@ export default function SignupPage() {
         className="mt-4 inline-flex w-full items-center justify-center gap-2 py-2 text-xs font-semibold text-zinc-500 transition hover:text-violet-300 disabled:opacity-50"
       >
         <WandSparkles className="h-3.5 w-3.5" aria-hidden="true" />
-        {pending === "magic" ? "Enviando enlace..." : "Crear sin contraseña"}
+        {pending === "magic" ? a.sendingLinkShort : s.magic}
       </button>
 
       <AuthStatus status={status} />

@@ -4,10 +4,8 @@ export type PlanConfig = {
   id: PlanId;
   name: string;
   price: string;
-  cycle: string;
   agentLimit: number;
   messageLimit: number;
-  features: string[];
 };
 
 export const PLAN_CONFIG: Record<PlanId, PlanConfig> = {
@@ -15,29 +13,15 @@ export const PLAN_CONFIG: Record<PlanId, PlanConfig> = {
     id: "free",
     name: "Free",
     price: "$0",
-    cycle: "per month",
     agentLimit: 5,
     messageLimit: 1000,
-    features: [
-      "Up to 5 agents",
-      "1,000 messages/month",
-      "Starter widget branding",
-      "Standard support",
-    ],
   },
   pro: {
     id: "pro",
     name: "Pro",
     price: "EUR 22",
-    cycle: "one-time",
     agentLimit: Number.POSITIVE_INFINITY,
     messageLimit: 10000,
-    features: [
-      "Unlimited agents",
-      "10,000 messages/month",
-      "Custom escalation routes",
-      "Advanced widget customization",
-    ],
   },
 };
 

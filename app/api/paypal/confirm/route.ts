@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
 import { createServer } from "@/lib/supabase/server";
 
 const PAYPAL_API =
@@ -36,13 +38,14 @@ function addDays(base: Date, days: number) {
 }
 
 export async function POST(req: Request) {
+  const e = getMessages(getRequestLocale(req)).api;
   try {
     const { orderID, expectedAmount, expectedCurrency } =
       await req.json();
 
     if (!orderID) {
       return NextResponse.json(
-        { ok: false, error: "orderID requerido" },
+        { ok: false, error: e.paypal.orderIdRequired },
         { status: 400 }
       );
     }
@@ -54,7 +57,7 @@ export async function POST(req: Request) {
     } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json(
-        { ok: false, error: "No autenticado" },
+        { ok: false, error: e.notAuthenticated },
         { status: 401 }
       );
     }
@@ -70,7 +73,7 @@ export async function POST(req: Request) {
     );
     if (!orderRes.ok) {
       return NextResponse.json(
-        { ok: false, error: "No se pudo verificar la orden" },
+        { ok: false, error: e.paypal.verifyFailed },
         { status: 400 }
       );
     }
@@ -78,7 +81,7 @@ export async function POST(req: Request) {
 
     if (order.status !== "COMPLETED") {
       return NextResponse.json(
-        { ok: false, error: "Pago no completado" },
+        { ok: false, error: e.paypal.notCompleted },
         { status: 400 }
       );
     }
@@ -92,7 +95,7 @@ export async function POST(req: Request) {
       (expectedCurrency && currency !== expectedCurrency)
     ) {
       return NextResponse.json(
-        { ok: false, error: "Importe o divisa no válidos" },
+        { ok: false, error: e.paypal.invalidAmount },
         { status: 400 }
       );
     }
@@ -130,7 +133,7 @@ export async function POST(req: Request) {
     if (upsertErr) {
       console.error(upsertErr);
       return NextResponse.json(
-        { ok: false, error: "DB upsert falló" },
+        { ok: false, error: e.paypal.dbUpsert },
         { status: 500 }
       );
     }
@@ -142,7 +145,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error(error);
     const message =
-      error instanceof Error ? error.message : "Error desconocido";
+      error instanceof Error ? error.message : e.unknown;
     return NextResponse.json(
       { ok: false, error: message },
       { status: 500 }

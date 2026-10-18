@@ -1,5 +1,9 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/requireUser";
+import { format, intlLocales, type Locale } from "@/lib/i18n/config";
+import type { Messages } from "@/lib/i18n/messages";
+import { getI18n } from "@/lib/i18n/server";
+import { rich } from "@/lib/i18n/rich";
 import SyncControls from "./SyncControls";
 import {
   createShopifyIntegration,
@@ -14,21 +18,16 @@ export const runtime = "nodejs";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-function statusMessage(status: string | null) {
+type PageText = Messages["integrationPages"];
+
+function statusMessage(status: string | null, ip: PageText) {
   switch (status) {
     case "created":
-      return {
-        intent: "success" as const,
-        text: "Integration created successfully.",
-      };
     case "updated":
-      return { intent: "success" as const, text: "Integration updated." };
     case "deleted":
-      return { intent: "success" as const, text: "Integration deleted." };
     case "sync_ok":
-      return { intent: "success" as const, text: "Sync completed." };
     case "test_ok":
-      return { intent: "success" as const, text: "Connection looks good." };
+      return { intent: "success" as const, text: ip.status[status] };
     default:
       return null;
   }
@@ -38,46 +37,46 @@ function errorMessage(
   error: string | null,
   status: number | null,
   code: string | null,
+  ip: PageText,
 ) {
+  const pe = ip.shopify.errors;
   if (error === "sync_failed") {
     const detailParts = [];
-    if (status) detailParts.push(`status ${status}`);
-    if (code) detailParts.push(`code ${code}`);
+    if (status) detailParts.push(format(ip.errors.details, { status }));
+    if (code) detailParts.push(format(ip.errors.detailsCode, { code }));
     const details = detailParts.length ? ` (${detailParts.join(", ")})` : "";
 
     if (status === 401) {
-      return "Token invalid or revoked. Reconnect the store." + details;
+      return pe.unauthorized + details;
     }
     if (status === 403) {
-      return "Missing access scope. Update scopes and reconnect." + details;
+      return pe.forbidden + details;
     }
     if (status === 404) {
-      return "Shop not found or invalid domain." + details;
+      return pe.notFound + details;
     }
     if (status === 429) {
-      return "Rate limit. Retry in a few minutes." + details;
+      return ip.errors.rateLimit + details;
     }
     if (status && status >= 500) {
-      return "Shopify returned a server error." + details;
+      return pe.server + details;
     }
-    return "Sync failed. Please verify the connection and try again." + details;
+    return pe.generic + details;
   }
 
   switch (error) {
     case "invalid":
-      return "Check the fields: there is invalid data.";
     case "db":
-      return "We could not save the changes. Please try again.";
     case "unexpected":
-      return "An unexpected error occurred while processing the integration.";
+      return ip.errors[error];
     default:
       return null;
   }
 }
 
-function formatSyncDate(value: string | null) {
-  if (!value) return "Not synced";
-  return new Intl.DateTimeFormat("en-US", {
+function formatSyncDate(value: string | null, locale: Locale, fallback: string) {
+  if (!value) return fallback;
+  return new Intl.DateTimeFormat(intlLocales[locale], {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
@@ -89,6 +88,8 @@ export default async function ShopifyIntegrationPage({
   searchParams: SearchParams;
 }) {
   const { supabase, user } = await requireUser();
+  const { locale, t } = await getI18n();
+  const ip = t.integrationPages;
 
   const params = await searchParams;
   const statusParam = typeof params.status === "string" ? params.status : null;
@@ -116,8 +117,8 @@ export default async function ShopifyIntegrationPage({
     throw new Error(error.message);
   }
 
-  const status = statusMessage(statusParam);
-  const errorMsg = errorMessage(errorParam, statusCode, codeParam);
+  const status = statusMessage(statusParam, ip);
+  const errorMsg = errorMessage(errorParam, statusCode, codeParam, ip);
 
   return (
     <main className="bg-slate-950 text-slate-100" data-oid="l05vp.j">
@@ -130,14 +131,13 @@ export default async function ShopifyIntegrationPage({
             className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="rvy:23u"
           >
-            Integrations
+            {ip.integrations}
           </p>
           <h1 className="text-3xl font-semibold sm:text-4xl" data-oid="bjx9ev_">
-            Manage your Shopify connections
+            {ip.shopify.title}
           </h1>
           <p className="text-sm text-slate-300 sm:text-base" data-oid="ecpzevn">
-            Store each shop token so your agents can answer with real-time
-            catalog data and availability.
+            {ip.shopify.intro}
           </p>
         </header>
 
@@ -166,17 +166,19 @@ export default async function ShopifyIntegrationPage({
             data-oid="6hip_83"
           >
             <h2 className="text-xl font-semibold text-white" data-oid="g5_kl6y">
-              Register new store
+              {ip.shopify.registerTitle}
             </h2>
             <p className="text-sm text-slate-300" data-oid="x9kqp8f">
-              Shopify OAuth tokens are encrypted with your{" "}
-              <code
-                className="rounded bg-slate-800 px-1 py-0.5 text-xs"
-                data-oid="zazeo.d"
-              >
-                CRED_ENC_KEY
-              </code>{" "}
-              and are never shown in full.
+              {rich(ip.shopify.encrypted, {
+                key: (
+                  <code
+                    className="rounded bg-slate-800 px-1 py-0.5 text-xs"
+                    data-oid="zazeo.d"
+                  >
+                    CRED_ENC_KEY
+                  </code>
+                ),
+              })}
             </p>
 
             <form
@@ -190,13 +192,13 @@ export default async function ShopifyIntegrationPage({
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                     data-oid="7eewf:9"
                   >
-                    Internal label
+                    {ip.internalLabel}
                   </span>
                   <input
                     name="label"
                     required
                     maxLength={80}
-                    placeholder="Main Shopify"
+                    placeholder={ip.shopify.labelPlaceholder}
                     className="w-full rounded-xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-400/40"
                     data-oid="_9_:qw5"
                   />
@@ -206,7 +208,7 @@ export default async function ShopifyIntegrationPage({
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                     data-oid="peexinv"
                   >
-                    Shop domain
+                    {ip.shopify.shopDomain}
                   </span>
                   <input
                     name="shop_domain"
@@ -230,7 +232,7 @@ export default async function ShopifyIntegrationPage({
                   className="h-4 w-4 rounded border border-slate-600 bg-transparent text-neutral-400 focus:ring-neutral-400"
                   data-oid="fzwbdjm"
                 />
-                Mark as active on creation
+                {ip.shopify.activeOnCreate}
               </label>
 
               <button
@@ -238,7 +240,7 @@ export default async function ShopifyIntegrationPage({
                 className="inline-flex w-full items-center justify-center rounded-full bg-neutral-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-neutral-300 sm:w-auto"
                 data-oid="5excbtm"
               >
-                Connect Shopify
+                {ip.shopify.connect}
               </button>
             </form>
 
@@ -247,21 +249,15 @@ export default async function ShopifyIntegrationPage({
               data-oid="2jwake5"
             >
               <p className="font-semibold text-slate-200" data-oid="qi5p_2k">
-                How does OAuth work?
+                {ip.shopify.oauthTitle}
               </p>
               <ol
                 className="mt-2 list-decimal space-y-1 pl-5"
                 data-oid="m3t2mzb"
               >
-                <li data-oid="wtj7nju">
-                  Enter the shop domain and click Connect Shopify.
-                </li>
-                <li data-oid="7e12try">
-                  You will be redirected to Shopify to approve access.
-                </li>
-                <li data-oid="qjqjtxu">
-                  After approval, the connection appears on the right list.
-                </li>
+                {ip.shopify.oauthSteps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
               </ol>
             </div>
           </section>
@@ -280,11 +276,10 @@ export default async function ShopifyIntegrationPage({
                     className="text-xl font-semibold text-white"
                     data-oid="-zap6zk"
                   >
-                    Registered integrations
+                    {ip.shopify.registeredTitle}
                   </h2>
                   <p className="mt-1 text-sm text-slate-300" data-oid=":4rott0">
-                    Assign these connections from the agent detail page to
-                    enable Shopify data.
+                    {ip.shopify.registeredIntro}
                   </p>
                 </div>
                 <Link
@@ -292,7 +287,7 @@ export default async function ShopifyIntegrationPage({
                   className="rounded-full border border-neutral-400/40 bg-neutral-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-neutral-200 transition hover:bg-neutral-500/20"
                   data-oid=":2i6-.c"
                 >
-                  View agents
+                  {ip.viewAgents}
                 </Link>
               </div>
 
@@ -331,7 +326,7 @@ export default async function ShopifyIntegrationPage({
                           ].join(" ")}
                           data-oid="fu_72:m"
                         >
-                          {integration.is_active ? "Active" : "Paused"}
+                          {integration.is_active ? ip.active : ip.paused}
                         </span>
                       </div>
 
@@ -343,7 +338,7 @@ export default async function ShopifyIntegrationPage({
                           className="cursor-pointer text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                           data-oid="pt4h29i"
                         >
-                          Edit integration
+                          {ip.shopify.editIntegration}
                         </summary>
                         <form
                           action={updateShopifyIntegration}
@@ -366,7 +361,7 @@ export default async function ShopifyIntegrationPage({
                                 className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                                 data-oid="y::gxr3"
                               >
-                                Internal label
+                                {ip.internalLabel}
                               </span>
                               <input
                                 name="label"
@@ -381,7 +376,7 @@ export default async function ShopifyIntegrationPage({
                                 className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                                 data-oid="wq7zt5g"
                               >
-                                Shop domain (reauth if changed)
+                                {ip.shopify.shopDomainReauth}
                               </span>
                               <input
                                 name="shop_domain"
@@ -405,7 +400,7 @@ export default async function ShopifyIntegrationPage({
                               className="h-4 w-4 rounded border border-slate-600 bg-transparent text-neutral-400 focus:ring-neutral-400"
                               data-oid="i9u7qeg"
                             />
-                            Keep active
+                            {ip.keepActive}
                           </label>
 
                           <div
@@ -417,7 +412,7 @@ export default async function ShopifyIntegrationPage({
                               className="inline-flex items-center justify-center rounded-full bg-neutral-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-neutral-300"
                               data-oid="jie6vfh"
                             >
-                              Save changes
+                              {ip.saveChanges}
                             </button>
                           </div>
                         </form>
@@ -436,6 +431,8 @@ export default async function ShopifyIntegrationPage({
                         }}
                         formattedLastSync={formatSyncDate(
                           integration.last_sync_at ?? null,
+                          locale,
+                          ip.notSynced,
                         )}
                         webhookUrl={null}
                         statusParam={statusParam}
@@ -456,11 +453,10 @@ export default async function ShopifyIntegrationPage({
                   data-oid="q86n69b"
                 >
                   <p className="font-medium text-white" data-oid="dxmb2ty">
-                    You have not connected any store yet.
+                    {ip.shopify.emptyTitle}
                   </p>
                   <p data-oid="c8i:zbi">
-                    Create your first integration using the steps on the left,
-                    then assign it to an agent from its detail page.
+                    {ip.shopify.emptyBody}
                   </p>
                 </div>
               )}

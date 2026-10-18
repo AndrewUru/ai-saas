@@ -3,12 +3,16 @@ import { getDefaultMessageLimit } from "@/lib/plans";
 import { getSubscription } from "@/lib/paypal";
 import { createAdmin } from "@/lib/supabase/admin";
 import { createServer } from "@/lib/supabase/server";
+import { format } from "@/lib/i18n/config";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
 
 const PRO_PAYPAL_PLAN_IDS = new Set(
   [process.env.PAYPAL_PLAN_PRO].filter(Boolean)
 );
 
 export async function POST(req: Request) {
+  const e = getMessages(getRequestLocale(req)).api;
   try {
     const { subscriptionID, plan: requestedPlan } = (await req.json()) as {
       subscriptionID: string;
@@ -16,7 +20,7 @@ export async function POST(req: Request) {
     };
     if (!subscriptionID) {
       return NextResponse.json(
-        { ok: false, error: "subscriptionID requerido" },
+        { ok: false, error: e.paypal.subscriptionIdRequired },
         { status: 400 }
       );
     }
@@ -27,7 +31,7 @@ export async function POST(req: Request) {
     } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json(
-        { ok: false, error: "No autenticado" },
+        { ok: false, error: e.notAuthenticated },
         { status: 401 }
       );
     }
@@ -39,7 +43,7 @@ export async function POST(req: Request) {
 
     if (!PRO_PAYPAL_PLAN_IDS.has(paypalPlanId)) {
       return NextResponse.json(
-        { ok: false, error: "Plan PayPal no reconocido" },
+        { ok: false, error: e.paypal.unknownPlan },
         { status: 400 }
       );
     }
@@ -47,7 +51,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           ok: false,
-          error: `Plan solicitado (${requestedPlan}) no coincide con PayPal`,
+          error: format(e.paypal.planMismatch, { plan: requestedPlan }),
         },
         { status: 400 }
       );
@@ -111,9 +115,9 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ ok: true, status });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "Error desconocido";
-    console.error(e);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : e.unknown;
+    console.error(err);
     return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }

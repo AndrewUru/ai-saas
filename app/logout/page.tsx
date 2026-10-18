@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { authSecondaryButtonClassName } from "@/components/auth/AuthControls";
 import AuthExperience from "@/components/auth/AuthExperience";
+import { useI18n } from "@/lib/i18n/client";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LogoutPage() {
@@ -13,6 +14,8 @@ export default function LogoutPage() {
   const supabase = useMemo(() => createClient(), []);
   const started = useRef(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useI18n();
+  const l = t.auth.logout;
 
   useEffect(() => {
     if (started.current) return;
@@ -35,13 +38,9 @@ export default function LogoutPage() {
 
   return (
     <AuthExperience
-      eyebrow="Sesión segura"
-      title={error ? "No pudimos cerrar la sesión." : "Cerrando tu sesión."}
-      description={
-        error
-          ? "Tu sesión sigue activa. Puedes intentarlo de nuevo sin perder ningún cambio."
-          : "Estamos protegiendo tu cuenta antes de volver al inicio."
-      }
+      eyebrow={l.eyebrow}
+      title={error ? l.titleError : l.title}
+      description={error ? l.descriptionError : l.description}
     >
       {error ? (
         <div className="space-y-4">
@@ -56,7 +55,7 @@ export default function LogoutPage() {
             onClick={() => window.location.reload()}
             className={authSecondaryButtonClassName}
           >
-            Intentar de nuevo
+            {l.retry}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
@@ -67,7 +66,7 @@ export default function LogoutPage() {
               <LoaderCircle className="h-5 w-5" aria-hidden="true" />
             </span>
           </span>
-          Guardando el estado de tu espacio...
+          {l.saving}
         </div>
       )}
     </AuthExperience>

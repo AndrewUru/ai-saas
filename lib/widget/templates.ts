@@ -239,6 +239,31 @@ export function getWidgetTemplate(
   return widgetTemplateMap.get(templateId) ?? widgetTemplates[0];
 }
 
+/** Textos traducibles de un preset (nombre, descripción y copy del widget). */
+export type WidgetTemplateCopy = Pick<WidgetTemplate, "name" | "description"> &
+  Pick<
+    WidgetTemplateSettings,
+    | "brandName"
+    | "collapsedLabel"
+    | "greeting"
+    | "humanSupportText"
+    | "bubbleSubtitle"
+  >;
+
+export function localizeWidgetTemplate(
+  template: WidgetTemplate,
+  copy?: WidgetTemplateCopy,
+): WidgetTemplate {
+  if (!copy) return template;
+  const { name, description, ...settingsCopy } = copy;
+  return {
+    ...template,
+    name,
+    description,
+    settings: { ...template.settings, ...settingsCopy },
+  };
+}
+
 export function applyWidgetTemplate(
   current: Partial<WidgetTemplateSettings>,
   templateId: WidgetTemplateId,

@@ -10,6 +10,7 @@ import {
   getConsentFromBrowser,
   setConsentInBrowser,
 } from "@/lib/cookies/consent";
+import { useI18n } from "@/lib/i18n/client";
 
 type Mode = "banner" | "settings" | "hidden";
 
@@ -19,6 +20,8 @@ const bannerOffset =
 export default function CookieBanner() {
   const [mode, setMode] = useState<Mode>("hidden");
   const [consent, setConsent] = useState<ConsentState>(defaultConsent);
+  const { t } = useI18n();
+  const c = t.cookies;
 
   useEffect(() => {
     const stored = getConsentFromBrowser();
@@ -66,7 +69,7 @@ export default function CookieBanner() {
 
   return (
     <aside
-      aria-label="Cookie consent"
+      aria-label={c.ariaLabel}
       className={`fixed left-3 right-3 ${bannerOffset} z-[70] sm:left-5 sm:right-auto sm:w-[min(430px,calc(100vw-40px))]`}
     >
       <div className="ui-card ui-card--strong overflow-hidden border-accent/20 bg-background/90 shadow-[0_22px_60px_rgba(0,0,0,0.45)]">
@@ -81,12 +84,10 @@ export default function CookieBanner() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-foreground">
-                      Cookies y privacidad
+                      {c.title}
                     </p>
                     <p className="mt-1 text-xs leading-5 text-[var(--foreground-muted)]">
-                      Usamos cookies necesarias para que la app funcione. Con tu
-                      permiso, tambien usamos analitica y marketing para mejorar
-                      la experiencia.
+                      {c.description}
                     </p>
                   </div>
 
@@ -94,7 +95,7 @@ export default function CookieBanner() {
                     type="button"
                     onClick={rejectAll}
                     className="ui-button ui-button--subtle -mr-2 -mt-2 h-9 w-9 shrink-0 p-0"
-                    aria-label="Cerrar y usar solo cookies necesarias"
+                    aria-label={c.closeAria}
                   >
                     <X className="h-4 w-4" aria-hidden="true" />
                   </button>
@@ -106,7 +107,7 @@ export default function CookieBanner() {
                     onClick={acceptAll}
                     className="ui-button ui-button--primary h-10 flex-1 px-4 text-sm"
                   >
-                    Aceptar todo
+                    {c.acceptAll}
                   </button>
                   <button
                     type="button"
@@ -114,7 +115,7 @@ export default function CookieBanner() {
                     className="ui-button ui-button--secondary h-10 flex-1 px-4 text-sm"
                   >
                     <Settings2 className="h-4 w-4" aria-hidden="true" />
-                    Configurar
+                    {c.configure}
                   </button>
                 </div>
 
@@ -124,13 +125,13 @@ export default function CookieBanner() {
                     onClick={rejectAll}
                     className="font-medium underline decoration-border underline-offset-4 transition hover:text-foreground"
                   >
-                    Solo necesarias
+                    {c.onlyNecessary}
                   </button>
                   <Link
                     href="/privacy"
                     className="font-medium underline decoration-border underline-offset-4 transition hover:text-foreground"
                   >
-                    Politica de privacidad
+                    {c.privacyPolicy}
                   </Link>
                 </div>
               </div>
@@ -145,10 +146,10 @@ export default function CookieBanner() {
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-foreground">
-                    Preferencias de cookies
+                    {c.preferencesTitle}
                   </p>
                   <p className="mt-1 text-xs leading-5 text-[var(--foreground-muted)]">
-                    Puedes activar solo las categorias que quieras.
+                    {c.preferencesDescription}
                   </p>
                 </div>
               </div>
@@ -157,7 +158,7 @@ export default function CookieBanner() {
                 type="button"
                 onClick={() => setMode("banner")}
                 className="ui-button ui-button--subtle -mr-2 -mt-2 h-9 w-9 shrink-0 p-0"
-                aria-label="Volver al resumen de cookies"
+                aria-label={c.backAria}
               >
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -165,23 +166,23 @@ export default function CookieBanner() {
 
             <div className="mt-4 space-y-2">
               <CookieRow
-                title="Necesarias"
-                desc="Imprescindibles para sesion, seguridad y preferencias basicas."
+                title={c.necessaryTitle}
+                desc={c.necessaryDesc}
                 checked
                 disabled
                 onChange={() => {}}
               />
               <CookieRow
-                title="Analitica"
-                desc="Nos ayuda a medir uso y detectar friccion en la experiencia."
+                title={c.analyticsTitle}
+                desc={c.analyticsDesc}
                 checked={consent.analytics}
                 onChange={(analytics) =>
                   setConsent((current) => ({ ...current, analytics }))
                 }
               />
               <CookieRow
-                title="Marketing"
-                desc="Permite personalizar campanas y medir conversiones."
+                title={c.marketingTitle}
+                desc={c.marketingDesc}
                 checked={consent.marketing}
                 onChange={(marketing) =>
                   setConsent((current) => ({ ...current, marketing }))
@@ -195,14 +196,14 @@ export default function CookieBanner() {
                 onClick={rejectAll}
                 className="ui-button ui-button--secondary h-10 flex-1 px-4 text-sm"
               >
-                Rechazar todo
+                {c.rejectAll}
               </button>
               <button
                 type="button"
                 onClick={() => save(consent)}
                 className="ui-button ui-button--primary h-10 flex-1 px-4 text-sm"
               >
-                Guardar preferencias
+                {c.savePreferences}
               </button>
             </div>
           </div>

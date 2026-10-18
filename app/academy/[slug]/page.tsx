@@ -8,13 +8,15 @@ import {
   getAdjacentPosts,
   getAllAcademyPosts,
 } from "@/lib/academy";
+import { defaultLocale, format } from "@/lib/i18n/config";
+import { getI18n } from "@/lib/i18n/server";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
-  const posts = await getAllAcademyPosts(false);
+  const posts = await getAllAcademyPosts(defaultLocale, false);
   return posts.map((post) => ({ slug: post.slug }));
 }
 
@@ -22,14 +24,15 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getAcademyPostBySlug(slug);
+  const { locale, t } = await getI18n();
+  const post = await getAcademyPostBySlug(slug, locale);
 
   if (!post) {
-    return { title: "Academy" };
+    return { title: t.academy.meta.title };
   }
 
   return {
-    title: `${post.title} | Academy`,
+    title: `${post.title} | ${t.academy.meta.title}`,
     description: post.description,
     openGraph: {
       title: post.title,
@@ -43,13 +46,14 @@ export async function generateMetadata({
 
 export default async function AcademyPostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = await getAcademyPostBySlug(slug);
+  const { locale, t } = await getI18n();
+  const post = await getAcademyPostBySlug(slug, locale);
 
   if (!post) {
     notFound();
   }
 
-  const { previous, next } = await getAdjacentPosts(slug);
+  const { previous, next } = await getAdjacentPosts(slug, locale);
 
   return (
     <main className="bg-slate-950 text-slate-100" data-oid="qjhrsny">
@@ -63,7 +67,7 @@ export default async function AcademyPostPage({ params }: PageProps) {
             className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="w8sq9hf"
           >
-            ← Back to Academy
+            {t.academy.post.back}
           </Link>
 
           <header className="space-y-3" data-oid="2atalqr">
@@ -71,7 +75,7 @@ export default async function AcademyPostPage({ params }: PageProps) {
               className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400"
               data-oid="5tua4:1"
             >
-              {post.level} -{" "}
+              {t.academy.levels[post.level]} -{" "}
               <time dateTime={post.date} data-oid="1xtjh2n">
                 {post.dateLabel}
               </time>
@@ -119,7 +123,7 @@ export default async function AcademyPostPage({ params }: PageProps) {
               className="rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 transition hover:border-neutral-400/40 hover:text-neutral-200"
               data-oid="i2piie:"
             >
-              ← Previous: {previous.title}
+              {format(t.academy.post.previous, { title: previous.title })}
             </Link>
           ) : (
             <span data-oid="3o4uxhh" />
@@ -130,7 +134,7 @@ export default async function AcademyPostPage({ params }: PageProps) {
               className="rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-sm text-slate-200 transition hover:border-neutral-400/40 hover:text-neutral-200"
               data-oid="k9rq740"
             >
-              Next: {next.title} →
+              {format(t.academy.post.next, { title: next.title })}
             </Link>
           ) : null}
         </div>

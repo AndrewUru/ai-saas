@@ -1,7 +1,17 @@
-import React from "react";
 import { Mail, Zap, ArrowRight } from "lucide-react";
+import type { Metadata } from "next";
 
-export default function ContactPage() {
+import { getI18n } from "@/lib/i18n/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.contact.meta.title };
+}
+
+export default async function ContactPage() {
+  const { t } = await getI18n();
+  const c = t.contact;
+
   return (
     // Cambio: Fondo negro profundo (#050505) con selección de texto personalizada
     <main
@@ -27,22 +37,21 @@ export default function ContactPage() {
             className="inline-flex items-center rounded-full border border-neutral-500/20 bg-neutral-500/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-neutral-400 backdrop-blur-sm"
             data-oid="i9ki1b5"
           >
-            Agency Support
+            {c.badge}
           </div>
 
           <h1
             className="text-4xl font-bold tracking-tight text-white sm:text-5xl"
             data-oid="ua.kuaa"
           >
-            Let’s talk about your{" "}
+            {c.titleStart}{" "}
             <span className="text-neutral-400" data-oid="83imacs">
-              implementation
+              {c.titleHighlight}
             </span>
           </h1>
 
           <p className="max-w-2xl text-lg text-neutral-400" data-oid="kenlqwd">
-            Reach out to resolve technical questions, prepare client demos, or
-            discuss enterprise plans tailored to your needs.
+            {c.intro}
           </p>
         </header>
 
@@ -61,14 +70,13 @@ export default function ContactPage() {
             </div>
 
             <h2 className="text-xl font-bold text-white" data-oid="zvirg2_">
-              Email support
+              {c.emailTitle}
             </h2>
             <p
               className="mt-2 text-sm text-neutral-400 leading-relaxed"
               data-oid="0xdcvcy"
             >
-              Send your inquiry including the store URL and the number of agents
-              you plan to deploy.
+              {c.emailBody}
             </p>
 
             <div className="mt-8" data-oid="0z:zys3">
@@ -105,21 +113,20 @@ export default function ContactPage() {
             </div>
 
             <h2 className="text-xl font-bold text-white" data-oid="z:g8_mj">
-              Book a strategy session
+              {c.sessionTitle}
             </h2>
             <p
               className="mt-2 text-sm text-neutral-400 leading-relaxed"
               data-oid="w51j2x5"
             >
-              We run integration workshops and prompt audits with your team.
-              Request a session via email or dashboard.
+              {c.sessionBody}
             </p>
 
             <div
               className="mt-8 flex items-center gap-2 text-sm font-medium text-neutral-500"
               data-oid="p0gxbot"
             >
-              <span data-oid="sn158m-">Available via Dashboard</span>
+              <span data-oid="sn158m-">{c.sessionAvailability}</span>
             </div>
           </div>
         </div>

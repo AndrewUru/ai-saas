@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { agentListSchema } from "@/lib/contracts/agent";
 import { createServer } from "@/lib/supabase/server";
+import { getI18n } from "@/lib/i18n/server";
 
 export async function GET() {
+  const e = (await getI18n()).t.api;
   const supabase = await createServer();
 
   const {
@@ -11,7 +13,7 @@ export async function GET() {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    return NextResponse.json({ error: e.notAuthenticated }, { status: 401 });
   }
 
   const { data, error } = await supabase
@@ -22,14 +24,14 @@ export async function GET() {
 
   if (error) {
     return NextResponse.json(
-      { error: "Could not load agents" },
+      { error: e.couldNotLoadAgents },
       { status: 500 }
     );
   }
 
   const parsed = agentListSchema.safeParse(data ?? []);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid agent data" }, { status: 500 });
+    return NextResponse.json({ error: e.invalidAgentData }, { status: 500 });
   }
 
   return NextResponse.json(parsed.data);

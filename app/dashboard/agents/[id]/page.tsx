@@ -13,6 +13,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/requireUser";
+import { format, intlLocales } from "@/lib/i18n/config";
+import { rich } from "@/lib/i18n/rich";
+import { getI18n } from "@/lib/i18n/server";
 import SubmitButton from "@/components/SubmitButton";
 import AgentSimulator from "./AgentSimulator";
 import KnowledgeSection from "./KnowledgeSection";
@@ -26,13 +29,7 @@ import {
   sanitizePosition,
 } from "@/lib/widget/defaults";
 
-const LANGUAGE_OPTIONS = [
-  { value: "auto", label: "Automatic detection" },
-  { value: "es", label: "Spanish" },
-  { value: "en", label: "English" },
-  { value: "pt", label: "Portuguese" },
-  { value: "fr", label: "French" },
-];
+const LANGUAGE_VALUES = ["auto", "es", "en", "pt", "fr"] as const;
 
 // --- Utilities -------------------------------------------------------------
 function toHostname(raw: string): string | null {
@@ -439,6 +436,8 @@ export default async function AgentDetailPage({
   const resolvedSearchParams = await searchParams;
 
   const { supabase, user } = await requireUser();
+  const { locale, t } = await getI18n();
+  const d = t.agentDetail;
 
   let { data: agent, error: agentError } = await supabase
     .from("agents")
@@ -484,12 +483,12 @@ export default async function AgentDetailPage({
   const errorKey = typeof errorParam === "string" ? errorParam : null;
 
   const errorMessages: Record<string, string> = {
-    integration: "The selected integration does not belong to your account.",
-    integration_inactive: "The selected integration is inactive.",
-    save_all: "We could not save your changes. Please try again.",
+    integration: d.errors.integration,
+    integration_inactive: d.errors.integration_inactive,
+    save_all: d.errors.save_all,
   };
 
-  const statusLabel = agent.is_active ? "Active" : "Paused";
+  const statusLabel = agent.is_active ? t.dashCommon.active : t.dashCommon.paused;
   const allowedDomains = agent.allowed_domains ?? [];
   const promptSystemValue = agent.prompt_system ?? "";
   const languageValue = agent.language ?? "auto";
@@ -497,12 +496,12 @@ export default async function AgentDetailPage({
   const descriptionFallback = agent.description ?? "";
 
   const createdAt = agent.created_at
-    ? new Intl.DateTimeFormat("en-US", {
+    ? new Intl.DateTimeFormat(intlLocales[locale], {
         day: "2-digit",
         month: "long",
         year: "numeric",
       }).format(new Date(agent.created_at))
-    : "Unknown date";
+    : d.unknownDate;
 
   const selectedWooIntegration = (wooIntegrations ?? []).find(
     (integration) => integration.id === agent.woo_integration_id,
@@ -517,7 +516,7 @@ export default async function AgentDetailPage({
     : selectedShopifyIntegration
       ? selectedShopifyIntegration.label?.trim() ||
         selectedShopifyIntegration.shop_domain
-      : "No catalog connected";
+      : d.noCatalog;
   const selectedIntegrationActive = selectedIntegration?.is_active ?? false;
   const indexedProducts = selectedIntegration?.products_indexed_count ?? 0;
   const hasCatalog = Boolean(selectedIntegration);
@@ -563,16 +562,22 @@ export default async function AgentDetailPage({
     (completionCount / completionItems.length) * 100,
   );
   const nextStep = !agent.is_active
-    ? "Activate this agent"
+    ? d.nextSteps.activate
     : !hasCatalog
-      ? "Connect a catalog"
+      ? d.nextSteps.catalog
       : !hasDomains
-        ? "Add allowed domains"
+        ? d.nextSteps.domains
         : !hasPrompt
-          ? "Add agent instructions"
+          ? d.nextSteps.prompt
           : !hasWidgetCopy
-            ? "Customize widget copy"
-            : "Install the widget";
+            ? d.nextSteps.copy
+            : d.nextSteps.install;
+  const numberFormat = intlLocales[locale];
+  const integrationLink = (href: string) => (
+    <Link href={href} className="text-neutral-300 hover:text-neutral-200">
+      {d.integrationsLink}
+    </Link>
+  );
 
   return (
     <main className="min-h-screen text-slate-100">
@@ -583,7 +588,7 @@ export default async function AgentDetailPage({
               <Link
                 href={AGENTS_BASE}
                 className="ui-button ui-button--subtle h-10 w-10 p-0"
-                aria-label="Back to agents"
+                aria-label={d.backToAgents}
               >
                 <ArrowLeft className="h-4 w-4" />
               </Link>
@@ -602,8 +607,7 @@ export default async function AgentDetailPage({
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-slate-400">
-                  Use the left sidebar to move between setup, widget design,
-                  knowledge, simulator, and install.
+                  {d.headerHint}
                 </p>
               </div>
             </div>
@@ -614,25 +618,25 @@ export default async function AgentDetailPage({
               href={`${AGENTS_BASE}/${agent.id}/widget`}
               className="ui-button ui-button--secondary"
             >
-              Edit widget
+              {d.editWidget}
             </Link>
             <Link
               href={`${AGENTS_BASE}/${agent.id}/install`}
               className="ui-button ui-button--primary"
             >
-              Publish
+              {d.publish}
             </Link>
           </div>
         </header>
 
         {saved ? (
           <div className="ui-alert ui-alert--success">
-            Changes saved successfully.
+            {d.saved}
           </div>
         ) : null}
         {errorKey ? (
           <div className="ui-alert ui-alert--error">
-            {errorMessages[errorKey] ?? "An unexpected error occurred."}
+            {errorMessages[errorKey] ?? d.errors.unexpected}
           </div>
         ) : null}
 
@@ -645,45 +649,48 @@ export default async function AgentDetailPage({
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-white">
-                    I opened a widget draft in the canvas.
+                    {d.draftTitle}
                   </p>
                   <p className="mt-1 text-xs leading-5 text-slate-400">
-                    Edit the copy, colors, behavior, catalog, knowledge, and
-                    publish checklist without leaving this conversation.
+                    {d.draftBody}
                   </p>
                 </div>
               </div>
 
               <div className="mt-4 grid gap-2 text-sm">
                 <StatusRow
-                  label="Catalog"
+                  label={d.status.catalog}
                   value={selectedIntegrationName}
                   good={hasCatalog && selectedIntegrationActive}
                 />
                 <StatusRow
-                  label="Domains"
-                  value={hasDomains ? `${allowedDomains.length} allowed` : "Open"}
+                  label={d.status.domains}
+                  value={
+                    hasDomains
+                      ? format(d.status.domainsAllowed, { count: allowedDomains.length })
+                      : d.status.open
+                  }
                   good={hasDomains}
                 />
                 <StatusRow
-                  label="Messages"
-                  value={agent.messages_limit?.toLocaleString("en-US") ?? "Not set"}
+                  label={d.status.messages}
+                  value={agent.messages_limit?.toLocaleString(numberFormat) ?? d.status.notSet}
                   good={Boolean(agent.messages_limit)}
                 />
-                <StatusRow label="Created" value={createdAt} good />
+                <StatusRow label={d.status.created} value={createdAt} good />
               </div>
             </article>
 
             <nav
-              aria-label="Agent editor sections"
+              aria-label={d.editorNavAria}
               className="rounded-3xl border border-border bg-surface/35 p-3"
             >
               <div className="px-2 pb-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-200">
-                  Editor
+                  {d.editor}
                 </p>
                 <p className="mt-1 text-xs leading-5 text-slate-400">
-                  Widget design now lives in its own focused screen.
+                  {d.editorHint}
                 </p>
               </div>
 
@@ -691,43 +698,43 @@ export default async function AgentDetailPage({
                 <SidebarLink
                   href={`${AGENTS_BASE}/${agent.id}`}
                   icon={Brain}
-                  label="Agent setup"
-                  description="Rules, integrations, domains, and escalation."
+                  label={d.sidebar.setup.label}
+                  description={d.sidebar.setup.description}
                   active
                 />
                 <SidebarLink
                   href={`${AGENTS_BASE}/${agent.id}/widget`}
                   icon={Palette}
-                  label="Widget editor"
+                  label={d.sidebar.widget.label}
                   description={
                     hasWidgetCopy || hasWidgetColors
-                      ? "Copy or colors have custom settings."
-                      : "Customize copy, colors, position, and preview."
+                      ? d.sidebar.widget.custom
+                      : d.sidebar.widget.description
                   }
                 />
                 <SidebarLink
                   href={`${AGENTS_BASE}/${agent.id}/analytics`}
                   icon={BarChart3}
-                  label="Analytics"
-                  description="Traffic, opens, interactions, and words."
+                  label={d.sidebar.analytics.label}
+                  description={d.sidebar.analytics.description}
                 />
                 <SidebarLink
                   href={`${AGENTS_BASE}/${agent.id}/knowledge`}
                   icon={BookOpen}
-                  label="Knowledge"
-                  description="Upload product and support context."
+                  label={d.sidebar.knowledge.label}
+                  description={d.sidebar.knowledge.description}
                 />
                 <SidebarLink
                   href={`${AGENTS_BASE}/${agent.id}/simulator`}
                   icon={MessageSquare}
-                  label="Simulator"
-                  description="Test replies before publishing."
+                  label={d.sidebar.simulator.label}
+                  description={d.sidebar.simulator.description}
                 />
                 <SidebarLink
                   href={`${AGENTS_BASE}/${agent.id}/install`}
                   icon={Rocket}
-                  label="Install"
-                  description="Copy the production snippet."
+                  label={d.sidebar.install.label}
+                  description={d.sidebar.install.description}
                 />
               </div>
             </nav>
@@ -744,17 +751,17 @@ export default async function AgentDetailPage({
             <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-t-3xl border-b border-border bg-background/90 px-4 py-3 backdrop-blur-md sm:px-5">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-200">
-                  Setup
+                  {d.setup}
                 </p>
                 <h2 className="truncate text-lg font-semibold text-white">
-                  Agent editor
+                  {d.agentEditor}
                 </h2>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-slate-300">
-                  {completionPercent}% ready
+                  {format(d.ready, { percent: completionPercent })}
                 </span>
-                <SubmitButton label="Save canvas" />
+                <SubmitButton label={d.saveCanvas} />
               </div>
             </div>
 
@@ -763,23 +770,21 @@ export default async function AgentDetailPage({
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-200">
-                      Workspace
+                      {d.workspace}
                     </p>
                     <p className="mt-1 text-sm text-neutral-50">
-                      Configure the assistant here. Open the widget editor from
-                      the left sidebar when you want to tune the customer-facing
-                      launcher and preview.
+                      {d.workspaceBody}
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-xs text-neutral-100/75">
-                      Next: {nextStep}
+                      {format(d.next, { step: nextStep })}
                     </p>
                     <Link
                       href={`${AGENTS_BASE}/${agent.id}/widget`}
                       className="rounded-full border border-neutral-300/35 bg-neutral-300/10 px-3 py-1.5 text-xs font-semibold text-neutral-50 transition hover:bg-neutral-300/20"
                     >
-                      Edit widget
+                      {d.editWidget}
                     </Link>
                   </div>
                 </div>
@@ -787,9 +792,9 @@ export default async function AgentDetailPage({
 
               <section className="rounded-2xl border border-slate-800/80 p-5">
                 <SectionHeading
-                  eyebrow="Behavior"
-                  title="Assistant rules"
-                  description="Tune the core instructions next to the widget draft."
+                  eyebrow={d.behavior}
+                  title={d.rulesTitle}
+                  description={d.rulesDescription}
                 />
               <div className="mt-5 space-y-5">
                 <div className="space-y-2" data-oid="1:fz-w-">
@@ -798,7 +803,7 @@ export default async function AgentDetailPage({
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                     data-oid="3pgz8dj"
                   >
-                    WooCommerce integration
+                    {d.wooIntegration}
                   </label>
                   <select
                     id="woo-integration"
@@ -808,7 +813,7 @@ export default async function AgentDetailPage({
                     data-oid="xwo.-f7"
                   >
                     <option value="none" data-oid="0v5v70x">
-                      No integration
+                      {d.noIntegration}
                     </option>
                     {(wooIntegrations ?? []).map((integration) => {
                       const label =
@@ -818,8 +823,8 @@ export default async function AgentDetailPage({
                       const syncLabel =
                         integration.last_sync_status === "success" &&
                         indexedCount > 0
-                          ? `indexed ${indexedCount}`
-                          : "not indexed";
+                          ? format(d.indexed, { count: indexedCount })
+                          : d.notIndexed;
                       return (
                         <option
                           key={integration.id}
@@ -827,21 +832,13 @@ export default async function AgentDetailPage({
                           data-oid="pkj188g"
                         >
                           {label} - {syncLabel}{" "}
-                          {integration.is_active ? "" : "(inactive)"}
+                          {integration.is_active ? "" : d.inactive}
                         </option>
                       );
                     })}
                   </select>
                   <p className="text-xs text-slate-500" data-oid="ec9k2tu">
-                    Manage your WooCommerce credentials from{" "}
-                    <Link
-                      href="/integrations/woo"
-                      className="text-neutral-300 hover:text-neutral-200"
-                      data-oid="7.y9isq"
-                    >
-                      Integrations
-                    </Link>
-                    .
+                    {rich(d.manageWoo, { link: integrationLink("/integrations/woo") })}
                   </p>
                 </div>
 
@@ -851,7 +848,7 @@ export default async function AgentDetailPage({
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                     data-oid="dm1pc3c"
                   >
-                    Shopify integration
+                    {d.shopifyIntegration}
                   </label>
                   <select
                     id="shopify-integration"
@@ -861,7 +858,7 @@ export default async function AgentDetailPage({
                     data-oid=":.mz4qy"
                   >
                     <option value="none" data-oid="b_zx3c_">
-                      No integration
+                      {d.noIntegration}
                     </option>
                     {(shopifyIntegrations ?? []).map((integration) => {
                       const label =
@@ -871,8 +868,8 @@ export default async function AgentDetailPage({
                       const syncLabel =
                         integration.last_sync_status === "success" &&
                         indexedCount > 0
-                          ? `indexed ${indexedCount}`
-                          : "not indexed";
+                          ? format(d.indexed, { count: indexedCount })
+                          : d.notIndexed;
                       return (
                         <option
                           key={integration.id}
@@ -880,21 +877,13 @@ export default async function AgentDetailPage({
                           data-oid="6paed6w"
                         >
                           {label} - {syncLabel}{" "}
-                          {integration.is_active ? "" : "(inactive)"}
+                          {integration.is_active ? "" : d.inactive}
                         </option>
                       );
                     })}
                   </select>
                   <p className="text-xs text-slate-500" data-oid="ww_uvw9">
-                    Manage your Shopify credentials from{" "}
-                    <Link
-                      href="/integrations/shopify"
-                      className="text-neutral-300 hover:text-neutral-200"
-                      data-oid="ce3adea"
-                    >
-                      Integrations
-                    </Link>
-                    .
+                    {rich(d.manageShopify, { link: integrationLink("/integrations/shopify") })}
                   </p>
                 </div>
 
@@ -904,15 +893,14 @@ export default async function AgentDetailPage({
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                     data-oid="ons7xg4"
                   >
-                    Agent instructions (prompt)
+                    {d.promptLabel}
                   </label>
                   <textarea
                     id="prompt-system"
                     name="prompt_system"
                     defaultValue={promptSystemValue}
                     placeholder={
-                      descriptionFallback ||
-                      "Describe tone, policies, and objectives for the agent."
+                      descriptionFallback || d.promptPlaceholder
                     }
                     rows={5}
                     className="ui-input"
@@ -920,8 +908,7 @@ export default async function AgentDetailPage({
                   />
 
                   <p className="text-xs text-slate-500" data-oid=".msit-m">
-                    This text is sent as the system prompt to the model. Use
-                    variables, the desired tone, and brand guardrails.
+                    {d.promptHelp}
                   </p>
                 </div>
 
@@ -931,7 +918,7 @@ export default async function AgentDetailPage({
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                     data-oid="yjzbpy_"
                   >
-                    Preferred response language
+                    {d.languageLabel}
                   </label>
                   <select
                     id="language"
@@ -940,19 +927,14 @@ export default async function AgentDetailPage({
                     className="ui-input"
                     data-oid="rugrt2_"
                   >
-                    {LANGUAGE_OPTIONS.map((option) => (
-                      <option
-                        key={option.value}
-                        value={option.value}
-                        data-oid="m-avm:b"
-                      >
-                        {option.label}
+                    {LANGUAGE_VALUES.map((value) => (
+                      <option key={value} value={value} data-oid="m-avm:b">
+                        {d.languages[value]}
                       </option>
                     ))}
                   </select>
                   <p className="text-xs text-slate-500" data-oid="0q.y24n">
-                    With automatic detection, the model adapts the response to
-                    the customer&apos;s language.
+                    {d.languageHelp}
                   </p>
                 </div>
 
@@ -962,7 +944,7 @@ export default async function AgentDetailPage({
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                     data-oid="an8t:z9"
                   >
-                    Fallback URL (optional)
+                    {d.fallbackLabel}
                   </label>
                   <input
                     id="fallback-url"
@@ -976,8 +958,7 @@ export default async function AgentDetailPage({
                   />
 
                   <p className="text-xs text-slate-500" data-oid="2nyqjet">
-                    Use a contact page, WhatsApp link, or Telegram link for
-                    human escalation.
+                    {d.fallbackHelp}
                   </p>
                 </div>
 
@@ -987,7 +968,7 @@ export default async function AgentDetailPage({
                     className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400"
                     data-oid="ds0xspz"
                   >
-                    Allowed domains (optional)
+                    {d.domainsLabel}
                   </label>
                   <input
                     id="allowed-domains"
@@ -999,12 +980,11 @@ export default async function AgentDetailPage({
                   />
 
                   <p className="text-xs text-slate-500" data-oid="vmqk_:.">
-                    Separate each domain with commas. If left empty, the widget
-                    can load from any origin.
+                    {d.domainsHelp}
                   </p>
                   {!!allowedDomains.length && (
                     <p className="text-xs text-slate-400" data-oid="c8jvf_7">
-                      Current domains:{" "}
+                      {d.currentDomains}{" "}
                       <span
                         className="font-mono text-neutral-200"
                         data-oid="s7mgxhf"
@@ -1026,59 +1006,63 @@ export default async function AgentDetailPage({
                   </span>
                   <div>
                     <h2 className="text-lg font-semibold text-white">
-                      Publication checklist
+                      {d.checklistTitle}
                     </h2>
                     <p className="text-xs text-slate-400">
-                      {completionCount} of {completionItems.length} complete
+                      {format(d.checklistProgress, { done: completionCount, total: completionItems.length })}
                     </p>
                   </div>
                 </div>
                 <ol className="mt-4 space-y-2">
                   <ChecklistItem
                     done={agent.is_active}
-                    title="Agent active"
+                    title={d.checklist.active.title}
                     detail={
                       agent.is_active
-                        ? "This agent can respond to widget requests."
-                        : "Activate it before installing on a live store."
+                        ? d.checklist.active.done
+                        : d.checklist.active.todo
                     }
                   />
                   <ChecklistItem
                     done={hasCatalog && selectedIntegrationActive}
-                    title="Catalog connected"
+                    title={d.checklist.catalog.title}
                     detail={
                       hasCatalog
                         ? selectedIntegrationActive
-                          ? `${indexedProducts.toLocaleString("en-US")} products available.`
-                          : "Selected integration is inactive."
-                        : "Select WooCommerce or Shopify."
+                          ? format(d.checklist.catalog.done, {
+                              count: indexedProducts.toLocaleString(numberFormat),
+                            })
+                          : d.checklist.catalog.inactive
+                        : d.checklist.catalog.todo
                     }
                   />
                   <ChecklistItem
                     done={hasDomains}
-                    title="Domains allowed"
+                    title={d.checklist.domains.title}
                     detail={
                       hasDomains
-                        ? `${allowedDomains.length} domain${allowedDomains.length === 1 ? "" : "s"} configured.`
-                        : "Add the production storefront domain."
+                        ? allowedDomains.length === 1
+                          ? d.checklist.domains.doneOne
+                          : format(d.checklist.domains.doneMany, { count: allowedDomains.length })
+                        : d.checklist.domains.todo
                     }
                   />
                   <ChecklistItem
                     done={hasPrompt}
-                    title="Instructions set"
+                    title={d.checklist.prompt.title}
                     detail={
                       hasPrompt
-                        ? "Tone and policy guidance are configured."
-                        : "Add support rules and brand tone."
+                        ? d.checklist.prompt.done
+                        : d.checklist.prompt.todo
                     }
                   />
                   <ChecklistItem
                     done={hasWidgetCopy}
-                    title="Widget customized"
+                    title={d.checklist.widget.title}
                     detail={
                       hasWidgetCopy
-                        ? "Visible widget text has been adjusted."
-                        : "Tune greeting, label, and subtitle."
+                        ? d.checklist.widget.done
+                        : d.checklist.widget.todo
                     }
                   />
                 </ol>
@@ -1096,22 +1080,18 @@ export default async function AgentDetailPage({
                     className="text-lg font-semibold text-white"
                     data-oid="qdyz.rq"
                   >
-                    Operating notes
+                    {d.notesTitle}
                   </h3>
                 </div>
                 <div className="mt-4 grid gap-3 text-xs text-slate-400">
-                  <p className="rounded-xl border border-slate-800 bg-slate-950/35 p-3">
-                    One agent per store or language keeps catalog answers and
-                    tone more predictable.
-                  </p>
-                  <p className="rounded-xl border border-slate-800 bg-slate-950/35 p-3">
-                    Rotate the install key by creating a new agent if access is
-                    ever exposed.
-                  </p>
-                  <p className="rounded-xl border border-slate-800 bg-slate-950/35 p-3">
-                    Watch message limits before seasonal campaigns or product
-                    launches.
-                  </p>
+                  {d.notes.map((note) => (
+                    <p
+                      key={note}
+                      className="rounded-xl border border-slate-800 bg-slate-950/35 p-3"
+                    >
+                      {note}
+                    </p>
+                  ))}
                 </div>
               </article>
             </div>

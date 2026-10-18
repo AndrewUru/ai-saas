@@ -4,6 +4,8 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { generateAgentApiKey } from "@/lib/agents/keys";
+import type { Messages } from "@/lib/i18n/messages";
+import { getI18n } from "@/lib/i18n/server";
 import { createServer } from "@/lib/supabase/server";
 import { safeFilename, normalizeText, chunkText } from "@/lib/knowledge/text";
 import { extractTextFromPdf, extractTextFromCsv } from "@/lib/knowledge/extract";
@@ -57,7 +59,8 @@ type OwnedAgentRow = { id: string; user_id: string };
 async function getOwnedAgent(
   supabase: Awaited<ReturnType<typeof createServer>>,
   agentId: string,
-  userId: string
+  userId: string,
+  e: Messages["errors"]
 ): Promise<ActionResult<{ agent: OwnedAgentRow }>> {
   const { data: agent, error } = await supabase
     .from("agents")
@@ -66,10 +69,10 @@ async function getOwnedAgent(
     .single();
 
   if (error || !agent) {
-    return { ok: false as const, error: "Agent not found." };
+    return { ok: false as const, error: e.agentNotFound };
   }
   if (agent.user_id !== userId) {
-    return { ok: false as const, error: "Unauthorized for this agent." };
+    return { ok: false as const, error: e.unauthorizedAgent };
   }
 
   return { ok: true as const, agent };
@@ -98,13 +101,14 @@ function toSafeFileResponse(row: AgentFileRow): AgentFileResponse {
 export async function saveAgentSettings(
   formData: FormData
 ): Promise<ActionResult> {
+  const e = (await getI18n()).t.errors;
   try {
     const supabase = await createServer();
 
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return { ok: false, error: "No autenticado" };
+    if (!user) return { ok: false, error: e.notAuthenticated };
 
     const parsed = Schema.safeParse({
       id: String(formData.get("id") ?? ""),
@@ -116,7 +120,7 @@ export async function saveAgentSettings(
     if (!parsed.success) {
       return {
         ok: false,
-        error: "Datos inválidos",
+        error: e.invalidData,
         issues: parsed.error.flatten(),
       };
     }
@@ -138,9 +142,9 @@ export async function saveAgentSettings(
       .eq("id", id)
       .single();
 
-    if (qErr || !agent) return { ok: false, error: "Agente no encontrado" };
+    if (qErr || !agent) return { ok: false, error: e.agentNotFound };
     if (agent.user_id !== user.id)
-      return { ok: false, error: "Sin permiso sobre el agente" };
+      return { ok: false, error: e.unauthorizedAgent };
 
     // Update: requiere política RLS de UPDATE correcta
     const { error: updErr } = await supabase
@@ -153,7 +157,7 @@ export async function saveAgentSettings(
 
     if (updErr) {
       console.error("Supabase update error:", updErr);
-      return { ok: false, error: updErr.message || "No se pudo guardar" };
+      return { ok: false, error: updErr.message || e.couldNotSave };
     }
 
     // opcional: revalidatePath(`/agents/${id}`);
@@ -163,7 +167,7 @@ export async function saveAgentSettings(
   } catch (error) {
     console.error(error);
     const message =
-      error instanceof Error ? error.message : "Error desconocido";
+      error instanceof Error ? error.message : e.unknown;
     return { ok: false, error: message };
   }
 }
@@ -171,19 +175,20 @@ export async function saveAgentSettings(
 export async function rotateAgentApiKey(
   agentId: string
 ): Promise<ActionResult<{ apiKeySuffix: string }>> {
+  const e = (await getI18n()).t.errors;
   try {
     const parsedAgentId = RotateApiKeySchema.safeParse(agentId);
     if (!parsedAgentId.success) {
-      return { ok: false, error: "Invalid agent id." };
+      return { ok: false, error: e.invalidAgentId };
     }
 
     const supabase = await createServer();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return { ok: false, error: "Not authenticated." };
+    if (!user) return { ok: false, error: e.notAuthenticated };
 
-    const owned = await getOwnedAgent(supabase, parsedAgentId.data, user.id);
+    const owned = await getOwnedAgent(supabase, parsedAgentId.data, user.id, e);
     if (!owned.ok) return { ok: false, error: owned.error };
 
     for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -206,15 +211,15 @@ export async function rotateAgentApiKey(
 
       if (error.code !== "23505") {
         console.error("Supabase rotate key error:", error);
-        return { ok: false, error: error.message || "Could not rotate key." };
+        return { ok: false, error: error.message || e.couldNotRotate };
       }
     }
 
-    return { ok: false, error: "Could not generate a unique key." };
+    return { ok: false, error: e.uniqueKey };
   } catch (error) {
     console.error(error);
     const message =
-      error instanceof Error ? error.message : "Unexpected error.";
+      error instanceof Error ? error.message : e.unexpected;
     return { ok: false, error: message };
   }
 }
@@ -222,14 +227,15 @@ export async function rotateAgentApiKey(
 export async function listAgentFiles(
   agentId: string
 ): Promise<ActionResult<{ files: AgentFileResponse[] }>> {
+  const e = (await getI18n()).t.errors;
   try {
     const supabase = await createServer();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return { ok: false, error: "Not authenticated." };
+    if (!user) return { ok: false, error: e.notAuthenticated };
 
-    const owned = await getOwnedAgent(supabase, agentId, user.id);
+    const owned = await getOwnedAgent(supabase, agentId, user.id, e);
     if (!owned.ok) return { ok: false, error: owned.error };
 
     const { data, error } = await supabase
@@ -248,7 +254,7 @@ export async function listAgentFiles(
   } catch (error) {
     console.error(error);
     const message =
-      error instanceof Error ? error.message : "Unexpected error.";
+      error instanceof Error ? error.message : e.unexpected;
     return { ok: false, error: message };
   }
 }
@@ -257,28 +263,29 @@ export async function uploadAgentFile(
   agentId: string,
   formData: FormData
 ): Promise<ActionResult<{ file: AgentFileResponse }>> {
+  const e = (await getI18n()).t.errors;
   try {
     const supabase = await createServer();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return { ok: false, error: "Not authenticated." };
+    if (!user) return { ok: false, error: e.notAuthenticated };
 
-    const owned = await getOwnedAgent(supabase, agentId, user.id);
+    const owned = await getOwnedAgent(supabase, agentId, user.id, e);
     if (!owned.ok) return { ok: false, error: owned.error };
 
     const file = formData.get("file");
     if (!(file instanceof File)) {
-      return { ok: false, error: "No file uploaded." };
+      return { ok: false, error: e.noFile };
     }
 
     if (file.size > MAX_FILE_BYTES) {
-      return { ok: false, error: "File exceeds 10MB limit." };
+      return { ok: false, error: e.fileTooLarge };
     }
 
     const typeCheck = isAllowedFileType(file);
     if (!typeCheck.ok) {
-      return { ok: false, error: "Only PDF or CSV files are supported." };
+      return { ok: false, error: e.fileType };
     }
 
     const safeName = safeFilename(file.name);
@@ -299,7 +306,7 @@ export async function uploadAgentFile(
 
     if (insertError || !inserted) {
       console.error("Supabase insert file error:", insertError);
-      return { ok: false, error: insertError?.message ?? "Insert failed" };
+      return { ok: false, error: insertError?.message ?? e.insertFailed };
     }
 
     // 2) Deterministic path
@@ -337,14 +344,14 @@ export async function uploadAgentFile(
     if (updateError || !updated) {
       console.error("Supabase update file error:", updateError);
       // Return the real error message if possible
-      return { ok: false, error: updateError.message || "File uploaded, but update failed." };
+      return { ok: false, error: updateError?.message || e.uploadUpdateFailed };
     }
 
     return { ok: true, file: toSafeFileResponse(updated as AgentFileRow) };
   } catch (error) {
     console.error(error);
     const message =
-      error instanceof Error ? error.message : "Unexpected error.";
+      error instanceof Error ? error.message : e.unexpected;
     return { ok: false, error: message };
   }
 }
@@ -353,13 +360,14 @@ export async function processAgentFile(
   agentId: string,
   fileId: string
 ): Promise<ActionResult> {
+  const e = (await getI18n()).t.errors;
   const supabase = await createServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Not authenticated." };
+  if (!user) return { ok: false, error: e.notAuthenticated };
 
-  const owned = await getOwnedAgent(supabase, agentId, user.id);
+  const owned = await getOwnedAgent(supabase, agentId, user.id, e);
   if (!owned.ok) return { ok: false, error: owned.error };
 
   const { data: file, error: fileError } = await supabase
@@ -370,11 +378,11 @@ export async function processAgentFile(
     .single();
 
   if (fileError || !file) {
-    return { ok: false, error: "File not found." };
+    return { ok: false, error: e.fileNotFound };
   }
 
   if (!file.storage_path) {
-    return { ok: false, error: "File is missing a storage path." };
+    return { ok: false, error: e.missingStoragePath };
   }
 
   const { error: statusError } = await supabase
@@ -395,7 +403,7 @@ export async function processAgentFile(
   try {
     const openaiApiKey = process.env.OPENAI_API_KEY;
     if (!openaiApiKey) {
-      throw new Error("Missing OPENAI_API_KEY for embeddings.");
+      throw new Error(e.missingOpenAiKey);
     }
 
     const { data: storedFile, error: downloadError } = await supabase.storage
@@ -403,7 +411,7 @@ export async function processAgentFile(
       .download(file.storage_path);
 
     if (downloadError || !storedFile) {
-      throw new Error(downloadError?.message || "Failed to download file.");
+      throw new Error(downloadError?.message || e.downloadFailed);
     }
 
     const buffer = Buffer.from(await storedFile.arrayBuffer());
@@ -413,7 +421,7 @@ export async function processAgentFile(
     const isCsv = lowerName.endsWith(".csv") || mimeType.includes("csv");
 
     if (!isPdf && !isCsv) {
-      throw new Error("Unsupported file type.");
+      throw new Error(e.unsupportedType);
     }
 
     const rawText = isPdf
@@ -427,7 +435,7 @@ export async function processAgentFile(
     });
 
     if (!chunks.length) {
-      throw new Error("No usable text found in the file.");
+      throw new Error(e.noText);
     }
 
     const embeddings: number[][] = [];
@@ -438,7 +446,7 @@ export async function processAgentFile(
     }
 
     if (embeddings.length !== chunks.length) {
-      throw new Error("Embedding count mismatch.");
+      throw new Error(e.embeddingMismatch);
     }
 
     const { error: deleteError } = await supabase
@@ -487,7 +495,7 @@ export async function processAgentFile(
   } catch (error) {
     console.error(error);
     const message =
-      error instanceof Error ? error.message : "Processing failed.";
+      error instanceof Error ? error.message : e.processingFailed;
     await supabase
       .from("agent_files")
       .update({
@@ -505,14 +513,15 @@ export async function deleteAgentFile(
   agentId: string,
   fileId: string
 ): Promise<ActionResult> {
+  const e = (await getI18n()).t.errors;
   try {
     const supabase = await createServer();
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return { ok: false, error: "Not authenticated." };
+    if (!user) return { ok: false, error: e.notAuthenticated };
 
-    const owned = await getOwnedAgent(supabase, agentId, user.id);
+    const owned = await getOwnedAgent(supabase, agentId, user.id, e);
     if (!owned.ok) return { ok: false, error: owned.error };
 
     const { data: file, error: fileError } = await supabase
@@ -523,7 +532,7 @@ export async function deleteAgentFile(
       .single();
 
     if (fileError || !file) {
-      return { ok: false, error: "File not found." };
+      return { ok: false, error: e.fileNotFound };
     }
 
     if (file.storage_path) {
@@ -559,7 +568,7 @@ export async function deleteAgentFile(
   } catch (error) {
     console.error(error);
     const message =
-      error instanceof Error ? error.message : "Unexpected error.";
+      error instanceof Error ? error.message : e.unexpected;
     return { ok: false, error: message };
   }
 }

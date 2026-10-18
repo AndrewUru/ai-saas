@@ -3,6 +3,8 @@
 import { Sparkles } from "lucide-react";
 import { useFormStatus } from "react-dom";
 
+import { useI18n } from "@/lib/i18n/client";
+
 type SubmitButtonProps = {
   label: string;
   className?: string;
@@ -14,6 +16,7 @@ function cx(...classes: Array<string | false | null | undefined>) {
 
 export default function SubmitButton({ label, className }: SubmitButtonProps) {
   const { pending } = useFormStatus();
+  const { t } = useI18n();
 
   return (
     <button
@@ -33,7 +36,7 @@ export default function SubmitButton({ label, className }: SubmitButtonProps) {
           <Sparkles className="h-3.5 w-3.5" />
         </span>
       ) : null}
-      <span data-oid=":8wy4dg">{pending ? "Saving\u2026" : label}</span>
+      <span data-oid=":8wy4dg">{pending ? t.auth.saving : label}</span>
     </button>
   );
 }

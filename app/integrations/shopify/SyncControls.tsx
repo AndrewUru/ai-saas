@@ -4,6 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 
+import { useI18n } from "@/lib/i18n/client";
+import { format } from "@/lib/i18n/config";
+
+const PROVIDER = "Shopify";
+
 type ServerAction = (formData: FormData) => Promise<void> | void;
 
 type IntegrationSummary = {
@@ -97,13 +102,15 @@ export default function SyncControls({
   const [isTesting, setIsTesting] = useState(false);
   const [progress, setProgress] = useState(0);
   const wasSyncingRef = useRef(false);
+  const { t } = useI18n();
+  const s = t.integrationPages.sync;
 
   const globalDisabled = isSyncing || isTesting;
   const syncStatusLabel = useMemo(() => {
-    if (isSyncing) return "Syncing...";
-    if (integration.last_sync_status === "running") return "Syncing...";
-    return integration.last_sync_status ?? "Not synced";
-  }, [integration.last_sync_status, isSyncing]);
+    if (isSyncing) return s.syncing;
+    if (integration.last_sync_status === "running") return s.syncing;
+    return integration.last_sync_status ?? t.integrationPages.notSynced;
+  }, [integration.last_sync_status, isSyncing, s, t]);
 
   const shouldShowToast =
     syncTargetId === integration.id &&
@@ -111,8 +118,8 @@ export default function SyncControls({
 
   const toastText =
     statusParam === "sync_ok"
-      ? `Products imported: ${integration.products_indexed_count ?? 0}.`
-      : "Sync failed. Review the error details and retry.";
+      ? format(s.imported, { count: integration.products_indexed_count ?? 0 })
+      : s.failed;
 
   const toastTone =
     statusParam === "sync_ok"
@@ -121,8 +128,8 @@ export default function SyncControls({
 
   const syncLabel =
     integration.last_sync_status === "failed"
-      ? "Retry sync"
-      : "Sync products now";
+      ? s.retry
+      : s.syncNow;
 
   useEffect(() => {
     if (!isSyncing) return;
@@ -174,7 +181,7 @@ export default function SyncControls({
             className="text-xs uppercase tracking-[0.22em] text-slate-400"
             data-oid="6xhb9x4"
           >
-            Sync status
+            {s.status}
           </span>
           <span className="text-xs font-semibold text-white" data-oid="ztknyjb">
             {syncStatusLabel}
@@ -188,7 +195,7 @@ export default function SyncControls({
             className="text-xs uppercase tracking-[0.22em] text-slate-400"
             data-oid="-pm_--_"
           >
-            Products indexed
+            {s.productsIndexed}
           </span>
           <span className="text-xs font-semibold text-white" data-oid="_kulcju">
             {integration.products_indexed_count ?? 0}
@@ -202,7 +209,7 @@ export default function SyncControls({
             className="text-xs uppercase tracking-[0.22em] text-slate-400"
             data-oid="a6fkzq9"
           >
-            Last sync
+            {s.lastSync}
           </span>
           <span className="text-xs font-semibold text-white" data-oid="--rcmfb">
             {formattedLastSync}
@@ -222,12 +229,11 @@ export default function SyncControls({
             >
               <Spinner data-oid="hsm_vni" />
               <span className="text-xs font-semibold" data-oid="kr74uhw">
-                Syncing...
+                {s.syncing}
               </span>
             </div>
             <p className="text-xs text-slate-400" data-oid="623ddru">
-              Importing products from Shopify to Supabase. This can take a few
-              minutes.
+              {format(s.importing, { provider: PROVIDER })}
             </p>
           </div>
         )}
@@ -245,7 +251,7 @@ export default function SyncControls({
               />
             </div>
             <p className="text-[11px] text-slate-500" data-oid="7oksc0m">
-              Estimated progress {Math.round(progress)}%
+              {format(s.progress, { percent: Math.round(progress) })}
             </p>
           </div>
         )}
@@ -282,7 +288,7 @@ export default function SyncControls({
               className="text-[10px] uppercase tracking-[0.2em] text-slate-500"
               data-oid="kuyg1_j"
             >
-              Webhook URL
+              {s.webhookUrl}
             </p>
             <p
               className="mt-1 break-all font-mono text-[11px] text-neutral-200"
@@ -314,7 +320,7 @@ export default function SyncControls({
           />
 
           <PendingButton
-            label={integration.is_active ? "Pause" : "Activate"}
+            label={integration.is_active ? s.pause : s.activate}
             disabled={globalDisabled}
             className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-neutral-400/60 hover:text-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
             data-oid=".m:qbi3"
@@ -330,8 +336,8 @@ export default function SyncControls({
           />
 
           <PendingButton
-            label="Test connection"
-            pendingLabel="Testing..."
+            label={s.test}
+            pendingLabel={s.testing}
             disabled={globalDisabled}
             onPendingChange={setIsTesting}
             className="inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 font-semibold text-slate-200 transition hover:border-neutral-400/60 hover:text-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
@@ -349,7 +355,7 @@ export default function SyncControls({
 
           <PendingButton
             label={syncLabel}
-            pendingLabel="Syncing..."
+            pendingLabel={s.syncing}
             disabled={globalDisabled}
             onPendingChange={setIsSyncing}
             className="inline-flex items-center justify-center rounded-full border border-neutral-400/40 bg-neutral-500/10 px-4 py-2 font-semibold text-neutral-200 transition hover:border-neutral-400/70 hover:bg-neutral-500/20 disabled:cursor-not-allowed disabled:opacity-60"
@@ -366,7 +372,7 @@ export default function SyncControls({
           />
 
           <PendingButton
-            label="Delete"
+            label={s.delete}
             disabled={globalDisabled}
             className="inline-flex items-center justify-center rounded-full border border-rose-500/40 px-4 py-2 font-semibold text-rose-200 transition hover:border-rose-400 hover:text-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
             data-oid="8_6c0h5"

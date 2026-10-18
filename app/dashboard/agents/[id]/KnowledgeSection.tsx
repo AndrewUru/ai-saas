@@ -20,6 +20,9 @@ import {
   processAgentFile,
   uploadAgentFile,
 } from "./actions";
+import { useI18n } from "@/lib/i18n/client";
+import { intlLocales, type Locale } from "@/lib/i18n/config";
+import type { Messages } from "@/lib/i18n/messages";
 
 type ListFilesResult = Awaited<ReturnType<typeof listAgentFiles>>;
 type AgentFileItem = Extract<ListFilesResult, { ok: true }>["files"][number];
@@ -31,12 +34,7 @@ type Notice = {
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
-const STATUS_LABELS: Record<string, string> = {
-  uploaded: "Uploaded",
-  processing: "Indexing",
-  ready: "Ready",
-  failed: "Failed",
-};
+type KnowledgeText = Messages["knowledge"];
 
 const STATUS_STYLES: Record<string, string> = {
   uploaded: "border-border bg-surface text-slate-200",
@@ -52,8 +50,8 @@ const STATUS_ICONS = {
   failed: AlertCircle,
 };
 
-function formatBytes(bytes: number | null) {
-  if (!bytes && bytes !== 0) return "Unknown size";
+function formatBytes(bytes: number | null, unknown: string) {
+  if (!bytes && bytes !== 0) return unknown;
   if (bytes < 1024) return `${bytes} B`;
   const kb = bytes / 1024;
   if (kb < 1024) return `${kb.toFixed(1)} KB`;
@@ -61,23 +59,27 @@ function formatBytes(bytes: number | null) {
   return `${mb.toFixed(1)} MB`;
 }
 
-function formatDate(value: string | null) {
-  if (!value) return "Unknown date";
-  return new Intl.DateTimeFormat("en-US", {
+function formatDate(value: string | null, locale: Locale, unknown: string) {
+  if (!value) return unknown;
+  return new Intl.DateTimeFormat(intlLocales[locale], {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
 }
 
-function validateFile(file: File, existingNames: string[]) {
+function validateFile(
+  file: File,
+  existingNames: string[],
+  v: KnowledgeText["validation"],
+) {
   const lowerName = file.name.toLowerCase();
   const lowerType = file.type.toLowerCase();
   const isPdf = lowerName.endsWith(".pdf") || lowerType.includes("pdf");
   const isCsv = lowerName.endsWith(".csv") || lowerType.includes("csv");
-  if (!isPdf && !isCsv) return "Only PDF or CSV files are allowed.";
-  if (file.size > MAX_FILE_BYTES) return "File too large (max 10MB).";
+  if (!isPdf && !isCsv) return v.type;
+  if (file.size > MAX_FILE_BYTES) return v.size;
   if (existingNames.includes(lowerName)) {
-    return "A file with this name already exists.";
+    return v.duplicate;
   }
   return null;
 }
@@ -101,6 +103,12 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
   const [autoProcess, setAutoProcess] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const { locale, t } = useI18n();
+  const k = t.knowledge;
+  const STATUS_LABELS: Record<string, string> = k.status;
+  const sizeLabel = (bytes: number | null) => formatBytes(bytes, k.unknownSize);
+  const dateLabel = (value: string | null) =>
+    formatDate(value, locale, k.unknownDate);
 
   const refreshFiles = useCallback(
     async (silent = false) => {
@@ -192,7 +200,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
       }
 
       const existingNames = files.map((item) => item.filename.toLowerCase());
-      const error = validateFile(file, existingNames);
+      const error = validateFile(file, existingNames, k.validation);
       if (error) {
         setNotice({ type: "error", message: error });
         setSelectedFile(null);
@@ -203,7 +211,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
       setNotice(null);
       setSelectedFile(file);
     },
-    [files],
+    [files, k.validation],
   );
 
   const handleUpload = async () => {
@@ -211,13 +219,13 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
     if (!file) {
       setNotice({
         type: "error",
-        message: "Select a PDF or CSV file to upload.",
+        message: k.validation.select,
       });
       return;
     }
 
     const existingNames = files.map((item) => item.filename.toLowerCase());
-    const validationError = validateFile(file, existingNames);
+    const validationError = validateFile(file, existingNames, k.validation);
     if (validationError) {
       setNotice({ type: "error", message: validationError });
       return;
@@ -240,10 +248,10 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
     if (autoProcess) {
       setNotice({
         type: "success",
-        message: "Upload complete. Indexing started.",
+        message: k.notices.uploadedIndexing,
       });
     } else {
-      setNotice({ type: "success", message: "File uploaded successfully." });
+      setNotice({ type: "success", message: k.notices.uploaded });
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
     setSelectedFile(null);
@@ -275,7 +283,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
     }
 
     if (!options?.silentSuccess) {
-      setNotice({ type: "success", message: "File indexed successfully." });
+      setNotice({ type: "success", message: k.notices.indexed });
     }
     await refreshFiles(true);
   };
@@ -292,7 +300,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
       return;
     }
 
-    setNotice({ type: "success", message: "File deleted." });
+    setNotice({ type: "success", message: k.notices.deleted });
     setConfirmDeleteId(null);
     await refreshFiles(true);
   };
@@ -305,12 +313,12 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
             <Database className="h-5 w-5" aria-hidden="true" />
           </span>
           <div className="min-w-0">
-            <p className="ui-badge">Knowledge</p>
+            <p className="ui-badge">{k.badge}</p>
             <h2 className="mt-2 text-xl font-semibold text-white">
-              Knowledge files
+              {k.title}
             </h2>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-300">
-              Upload PDFs or CSVs that improve answers with your store data.
+              {k.intro}
             </p>
           </div>
         </div>
@@ -359,14 +367,12 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
               </span>
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-white">
-                  {selectedFile ? "File selected" : "Drop your file here"}
+                  {selectedFile ? k.fileSelected : k.dropHere}
                 </p>
                 <p className="mt-1 break-words text-xs leading-5 text-slate-400">
                   {selectedFile
-                    ? `${selectedFile.name} - ${formatBytes(
-                        selectedFile.size,
-                      )}`
-                    : "PDF or CSV up to 10MB. Click to browse."}
+                    ? `${selectedFile.name} - ${sizeLabel(selectedFile.size)}`
+                    : k.dropHint}
                 </p>
               </div>
             </div>
@@ -378,7 +384,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
               }}
               className="ui-button ui-button--secondary h-9 shrink-0 px-3 text-xs"
             >
-              {selectedFile ? "Change file" : "Browse"}
+              {selectedFile ? k.changeFile : k.browse}
             </button>
           </div>
           {selectedFile && (
@@ -392,7 +398,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 transition hover:text-slate-200"
               >
                 <X className="h-3.5 w-3.5" aria-hidden="true" />
-                Remove
+                {k.remove}
               </button>
             </div>
           )}
@@ -408,7 +414,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
           ) : (
             <Upload className="h-4 w-4" aria-hidden="true" />
           )}
-          {uploading ? "Uploading..." : "Upload"}
+          {uploading ? k.uploading : k.upload}
         </button>
       </div>
 
@@ -420,10 +426,10 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
             onChange={(event) => setAutoProcess(event.target.checked)}
             className="h-4 w-4 rounded border-border bg-background text-accent focus:ring-accent/40"
           />
-          Index automatically after upload
+          {k.autoIndex}
         </label>
         <span className="text-slate-500">
-          Max file size 10MB. Supported formats: PDF, CSV.
+          {k.limits}
         </span>
       </div>
 
@@ -451,7 +457,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
             type="button"
             onClick={dismissNotice}
             className="rounded-full p-1 text-current/70 transition hover:bg-current/10 hover:text-current"
-            aria-label="Dismiss notice"
+            aria-label={k.dismiss}
           >
             <X className="h-4 w-4" aria-hidden="true" />
           </button>
@@ -462,38 +468,38 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
         {loading && (
           <p className="flex items-center gap-2 rounded-2xl border border-border bg-surface/35 px-4 py-3 text-sm text-slate-400">
             <Loader2 className="ui-loader-icon h-4 w-4" aria-hidden="true" />
-            Loading knowledge files...
+            {k.loadingFiles}
           </p>
         )}
         {!loading && files.length === 0 && (
           <div className="rounded-2xl border border-dashed border-border bg-surface/25 px-4 py-6 text-center">
             <Database className="mx-auto h-5 w-5 text-slate-500" />
             <p className="mt-2 text-sm font-semibold text-white">
-              No knowledge files yet
+              {k.emptyTitle}
             </p>
             <p className="mt-1 text-xs text-slate-400">
-              Upload a PDF or CSV to give this agent more context.
+              {k.emptyBody}
             </p>
           </div>
         )}
         {!loading && files.length > 0 && (
           <div className="hidden grid-cols-[minmax(0,2.4fr)_minmax(0,0.7fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] gap-3 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 sm:grid">
-            <span>File</span>
-            <span>Size</span>
-            <span>Uploaded</span>
-            <span>Status</span>
-            <span className="text-right">Actions</span>
+            <span>{k.columns.file}</span>
+            <span>{k.columns.size}</span>
+            <span>{k.columns.uploaded}</span>
+            <span>{k.columns.status}</span>
+            <span className="text-right">{k.columns.actions}</span>
           </div>
         )}
         {files.map((file) => {
           const statusKey = (file.status ?? "uploaded").toLowerCase();
-          const statusLabel = STATUS_LABELS[statusKey] ?? "Unknown";
+          const statusLabel = STATUS_LABELS[statusKey] ?? k.status.unknown;
           const statusStyle =
             STATUS_STYLES[statusKey] ?? STATUS_STYLES.uploaded;
           const isProcessing = !!processing[file.id];
           const isDeleting = !!deleting[file.id];
           const isBusy = isProcessing || isDeleting || uploading;
-          const processLabel = statusKey === "ready" ? "Re-index" : "Process";
+          const processLabel = statusKey === "ready" ? k.reindex : k.process;
           const isIndexing = statusKey === "processing" || isProcessing;
           const StatusIcon =
             STATUS_ICONS[statusKey as keyof typeof STATUS_ICONS] ?? FileText;
@@ -511,10 +517,10 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                   </p>
                 </div>
                 <p className="text-xs text-slate-400">
-                  {formatBytes(file.size_bytes)}
+                  {sizeLabel(file.size_bytes)}
                 </p>
                 <p className="text-xs text-slate-400">
-                  {formatDate(file.created_at)}
+                  {dateLabel(file.created_at)}
                 </p>
                 <div>
                   <span
@@ -534,7 +540,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                         <div className="absolute inset-y-0 w-1/2 animate-pulse rounded-full bg-amber-400/70" />
                       </div>
                       <p className="text-[11px] text-slate-400">
-                        Indexing can take 30-90s
+                        {k.indexingHint}
                       </p>
                     </div>
                   )}
@@ -554,7 +560,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                     ) : (
                       <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
                     )}
-                    {isProcessing ? "Indexing..." : processLabel}
+                    {isProcessing ? k.indexing : processLabel}
                   </button>
                   <details className="relative">
                     <summary className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-border text-slate-300 transition hover:border-slate-600 hover:bg-surface hover:text-white [&::-webkit-details-marker]:hidden">
@@ -573,7 +579,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-rose-200 transition hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:text-slate-500"
                       >
                         <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                        Delete
+                        {k.delete}
                       </button>
                     </div>
                   </details>
@@ -587,9 +593,9 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                       {file.filename}
                     </p>
                     <p className="text-xs text-slate-400">
-                      {formatBytes(file.size_bytes)}
+                      {sizeLabel(file.size_bytes)}
                       {" - "}
-                      {formatDate(file.created_at)}
+                      {dateLabel(file.created_at)}
                     </p>
                   </div>
                 </div>
@@ -619,7 +625,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                     ) : (
                       <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
                     )}
-                    {isProcessing ? "Indexing..." : processLabel}
+                    {isProcessing ? k.indexing : processLabel}
                   </button>
                   <button
                     type="button"
@@ -628,7 +634,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                     className="ui-button ui-button--ghost h-9 px-3 text-xs text-rose-200 hover:text-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                    Delete
+                    {k.delete}
                   </button>
                 </div>
                 {isIndexing && (
@@ -637,7 +643,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                       <div className="absolute inset-y-0 w-1/2 animate-pulse rounded-full bg-amber-400/70" />
                     </div>
                     <p className="text-[11px] text-slate-400">
-                      Indexing can take 30-90s
+                      {k.indexingHint}
                     </p>
                   </div>
                 )}
@@ -646,7 +652,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-100">
                   <span className="inline-flex items-center gap-2">
                     <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                    Delete this file?
+                    {k.confirmDelete}
                   </span>
                   <div className="flex gap-2">
                     <button
@@ -654,7 +660,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                       onClick={() => setConfirmDeleteId(null)}
                       className="ui-button ui-button--secondary h-8 px-3 text-xs"
                     >
-                      Cancel
+                      {k.cancel}
                     </button>
                     <button
                       type="button"
@@ -670,7 +676,7 @@ export default function KnowledgeSection({ agentId }: KnowledgeSectionProps) {
                       ) : (
                         <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                       )}
-                      {isDeleting ? "Deleting..." : "Delete"}
+                      {isDeleting ? k.deleting : k.delete}
                     </button>
                   </div>
                 </div>

@@ -11,6 +11,8 @@ import {
   Type,
 } from "lucide-react";
 import { requireUser } from "@/lib/auth/requireUser";
+import { format, intlLocales, type Locale } from "@/lib/i18n/config";
+import { getI18n } from "@/lib/i18n/server";
 
 type MessageRow = {
   id?: string;
@@ -30,20 +32,20 @@ function countWords(value: string | null | undefined) {
   return (value ?? "").trim().split(/\s+/).filter(Boolean).length;
 }
 
-function formatNumber(value: number) {
-  return new Intl.NumberFormat("en-US").format(value);
+function formatNumber(value: number, locale: Locale) {
+  return new Intl.NumberFormat(intlLocales[locale]).format(value);
 }
 
-function formatDate(value: string | null) {
-  if (!value) return "Unknown date";
-  return new Intl.DateTimeFormat("en-US", {
+function formatDate(value: string | null, locale: Locale, unknown: string) {
+  if (!value) return unknown;
+  return new Intl.DateTimeFormat(intlLocales[locale], {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
 }
 
-function getDomain(value: string | null) {
-  if (!value) return "Unknown page";
+function getDomain(value: string | null, unknown: string) {
+  if (!value) return unknown;
   try {
     return new URL(value).hostname.replace(/^www\./, "");
   } catch {
@@ -54,6 +56,7 @@ function getDomain(value: string | null) {
 function groupByDay(
   events: WidgetEventRow[],
   startDate: Date,
+  locale: Locale,
 ) {
   const days = new Map<string, { label: string; events: number }>();
 
@@ -62,7 +65,7 @@ function groupByDay(
     day.setDate(day.getDate() - index);
     const key = day.toISOString().slice(0, 10);
     days.set(key, {
-      label: new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(day),
+      label: new Intl.DateTimeFormat(intlLocales[locale], { weekday: "short" }).format(day),
       events: 0,
     });
   }
@@ -119,6 +122,9 @@ export default async function AgentAnalyticsPage({
 }) {
   const { id } = await params;
   const { supabase, user } = await requireUser();
+  const { locale, t } = await getI18n();
+  const a = t.analytics;
+  const fmt = (value: number) => formatNumber(value, locale);
 
   const { data: agent, error } = await supabase
     .from("agents")
@@ -181,14 +187,14 @@ export default async function AgentAnalyticsPage({
   const messageRate = opens > 0 ? Math.round((interactionCount / opens) * 100) : 0;
   const avgUserWords =
     interactionCount > 0 ? Math.round(userWords / interactionCount) : 0;
-  const activity = groupByDay(events, startDate);
+  const activity = groupByDay(events, startDate, locale);
   const maxActivity = Math.max(
     1,
     ...activity.map((day) => day.events),
   );
   const topPages = Array.from(
     events.reduce((acc, event) => {
-      const key = getDomain(event.page_url);
+      const key = getDomain(event.page_url, a.unknownPage);
       acc.set(key, (acc.get(key) ?? 0) + 1);
       return acc;
     }, new Map<string, number>()),
@@ -199,15 +205,14 @@ export default async function AgentAnalyticsPage({
   return (
     <div className="space-y-6">
       <header className="ui-card--strong p-6">
-        <p className="ui-badge">Analytics</p>
+        <p className="ui-badge">{a.badge}</p>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold text-white">
-              {agent.name} widget analytics
+              {format(a.title, { name: agent.name })}
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-              Traffic, opens, interactions, words written, and recent widget
-              conversations from the last 30 days.
+              {a.intro}
             </p>
           </div>
           <Link
@@ -215,7 +220,7 @@ export default async function AgentAnalyticsPage({
             className="ui-button ui-button--ghost"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            Back to setup
+            {t.agentPages.backToSetup}
           </Link>
         </div>
       </header>
@@ -223,29 +228,30 @@ export default async function AgentAnalyticsPage({
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           icon={Activity}
-          label="Traffic"
-          value={formatNumber(loads)}
-          helper="Widget script loads recorded on storefront pages."
+          label={a.traffic}
+          value={fmt(loads)}
+          helper={a.trafficHelp}
         />
         <MetricCard
           icon={MousePointerClick}
-          label="Opens"
-          value={formatNumber(opens)}
-          helper={`${openRate}% open rate from recorded loads.`}
+          label={a.opens}
+          value={fmt(opens)}
+          helper={format(a.opensHelp, { rate: openRate })}
         />
         <MetricCard
           icon={MessageSquare}
-          label="Interactions"
-          value={formatNumber(interactionCount)}
-          helper={`${messageRate}% of opens became conversations.`}
+          label={a.interactions}
+          value={fmt(interactionCount)}
+          helper={format(a.interactionsHelp, { rate: messageRate })}
         />
         <MetricCard
           icon={Type}
-          label="Words"
-          value={formatNumber(totalWords)}
-          helper={`${formatNumber(userWords)} user words, ${formatNumber(
-            assistantWords,
-          )} assistant words.`}
+          label={a.words}
+          value={fmt(totalWords)}
+          helper={format(a.wordsHelp, {
+            user: fmt(userWords),
+            assistant: fmt(assistantWords),
+          })}
         />
       </section>
 
@@ -254,14 +260,14 @@ export default async function AgentAnalyticsPage({
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-                Activity
+                {a.activity}
               </p>
               <h2 className="mt-2 text-xl font-semibold text-foreground">
-                Last 7 days
+                {a.last7}
               </h2>
             </div>
             <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs text-[var(--foreground-muted)]">
-              {formatNumber(failedEvents)} failed messages
+              {format(a.failed, { count: fmt(failedEvents) })}
             </span>
           </div>
 
@@ -298,20 +304,20 @@ export default async function AgentAnalyticsPage({
                 <Send className="h-4 w-4" aria-hidden="true" />
               </span>
               <div>
-                <h3 className="font-semibold text-foreground">Message depth</h3>
+                <h3 className="font-semibold text-foreground">{a.depthTitle}</h3>
                 <p className="text-xs text-[var(--foreground-muted)]">
-                  Average user message length
+                  {a.depthSubtitle}
                 </p>
               </div>
             </div>
             <p className="mt-5 text-3xl font-semibold">{avgUserWords}</p>
             <p className="mt-1 text-xs text-[var(--foreground-muted)]">
-              words per interaction
+              {a.wordsPerInteraction}
             </p>
           </div>
 
           <div className="ui-card p-5">
-            <h3 className="font-semibold text-foreground">Top pages</h3>
+            <h3 className="font-semibold text-foreground">{a.topPages}</h3>
             <div className="mt-4 space-y-2">
               {topPages.length ? (
                 topPages.map(([page, count]) => (
@@ -323,13 +329,13 @@ export default async function AgentAnalyticsPage({
                       {page}
                     </span>
                     <span className="font-semibold text-foreground">
-                      {formatNumber(count)}
+                      {fmt(count)}
                     </span>
                   </div>
                 ))
               ) : (
                 <p className="text-sm leading-6 text-[var(--foreground-muted)]">
-                  No widget traffic recorded yet.
+                  {a.noTraffic}
                 </p>
               )}
             </div>
@@ -341,15 +347,15 @@ export default async function AgentAnalyticsPage({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              Conversations
+              {a.conversations}
             </p>
             <h2 className="mt-2 text-xl font-semibold text-foreground">
-              Recent interactions
+              {a.recent}
             </h2>
           </div>
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs text-[var(--foreground-muted)]">
             <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-            Last 30 days
+            {a.last30}
           </span>
         </div>
 
@@ -362,17 +368,17 @@ export default async function AgentAnalyticsPage({
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs text-[var(--foreground-muted)]">
-                    {formatDate(message.created_at)}
+                    {formatDate(message.created_at, locale, a.unknownDate)}
                   </p>
                   <span className="rounded-full border border-border bg-background px-2.5 py-1 text-xs text-[var(--foreground-muted)]">
-                    {countWords(message.message)} user words
+                    {format(a.userWords, { count: countWords(message.message) })}
                   </span>
                 </div>
                 <p className="mt-3 line-clamp-3 text-sm leading-6 text-foreground">
-                  {message.message || "Empty user message"}
+                  {message.message || a.emptyMessage}
                 </p>
                 <p className="mt-2 line-clamp-2 text-xs leading-5 text-[var(--foreground-muted)]">
-                  {message.reply || "No assistant reply stored."}
+                  {message.reply || a.noReply}
                 </p>
               </article>
             ))
@@ -380,22 +386,20 @@ export default async function AgentAnalyticsPage({
             <div className="rounded-2xl border border-dashed border-border bg-surface/20 p-8 text-center">
               <BarChart3 className="mx-auto h-6 w-6 text-[var(--foreground-muted)]" />
               <p className="mt-3 font-semibold text-foreground">
-                Interaction recorded
+                {a.recordedTitle}
               </p>
               <p className="mt-1 text-sm text-[var(--foreground-muted)]">
-                This interaction was counted from widget events, but its
-                conversation text was not stored.
+                {a.recordedBody}
               </p>
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-border bg-surface/20 p-8 text-center">
               <BarChart3 className="mx-auto h-6 w-6 text-[var(--foreground-muted)]" />
               <p className="mt-3 font-semibold text-foreground">
-                No interactions yet
+                {a.emptyTitle}
               </p>
               <p className="mt-1 text-sm text-[var(--foreground-muted)]">
-                Once customers write through the widget, conversations and word
-                metrics will appear here.
+                {a.emptyBody}
               </p>
             </div>
           )}

@@ -1,12 +1,19 @@
+"use client";
+
 import { Sparkles } from "lucide-react";
 
+import { useI18n } from "@/lib/i18n/client";
+import type { Messages } from "@/lib/i18n/messages";
+
 export function AiPulse({
-  label = "Preparing your workspace",
+  label,
   compact = false,
 }: {
   label?: string;
   compact?: boolean;
 }) {
+  const { t } = useI18n();
+
   return (
     <div
       className={compact ? "ui-ai-loader ui-ai-loader--compact" : "ui-ai-loader"}
@@ -16,16 +23,19 @@ export function AiPulse({
       <span className="ui-ai-orb" aria-hidden="true">
         <Sparkles className="h-4 w-4" />
       </span>
-      <span>{label}</span>
+      <span>{label ?? t.loading.default}</span>
     </div>
   );
 }
 
 export function PageLoading({
-  label = "Preparing your workspace",
+  labelKey = "default",
 }: {
-  label?: string;
+  labelKey?: keyof Messages["loading"];
 }) {
+  const { t } = useI18n();
+  const label = t.loading[labelKey];
+
   return (
     <main className="mx-auto min-h-[70vh] max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="ui-card--strong overflow-hidden p-6 sm:p-8">

@@ -1,40 +1,22 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { PLAN_CONFIG } from "@/lib/plans";
+import { format, intlLocales } from "@/lib/i18n/config";
+import { getI18n } from "@/lib/i18n/server";
+import { PLAN_CONFIG, type PlanId } from "@/lib/plans";
 import { createServer } from "@/lib/supabase/server";
 
-type PlanCard = {
-  id: string;
-  name: string;
-  price: string;
-  cycle: string;
-  limit: string;
-  blurb: string;
-  features: string[];
-};
-
-const PLAN_CARDS: PlanCard[] = [
-  {
-    id: "free",
-    name: "Free plan",
-    price: PLAN_CONFIG.free.price,
-    cycle: PLAN_CONFIG.free.cycle,
-    limit: "Up to 1,000 messages/month",
-    blurb: "Perfect to test the dashboard and launch your first agent.",
-    features: PLAN_CONFIG.free.features,
-  },
-  {
-    id: "pro",
-    name: "Pro plan",
-    price: PLAN_CONFIG.pro.price,
-    cycle: PLAN_CONFIG.pro.cycle,
-    limit: "Up to 10,000 messages/month",
-    blurb: "For 24/7 operations with high volume and escalations.",
-    features: PLAN_CONFIG.pro.features,
-  },
-];
+const PLAN_IDS: PlanId[] = ["free", "pro"];
 
 export default async function BillingPage() {
+  const { locale, t } = await getI18n();
+  const b = t.billing;
+  const PLAN_CARDS = PLAN_IDS.map((id) => ({
+    id,
+    price: PLAN_CONFIG[id].price,
+    cycle: t.plans[id].cycle,
+    features: t.plans[id].features,
+    ...b.cards[id],
+  }));
   const supabase = await createServer();
   const {
     data: { user },
@@ -53,7 +35,7 @@ export default async function BillingPage() {
 
   const activePlan = (profile?.plan ?? "free").toLowerCase();
   const activeUntil = profile?.active_until
-    ? new Intl.DateTimeFormat("en-US", {
+    ? new Intl.DateTimeFormat(intlLocales[locale], {
         day: "numeric",
         month: "short",
         year: "numeric",
@@ -83,7 +65,7 @@ export default async function BillingPage() {
               className="ml-2 rounded-full border border-border bg-surface px-2 py-0.5 text-[10px] uppercase font-semibold text-[var(--foreground-muted)]"
               data-oid="-qqz_t_"
             >
-              Billing
+              {b.badge}
             </span>
           </div>
           <div className="flex items-center gap-4" data-oid="vns_7u:">
@@ -92,7 +74,7 @@ export default async function BillingPage() {
               className="text-sm font-medium text-[var(--foreground-muted)] hover:text-foreground transition-colors"
               data-oid="z:lkomw"
             >
-              Back to Board
+              {b.back}
             </Link>
             <div
               className="h-8 w-8 rounded-full bg-surface-strong border border-border flex items-center justify-center text-xs font-bold"
@@ -117,14 +99,13 @@ export default async function BillingPage() {
               className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground"
               data-oid=".hgno3h"
             >
-              Manage your plan
+              {b.title}
             </h1>
             <p
               className="mt-4 text-lg text-[var(--foreground-muted)]"
               data-oid="370spa0"
             >
-              Review your usage limits, upgrade to scale your operations, and
-              manage your invoices.
+              {b.intro}
             </p>
           </div>
 
@@ -136,7 +117,7 @@ export default async function BillingPage() {
               className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]"
               data-oid="mgbyjxc"
             >
-              Current Plan
+              {b.currentPlan}
             </span>
             <div className="flex items-center gap-2 mt-1" data-oid=".u1y_t5">
               <div
@@ -155,7 +136,7 @@ export default async function BillingPage() {
               className="text-xs text-[var(--foreground-muted)] mt-1"
               data-oid="cqvkg.6"
             >
-              {activeUntil ? `Renews on ${activeUntil}` : "No expiry date"}
+              {activeUntil ? format(b.renewsOn, { date: activeUntil }) : b.noExpiry}
             </span>
           </div>
         </div>
@@ -196,7 +177,7 @@ export default async function BillingPage() {
                       className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-accent shadow-[0_0_10px_rgba(212,212,216,0.2)]"
                       data-oid="whifer1"
                     >
-                      Active
+                      {b.active}
                     </span>
                   )}
                 </div>
@@ -263,7 +244,7 @@ export default async function BillingPage() {
                       className="w-full rounded-full border border-border bg-surface/50 px-4 py-3 text-sm font-semibold text-[var(--foreground-muted)] cursor-not-allowed opacity-70"
                       data-oid="9if0cqt"
                     >
-                      Current Plan
+                      {b.currentPlan}
                     </button>
                   ) : (
                     <Link
@@ -271,7 +252,7 @@ export default async function BillingPage() {
                       className="ui-button ui-button--primary w-full justify-center py-3"
                       data-oid="i9aeh0e"
                     >
-                      Upgrade Plan
+                      {b.upgrade}
                     </Link>
                   )}
                 </div>
@@ -289,14 +270,13 @@ export default async function BillingPage() {
               className="text-lg font-semibold text-foreground"
               data-oid="y1c6uif"
             >
-              Questions about enterprise billing?
+              {b.enterpriseTitle}
             </h3>
             <p
               className="text-[var(--foreground-muted)] max-w-xl"
               data-oid="wq3jegp"
             >
-              We offer custom plans for large agencies, including dedicated
-              support, custom integrations, and consolidated billing.
+              {b.enterpriseBody}
             </p>
           </div>
           <div className="flex flex-wrap gap-4" data-oid="y6ys4b.">
@@ -305,14 +285,14 @@ export default async function BillingPage() {
               className="ui-button ui-button--ghost"
               data-oid="7il0nl1"
             >
-              Contact Support
+              {b.contactSupport}
             </a>
             <Link
               href="/dashboard"
               className="ui-button ui-button--secondary"
               data-oid="xt-9i:w"
             >
-              Return to Dashboard
+              {b.returnToDashboard}
             </Link>
           </div>
         </section>

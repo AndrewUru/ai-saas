@@ -15,6 +15,11 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { format } from "@/lib/i18n/config";
+import type { Messages } from "@/lib/i18n/messages";
+import { rich } from "@/lib/i18n/rich";
+import { getI18n } from "@/lib/i18n/server";
+
 type Feature = {
   icon: LucideIcon;
   title: string;
@@ -22,95 +27,19 @@ type Feature = {
   href?: string;
 };
 
-const features: Feature[] = [
-  {
-    icon: Bot,
-    title: "Agents",
-    description:
-      "Create one assistant per store or client. Each agent has its own API key, knowledge base, widget settings, allowed domains, simulator and analytics.",
-    href: "/dashboard/agents",
-  },
-  {
-    icon: Database,
-    title: "Knowledge",
-    description:
-      "Upload store context, policies, FAQs, catalog notes and internal answers so the assistant can respond with approved information instead of guessing.",
-  },
-  {
-    icon: Palette,
-    title: "Widget studio",
-    description:
-      "Customize brand name, greeting, launcher text, colors, chat bubbles, header, position and language. The preview updates before you publish.",
-  },
-  {
-    icon: MessageSquare,
-    title: "Simulator",
-    description:
-      "Test shopper questions before going live. Use it to validate refunds, shipping, product recommendations, edge cases and handoff behavior.",
-  },
-  {
-    icon: PlugZap,
-    title: "Integrations",
-    description:
-      "Connect WooCommerce or Shopify so the assistant can work with product and catalog context instead of static support copy only.",
-    href: "/dashboard/integrations",
-  },
-  {
-    icon: BarChart3,
-    title: "Analytics",
-    description:
-      "Review conversations, usage and friction signals. Use the data to spot missing answers, shopper objections and opportunities to improve the store.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Allowed domains",
-    description:
-      "Limit where each widget can load. This prevents a leaked script from being reused on unapproved domains or client sites.",
-  },
-  {
-    icon: KeyRound,
-    title: "API key rotation",
-    description:
-      "Rotate a widget key from the install screen if a snippet is exposed, a client contract ends or you want to revoke previous access.",
-  },
-];
-
-const installSteps = [
-  {
-    title: "Create or open an agent",
-    body: "Go to Agents, choose the store/client assistant, then review its knowledge, widget style and allowed domains.",
-  },
-  {
-    title: "Copy the embed snippet",
-    body: "Open the agent Install screen and copy the generated script. The snippet stays stable when you update widget settings.",
-  },
-  {
-    title: "Paste before the closing body tag",
-    body: "Use the footer/custom HTML area in WordPress, Shopify, Webflow or any site builder. In custom HTML, paste it before </body>.",
-  },
-  {
-    title: "Verify and monitor",
-    body: "Open the storefront, send a test message, then check analytics and simulator results before handing the store to the client.",
-  },
-];
-
-const troubleshooting = [
-  {
-    issue: "Widget does not appear",
-    fix: "Check that the script is installed once, the agent key is active and the current domain is allowed.",
-  },
-  {
-    issue: "Browser console shows 403",
-    fix: "The domain is not authorized. Add the exact domain or a wildcard such as *.example.com.",
-  },
-  {
-    issue: "React or Next.js throws a script error",
-    fix: "Do not paste the raw script inside JSX. Load it with a framework script loader.",
-  },
-  {
-    issue: "The style did not update",
-    fix: "Refresh the storefront and confirm the settings were saved on the agent widget screen.",
-  },
+const FEATURE_DEFS: {
+  key: keyof Messages["docs"]["features"];
+  icon: LucideIcon;
+  href?: string;
+}[] = [
+  { key: "agents", icon: Bot, href: "/dashboard/agents" },
+  { key: "knowledge", icon: Database },
+  { key: "widget", icon: Palette },
+  { key: "simulator", icon: MessageSquare },
+  { key: "integrations", icon: PlugZap, href: "/dashboard/integrations" },
+  { key: "analytics", icon: BarChart3 },
+  { key: "domains", icon: ShieldCheck },
+  { key: "rotation", icon: KeyRound },
 ];
 
 function FeatureCard({ feature }: { feature: Feature }) {
@@ -155,44 +84,46 @@ function CodeBlock({ children }: { children: string }) {
   );
 }
 
-export default function DocsPage() {
+export default async function DocsPage() {
+  const { t } = await getI18n();
+  const d = t.docs;
+  const features: Feature[] = FEATURE_DEFS.map(({ key, ...def }) => ({
+    ...def,
+    ...d.features[key],
+  }));
+  const installSteps = d.installSteps;
+  const troubleshooting = d.troubleshooting;
+
   return (
     <div className="space-y-8">
       <header className="rounded-lg border border-white/10 bg-white/[0.03] p-6 shadow-xl shadow-black/20">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="max-w-3xl">
-            <p className="ui-badge">Documentation</p>
+            <p className="ui-badge">{d.badge}</p>
             <h1 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              Product guide and widget installation
+              {d.title}
             </h1>
             <p className="mt-4 text-sm leading-6 text-zinc-400 sm:text-base">
-              Use this page to understand what each dashboard area does, how the
-              storefront widget is installed, and how to troubleshoot common
-              launch issues for WooCommerce, Shopify, HTML and React/Next.js
-              projects.
+              {d.intro}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
             <Link href="/dashboard/agents" className="ui-button ui-button--primary">
-              Open agents
+              {d.openAgents}
             </Link>
             <Link
               href="/dashboard/integrations"
               className="ui-button ui-button--secondary"
             >
-              Connect store
+              {d.connectStore}
             </Link>
           </div>
         </div>
       </header>
 
       <section className="grid gap-4 md:grid-cols-3">
-        {[
-          "Create an agent for each storefront.",
-          "Train it with approved business knowledge.",
-          "Install one secure script on the client site.",
-        ].map((item) => (
+        {d.highlights.map((item) => (
           <div
             key={item}
             className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-4"
@@ -209,10 +140,10 @@ export default function DocsPage() {
       <section className="space-y-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-            Dashboard functionality
+            {d.modulesEyebrow}
           </p>
           <h2 className="mt-2 text-2xl font-semibold text-white">
-            What each module is for
+            {d.modulesTitle}
           </h2>
         </div>
 
@@ -231,10 +162,10 @@ export default function DocsPage() {
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-                Installation
+                {d.installEyebrow}
               </p>
               <h2 className="mt-1 text-2xl font-semibold text-white">
-                Publish the widget
+                {d.installTitle}
               </h2>
             </div>
           </div>
@@ -246,7 +177,7 @@ export default function DocsPage() {
                 className="rounded-lg border border-white/10 bg-black/20 p-4"
               >
                 <span className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-                  Step {index + 1}
+                  {format(d.step, { n: index + 1 })}
                 </span>
                 <h3 className="mt-2 text-sm font-semibold text-white">
                   {step.title}
@@ -261,11 +192,10 @@ export default function DocsPage() {
           <div className="mt-6 space-y-4">
             <div>
               <h3 className="text-sm font-semibold text-white">
-                Standard HTML, WordPress, Shopify or Webflow
+                {d.htmlTitle}
               </h3>
               <p className="mt-2 text-sm leading-6 text-zinc-400">
-                Paste the generated snippet into the footer, theme custom HTML,
-                tag manager or immediately before the closing body tag.
+                {d.htmlBody}
               </p>
             </div>
             <CodeBlock>
@@ -274,11 +204,10 @@ export default function DocsPage() {
 
             <div>
               <h3 className="text-sm font-semibold text-white">
-                Next.js example
+                {d.nextTitle}
               </h3>
               <p className="mt-2 text-sm leading-6 text-zinc-400">
-                In React and Next.js, load the script with the framework loader
-                instead of placing a raw script tag inside JSX.
+                {d.nextBody}
               </p>
             </div>
             <CodeBlock>
@@ -301,28 +230,26 @@ export function WidgetScript() {
             <div className="flex items-center gap-3">
               <Globe2 className="h-5 w-5 text-accent" aria-hidden="true" />
               <h2 className="text-base font-semibold text-white">
-                Domain security
+                {d.domainTitle}
               </h2>
             </div>
             <p className="mt-3 text-sm leading-6 text-zinc-400">
-              Allowed domains are exact. <code>example.com</code> and{" "}
-              <code>app.example.com</code> are different origins. Add each
-              production, staging and client domain that should load the widget.
+              {rich(d.domainExact, {
+                root: <code>example.com</code>,
+                sub: <code>app.example.com</code>,
+              })}
             </p>
             <p className="mt-3 text-sm leading-6 text-zinc-400">
-              Use <code>*.example.com</code> when every subdomain should be
-              valid. Keep the list empty only while testing locally or during a
-              temporary setup window.
+              {rich(d.domainWildcard, { wildcard: <code>*.example.com</code> })}
             </p>
           </div>
 
           <div className="rounded-lg border border-amber-400/20 bg-amber-400/10 p-5 text-amber-100">
-            <h2 className="text-base font-semibold">Launch checklist</h2>
+            <h2 className="text-base font-semibold">{d.checklistTitle}</h2>
             <ul className="mt-3 space-y-2 text-sm leading-6">
-              <li>Agent knowledge is approved.</li>
-              <li>Allowed domains include the live store.</li>
-              <li>Widget colors and copy match the brand.</li>
-              <li>Simulator answers match support policy.</li>
+              {d.checklist.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
           </div>
         </aside>
@@ -333,10 +260,10 @@ export function WidgetScript() {
           <LifeBuoy className="mt-1 h-5 w-5 text-accent" aria-hidden="true" />
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-              Troubleshooting
+              {d.troubleEyebrow}
             </p>
             <h2 className="mt-1 text-2xl font-semibold text-white">
-              Common issues
+              {d.troubleTitle}
             </h2>
           </div>
         </div>
@@ -357,10 +284,10 @@ export function WidgetScript() {
 
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/contact" className="ui-button ui-button--primary">
-            Contact support
+            {d.contactSupport}
           </Link>
           <Link href="/academy" className="ui-button ui-button--secondary">
-            Read academy
+            {d.readAcademy}
           </Link>
         </div>
       </section>

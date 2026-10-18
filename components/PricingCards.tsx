@@ -5,35 +5,29 @@ import { CheckCircle2, CreditCard, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { PLAN_CONFIG } from "@/lib/plans";
-
-const plans = [
-  {
-    id: "free",
-    name: "Free",
-    headline: "Start building agents",
-    price: "0",
-    period: "forever",
-    description: "Perfect to test the dashboard and launch your first agent.",
-    features: PLAN_CONFIG.free.features,
-    highlight: false,
-    badge: "Free forever",
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    headline: "Scale with confidence",
-    price: "22",
-    period: "one-time",
-    description:
-      "Remove branding, get priority support, and unlock higher limits.",
-    features: PLAN_CONFIG.pro.features,
-    highlight: true,
-    badge: "Best value",
-  },
-] as const;
+import { useI18n } from "@/lib/i18n/client";
 
 export default function PricingCards({ clientId }: { clientId: string }) {
+  const { t } = useI18n();
+  const pc = t.pricingCards;
+  const plans = [
+    {
+      id: "free",
+      name: t.plans.free.name,
+      price: "0",
+      features: t.plans.free.features,
+      highlight: false,
+      ...pc.free,
+    },
+    {
+      id: "pro",
+      name: t.plans.pro.name,
+      price: "22",
+      features: t.plans.pro.features,
+      highlight: true,
+      ...pc.pro,
+    },
+  ];
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -42,7 +36,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
   if (!clientId) {
     return (
       <div className="ui-alert ui-alert--error mt-8 text-center">
-        PayPal Client ID is not configured. Add it before taking payments.
+        {pc.missingClientId}
       </div>
     );
   }
@@ -133,7 +127,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                   href="/dashboard"
                   className="ui-button ui-button--secondary h-12 w-full"
                 >
-                  Go to Dashboard
+                  {pc.goToDashboard}
                 </Link>
               ) : (
                 <div className="space-y-3">
@@ -151,7 +145,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                             aria-hidden="true"
                           />
                         )}
-                        {isProcessing ? "Processing checkout" : "Pay once"}
+                        {isProcessing ? pc.processing : pc.payOnce}
                       </span>
                       <span>EUR 22</span>
                     </div>
@@ -181,7 +175,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                         if (!res.ok || !data?.orderId) {
                           setIsProcessing(false);
                           throw new Error(
-                            data?.error || "Could not create order",
+                            data?.error || pc.createOrderError,
                           );
                         }
 
@@ -189,9 +183,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                       }}
                       onApprove={async (data) => {
                         setErrorMsg("");
-                        setSuccessMsg(
-                          "Payment approved. Activating your account...",
-                        );
+                        setSuccessMsg(pc.approved);
 
                         const res = await fetch("/api/paypal/capture-order", {
                           method: "POST",
@@ -203,12 +195,12 @@ export default function PricingCards({ clientId }: { clientId: string }) {
 
                         if (!res.ok || !out?.ok) {
                           setSuccessMsg("");
-                          setErrorMsg(out?.error || "Payment capture failed");
+                          setErrorMsg(out?.error || pc.captureFailed);
                           setIsProcessing(false);
                           return;
                         }
 
-                        setSuccessMsg("PRO activated! Redirecting...");
+                        setSuccessMsg(pc.activated);
                         router.push("/dashboard");
                         router.refresh();
                       }}
@@ -220,7 +212,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                       onError={(err) => {
                         setSuccessMsg("");
                         setErrorMsg(
-                          err instanceof Error ? err.message : "PayPal error",
+                          err instanceof Error ? err.message : pc.paypalError,
                         );
                         setIsProcessing(false);
                       }}
@@ -228,8 +220,7 @@ export default function PricingCards({ clientId }: { clientId: string }) {
                   </div>
 
                   <p className="text-center text-xs text-[var(--foreground-muted)]">
-                    Secure checkout powered by PayPal. Access activates after
-                    approval.
+                    {pc.secureNote}
                   </p>
                 </div>
               )}

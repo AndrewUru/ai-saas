@@ -1,36 +1,21 @@
 import { ArrowUpRight, Headphones, Layers3, Store } from "lucide-react";
 
-const useCases = [
-  {
-    icon: Store,
-    number: "01",
-    title: "Commerce teams",
-    description:
-      "Guide product discovery, answer buying questions, and surface the friction hiding between product view and checkout.",
-    outcomes: ["Product discovery", "Policy answers", "Bundle guidance"],
-    accent: "from-amber-300/18",
-  },
-  {
-    icon: Layers3,
-    number: "02",
-    title: "Digital agencies",
-    description:
-      "Operate multiple branded agents from one workflow while keeping every client's data, tone, and approvals separate.",
-    outcomes: ["Reusable playbooks", "Client reporting", "Brand control"],
-    accent: "from-violet-400/18",
-  },
-  {
-    icon: Headphones,
-    number: "03",
-    title: "Customer experience",
-    description:
-      "Resolve repetitive questions instantly and hand complex cases to people with intent, history, and product context attached.",
-    outcomes: ["Smart handoff", "Conversation context", "Training queue"],
-    accent: "from-sky-300/18",
-  },
+import { getI18n } from "@/lib/i18n/server";
+
+const useCaseStyles = [
+  { icon: Store, number: "01", accent: "from-amber-300/18" },
+  { icon: Layers3, number: "02", accent: "from-violet-400/18" },
+  { icon: Headphones, number: "03", accent: "from-sky-300/18" },
 ] as const;
 
-export function Testimonials() {
+export async function Testimonials() {
+  const { t } = await getI18n();
+  const u = t.landing.useCases;
+  const useCases = u.items.map((item, index) => ({
+    ...item,
+    ...useCaseStyles[index],
+  }));
+
   return (
     <section className="relative overflow-hidden bg-[#080808] py-24 sm:py-32">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -38,15 +23,14 @@ export function Testimonials() {
         <div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
           <div>
             <span className="text-xs font-semibold uppercase tracking-[0.24em] text-zinc-400">
-              Built around the work
+              {u.eyebrow}
             </span>
             <h2 className="mt-4 text-balance text-4xl font-semibold tracking-[-0.045em] text-white sm:text-6xl">
-              One agent. Different operating modes.
+              {u.title}
             </h2>
           </div>
           <p className="max-w-xl text-lg leading-8 text-zinc-400 lg:justify-self-end">
-            Start with the workflow your team needs today. Keep the same
-            conversation intelligence as the operation grows.
+            {u.description}
           </p>
         </div>
 
@@ -89,7 +73,7 @@ export function Testimonials() {
                     ))}
                   </div>
                   <div className="mt-6 flex items-center justify-between border-t border-white/8 pt-5 text-xs font-semibold text-zinc-500 transition-colors group-hover:text-white">
-                    Explore the workflow
+                    {u.explore}
                     <ArrowUpRight
                       className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                       aria-hidden="true"
@@ -103,12 +87,12 @@ export function Testimonials() {
 
         <div className="mt-6 flex flex-col items-center justify-between gap-5 rounded-[1.5rem] border border-white/8 bg-white/[0.02] px-6 py-5 sm:flex-row">
           <p className="text-sm text-zinc-400">
-            Connect the commerce stack you already use.
+            {u.connect}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
             <span>WooCommerce</span>
             <span>Shopify</span>
-            <span>Any website</span>
+            <span>{u.anyWebsite}</span>
             <span>Supabase</span>
           </div>
         </div>

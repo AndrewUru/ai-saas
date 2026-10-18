@@ -12,6 +12,8 @@ import {
   ensureDomainAllowed,
   type RequestHostContext,
 } from "@/lib/security/domains";
+import { defaultLocale, type Locale } from "@/lib/i18n/config";
+import { getMessages } from "@/lib/i18n/messages";
 
 export const FALLBACK_AGENT_MODEL = "gpt-4o-mini";
 const DEFAULT_SYSTEM_PROMPT =
@@ -214,10 +216,14 @@ export async function chatWithAgent(
     requestHost?: RequestHostContext;
     skipQuota?: boolean;
     persistConversation?: boolean;
+    /** Idioma de los mensajes de error y de la respuesta de respaldo. */
+    locale?: Locale;
   },
   deps: AgentChatDeps
 ): Promise<AgentChatResult> {
   const logger = deps.logger ?? console;
+  const apiText = getMessages(params.locale ?? defaultLocale).api;
+  const m = apiText.chat;
 
   const parsedRequest = chatRequestSchema.safeParse({
     api_key: params.apiKey,
@@ -240,7 +246,7 @@ export async function chatWithAgent(
     return {
       ok: false,
       status: 500,
-      error: "Model configuration is incomplete.",
+      error: m.modelConfig,
     };
   }
 
@@ -256,7 +262,7 @@ export async function chatWithAgent(
     return {
       ok: false,
       status: 404,
-      error: "Agent not found or invalid API key.",
+      error: m.agentNotFound,
     };
   }
 
@@ -269,7 +275,7 @@ export async function chatWithAgent(
     return {
       ok: false,
       status: 500,
-      error: "Internal server error.",
+      error: apiText.internal,
     };
   }
 
@@ -286,7 +292,7 @@ export async function chatWithAgent(
       return {
         ok: false,
         status,
-        error: "This domain is not allowed for this agent.",
+        error: apiText.domainNotAllowed,
         fallbackUrl: validAgent.fallback_url ?? null,
       };
     }
@@ -296,7 +302,7 @@ export async function chatWithAgent(
     return {
       ok: false,
       status: 403,
-      error: "This agent is inactive.",
+      error: apiText.agentInactive,
       fallbackUrl: validAgent.fallback_url ?? null,
     };
   }
@@ -312,7 +318,7 @@ export async function chatWithAgent(
       return {
         ok: false,
         status: 500,
-        error: "Could not validate message quota.",
+        error: m.quotaCheck,
         fallbackUrl: validAgent.fallback_url ?? null,
       };
     }
@@ -321,7 +327,7 @@ export async function chatWithAgent(
       return {
         ok: false,
         status: 403,
-        error: "The message limit for this agent has been reached.",
+        error: m.quotaReached,
         fallbackUrl: validAgent.fallback_url ?? null,
       };
     }
@@ -392,7 +398,7 @@ export async function chatWithAgent(
     return {
       ok: false,
       status: 502,
-      error: "The model could not generate a response.",
+      error: m.modelFailed,
       fallbackUrl: validAgent.fallback_url ?? null,
     };
   }
@@ -496,7 +502,7 @@ export async function chatWithAgent(
         return {
           ok: false,
           status: 502,
-          error: "The model could not process tool results.",
+          error: m.toolFailed,
           fallbackUrl: validAgent.fallback_url ?? null,
         };
       }
@@ -504,7 +510,7 @@ export async function chatWithAgent(
       completion = await response.json();
       reply =
         completion.choices?.[0]?.message?.content?.trim() ||
-        "Sorry, I couldn't generate a final response.";
+        m.noFinalReply;
     }
   }
 

@@ -38,9 +38,12 @@ import {
 } from "@/lib/widget/defaults";
 import { getEmbedSnippet } from "@/lib/widget/embedSnippet";
 import {
+  localizeWidgetTemplate,
   type WidgetTemplateId,
-  widgetTemplates,
+  widgetTemplates as baseWidgetTemplates,
 } from "@/lib/widget/templates";
+import { useI18n } from "@/lib/i18n/client";
+import { format as formatMessage } from "@/lib/i18n/config";
 
 type WidgetDesignerProps = {
   apiKey: string;
@@ -96,63 +99,18 @@ type EditablePart =
 
 type PreviewViewport = "desktop" | "mobile";
 
-const editableParts: Array<{
-  id: EditablePart;
-  label: string;
-  description: string;
-  icon: LucideIcon;
-}> = [
-  {
-    id: "presets",
-    label: "Styles",
-    description: "Apply a complete visual direction.",
-    icon: WandSparkles,
-  },
-  {
-    id: "header",
-    label: "Header",
-    description: "Edit the identity shown at the top.",
-    icon: Type,
-  },
-  {
-    id: "chat",
-    label: "Canvas",
-    description: "Set the chat background and main accent.",
-    icon: Palette,
-  },
-  {
-    id: "botBubble",
-    label: "Assistant",
-    description: "Style assistant messages.",
-    icon: Bot,
-  },
-  {
-    id: "userBubble",
-    label: "Customer",
-    description: "Style customer messages.",
-    icon: MessageSquare,
-  },
-  {
-    id: "composer",
-    label: "Welcome",
-    description: "Change the first message customers see.",
-    icon: Sparkles,
-  },
-  {
-    id: "launcher",
-    label: "Launcher",
-    description: "Customize the button that opens the chat.",
-    icon: ImageIcon,
-  },
-  {
-    id: "layout",
-    label: "Size & position",
-    description: "Control placement, dimensions, and corners.",
-    icon: Maximize2,
-  },
+const editablePartIcons: Array<{ id: EditablePart; icon: LucideIcon }> = [
+  { id: "presets", icon: WandSparkles },
+  { id: "header", icon: Type },
+  { id: "chat", icon: Palette },
+  { id: "botBubble", icon: Bot },
+  { id: "userBubble", icon: MessageSquare },
+  { id: "composer", icon: Sparkles },
+  { id: "launcher", icon: ImageIcon },
+  { id: "layout", icon: Maximize2 },
 ];
 
-const editablePartMap = new Map(editableParts.map((part) => [part.id, part]));
+const editablePartIds = new Set(editablePartIcons.map((part) => part.id));
 
 function normalizeHex(value: string): string | null {
   const trimmed = value.trim();
@@ -172,25 +130,6 @@ function normalizeHex(value: string): string | null {
 
 const inputClass =
   "w-full min-w-0 rounded-xl border border-slate-800 px-3.5 py-3 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-400/30";
-
-const launcherIconLabels: Record<WidgetLauncherIcon, string> = {
-  whatsapp: "WhatsApp",
-  chat: "Chat",
-  sparkles: "AI sparkles",
-  bot: "Bot",
-  store: "Store",
-  logo: "Logo URL",
-};
-
-const launcherStyleLabels: Record<WidgetLauncherStyle, string> = {
-  icon: "Compact icon",
-  card: "AI bubble card",
-};
-
-const launcherStyleHelp: Record<WidgetLauncherStyle, string> = {
-  icon: "Round launcher with hover label.",
-  card: "Assistant card with title, subtitle, glow, and 3D orb.",
-};
 
 function normalizeWidgetFormat(value: string | null): WidgetFormat {
   return widgetFormats.includes(value as WidgetFormat)
@@ -234,6 +173,7 @@ function FieldInput({
   helper: string;
 }) {
   const remaining = maxLength - value.length;
+  const { t } = useI18n();
 
   return (
     <div className="space-y-2 min-w-0">
@@ -244,7 +184,7 @@ function FieldInput({
         >
           {label}
         </label>
-        <span className="text-[11px] text-slate-500">{remaining} left</span>
+        <span className="text-[11px] text-slate-500">{formatMessage(t.widgetEditor.charsLeft, { count: remaining })}</span>
       </div>
       <input
         id={name}
@@ -266,7 +206,7 @@ function ColorInput({
   value,
   onChange,
   defaultValue,
-  errorMessage = "Use a valid hex value.",
+  errorMessage,
 }: {
   label: string;
   name: string;
@@ -276,6 +216,7 @@ function ColorInput({
   errorMessage?: string;
 }) {
   const pickerValue = normalizeHex(value) ?? defaultValue;
+  const { t } = useI18n();
   const hasCustomValue = Boolean(value.trim());
   const isInvalid = hasCustomValue && !normalizeHex(value);
 
@@ -294,7 +235,7 @@ function ColorInput({
             onClick={() => onChange("")}
             className="text-[11px] font-semibold text-slate-500 transition hover:text-neutral-200"
           >
-            Reset
+            {t.widgetEditor.reset}
           </button>
         )}
       </div>
@@ -302,7 +243,7 @@ function ColorInput({
       <div className="flex items-center gap-2 min-w-0">
         <input
           type="color"
-          aria-label={`${label} color picker`}
+          aria-label={formatMessage(t.widgetEditor.colorPicker, { label })}
           className="h-10 w-10 shrink-0 cursor-pointer rounded-xl border border-slate-700  p-1"
           value={pickerValue}
           onChange={(e) => onChange(e.target.value)}
@@ -322,7 +263,7 @@ function ColorInput({
         />
       </div>
       {isInvalid && (
-        <p className="text-xs text-rose-300">{errorMessage}</p>
+        <p className="text-xs text-rose-300">{errorMessage ?? t.widgetEditor.invalidHex}</p>
       )}
     </div>
   );
@@ -414,6 +355,17 @@ export default function WidgetDesigner({
   initialLauncherIcon,
   initialLauncherLogoUrl,
 }: WidgetDesignerProps) {
+  const { t } = useI18n();
+  const w = t.widgetEditor;
+  const f = w.fields;
+  const editableParts = editablePartIcons.map((part) => ({
+    ...part,
+    ...w.parts[part.id],
+  }));
+  const editablePartMap = new Map(editableParts.map((part) => [part.id, part]));
+  const widgetTemplates = baseWidgetTemplates.map((template) =>
+    localizeWidgetTemplate(template, t.widgetTemplates[template.id]),
+  );
   const initialNormalizedLauncherStyle = normalizeLauncherStyle(
     initialLauncherStyle,
   );
@@ -763,7 +715,7 @@ export default function WidgetDesigner({
       }
 
       if (event.data?.type !== "ai-widget-editor:select") return;
-      if (!editablePartMap.has(event.data.part as EditablePart)) return;
+      if (!editablePartIds.has(event.data.part as EditablePart)) return;
       setSelectedPart(event.data.part as EditablePart);
     };
 
@@ -868,9 +820,9 @@ export default function WidgetDesigner({
             <MousePointer2 className="h-4 w-4" aria-hidden="true" />
           </span>
           <div>
-            <p className="text-sm font-semibold text-white">Click to style. Double-click text to rewrite it.</p>
+            <p className="text-sm font-semibold text-white">{w.hintTitle}</p>
             <p className="mt-1 text-xs leading-5 text-slate-400">
-              Changes now appear instantly without reloading the preview.
+              {w.hintBody}
             </p>
           </div>
         </div>
@@ -880,7 +832,7 @@ export default function WidgetDesigner({
           onClick={handleReset}
         >
           <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-          Reset design
+          {w.resetDesign}
         </button>
       </div>
 
@@ -888,13 +840,13 @@ export default function WidgetDesigner({
         <section className="min-w-0 overflow-hidden rounded-2xl border border-slate-800/80 bg-[#070b12] shadow-2xl shadow-black/25">
           <div className="flex flex-col gap-3 border-b border-slate-800/80 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-200">Live canvas</p>
-              <p className="mt-1 text-sm text-slate-400">Select any area, or double-click visible text to edit in place.</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-200">{w.liveCanvas}</p>
+              <p className="mt-1 text-sm text-slate-400">{w.liveCanvasHint}</p>
             </div>
             <div className="inline-flex self-start rounded-xl border border-slate-800 bg-slate-950 p-1">
               {([
-                { id: "desktop" as const, label: "Desktop", icon: Monitor },
-                { id: "mobile" as const, label: "Mobile", icon: Smartphone },
+                { id: "desktop" as const, label: w.desktop, icon: Monitor },
+                { id: "mobile" as const, label: w.mobile, icon: Smartphone },
               ]).map((viewport) => {
                 const ViewportIcon = viewport.icon;
                 const isActive = previewViewport === viewport.id;
@@ -930,7 +882,7 @@ export default function WidgetDesigner({
               <iframe
                 ref={iframeRef}
                 key={format}
-                title="Interactive widget preview"
+                title={w.previewTitle}
                 src={previewPageUrl}
                 sandbox="allow-scripts allow-same-origin"
                 onLoad={() => {
@@ -959,14 +911,14 @@ export default function WidgetDesigner({
                   <activePart.icon className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-200">Editing</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-200">{w.editing}</p>
                   <h2 className="mt-1 text-base font-semibold text-white">{activePart.label}</h2>
                   <p className="mt-1 text-xs leading-5 text-slate-400">{activePart.description}</p>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-1 border-b border-slate-800/80 p-2" aria-label="Widget parts">
+            <div className="grid grid-cols-4 gap-1 border-b border-slate-800/80 p-2" aria-label={w.partsAria}>
               {editableParts.map((part) => {
                 const PartIcon = part.icon;
                 const isActive = selectedPart === part.id;
@@ -975,7 +927,7 @@ export default function WidgetDesigner({
                     key={part.id}
                     type="button"
                     title={part.label}
-                    aria-label={`Edit ${part.label}`}
+                    aria-label={formatMessage(w.editPart, { label: part.label })}
                     aria-pressed={isActive}
                     onClick={() => selectEditorPart(part.id)}
                     className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-1 text-[10px] font-semibold transition ${
@@ -995,7 +947,7 @@ export default function WidgetDesigner({
               {selectedPart === "presets" ? (
                 <div className="space-y-5">
                   <fieldset>
-                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Experience</legend>
+                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{w.experience}</legend>
                     <div className="mt-2 grid grid-cols-2 gap-2">
                       {widgetFormats.map((option) => (
                         <button
@@ -1009,7 +961,7 @@ export default function WidgetDesigner({
                               : "border-slate-800 text-slate-400 hover:border-slate-700 hover:text-white"
                           }`}
                         >
-                          {option}
+                          {w.formats[option]}
                         </button>
                       ))}
                     </div>
@@ -1058,26 +1010,26 @@ export default function WidgetDesigner({
               {selectedPart === "header" ? (
                 <div className="space-y-5">
                   <FieldInput
-                    label="Visible name"
+                    label={f.visibleName}
                     name="editor_widget_brand"
                     maxLength={widgetLimits.brand}
                     placeholder={widgetDefaults.brand}
                     value={brandInput}
                     onChange={setBrandInput}
-                    helper="The name customers see in the widget header."
+                    helper={f.visibleNameHelp}
                   />
                   <FieldInput
-                    label="Status line"
+                    label={f.statusLine}
                     name="editor_widget_human_support_text"
                     maxLength={widgetLimits.humanSupportText}
                     placeholder={widgetDefaults.humanSupportText}
                     value={humanSupportTextInput}
                     onChange={setHumanSupportTextInput}
-                    helper="Short availability or support message."
+                    helper={f.statusLineHelp}
                   />
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-1">
-                    <ColorInput label="Background" name="editor_header_bg" value={colorHeaderBg} onChange={setColorHeaderBg} defaultValue={appearanceDefaults.colorHeaderBg} />
-                    <ColorInput label="Text" name="editor_header_text" value={colorHeaderText} onChange={setColorHeaderText} defaultValue={appearanceDefaults.colorHeaderText} />
+                    <ColorInput label={f.background} name="editor_header_bg" value={colorHeaderBg} onChange={setColorHeaderBg} defaultValue={appearanceDefaults.colorHeaderBg} />
+                    <ColorInput label={f.text} name="editor_header_text" value={colorHeaderText} onChange={setColorHeaderText} defaultValue={appearanceDefaults.colorHeaderText} />
                   </div>
                 </div>
               ) : null}
@@ -1085,44 +1037,44 @@ export default function WidgetDesigner({
               {selectedPart === "chat" ? (
                 <div className="space-y-5">
                   <ColorInput
-                    label="Main accent"
+                    label={f.mainAccent}
                     name="editor_accent"
                     value={accentInput}
                     onChange={setAccentInput}
                     defaultValue={accentDefault}
-                    errorMessage="Use a 3- or 6-character hex value."
+                    errorMessage={w.invalidHexShort}
                   />
-                  <ColorInput label="Chat background" name="editor_chat_bg" value={colorChatBg} onChange={setColorChatBg} defaultValue={appearanceDefaults.colorChatBg} />
+                  <ColorInput label={f.chatBackground} name="editor_chat_bg" value={colorChatBg} onChange={setColorChatBg} defaultValue={appearanceDefaults.colorChatBg} />
                   <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-3 text-xs leading-5 text-slate-400">
-                    The accent is reused for active controls and subtle highlights to keep the design coherent.
+                    {f.accentNote}
                   </p>
                 </div>
               ) : null}
 
               {selectedPart === "botBubble" ? (
                 <div className="space-y-5">
-                  <ColorInput label="Bubble background" name="editor_bot_bg" value={colorBotBubbleBg} onChange={setColorBotBubbleBg} defaultValue={appearanceDefaults.colorBotBubbleBg} />
-                  <ColorInput label="Message text" name="editor_bot_text" value={colorBotBubbleText} onChange={setColorBotBubbleText} defaultValue={appearanceDefaults.colorBotBubbleText} />
+                  <ColorInput label={f.bubbleBackground} name="editor_bot_bg" value={colorBotBubbleBg} onChange={setColorBotBubbleBg} defaultValue={appearanceDefaults.colorBotBubbleBg} />
+                  <ColorInput label={f.messageText} name="editor_bot_text" value={colorBotBubbleText} onChange={setColorBotBubbleText} defaultValue={appearanceDefaults.colorBotBubbleText} />
                 </div>
               ) : null}
 
               {selectedPart === "userBubble" ? (
                 <div className="space-y-5">
-                  <ColorInput label="Bubble background" name="editor_user_bg" value={colorUserBubbleBg} onChange={setColorUserBubbleBg} defaultValue={appearanceDefaults.colorUserBubbleBg} />
-                  <ColorInput label="Message text" name="editor_user_text" value={colorUserBubbleText} onChange={setColorUserBubbleText} defaultValue={appearanceDefaults.colorUserBubbleText} />
+                  <ColorInput label={f.bubbleBackground} name="editor_user_bg" value={colorUserBubbleBg} onChange={setColorUserBubbleBg} defaultValue={appearanceDefaults.colorUserBubbleBg} />
+                  <ColorInput label={f.messageText} name="editor_user_text" value={colorUserBubbleText} onChange={setColorUserBubbleText} defaultValue={appearanceDefaults.colorUserBubbleText} />
                 </div>
               ) : null}
 
               {selectedPart === "composer" ? (
                 <div className="space-y-5">
                   <FieldInput
-                    label="Welcome message"
+                    label={f.welcome}
                     name="editor_widget_greeting"
                     maxLength={widgetLimits.greeting}
                     placeholder={widgetDefaults.greeting}
                     value={greetingInput}
                     onChange={setGreetingInput}
-                    helper="The first message shown when the conversation opens."
+                    helper={f.welcomeHelp}
                   />
                 </div>
               ) : null}
@@ -1130,16 +1082,16 @@ export default function WidgetDesigner({
               {selectedPart === "launcher" ? (
                 <div className="space-y-5">
                   <FieldInput
-                    label="Button text"
+                    label={f.buttonText}
                     name="editor_widget_label"
                     maxLength={widgetLimits.label}
                     placeholder={widgetDefaults.label}
                     value={labelInput}
                     onChange={setLabelInput}
-                    helper="Shown beside the launcher icon."
+                    helper={f.buttonTextHelp}
                   />
                   <fieldset>
-                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Launcher style</legend>
+                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{f.launcherStyle}</legend>
                     <div className="mt-2 grid grid-cols-2 gap-2">
                       {widgetLauncherStyles.map((option) => (
                         <button
@@ -1153,8 +1105,8 @@ export default function WidgetDesigner({
                               : "border-slate-800 text-slate-400 hover:border-slate-700"
                           }`}
                         >
-                          <span className="block text-sm font-semibold">{launcherStyleLabels[option]}</span>
-                          <span className="mt-1 block text-[11px] leading-4 text-slate-500">{launcherStyleHelp[option]}</span>
+                          <span className="block text-sm font-semibold">{w.launcherStyles[option].label}</span>
+                          <span className="mt-1 block text-[11px] leading-4 text-slate-500">{w.launcherStyles[option].help}</span>
                         </button>
                       ))}
                     </div>
@@ -1162,18 +1114,18 @@ export default function WidgetDesigner({
 
                   {launcherStyle === "card" ? (
                     <FieldInput
-                      label="Subtitle"
+                      label={f.subtitle}
                       name="editor_bubble_subtitle"
                       maxLength={widgetLimits.bubbleSubtitle}
                       placeholder={widgetDefaults.bubbleSubtitle}
                       value={bubbleSubtitleInput}
                       onChange={setBubbleSubtitleInput}
-                      helper="Secondary line inside the launcher card."
+                      helper={f.subtitleHelp}
                     />
                   ) : null}
 
                   <fieldset>
-                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Icon</legend>
+                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{f.icon}</legend>
                     <div className="mt-2 grid grid-cols-3 gap-2">
                       {widgetLauncherIcons.map((option) => {
                         const OptionIcon = option === "sparkles" ? Sparkles : option === "bot" ? Bot : option === "store" ? Store : option === "logo" ? ImageIcon : MessageSquare;
@@ -1181,8 +1133,8 @@ export default function WidgetDesigner({
                           <button
                             key={option}
                             type="button"
-                            title={launcherIconLabels[option]}
-                            aria-label={launcherIconLabels[option]}
+                            title={w.launcherIcons[option]}
+                            aria-label={w.launcherIcons[option]}
                             aria-pressed={launcherIcon === option}
                             onClick={() => setLauncherIcon(option)}
                             className={`flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl border text-[10px] font-semibold transition ${
@@ -1192,7 +1144,7 @@ export default function WidgetDesigner({
                             }`}
                           >
                             <OptionIcon className="h-5 w-5" aria-hidden="true" />
-                            {launcherIconLabels[option]}
+                            {w.launcherIcons[option]}
                           </button>
                         );
                       })}
@@ -1201,7 +1153,7 @@ export default function WidgetDesigner({
 
                   {launcherIcon === "logo" ? (
                     <div className="space-y-2">
-                      <label htmlFor="editor_launcher_logo_url" className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Logo image URL</label>
+                      <label htmlFor="editor_launcher_logo_url" className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{f.logoUrl}</label>
                       <input
                         id="editor_launcher_logo_url"
                         type="url"
@@ -1216,20 +1168,20 @@ export default function WidgetDesigner({
                   ) : null}
 
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-1">
-                    <ColorInput label="Background" name="editor_toggle_bg" value={colorToggleBg} onChange={setColorToggleBg} defaultValue={appearanceDefaults.colorToggleBg} />
-                    <ColorInput label="Icon color" name="editor_toggle_text" value={colorToggleText} onChange={setColorToggleText} defaultValue={appearanceDefaults.colorToggleText} />
+                    <ColorInput label={f.background} name="editor_toggle_bg" value={colorToggleBg} onChange={setColorToggleBg} defaultValue={appearanceDefaults.colorToggleBg} />
+                    <ColorInput label={f.iconColor} name="editor_toggle_text" value={colorToggleText} onChange={setColorToggleText} defaultValue={appearanceDefaults.colorToggleText} />
                   </div>
 
                   {launcherStyle === "card" ? (
                     <details className="rounded-xl border border-slate-800 p-3">
-                      <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.15em] text-slate-300">Card details</summary>
+                      <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.15em] text-slate-300">{f.cardDetails}</summary>
                       <div className="mt-4 space-y-5">
                         <div className="grid grid-cols-2 gap-4">
-                          <RangeInput label="Width" name="editor_bubble_width" value={bubbleWidth} onChange={setBubbleWidth} min={widgetLimits.bubbleWidth.min} max={widgetLimits.bubbleWidth.max} />
-                          <RangeInput label="Corners" name="editor_bubble_radius" value={bubbleRadius} onChange={setBubbleRadius} min={widgetLimits.bubbleRadius.min} max={widgetLimits.bubbleRadius.max} />
+                          <RangeInput label={f.width} name="editor_bubble_width" value={bubbleWidth} onChange={setBubbleWidth} min={widgetLimits.bubbleWidth.min} max={widgetLimits.bubbleWidth.max} />
+                          <RangeInput label={f.corners} name="editor_bubble_radius" value={bubbleRadius} onChange={setBubbleRadius} min={widgetLimits.bubbleRadius.min} max={widgetLimits.bubbleRadius.max} />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
-                          {[{ label: "3D glow", value: true }, { label: "Static", value: false }].map((option) => (
+                          {[{ label: f.glow3d, value: true }, { label: f.static, value: false }].map((option) => (
                             <button
                               key={option.label}
                               type="button"
@@ -1241,11 +1193,11 @@ export default function WidgetDesigner({
                             </button>
                           ))}
                         </div>
-                        <ColorInput label="Card background" name="editor_bubble_bg" value={colorBubbleBg} onChange={setColorBubbleBg} defaultValue={appearanceDefaults.colorBubbleBg} />
-                        <ColorInput label="Title" name="editor_bubble_text" value={colorBubbleText} onChange={setColorBubbleText} defaultValue={appearanceDefaults.colorBubbleText} />
-                        <ColorInput label="Subtitle" name="editor_bubble_subtext" value={colorBubbleSubtext} onChange={setColorBubbleSubtext} defaultValue={appearanceDefaults.colorBubbleSubtext} />
-                        <ColorInput label="Border" name="editor_bubble_border" value={colorBubbleBorder} onChange={setColorBubbleBorder} defaultValue={appearanceDefaults.colorBubbleBorder} />
-                        <ColorInput label="Glow" name="editor_bubble_glow" value={colorBubbleGlow} onChange={setColorBubbleGlow} defaultValue={appearanceDefaults.colorBubbleGlow} />
+                        <ColorInput label={f.cardBackground} name="editor_bubble_bg" value={colorBubbleBg} onChange={setColorBubbleBg} defaultValue={appearanceDefaults.colorBubbleBg} />
+                        <ColorInput label={f.title} name="editor_bubble_text" value={colorBubbleText} onChange={setColorBubbleText} defaultValue={appearanceDefaults.colorBubbleText} />
+                        <ColorInput label={f.subtitle} name="editor_bubble_subtext" value={colorBubbleSubtext} onChange={setColorBubbleSubtext} defaultValue={appearanceDefaults.colorBubbleSubtext} />
+                        <ColorInput label={f.border} name="editor_bubble_border" value={colorBubbleBorder} onChange={setColorBubbleBorder} defaultValue={appearanceDefaults.colorBubbleBorder} />
+                        <ColorInput label={f.glow} name="editor_bubble_glow" value={colorBubbleGlow} onChange={setColorBubbleGlow} defaultValue={appearanceDefaults.colorBubbleGlow} />
                       </div>
                     </details>
                   ) : null}
@@ -1255,7 +1207,7 @@ export default function WidgetDesigner({
               {selectedPart === "layout" ? (
                 <div className="space-y-5">
                   <fieldset>
-                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Screen side</legend>
+                    <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{f.screenSide}</legend>
                     <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-slate-800 p-1.5">
                       {widgetPositions.map((option) => (
                         <button
@@ -1265,20 +1217,20 @@ export default function WidgetDesigner({
                           onClick={() => setPosition(option)}
                           className={`rounded-lg px-4 py-2.5 text-sm font-semibold capitalize transition ${position === option ? "bg-white text-slate-950" : "text-slate-400 hover:text-white"}`}
                         >
-                          {option}
+                          {w.positions[option]}
                         </button>
                       ))}
                     </div>
                   </fieldset>
-                  <RangeInput label="Widget width" name="editor_width" value={width} onChange={setWidth} min={widgetLimits.width.min} max={widgetLimits.width.max} />
-                  <RangeInput label="Widget height" name="editor_height" value={height} onChange={setHeight} min={widgetLimits.height.min} max={widgetLimits.height.max} />
-                  <RangeInput label="Side spacing" name="editor_offset_x" value={offsetX} onChange={setOffsetX} min={widgetLimits.offsetX.min} max={widgetLimits.offsetX.max} />
-                  <RangeInput label="Bottom spacing" name="editor_offset_y" value={offsetY} onChange={setOffsetY} min={widgetLimits.offsetY.min} max={widgetLimits.offsetY.max} />
-                  <RangeInput label="Launcher size" name="editor_launcher_size" value={launcherSize} onChange={setLauncherSize} min={widgetLimits.launcherSize.min} max={widgetLimits.launcherSize.max} />
-                  <RangeInput label="Widget corners" name="editor_border_radius" value={borderRadius} onChange={setBorderRadius} min={widgetLimits.borderRadius.min} max={widgetLimits.borderRadius.max} />
+                  <RangeInput label={f.widgetWidth} name="editor_width" value={width} onChange={setWidth} min={widgetLimits.width.min} max={widgetLimits.width.max} />
+                  <RangeInput label={f.widgetHeight} name="editor_height" value={height} onChange={setHeight} min={widgetLimits.height.min} max={widgetLimits.height.max} />
+                  <RangeInput label={f.sideSpacing} name="editor_offset_x" value={offsetX} onChange={setOffsetX} min={widgetLimits.offsetX.min} max={widgetLimits.offsetX.max} />
+                  <RangeInput label={f.bottomSpacing} name="editor_offset_y" value={offsetY} onChange={setOffsetY} min={widgetLimits.offsetY.min} max={widgetLimits.offsetY.max} />
+                  <RangeInput label={f.launcherSize} name="editor_launcher_size" value={launcherSize} onChange={setLauncherSize} min={widgetLimits.launcherSize.min} max={widgetLimits.launcherSize.max} />
+                  <RangeInput label={f.widgetCorners} name="editor_border_radius" value={borderRadius} onChange={setBorderRadius} min={widgetLimits.borderRadius.min} max={widgetLimits.borderRadius.max} />
                   <div className="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-900/40 p-3 text-xs leading-5 text-slate-400">
                     <Move className="mt-0.5 h-4 w-4 shrink-0 text-violet-200" aria-hidden="true" />
-                    Mobile automatically keeps a safe full-width layout.
+                    {f.mobileNote}
                   </div>
                 </div>
               ) : null}
@@ -1287,8 +1239,8 @@ export default function WidgetDesigner({
 
           <details className="rounded-2xl border border-slate-800/80 bg-slate-950/45 p-4">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
-              <span className="flex items-center gap-2"><Frame className="h-4 w-4 text-violet-200" aria-hidden="true" />Installation code</span>
-              <span className="text-slate-600">Advanced</span>
+              <span className="flex items-center gap-2"><Frame className="h-4 w-4 text-violet-200" aria-hidden="true" />{w.installCode}</span>
+              <span className="text-slate-600">{w.advanced}</span>
             </summary>
             <div className="mt-4 space-y-3">
               <code className="block max-h-28 overflow-auto rounded-xl border border-slate-800 bg-slate-950 p-3 font-mono text-[10px] leading-relaxed text-slate-300 break-all">{embedSnippet}</code>
@@ -1298,7 +1250,7 @@ export default function WidgetDesigner({
                 className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-violet-400/60 hover:text-white"
               >
                 {copyState === "copied" ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Clipboard className="h-3.5 w-3.5" aria-hidden="true" />}
-                {copyState === "copied" ? "Copied" : "Copy code"}
+                {copyState === "copied" ? w.copied : w.copyCode}
               </button>
             </div>
           </details>

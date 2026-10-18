@@ -5,6 +5,9 @@ import Image from "next/image";
 import { usePathname } from "next/navigation"; // Nuevo import para UX de estado activo
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useI18n } from "@/lib/i18n/client";
+import type { Messages } from "@/lib/i18n/messages";
 
 // Iconos sencillos (SVG) para mejorar la UX visual sin instalar librerías extra
 const Icons = {
@@ -47,23 +50,24 @@ const Icons = {
 
 type NavLink = {
   href: string;
-  label: string;
+  labelKey: keyof Messages["nav"];
   requiresAuth?: boolean;
   hideWhenAuth?: boolean;
 };
 
 const NAV_LINKS: NavLink[] = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/dashboard/docs", label: "Docs" },
-  { href: "/academy", label: "Academy" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/contact", label: "Contact" },
-  { href: "/dashboard", label: "Dashboard", requiresAuth: true },
+  { href: "/", labelKey: "home" },
+  { href: "/about", labelKey: "about" },
+  { href: "/dashboard/docs", labelKey: "docs" },
+  { href: "/academy", labelKey: "academy" },
+  { href: "/pricing", labelKey: "pricing" },
+  { href: "/contact", labelKey: "contact" },
+  { href: "/dashboard", labelKey: "dashboard", requiresAuth: true },
 ];
 
 export default function Navbar() {
   const pathname = usePathname(); // Hook para saber la ruta actual
+  const { t } = useI18n();
   const [supabase, setSupabase] = useState<ReturnType<
     typeof createClient
   > | null>(null);
@@ -165,7 +169,7 @@ export default function Navbar() {
                 }`}
                 data-oid="oj0k0lk"
               >
-                {link.label}
+                {t.nav[link.labelKey]}
                 {isActive && (
                   <span
                     className="absolute inset-x-0 -bottom-px mx-auto h-px w-3/4 bg-neutral-500 shadow-[0_0_10px_rgba(161,161,170,0.5)]"
@@ -179,6 +183,7 @@ export default function Navbar() {
 
         {/* ACTIONS AREA */}
         <div className="hidden items-center gap-3 md:flex" data-oid="gs2q_g_">
+          <LanguageSwitcher />
           {isLoadingUser ? (
             <div
               className="ui-skeleton h-9 w-28 rounded-full"
@@ -209,7 +214,7 @@ export default function Navbar() {
               <button
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                title="Cerrar sesión"
+                title={t.nav.signOut}
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-700 bg-transparent text-slate-400 transition hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
                 data-oid="sjbjstv"
               >
@@ -223,24 +228,25 @@ export default function Navbar() {
                 className="text-sm font-medium text-slate-300 transition hover:text-white"
                 data-oid="lduq_rd"
               >
-                Log in
+                {t.nav.logIn}
               </Link>
               <Link
                 href="/signup"
                 className="group relative inline-flex items-center justify-center rounded-full bg-neutral-500 px-5 py-2 text-sm font-semibold text-slate-950 hover:text-amber-50 shadow-[0_0_20px_rgba(161,161,170,0.3)] transition-all hover:bg-neutral-400 hover:shadow-[0_0_25px_rgba(161,161,170,0.5)]"
                 data-oid="gjrst2r"
               >
-                Start for free
+                {t.nav.startFree}
               </Link>
             </>
           )}
         </div>
 
         {/* MOBILE TOGGLE */}
-        <div className="md:hidden" data-oid="j98of37">
+        <div className="flex items-center gap-2 md:hidden" data-oid="j98of37">
+          <LanguageSwitcher />
           <button
             type="button"
-            aria-label={isMenuOpen ? "Cerrar navegación" : "Abrir navegación"}
+            aria-label={isMenuOpen ? t.nav.closeMenu : t.nav.openMenu}
             onClick={() => setIsMenuOpen((prev) => !prev)}
             className="group relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-800 bg-slate-900/50 text-slate-300 transition active:scale-95"
             data-oid="0ahbp1p"
@@ -298,7 +304,7 @@ export default function Navbar() {
                 }`}
                 data-oid="a_c:t2k"
               >
-                {link.label}
+                {t.nav[link.labelKey]}
               </Link>
             );
           })}
@@ -330,7 +336,7 @@ export default function Navbar() {
                     {userEmail}
                   </p>
                   <p className="text-xs text-neutral-400" data-oid="qopy3av">
-                    Sesión iniciada
+                    {t.nav.signedIn}
                   </p>
                 </div>
               </div>
@@ -341,7 +347,7 @@ export default function Navbar() {
                 data-oid="jcdi9g2"
               >
                 <Icons.SignOut data-oid="9eqnwy_" />
-                {isSigningOut ? "Cerrando..." : "Cerrar sesión"}
+                {isSigningOut ? t.nav.signingOut : t.nav.signOut}
               </button>
             </div>
           ) : (
@@ -352,7 +358,7 @@ export default function Navbar() {
                 className="flex w-full justify-center rounded-xl border border-slate-700 bg-slate-800 py-3 text-sm font-semibold text-slate-200 transition active:scale-95"
                 data-oid="7-bv3lk"
               >
-                Log in
+                {t.nav.logIn}
               </Link>
               <Link
                 href="/signup"
@@ -360,7 +366,7 @@ export default function Navbar() {
                 className="flex w-full justify-center rounded-xl bg-neutral-500 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-neutral-900/20 transition active:scale-95"
                 data-oid="4330jov"
               >
-                Start for free
+                {t.nav.startFree}
               </Link>
             </div>
           )}

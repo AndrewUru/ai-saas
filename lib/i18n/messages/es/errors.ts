@@ -1,0 +1,28 @@
+import type { errors as en } from "../en/errors";
+
+export const errors: typeof en = {
+  notAuthenticated: "No has iniciado sesión.",
+  unauthorized: "No autorizado.",
+  agentNotFound: "Agente no encontrado.",
+  unauthorizedAgent: "No tienes permiso sobre este agente.",
+  invalidData: "Datos no válidos.",
+  couldNotSave: "No se pudo guardar.",
+  unknown: "Error desconocido.",
+  unexpected: "Error inesperado.",
+  invalidAgentId: "ID de agente no válido.",
+  couldNotRotate: "No se pudo rotar la clave.",
+  uniqueKey: "No se pudo generar una clave única.",
+  noFile: "No se ha subido ningún archivo.",
+  fileTooLarge: "El archivo supera el límite de 10 MB.",
+  fileType: "Solo se admiten archivos PDF o CSV.",
+  insertFailed: "No se pudo registrar el archivo.",
+  uploadUpdateFailed: "El archivo se subió, pero no se pudo actualizar su estado.",
+  fileNotFound: "Archivo no encontrado.",
+  missingStoragePath: "Al archivo le falta la ruta de almacenamiento.",
+  missingOpenAiKey: "Falta OPENAI_API_KEY para generar los embeddings.",
+  downloadFailed: "No se pudo descargar el archivo.",
+  unsupportedType: "Tipo de archivo no admitido.",
+  noText: "No se encontró texto aprovechable en el archivo.",
+  embeddingMismatch: "El número de embeddings no coincide.",
+  processingFailed: "Falló el procesamiento.",
+};

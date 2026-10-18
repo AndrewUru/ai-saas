@@ -3,6 +3,8 @@
 import { FormEvent, useMemo, useState } from "react";
 import { Bot, Send, Sparkles, User } from "lucide-react";
 
+import { useI18n } from "@/lib/i18n/client";
+
 type AgentSimulatorProps = {
   agentId: string;
 };
@@ -26,12 +28,6 @@ type ProductList = {
   }>;
 };
 
-const SAMPLE_PROMPTS = [
-  "Recommend a product for a first-time buyer",
-  "Do you have this in stock?",
-  "What is your shipping or return policy?",
-];
-
 function parseProductList(content: string): ProductList | null {
   const trimmed = content.trim();
   if (!trimmed.startsWith("{")) return null;
@@ -50,12 +46,13 @@ function parseProductList(content: string): ProductList | null {
 
 function AssistantMessage({ content }: { content: string }) {
   const productList = useMemo(() => parseProductList(content), [content]);
+  const { t } = useI18n();
 
   if (productList) {
     return (
       <div className="space-y-3">
         <p className="text-sm font-semibold text-white">
-          {productList.title ?? "Suggested products"}
+          {productList.title ?? t.agentPages.simulator.suggestedProducts}
         </p>
         <div className="grid gap-2">
           {productList.items.slice(0, 4).map((item) => (
@@ -103,6 +100,8 @@ export default function AgentSimulator({ agentId }: AgentSimulatorProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const { t } = useI18n();
+  const s = t.agentPages.simulator;
 
   async function sendMessage(message: string) {
     const text = message.trim();
@@ -126,19 +125,19 @@ export default function AgentSimulator({ agentId }: AgentSimulatorProps) {
       } | null;
 
       if (!res.ok) {
-        throw new Error(data?.error ?? "Could not test this agent.");
+        throw new Error(data?.error ?? s.error);
       }
 
       setMessages((current) => [
         ...current,
         {
           role: "assistant",
-          content: data?.reply ?? "No reply returned.",
+          content: data?.reply ?? s.noReply,
         },
       ]);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Could not test this agent.";
+        err instanceof Error ? err.message : s.error;
       setError(message);
     } finally {
       setIsSending(false);
@@ -155,28 +154,27 @@ export default function AgentSimulator({ agentId }: AgentSimulatorProps) {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-200">
-            Simulator
+            {s.eyebrow}
           </p>
           <h2 className="mt-2 text-xl font-semibold text-white">
-            Test this agent
+            {s.title}
           </h2>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-300">
-            Try real questions against the current prompt, catalog, and
-            knowledge files. Test messages do not consume quota.
+            {s.intro}
           </p>
         </div>
         <span className="inline-flex items-center gap-2 rounded-full border border-neutral-400/25 bg-neutral-400/10 px-3 py-1 text-xs font-semibold text-neutral-100">
           <Sparkles className="h-3.5 w-3.5" />
-          Preview mode
+          {s.previewMode}
         </span>
       </div>
 
       <div className="mt-5 min-h-64 rounded-2xl border border-slate-800 bg-slate-950/45 p-4">
         {messages.length === 0 ? (
           <div className="flex min-h-52 flex-col justify-center gap-3 text-sm text-slate-400">
-            <p className="font-medium text-slate-200">Start with a scenario</p>
+            <p className="font-medium text-slate-200">{s.start}</p>
             <div className="flex flex-wrap gap-2">
-              {SAMPLE_PROMPTS.map((prompt) => (
+              {s.samplePrompts.map((prompt) => (
                 <button
                   key={prompt}
                   type="button"
@@ -229,7 +227,7 @@ export default function AgentSimulator({ agentId }: AgentSimulatorProps) {
             {isSending && (
               <div className="flex items-center gap-3 text-xs text-slate-400">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-neutral-300" />
-                Testing agent response...
+                {s.testing}
               </div>
             )}
           </div>
@@ -246,7 +244,7 @@ export default function AgentSimulator({ agentId }: AgentSimulatorProps) {
         <input
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          placeholder="Ask about products, shipping, sizing, returns..."
+          placeholder={s.placeholder}
           className="ui-input min-w-0 flex-1"
           maxLength={2000}
         />
@@ -256,7 +254,7 @@ export default function AgentSimulator({ agentId }: AgentSimulatorProps) {
           className="ui-button ui-button--primary shrink-0 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Send className="h-4 w-4" />
-          Send test
+          {s.send}
         </button>
       </form>
     </article>

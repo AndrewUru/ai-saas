@@ -1,29 +1,17 @@
-type Entry = {
-  date: string;
-  title: string;
-  items: string[];
-};
+import type { Metadata } from "next";
 
-const entries: Entry[] = [
-  {
-    date: "2025-10-09",
-    title: "Personalización avanzada para agentes",
-    items: [
-      "Prompt de sistema editable, idioma preferido y URL de fallback por agente.",
-      "Widget mejorado con brand kit, botón flotante y estados de escritura.",
-    ],
-  },
-  {
-    date: "2025-10-08",
-    title: "Integraciones WooCommerce",
-    items: [
-      "Registro de tiendas con credenciales cifradas y control de dominios permitidos.",
-      "Asignación rápida desde la ficha del agente y validación en tiempo real.",
-    ],
-  },
-];
+import { getI18n } from "@/lib/i18n/server";
 
-export default function ChangelogPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.changelog.meta.title };
+}
+
+export default async function ChangelogPage() {
+  const { t } = await getI18n();
+  const c = t.changelog;
+  const entries = c.entries;
+
   return (
     <main className="bg-slate-950 text-slate-100" data-oid="c1xi924">
       <section
@@ -35,15 +23,13 @@ export default function ChangelogPage() {
             className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="8quh773"
           >
-            Novedades
+            {c.eyebrow}
           </p>
           <h1 className="text-3xl font-semibold sm:text-4xl" data-oid="1gebve9">
-            Historial de actualizaciones
+            {c.title}
           </h1>
           <p className="text-sm text-slate-300 sm:text-base" data-oid="h50jhm9">
-            Cada semana añadimos mejoras para agencias que integran AI SaaS en
-            sus tiendas online. Revisa los cambios recientes y comparte el
-            roadmap con tu equipo.
+            {c.intro}
           </p>
         </header>
 

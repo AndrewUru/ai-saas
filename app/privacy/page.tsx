@@ -1,4 +1,16 @@
-export default function PrivacyPage() {
+import type { Metadata } from "next";
+
+import { getI18n } from "@/lib/i18n/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.privacy.meta.title };
+}
+
+export default async function PrivacyPage() {
+  const { t } = await getI18n();
+  const p = t.privacy;
+
   return (
     <main className="bg-slate-950 text-slate-100" data-oid="9hctdf7">
       <section
@@ -10,15 +22,13 @@ export default function PrivacyPage() {
             className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="zl3ndeo"
           >
-            Legal Documentation
+            {p.eyebrow}
           </p>
           <h1 className="text-3xl font-semibold sm:text-4xl" data-oid="muompsk">
-            Privacy Policy
+            {p.title}
           </h1>
           <p className="text-sm text-slate-300 sm:text-base" data-oid="ysy0brf">
-            This page summarizes how we collect, use, and protect the data
-            entrusted to us by ecommerce agencies and their clients. This
-            document is updated as we add new features to the platform.
+            {p.intro}
           </p>
         </header>
 
@@ -26,39 +36,14 @@ export default function PrivacyPage() {
           className="mt-12 space-y-6 text-sm text-slate-300"
           data-oid="k48dkg:"
         >
-          <section className="space-y-2" data-oid="ewa4ov4">
-            <h2 className="text-lg font-semibold text-white" data-oid="5xbaabn">
-              Data We Store
-            </h2>
-            <p data-oid="xrfvkg2">
-              We only store the information required to operate the agents:
-              encrypted credentials from external services, billing details, and
-              the messages exchanged with end customers. We do not share this
-              data with third parties outside the agency that owns the account.
-            </p>
-          </section>
-
-          <section className="space-y-2" data-oid="77kqp4c">
-            <h2 className="text-lg font-semibold text-white" data-oid="cl01cbp">
-              Data Processing
-            </h2>
-            <p data-oid="i1-_tsc">
-              Access to sensitive information is limited to automated system
-              processes. Any manual intervention (technical support or audits)
-              requires written authorization from the agency and is logged.
-            </p>
-          </section>
-
-          <section className="space-y-2" data-oid="3tqzumn">
-            <h2 className="text-lg font-semibold text-white" data-oid="-_g:r35">
-              Retention and Deletion
-            </h2>
-            <p data-oid="1wjh554">
-              You may request full deletion of your data at any time. We retain
-              records for 30 days after account cancellation to comply with
-              accounting obligations and to address potential incidents.
-            </p>
-          </section>
+          {p.sections.map((section) => (
+            <section key={section.title} className="space-y-2">
+              <h2 className="text-lg font-semibold text-white">
+                {section.title}
+              </h2>
+              <p>{section.body}</p>
+            </section>
+          ))}
         </article>
       </section>
     </main>

@@ -16,36 +16,14 @@ import {
 
 import {
   getWidgetTemplate,
+  localizeWidgetTemplate,
   type WidgetTemplateId,
-  widgetTemplates,
+  widgetTemplates as baseWidgetTemplates,
 } from "@/lib/widget/templates";
+import { useI18n } from "@/lib/i18n/client";
+import { format } from "@/lib/i18n/config";
 
-const conversations = [
-  {
-    label: "Delivery",
-    question: "Will this arrive before Friday?",
-    answer:
-      "Yes. Order in the next 2 hours for Thursday delivery. The sand color is ready to ship.",
-    insight: "Delivery hesitation detected",
-    action: "Create a shipping reassurance rule",
-  },
-  {
-    label: "Product fit",
-    question: "Which one works best for sensitive skin?",
-    answer:
-      "The Calm Set is fragrance-free and has the gentlest formula. I can add the travel size too.",
-    insight: "High-intent recommendation",
-    action: "Suggest the Calm Set bundle",
-  },
-  {
-    label: "Returns",
-    question: "Can I return it if the size is wrong?",
-    answer:
-      "Absolutely. You have 30 days, and the first size exchange is free. Want the sizing guide?",
-    insight: "Return-policy friction detected",
-    action: "Surface size guidance earlier",
-  },
-] as const;
+const productColors = ["#c8b8a4", "#a9b0a2"];
 
 const templateIcons: Record<WidgetTemplateId, LucideIcon> = {
   whatsapp: MessageCircle,
@@ -58,7 +36,16 @@ export function Hero() {
   const [templateId, setTemplateId] =
     useState<WidgetTemplateId>("online-store");
   const [conversationIndex, setConversationIndex] = useState(0);
-  const template = getWidgetTemplate(templateId);
+  const { t } = useI18n();
+  const h = t.landing.hero;
+  const conversations = h.conversations;
+  const widgetTemplates = baseWidgetTemplates.map((item) =>
+    localizeWidgetTemplate(item, t.widgetTemplates[item.id]),
+  );
+  const template = localizeWidgetTemplate(
+    getWidgetTemplate(templateId),
+    t.widgetTemplates[templateId],
+  );
   const conversation = conversations[conversationIndex];
   const appearance = template.settings.appearance;
   const ActiveIcon = templateIcons[templateId];
@@ -85,19 +72,18 @@ export function Hero() {
                 style={{ backgroundColor: template.settings.accent }}
               />
             </span>
-            Commerce intelligence, live in every conversation
+            {h.badge}
           </div>
 
           <h1 className="mt-8 max-w-4xl text-balance text-5xl font-semibold tracking-[-0.055em] text-white sm:text-7xl lg:text-[5.25rem] lg:leading-[0.95]">
-            Turn shopper questions into
+            {h.titleLine1}
             <span className="mt-2 block bg-gradient-to-r from-white via-zinc-300 to-zinc-600 bg-clip-text text-transparent">
-              revenue signals.
+              {h.titleLine2}
             </span>
           </h1>
 
           <p className="mt-7 max-w-2xl text-pretty text-lg leading-8 text-zinc-400 sm:text-xl">
-            An AI agent that sells, supports, and shows your team exactly where
-            customers hesitate—before those questions become abandoned carts.
+            {h.subtitle}
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -105,7 +91,7 @@ export function Hero() {
               href="/signup"
               className="group inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-white px-7 text-sm font-semibold text-black transition hover:scale-[1.02] hover:bg-zinc-100 active:scale-[0.98]"
             >
-              Build your first agent
+              {h.primaryCta}
               <ArrowRight
                 className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
                 aria-hidden="true"
@@ -115,7 +101,7 @@ export function Hero() {
               href="#experience"
               className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-7 text-sm font-semibold text-white backdrop-blur-xl transition hover:border-white/20 hover:bg-white/[0.07]"
             >
-              See the intelligence loop
+              {h.secondaryCta}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </div>
@@ -125,7 +111,7 @@ export function Hero() {
             <span className="h-1 w-1 rounded-full bg-zinc-800" />
             <span>Shopify</span>
             <span className="h-1 w-1 rounded-full bg-zinc-800" />
-            <span>Install once</span>
+            <span>{h.installOnce}</span>
           </div>
         </div>
 
@@ -147,7 +133,7 @@ export function Hero() {
               </span>
               <span className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                Live
+                {h.live}
               </span>
             </div>
 
@@ -158,8 +144,8 @@ export function Hero() {
                   NORTH/STAR
                 </span>
                 <div className="hidden items-center gap-6 text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500 sm:flex">
-                  <span>New</span>
-                  <span>Essentials</span>
+                  <span>{h.storeNavNew}</span>
+                  <span>{h.storeNavEssentials}</span>
                   <ShoppingBag className="h-4 w-4" aria-hidden="true" />
                 </div>
               </div>
@@ -169,25 +155,22 @@ export function Hero() {
                   <div className="absolute -right-16 top-12 h-64 w-64 rounded-full border-[38px] border-[#c0aa91]/60" />
                   <div className="absolute bottom-[-4rem] right-6 h-72 w-32 rotate-[18deg] rounded-[4rem_4rem_1.5rem_1.5rem] bg-gradient-to-b from-[#3d2f29] to-[#171210] shadow-2xl" />
                   <p className="relative max-w-[12rem] text-3xl font-semibold leading-[1.02] tracking-[-0.045em] text-[#332b27] sm:text-4xl">
-                    Everyday objects, considered.
+                    {h.storeHeadline}
                   </p>
                   <span className="absolute bottom-5 left-6 rounded-full bg-white/70 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.15em] text-zinc-700 backdrop-blur">
-                    Explore collection
+                    {h.exploreCollection}
                   </span>
                 </div>
 
                 <div className="hidden flex-col gap-4 sm:flex">
-                  {[
-                    ["Calm set", "$68", "#c8b8a4"],
-                    ["Travel ritual", "$34", "#a9b0a2"],
-                  ].map(([name, price, color]) => (
+                  {h.products.map(({ name, price }, index) => (
                     <div
                       key={name}
                       className="flex flex-1 flex-col justify-between rounded-[1.4rem] bg-white/65 p-4 text-zinc-800"
                     >
                       <div
                         className="mx-auto h-24 w-16 rounded-[2rem_2rem_.8rem_.8rem] shadow-lg"
-                        style={{ backgroundColor: color }}
+                        style={{ backgroundColor: productColors[index] }}
                       />
                       <div className="flex items-end justify-between">
                         <span className="text-xs font-semibold">{name}</span>
@@ -228,7 +211,7 @@ export function Hero() {
                           {template.settings.brandName}
                         </span>
                         <span className="block text-[9px] opacity-65">
-                          Catalog connected · online
+                          {h.catalogOnline}
                         </span>
                       </span>
                     </div>
@@ -260,7 +243,7 @@ export function Hero() {
                 <div className="mt-2 grid grid-cols-2 gap-2">
                   <div className="rounded-xl border border-amber-400/20 bg-[#111]/90 p-2.5 text-white shadow-xl backdrop-blur-xl">
                     <span className="text-[8px] font-bold uppercase tracking-[0.16em] text-amber-300">
-                      Insight
+                      {h.insight}
                     </span>
                     <p className="mt-1 text-[10px] leading-4 text-zinc-300">
                       {conversation.insight}
@@ -269,7 +252,7 @@ export function Hero() {
                   <div className="rounded-xl border border-emerald-400/20 bg-[#111]/90 p-2.5 text-white shadow-xl backdrop-blur-xl">
                     <span className="flex items-center gap-1 text-[8px] font-bold uppercase tracking-[0.16em] text-emerald-300">
                       <Check className="h-2.5 w-2.5" aria-hidden="true" />
-                      Next action
+                      {h.nextAction}
                     </span>
                     <p className="mt-1 text-[10px] leading-4 text-zinc-300">
                       {conversation.action}
@@ -301,7 +284,7 @@ export function Hero() {
           <div
             className="mt-3 grid grid-cols-4 gap-2"
             role="group"
-            aria-label="Widget style"
+            aria-label={h.widgetStyleAria}
           >
             {widgetTemplates.map((item) => {
               const Icon = templateIcons[item.id];
@@ -311,7 +294,7 @@ export function Hero() {
                 <button
                   key={item.id}
                   type="button"
-                  aria-label={`Use ${item.name} style`}
+                  aria-label={format(h.useStyleAria, { name: item.name })}
                   aria-pressed={selected}
                   onClick={() => setTemplateId(item.id)}
                   className={`flex min-w-0 items-center justify-center gap-2 rounded-xl border px-2 py-2.5 text-[10px] font-semibold transition sm:text-xs ${

@@ -2,7 +2,14 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { generateAgentApiKey } from "@/lib/agents/keys";
 import { requireUser } from "@/lib/auth/requireUser";
-import { getAgentLimit, getDefaultMessageLimit, getPlanConfig } from "@/lib/plans";
+import { format, intlLocales } from "@/lib/i18n/config";
+import { getI18n } from "@/lib/i18n/server";
+import {
+  getAgentLimit,
+  getDefaultMessageLimit,
+  getPlanConfig,
+  normalizePlanId,
+} from "@/lib/plans";
 
 export default async function AgentsPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -10,6 +17,8 @@ export default async function AgentsPage(props: {
   const searchParams = await props.searchParams;
   const currentError = searchParams.error;
   const { supabase, user } = await requireUser();
+  const { locale, t } = await getI18n();
+  const a = t.agents;
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -17,9 +26,10 @@ export default async function AgentsPage(props: {
     .eq("id", user.id)
     .single();
   const planConfig = getPlanConfig(profile?.plan);
+  const planName = t.plans[normalizePlanId(profile?.plan)].name;
   const agentLimit = getAgentLimit(profile?.plan);
   const agentLimitLabel =
-    agentLimit === Number.POSITIVE_INFINITY ? "Unlimited" : agentLimit;
+    agentLimit === Number.POSITIVE_INFINITY ? t.dashCommon.unlimited : agentLimit;
 
   const { data: agents } = await supabase
     .from("agents")
@@ -97,7 +107,7 @@ export default async function AgentsPage(props: {
             data-oid="4spvj.w"
           >
             <p className="font-semibold" data-oid="6fs1ga2">
-              Unable to create agent
+              {a.createError}
             </p>
             <p className="text-sm opacity-80" data-oid="y:a:.4v">
               {currentError}
@@ -115,7 +125,7 @@ export default async function AgentsPage(props: {
               className="text-[10px] uppercase tracking-wider text-(--foreground-muted)"
               data-oid="z0yo1b:"
             >
-              Agents Created
+              {a.created}
             </span>
             <div className="flex items-center gap-2 mt-1" data-oid="ztt1prf">
               <div
@@ -137,10 +147,10 @@ export default async function AgentsPage(props: {
               className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]"
               data-oid="4ongqbw"
             >
-              Default Limit
+              {a.defaultLimit}
             </span>
             <span className="text-xl font-bold mt-1" data-oid="ij5j588">
-              {planConfig.messageLimit.toLocaleString("en-US")}
+              {planConfig.messageLimit.toLocaleString(intlLocales[locale])}
             </span>
           </div>
 
@@ -157,10 +167,10 @@ export default async function AgentsPage(props: {
                   className="text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]"
                   data-oid="sifm0hq"
                 >
-                  Need help?
+                  {a.needHelp}
                 </span>
                 <p className="text-sm font-medium mt-1" data-oid="v1e._14">
-                  Check our detailed integration guides
+                  {a.guides}
                 </p>
               </div>
               <Link
@@ -168,7 +178,7 @@ export default async function AgentsPage(props: {
                 className="ui-button ui-button--subtle text-xs"
                 data-oid="-smml4."
               >
-                View Docs
+                {a.viewDocs}
               </Link>
             </div>
           </div>
@@ -189,13 +199,13 @@ export default async function AgentsPage(props: {
                 className="text-xl font-bold text-foreground"
                 data-oid="1riw9ml"
               >
-                Active Agents
+                {a.activeAgents}
               </h2>
               <span
                 className="text-sm text-[var(--foreground-muted)]"
                 data-oid="9:6rrd4"
               >
-                Manage settings and integrations
+                {a.manage}
               </span>
             </div>
 
@@ -216,14 +226,13 @@ export default async function AgentsPage(props: {
                   className="text-lg font-semibold text-foreground"
                   data-oid="oql6hqd"
                 >
-                  No agents yet
+                  {a.emptyTitle}
                 </h3>
                 <p
                   className="text-[var(--foreground-muted)] max-w-sm mt-2"
                   data-oid="mtjuvpk"
                 >
-                  Create your first agent to generate an API key and start
-                  automating your ecommerce support.
+                  {a.emptyBody}
                 </p>
               </div>
             ) : (
@@ -232,7 +241,7 @@ export default async function AgentsPage(props: {
                   const statusColor = agent.is_active
                     ? "bg-accent"
                     : "bg-[var(--foreground-muted)]";
-                  const statusText = agent.is_active ? "Active" : "Paused";
+                  const statusText = agent.is_active ? t.dashCommon.active : t.dashCommon.paused;
                   const maskedKey = `${agent.api_key?.slice(0, 6) ?? "N/A"}...`;
 
                   return (
@@ -273,7 +282,7 @@ export default async function AgentsPage(props: {
                             data-oid="4b65uqj"
                           >
                             <span className="opacity-70" data-oid="v.o56l:">
-                              Key:
+                              {a.key}
                             </span>
                             <span
                               className="font-mono text-foreground/80"
@@ -283,8 +292,8 @@ export default async function AgentsPage(props: {
                             </span>
                           </span>
                           <span data-oid="8bqqvtb">
-                            Limit:{" "}
-                            {agent.messages_limit?.toLocaleString() ?? "∞"}
+                            {a.limit}{" "}
+                            {agent.messages_limit?.toLocaleString(intlLocales[locale]) ?? "∞"}
                           </span>
                         </div>
                       </div>
@@ -298,7 +307,7 @@ export default async function AgentsPage(props: {
                           className="ui-button ui-button--secondary text-xs"
                           data-oid="-py4aju"
                         >
-                          Open workspace
+                          {t.dashCommon.openWorkspace}
                         </Link>
                         <form action={deleteAgent} data-oid="bsi7cqb">
                           <input
@@ -313,7 +322,7 @@ export default async function AgentsPage(props: {
                             className="ui-button ui-button--ghost text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10"
                             data-oid="4tl4hy5"
                           >
-                            Delete
+                            {a.delete}
                           </button>
                         </form>
                       </div>
@@ -335,20 +344,19 @@ export default async function AgentsPage(props: {
                   className="text-xs font-bold uppercase tracking-widest text-accent"
                   data-oid="76eggo-"
                 >
-                  New Agent
+                  {a.newAgent}
                 </span>
                 <h2
                   className="text-xl font-bold text-foreground mt-2"
                   data-oid="e4ecq2x"
                 >
-                  Deploy new instance
+                  {a.deployTitle}
                 </h2>
                 <p
                   className="text-sm text-[var(--foreground-muted)] mt-2"
                   data-oid="hrw6on-"
                 >
-                  Generate a new API key immediately. You can rename and
-                  reconfigure it anytime.
+                  {a.deployBody}
                 </p>
               </div>
 
@@ -363,12 +371,12 @@ export default async function AgentsPage(props: {
                     className="text-xs font-semibold uppercase tracking-wider text-[var(--foreground-muted)]"
                     data-oid="-cs_.jt"
                   >
-                    Agent Name
+                    {a.nameLabel}
                   </label>
                   <input
                     id="name"
                     name="name"
-                    placeholder="e.g. 'Main Store Support'"
+                    placeholder={a.namePlaceholder}
                     required
                     className="w-full rounded-xl bg-surface border border-border px-4 py-3 text-sm text-foreground outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all placeholder:text-[var(--foreground-muted)]/50"
                     data-oid="5191v5x"
@@ -380,7 +388,7 @@ export default async function AgentsPage(props: {
                   className="ui-button ui-button--primary w-full justify-center py-3 text-sm"
                   data-oid="uivvsb:"
                 >
-                  Generate Agent
+                  {a.generate}
                 </button>
               </form>
 
@@ -389,14 +397,17 @@ export default async function AgentsPage(props: {
                 data-oid="11si0.b"
               >
                 <p data-oid="_2_6r44">
-                  • API keys are generated with secure randomness.
+                  {a.noteKeys}
                 </p>
                 <p data-oid="nh-j-wh">
-                  • Initial limits adhere to your plan defaults.
+                  {a.noteLimits}
                 </p>
                 <p>
-                  • Current plan: {planConfig.name} ({agents?.length ?? 0}/
-                  {agentLimitLabel} agents).
+                  {format(a.notePlan, {
+                    plan: planName,
+                    count: agents?.length ?? 0,
+                    limit: agentLimitLabel,
+                  })}
                 </p>
               </div>
             </div>

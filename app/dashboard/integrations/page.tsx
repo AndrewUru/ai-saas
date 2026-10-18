@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/requireUser";
+import { format, intlLocales, type Locale } from "@/lib/i18n/config";
+import type { Messages } from "@/lib/i18n/messages";
+import { getI18n } from "@/lib/i18n/server";
+
+type IntegrationsText = Messages["integrations"];
 
 type IntegrationBase = {
   id: string;
@@ -24,11 +29,14 @@ type IntegrationPanelProps<T extends IntegrationBase> = {
   items: T[];
   getLabel: (item: T) => string;
   getSubtitle: (item: T) => string;
+  text: IntegrationsText;
+  statusText: { active: string; paused: string };
+  locale: Locale;
 };
 
-function formatSyncDate(value: string | null) {
-  if (!value) return "Not synced yet";
-  return new Intl.DateTimeFormat("en-US", {
+function formatSyncDate(value: string | null, locale: Locale, fallback: string) {
+  if (!value) return fallback;
+  return new Intl.DateTimeFormat(intlLocales[locale], {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
@@ -60,11 +68,15 @@ function countActive<T extends { is_active: boolean | null }>(items: T[]) {
   return items.filter((item) => item.is_active).length;
 }
 
-function formatLabel(label: string | null, fallback: string | null) {
+function formatLabel(
+  label: string | null,
+  fallback: string | null,
+  unnamed: string,
+) {
   const trimmed = label?.trim();
   if (trimmed) return trimmed;
   if (fallback) return fallback;
-  return "Unnamed integration";
+  return unnamed;
 }
 
 function IntegrationPanel<T extends IntegrationBase>({
@@ -74,13 +86,16 @@ function IntegrationPanel<T extends IntegrationBase>({
   items,
   getLabel,
   getSubtitle,
+  text,
+  statusText,
+  locale,
 }: IntegrationPanelProps<T>) {
   const total = items.length;
   const activeCount = countActive(items);
   const indexedCount = sumIndexed(items);
   const lastSyncAt = getLatestSync(items);
   const recentItems = items.slice(0, 3);
-  const actionLabel = total === 0 ? "Connect" : "Manage";
+  const actionLabel = total === 0 ? text.connect : text.manage;
 
   return (
     <article className="ui-card flex h-full flex-col p-6" data-oid=".2al.dc">
@@ -93,7 +108,7 @@ function IntegrationPanel<T extends IntegrationBase>({
             className="text-[10px] uppercase tracking-[0.3em] text-[var(--foreground-muted)]"
             data-oid="erh:xpv"
           >
-            Provider
+            {text.provider}
           </p>
           <h2
             className="text-xl font-semibold text-foreground"
@@ -113,7 +128,7 @@ function IntegrationPanel<T extends IntegrationBase>({
             className="rounded-full border border-border bg-surface px-3 py-1 text-[10px] uppercase tracking-wider text-[var(--foreground-muted)]"
             data-oid="prfqpzj"
           >
-            {activeCount}/{total} active
+            {format(text.activeCount, { active: activeCount, total })}
           </span>
           <Link
             href={href}
@@ -130,21 +145,21 @@ function IntegrationPanel<T extends IntegrationBase>({
         data-oid="ob5daiy"
       >
         <div className="flex items-center justify-between" data-oid="u0.1nhs">
-          <span data-oid="3r1:egl">Connections</span>
+          <span data-oid="3r1:egl">{text.connections}</span>
           <span className="font-medium text-foreground" data-oid="3:a9a1q">
             {total}
           </span>
         </div>
         <div className="flex items-center justify-between" data-oid="ufx8.hp">
-          <span data-oid="h7d41w6">Indexed products</span>
+          <span data-oid="h7d41w6">{text.indexedProducts}</span>
           <span className="font-medium text-foreground" data-oid="7ex8rfg">
-            {indexedCount.toLocaleString("en-US")}
+            {indexedCount.toLocaleString(intlLocales[locale])}
           </span>
         </div>
         <div className="flex items-center justify-between" data-oid=":o_dmv:">
-          <span data-oid="vr50w71">Last sync</span>
+          <span data-oid="vr50w71">{text.lastSync}</span>
           <span className="font-medium text-foreground" data-oid="w8:c46z">
-            {formatSyncDate(lastSyncAt)}
+            {formatSyncDate(lastSyncAt, locale, text.notSynced)}
           </span>
         </div>
       </div>
@@ -155,13 +170,13 @@ function IntegrationPanel<T extends IntegrationBase>({
           data-oid="pyivl2c"
         >
           <p className="text-sm font-medium text-foreground">
-            No {title} connection yet
+            {format(text.emptyTitle, { provider: title })}
           </p>
           <p className="mx-auto mt-2 max-w-sm text-sm text-[var(--foreground-muted)]">
-            Add your first store to start syncing products and make agent answers more useful.
+            {text.emptyBody}
           </p>
           <Link href={href} className="ui-button ui-button--ghost mt-5 text-xs">
-            Connect {title}
+            {format(text.connectProvider, { provider: title })}
           </Link>
         </div>
       ) : (
@@ -170,7 +185,7 @@ function IntegrationPanel<T extends IntegrationBase>({
             className="text-xs uppercase tracking-[0.2em] text-[var(--foreground-muted)]"
             data-oid="r-3qczk"
           >
-            Recent connections
+            {text.recent}
           </p>
           <ul className="space-y-3" data-oid="4xpyv34">
             {recentItems.map((item) => {
@@ -206,7 +221,7 @@ function IntegrationPanel<T extends IntegrationBase>({
                       .join(" ")}
                     data-oid="0uaah33"
                   >
-                    {isActive ? "Active" : "Paused"}
+                    {isActive ? statusText.active : statusText.paused}
                   </span>
                 </li>
               );
@@ -217,7 +232,7 @@ function IntegrationPanel<T extends IntegrationBase>({
               className="text-xs text-[var(--foreground-muted)]"
               data-oid="y:d.xi9"
             >
-              Showing the latest 3 connections.
+              {text.showingLatest}
             </p>
           )}
         </div>
@@ -261,6 +276,9 @@ function StatCard({
 
 export default async function IntegrationsPage() {
   const { supabase, user } = await requireUser();
+  const { locale, t } = await getI18n();
+  const it = t.integrations;
+  const statusText = { active: t.dashCommon.active, paused: t.dashCommon.paused };
 
   const [wooResult, shopifyResult] = await Promise.all([
     supabase
@@ -301,19 +319,19 @@ export default async function IntegrationsPage() {
             className="text-[10px] uppercase tracking-[0.3em] text-[var(--foreground-muted)]"
             data-oid="ljn2_s_"
           >
-            Integrations
+            {it.eyebrow}
           </p>
           <h1
             className="text-3xl font-bold tracking-tight text-foreground"
             data-oid="hp3qp90"
           >
-            Connect your stores
+            {it.title}
           </h1>
           <p
             className="text-sm text-[var(--foreground-muted)]"
             data-oid="znkwuc2"
           >
-            Manage WooCommerce and Shopify connections used by your agents.
+            {it.subtitle}
           </p>
         </div>
         <Link
@@ -321,7 +339,7 @@ export default async function IntegrationsPage() {
           className="ui-button ui-button--ghost"
           data-oid="p54o2z1"
         >
-          View documentation
+          {it.viewDocs}
         </Link>
       </div>
 
@@ -330,33 +348,33 @@ export default async function IntegrationsPage() {
           className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-5 py-4 text-sm text-red-200"
           data-oid="9ry3fa:"
         >
-          We could not load integrations. Please refresh the page.
+          {it.loadError}
         </div>
       )}
 
       <div className="grid gap-4 sm:grid-cols-3" data-oid="mnqujaz">
         <StatCard
-          label="Total connections"
+          label={it.totalConnections}
           value={totalConnections}
           helper="WooCommerce + Shopify"
           data-oid="07nrk9x"
         />
 
         <StatCard
-          label="Active connections"
+          label={it.activeConnections}
           value={activeConnections}
           helper={
             activeConnections === totalConnections
-              ? "All stores are active"
-              : "Some stores are paused"
+              ? it.allActive
+              : it.somePaused
           }
           data-oid="f:--woc"
         />
 
         <StatCard
-          label="Products indexed"
-          value={totalIndexed.toLocaleString("en-US")}
-          helper="Across all stores"
+          label={it.productsIndexed}
+          value={totalIndexed.toLocaleString(intlLocales[locale])}
+          helper={it.acrossStores}
           data-oid="hs5nhnm"
         />
       </div>
@@ -364,21 +382,27 @@ export default async function IntegrationsPage() {
       <div className="mt-8 grid gap-6 lg:grid-cols-2" data-oid="p_4_wja">
         <IntegrationPanel
           title="WooCommerce"
-          description="Sync inventory, orders, and customers from Woo stores."
+          description={it.woo.description}
           href="/integrations/woo"
           items={wooIntegrations}
-          getLabel={(item) => formatLabel(item.label, item.store_url)}
-          getSubtitle={(item) => item.store_url ?? "Store URL not set"}
+          getLabel={(item) => formatLabel(item.label, item.store_url, it.unnamed)}
+          getSubtitle={(item) => item.store_url ?? it.woo.missing}
+          text={it}
+          statusText={statusText}
+          locale={locale}
           data-oid="x9l281z"
         />
 
         <IntegrationPanel
           title="Shopify"
-          description="Keep Shopify catalogs and order data in sync."
+          description={it.shopify.description}
           href="/integrations/shopify"
           items={shopifyIntegrations}
-          getLabel={(item) => formatLabel(item.label, item.shop_domain)}
-          getSubtitle={(item) => item.shop_domain ?? "Shop domain not set"}
+          getLabel={(item) => formatLabel(item.label, item.shop_domain, it.unnamed)}
+          getSubtitle={(item) => item.shop_domain ?? it.shopify.missing}
+          text={it}
+          statusText={statusText}
+          locale={locale}
           data-oid=".nn4id2"
         />
       </div>

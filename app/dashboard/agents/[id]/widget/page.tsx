@@ -3,6 +3,8 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import SubmitButton from "@/components/SubmitButton";
 import { requireUser } from "@/lib/auth/requireUser";
+import { format } from "@/lib/i18n/config";
+import { getI18n } from "@/lib/i18n/server";
 import { getSiteUrlFromHeaders } from "@/lib/site";
 import {
   sanitizeHex,
@@ -281,6 +283,8 @@ export default async function AgentWidgetPage({
   const { id } = await params;
   const query = await searchParams;
   const { supabase, user } = await requireUser();
+  const { t } = await getI18n();
+  const wp = t.widgetEditor.page;
   let { data: agent, error } = await supabase
     .from("agents")
     .select(WIDGET_AGENT_SELECT)
@@ -339,34 +343,34 @@ export default async function AgentWidgetPage({
     <form action={updateWidget} className="space-y-6">
       <input type="hidden" name="agent_id" value={agent.id} />
       <header className="ui-card--strong p-4 sm:p-6">
-        <p className="ui-badge">Widget</p>
+        <p className="ui-badge">{wp.badge}</p>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold text-white">
-              Design {agent.name}
+              {format(wp.title, { name: agent.name })}
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-300">
-              Click any part of the live widget to customize it, then save when it feels right.
+              {wp.intro}
             </p>
           </div>
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <SubmitButton label="Save widget" />
+            <SubmitButton label={wp.save} />
             <Link
               href={`/dashboard/agents/${agent.id}`}
               className="ui-button ui-button--ghost w-full sm:w-auto"
             >
-              Back to setup
+              {t.agentPages.backToSetup}
             </Link>
           </div>
         </div>
       </header>
 
       {query.saved === "1" ? (
-        <div className="ui-alert ui-alert--success">Widget saved.</div>
+        <div className="ui-alert ui-alert--success">{wp.saved}</div>
       ) : null}
       {query.error ? (
         <div className="ui-alert ui-alert--error">
-          We could not save the widget. Please try again.
+          {wp.error}
         </div>
       ) : null}
 

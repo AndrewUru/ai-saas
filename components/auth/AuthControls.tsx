@@ -1,4 +1,8 @@
+"use client";
+
 import Image from "next/image";
+
+import { useI18n } from "@/lib/i18n/client";
 
 export type AuthStatusValue = {
   intent: "info" | "success" | "error";
@@ -43,11 +47,13 @@ export function GoogleAuthButton({
   );
 }
 
-export function AuthDivider({ label = "o continúa con" }: { label?: string }) {
+export function AuthDivider({ label }: { label?: string }) {
+  const { t } = useI18n();
+
   return (
     <div className="my-6 flex items-center gap-4 text-[11px] font-medium text-zinc-600">
       <span className="h-px flex-1 bg-white/[0.08]" />
-      {label}
+      {label ?? t.auth.divider}
       <span className="h-px flex-1 bg-white/[0.08]" />
     </div>
   );

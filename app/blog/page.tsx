@@ -1,4 +1,16 @@
-export default function BlogPage() {
+import type { Metadata } from "next";
+
+import { getI18n } from "@/lib/i18n/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t.blog.meta.title };
+}
+
+export default async function BlogPage() {
+  const { t } = await getI18n();
+  const b = t.blog;
+
   return (
     <main className="bg-slate-950 text-slate-100" data-oid="9t:81fa">
       <section
@@ -13,14 +25,13 @@ export default function BlogPage() {
             className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
             data-oid="-9_s3v."
           >
-            Blog para agencias
+            {b.eyebrow}
           </p>
           <h1 className="text-4xl font-bold sm:text-5xl" data-oid="1gt4ba.">
-            Ideas para escalar servicios recurrentes en ecommerce
+            {b.title}
           </h1>
           <p className="text-base text-slate-300 sm:text-lg" data-oid="jsuh2vm">
-            Historias, experimentos y tacticas compartidas por agencias que ya
-            venden agentes de IA como parte de su oferta.
+            {b.intro}
           </p>
         </header>
 
@@ -33,17 +44,16 @@ export default function BlogPage() {
               className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300"
               data-oid="qt-br5l"
             >
-              Destacado
+              {b.featured}
             </p>
             <h2
               className="mt-3 text-xl font-semibold text-white"
               data-oid="3wtdfyk"
             >
-              Como convertir implementaciones en retainer mensual
+              {b.featuredTitle}
             </h2>
             <p className="mt-3 text-sm text-slate-300" data-oid="gs7c6nc">
-              Modelos de precio, contratos y reportes que agencias usan para
-              fidelizar clientes de tiendas online con agentes siempre activos.
+              {b.featuredBody}
             </p>
           </article>
 
@@ -52,12 +62,10 @@ export default function BlogPage() {
             data-oid="mgjdhe8"
           >
             <h2 className="text-xl font-semibold text-white" data-oid="qyyvfby">
-              Recursos en camino
+              {b.upcomingTitle}
             </h2>
             <p className="mt-3 text-sm text-slate-300" data-oid="aqc1992">
-              Estamos preparando entrevistas con directores de CX, guias sobre
-              prompts de venta cruzada y plantillas de propuestas comerciales.
-              Suscribete para recibirlos primero.
+              {b.upcomingBody}
             </p>
             <form
               className="mt-6 flex flex-col gap-3 sm:flex-row"
@@ -65,7 +73,7 @@ export default function BlogPage() {
             >
               <input
                 type="email"
-                placeholder="tuemail@agencia.com"
+                placeholder={b.emailPlaceholder}
                 className="w-full rounded-full border border-slate-700 bg-slate-950/80 px-5 py-3 text-sm text-white placeholder:text-slate-500 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-400/30"
                 data-oid="soe:afm"
               />
@@ -75,7 +83,7 @@ export default function BlogPage() {
                 className="rounded-full bg-neutral-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-neutral-300"
                 data-oid="_mrxg-g"
               >
-                Avisame
+                {b.notifyMe}
               </button>
             </form>
           </article>

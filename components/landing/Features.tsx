@@ -9,19 +9,25 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const frictionSignals = [
-  { label: "Delivery cost", value: 78, color: "bg-amber-300" },
-  { label: "Product fit", value: 61, color: "bg-violet-300" },
-  { label: "Return policy", value: 42, color: "bg-sky-300" },
+import { getI18n } from "@/lib/i18n/server";
+
+const frictionSignalStyles = [
+  { value: 78, color: "bg-amber-300" },
+  { value: 61, color: "bg-violet-300" },
+  { value: 42, color: "bg-sky-300" },
 ] as const;
 
-const approvalQueue = [
-  "Add shipping threshold answer",
-  "Recommend an in-stock alternative",
-  "Escalate refund requests",
-] as const;
+const operateIcons = [MessagesSquare, PackageSearch, BrainCircuit, ShieldCheck];
 
-export function Features() {
+export async function Features() {
+  const { t } = await getI18n();
+  const f = t.landing.features;
+  const frictionSignals = f.learn.signals.map((label, index) => ({
+    label,
+    ...frictionSignalStyles[index],
+  }));
+  const approvalQueue = f.control.queue;
+
   return (
     <section
       id="features"
@@ -34,16 +40,14 @@ export function Features() {
         <div className="grid gap-8 lg:grid-cols-[.72fr_1.28fr] lg:items-end">
           <div>
             <span className="text-xs font-semibold uppercase tracking-[0.24em] text-violet-300">
-              One continuous loop
+              {f.eyebrow}
             </span>
             <h2 className="mt-4 text-balance text-4xl font-semibold tracking-[-0.045em] text-white sm:text-6xl">
-              The widget is only the surface.
+              {f.title}
             </h2>
           </div>
           <p className="max-w-2xl text-pretty text-lg leading-8 text-zinc-400 lg:justify-self-end">
-            Every conversation enriches a shared operating system for commerce:
-            better recommendations for shoppers, clearer signals for teams, and
-            improvements that stay under human control.
+            {f.description}
           </p>
         </div>
 
@@ -54,14 +58,13 @@ export function Features() {
               <div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-black/6 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em]">
                   <PackageSearch className="h-3.5 w-3.5" aria-hidden="true" />
-                  Sell
+                  {f.sell.tag}
                 </span>
                 <h3 className="mt-5 max-w-lg text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
-                  Recommendations grounded in the live catalog.
+                  {f.sell.title}
                 </h3>
                 <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-600 sm:text-base">
-                  Match intent with price, stock, variants, policies, and useful
-                  alternatives instead of sending generic replies.
+                  {f.sell.description}
                 </p>
               </div>
               <ArrowUpRight
@@ -73,13 +76,13 @@ export function Features() {
             <div className="relative mt-10 grid gap-3 sm:grid-cols-[.82fr_1.18fr]">
               <div className="rounded-[1.5rem] bg-[#28231f] p-5 text-white shadow-2xl">
                 <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
-                  Shopper intent
+                  {f.sell.intentLabel}
                 </span>
                 <p className="mt-8 text-xl font-medium leading-7">
-                  “I need a fragrance-free routine under $80.”
+                  {f.sell.intentQuote}
                 </p>
                 <div className="mt-8 flex flex-wrap gap-2">
-                  {["Sensitive skin", "Budget $80", "Ready to buy"].map(
+                  {f.sell.signals.map(
                     (signal) => (
                       <span
                         key={signal}
@@ -95,11 +98,11 @@ export function Features() {
               <div className="rounded-[1.5rem] border border-black/8 bg-white/70 p-4 shadow-xl backdrop-blur-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">
-                    Best match
+                    {f.sell.bestMatch}
                   </span>
                   <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700">
                     <Sparkles className="h-3 w-3" aria-hidden="true" />
-                    In stock
+                    {f.sell.inStock}
                   </span>
                 </div>
                 <div className="mt-4 flex gap-4">
@@ -107,15 +110,15 @@ export function Features() {
                     <div className="h-20 w-10 rounded-[1.2rem_1.2rem_.5rem_.5rem] bg-[#f4efe8] shadow-lg" />
                   </div>
                   <div className="min-w-0 py-1">
-                    <p className="text-sm font-semibold">Calm skin set</p>
+                    <p className="text-sm font-semibold">{f.sell.productName}</p>
                     <p className="mt-1 text-xs leading-5 text-zinc-500">
-                      Fragrance-free · 3 products
+                      {f.sell.productMeta}
                     </p>
-                    <p className="mt-4 text-lg font-semibold">$68</p>
+                    <p className="mt-4 text-lg font-semibold">{f.sell.productPrice}</p>
                   </div>
                 </div>
                 <div className="mt-4 flex items-center justify-between rounded-xl bg-black px-3 py-2.5 text-xs font-semibold text-white">
-                  Recommend bundle
+                  {f.sell.recommend}
                   <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </div>
               </div>
@@ -127,22 +130,21 @@ export function Features() {
             <div className="relative">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-violet-200">
                 <BrainCircuit className="h-3.5 w-3.5" aria-hidden="true" />
-                Learn
+                {f.learn.tag}
               </span>
               <h3 className="mt-5 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl">
-                See why shoppers hesitate.
+                {f.learn.title}
               </h3>
               <p className="mt-4 text-sm leading-6 text-zinc-400 sm:text-base">
-                Group real conversations into patterns your team can understand
-                and act on.
+                {f.learn.description}
               </p>
 
               <div className="mt-10 rounded-[1.5rem] border border-white/8 bg-black/30 p-5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-white">
-                    Friction map
+                    {f.learn.frictionMap}
                   </span>
-                  <span className="text-[10px] text-zinc-500">Last 30 days</span>
+                  <span className="text-[10px] text-zinc-500">{f.learn.period}</span>
                 </div>
                 <div className="mt-7 space-y-6">
                   {frictionSignals.map((signal) => (
@@ -169,10 +171,10 @@ export function Features() {
           <article className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#111] p-6 sm:p-8 lg:col-span-5">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-200">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-              Control
+              {f.control.tag}
             </span>
             <h3 className="mt-5 text-3xl font-semibold tracking-[-0.04em] text-white">
-              AI proposes. Your team approves.
+              {f.control.title}
             </h3>
             <div className="mt-8 space-y-2">
               {approvalQueue.map((item, index) => (
@@ -204,32 +206,26 @@ export function Features() {
               <div>
                 <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-violet-200">
                   <Gauge className="h-3.5 w-3.5" aria-hidden="true" />
-                  Operate
+                  {f.operate.tag}
                 </span>
                 <h3 className="mt-5 max-w-xl text-3xl font-semibold tracking-[-0.04em] text-white">
-                  One cockpit for every store you manage.
+                  {f.operate.title}
                 </h3>
                 <p className="mt-4 max-w-lg text-sm leading-6 text-zinc-400">
-                  Keep each brand, catalog, prompt, and handoff policy separate
-                  while sharing the workflows that already work.
+                  {f.operate.description}
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-2 sm:w-56">
-                {[
-                  [MessagesSquare, "Conversations"],
-                  [PackageSearch, "Catalog"],
-                  [BrainCircuit, "Training"],
-                  [ShieldCheck, "Handoffs"],
-                ].map(([Icon, label]) => {
-                  const CardIcon = Icon as typeof MessagesSquare;
+                {f.operate.tiles.map((label, index) => {
+                  const CardIcon = operateIcons[index];
                   return (
                     <div
-                      key={label as string}
+                      key={label}
                       className="flex aspect-square flex-col justify-between rounded-2xl border border-white/8 bg-black/25 p-3"
                     >
                       <CardIcon className="h-4 w-4 text-zinc-300" aria-hidden="true" />
                       <span className="text-[9px] font-medium text-zinc-500">
-                        {label as string}
+                        {label}
                       </span>
                     </div>
                   );

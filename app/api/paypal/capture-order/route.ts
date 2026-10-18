@@ -1,6 +1,8 @@
 //C:\ai-saas\app\api\paypal\capture-order\route.ts
 
 import { NextResponse } from "next/server";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
 import { getDefaultMessageLimit } from "@/lib/plans";
 import { createServer } from "@/lib/supabase/server";
 import { createAdmin } from "@/lib/supabase/admin";
@@ -120,6 +122,7 @@ async function captureOrder(
 }
 
 export async function POST(req: Request) {
+  const e = getMessages(getRequestLocale(req)).api;
   try {
     const bodyUnknown: unknown = await req.json().catch(() => null);
 
@@ -137,7 +140,7 @@ export async function POST(req: Request) {
 
     if (!orderID) {
       return NextResponse.json(
-        { ok: false, error: "orderID requerido" },
+        { ok: false, error: e.paypal.orderIdRequired },
         { status: 400 }
       );
     }
@@ -149,7 +152,7 @@ export async function POST(req: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { ok: false, error: "No autenticado" },
+        { ok: false, error: e.notAuthenticated },
         { status: 401 }
       );
     }
@@ -165,14 +168,14 @@ export async function POST(req: Request) {
     if (existingSubErr) {
       console.error(existingSubErr);
       return NextResponse.json(
-        { ok: false, error: "DB read falló" },
+        { ok: false, error: e.paypal.dbRead },
         { status: 500 }
       );
     }
 
     if (existingSub?.user_id && existingSub.user_id !== user.id) {
       return NextResponse.json(
-        { ok: false, error: "Orden no pertenece al usuario" },
+        { ok: false, error: e.paypal.orderNotOwned },
         { status: 403 }
       );
     }
@@ -182,7 +185,7 @@ export async function POST(req: Request) {
 
     if (capture.status !== "COMPLETED") {
       return NextResponse.json(
-        { ok: false, error: "Pago no completado" },
+        { ok: false, error: e.paypal.notCompleted },
         { status: 400 }
       );
     }
@@ -190,7 +193,7 @@ export async function POST(req: Request) {
     const captureId = extractCaptureId(capture);
     if (!captureId) {
       return NextResponse.json(
-        { ok: false, error: "No se pudo obtener capture_id" },
+        { ok: false, error: e.paypal.noCaptureId },
         { status: 400 }
       );
     }
@@ -211,7 +214,7 @@ export async function POST(req: Request) {
       if (subUpdateErr) {
         console.error(subUpdateErr);
         return NextResponse.json(
-          { ok: false, error: "DB subscriptions falló" },
+          { ok: false, error: e.paypal.dbSubscriptions },
           { status: 500 }
         );
       }
@@ -229,7 +232,7 @@ export async function POST(req: Request) {
       if (subInsertErr) {
         console.error(subInsertErr);
         return NextResponse.json(
-          { ok: false, error: "DB subscriptions falló" },
+          { ok: false, error: e.paypal.dbSubscriptions },
           { status: 500 }
         );
       }
@@ -244,7 +247,7 @@ export async function POST(req: Request) {
     if (profUpdateErr) {
       console.error(profUpdateErr);
       return NextResponse.json(
-        { ok: false, error: "DB profiles falló" },
+        { ok: false, error: e.paypal.dbProfiles },
         { status: 500 }
       );
     }
@@ -257,7 +260,7 @@ export async function POST(req: Request) {
       if (profUpsertErr) {
         console.error(profUpsertErr);
         return NextResponse.json(
-          { ok: false, error: "DB profiles falló" },
+          { ok: false, error: e.paypal.dbProfiles },
           { status: 500 }
         );
       }
@@ -273,7 +276,7 @@ export async function POST(req: Request) {
     if (agentLimitErr) {
       console.error(agentLimitErr);
       return NextResponse.json(
-        { ok: false, error: "DB agents falló" },
+        { ok: false, error: e.paypal.dbAgents },
         { status: 500 }
       );
     }
@@ -282,7 +285,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error(error);
     const message =
-      error instanceof Error ? error.message : "Error desconocido";
+      error instanceof Error ? error.message : e.unknown;
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }

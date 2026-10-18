@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useI18n } from "@/lib/i18n/client";
+import { rich } from "@/lib/i18n/rich";
 import { getEmbedSnippet } from "@/lib/widget/embedSnippet";
 
 type Props = {
@@ -10,6 +12,8 @@ type Props = {
 
 export default function EmbedSnippet({ apiKey }: Props) {
   const [copied, setCopied] = useState(false);
+  const { t } = useI18n();
+  const e = t.agentPages.embed;
 
   const snippet = getEmbedSnippet(apiKey);
 
@@ -29,7 +33,7 @@ export default function EmbedSnippet({ apiKey }: Props) {
         data-oid="w-j2-ih"
       >
         <h3 className="text-lg font-semibold text-white" data-oid="1csi-4o">
-          Embed snippet
+          {e.title}
         </h3>
 
         <button
@@ -38,13 +42,12 @@ export default function EmbedSnippet({ apiKey }: Props) {
           className="rounded-full bg-neutral-400 px-4 py-1.5 text-xs font-semibold text-slate-950 transition hover:bg-neutral-300"
           data-oid="37itwtt"
         >
-          {copied ? "Copied" : "Copy code"}
+          {copied ? e.copied : e.copy}
         </button>
       </div>
 
       <p className="mt-2 text-sm text-slate-300" data-oid="-x0.ex:">
-        Copy and paste this script into your WordPress (footer or HTML widget).
-        The snippet stays the same even when you update settings.
+        {e.intro}
       </p>
 
       <pre
@@ -55,7 +58,7 @@ export default function EmbedSnippet({ apiKey }: Props) {
       </pre>
 
       <p className="mt-3 text-xs text-slate-500" data-oid="wl4ik4k">
-        The widget checks your active plan and usage limits before loading.
+        {e.planCheck}
       </p>
 
       {/* NEXT / REACT NOTICE */}
@@ -63,18 +66,19 @@ export default function EmbedSnippet({ apiKey }: Props) {
         className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 text-xs text-amber-200"
         data-oid="fpr-0j8"
       >
-        <strong data-oid="xeocbbo">React / Next.js:</strong>
+        <strong data-oid="xeocbbo">{e.reactTitle}</strong>
         <br data-oid="kwlnfq3" />
-        Do not paste this script directly inside React components. Use the
-        official integration method described in the{" "}
-        <Link
-          href="/dashboard/docs"
-          className="underline font-semibold hover:text-amber-100"
-          data-oid="bk:9hdw"
-        >
-          documentation
-        </Link>
-        .
+        {rich(e.reactBody, {
+          link: (
+            <Link
+              href="/dashboard/docs"
+              className="underline font-semibold hover:text-amber-100"
+              data-oid="bk:9hdw"
+            >
+              {e.docsLink}
+            </Link>
+          ),
+        })}
       </div>
     </article>
   );

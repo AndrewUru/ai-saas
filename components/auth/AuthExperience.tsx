@@ -1,6 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck, Sparkles } from "lucide-react";
+
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useI18n } from "@/lib/i18n/client";
 
 type AuthExperienceProps = {
   children: React.ReactNode;
@@ -17,6 +22,9 @@ export default function AuthExperience({
   footer,
   title,
 }: AuthExperienceProps) {
+  const { t } = useI18n();
+  const x = t.auth.experience;
+
   return (
     <main className="relative min-h-svh overflow-hidden bg-[#090a0e] text-white">
       <div
@@ -29,7 +37,7 @@ export default function AuthExperience({
       </div>
 
       <header className="absolute inset-x-0 top-0 z-20 flex h-20 items-center justify-between px-5 sm:px-8 lg:px-12">
-        <Link href="/" aria-label="Volver al inicio" className="inline-flex">
+        <Link href="/" aria-label={x.backHome} className="inline-flex">
           <Image
             src="/logo.svg"
             alt="AICommerce"
@@ -40,14 +48,17 @@ export default function AuthExperience({
           />
         </Link>
 
+        <div className="flex items-center gap-3">
+        <LanguageSwitcher />
         <Link
           href="/"
-          aria-label="Volver al inicio"
+          aria-label={x.backHome}
           className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.035] px-3 text-xs font-semibold text-zinc-400 transition hover:border-white/15 hover:bg-white/[0.07] hover:text-white"
         >
           <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-          <span className="hidden sm:inline">Volver al inicio</span>
+          <span className="hidden sm:inline">{x.backHome}</span>
         </Link>
+        </div>
       </header>
 
       <div className="relative mx-auto grid min-h-svh w-full max-w-7xl lg:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)]">
@@ -57,21 +68,20 @@ export default function AuthExperience({
               <Sparkles className="h-7 w-7 text-white" aria-hidden="true" />
             </div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-300">
-              AI Commerce Agents
+              {x.brand}
             </p>
             <h2 className="mt-5 max-w-lg text-balance text-5xl font-semibold leading-[1.04] tracking-[-0.045em] text-zinc-50 xl:text-6xl">
-              Todo tu equipo de IA en un solo lugar.
+              {x.sideTitle}
             </h2>
             <p className="mt-6 max-w-md text-base leading-7 text-zinc-500">
-              Configura, entrena y publica agentes que acompañan a tus clientes
-              en cada conversación.
+              {x.sideDescription}
             </p>
 
             <div className="mt-10 inline-flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.035] px-4 py-3 text-xs text-zinc-400 backdrop-blur-xl">
               <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300">
                 <ShieldCheck className="h-4 w-4" aria-hidden="true" />
               </span>
-              Acceso privado y protegido
+              {x.secure}
             </div>
           </div>
         </aside>

@@ -5,12 +5,15 @@ import { Features } from "@/components/landing/Features";
 import { Hero } from "@/components/landing/Hero";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { Workflow } from "@/components/landing/Workflow";
+import { getI18n } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  title: "AI Commerce Agents | Turn conversations into revenue signals",
-  description:
-    "Deploy branded AI agents for WooCommerce and Shopify that answer shoppers, recommend products, detect sales friction, and suggest improvements.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return {
+    title: t.landing.meta.title,
+    description: t.landing.meta.description,
+  };
+}
 
 export default function HomePage() {
   return (

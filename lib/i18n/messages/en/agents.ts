@@ -1,0 +1,26 @@
+export const agents = {
+  createError: "Unable to create agent",
+  created: "Agents Created",
+  defaultLimit: "Default Limit",
+  needHelp: "Need help?",
+  guides: "Check our detailed integration guides",
+  viewDocs: "View Docs",
+  activeAgents: "Active Agents",
+  manage: "Manage settings and integrations",
+  emptyTitle: "No agents yet",
+  emptyBody:
+    "Create your first agent to generate an API key and start automating your ecommerce support.",
+  key: "Key:",
+  limit: "Limit:",
+  delete: "Delete",
+  newAgent: "New Agent",
+  deployTitle: "Deploy new instance",
+  deployBody:
+    "Generate a new API key immediately. You can rename and reconfigure it anytime.",
+  nameLabel: "Agent Name",
+  namePlaceholder: "e.g. 'Main Store Support'",
+  generate: "Generate Agent",
+  noteKeys: "• API keys are generated with secure randomness.",
+  noteLimits: "• Initial limits adhere to your plan defaults.",
+  notePlan: "• Current plan: {plan} ({count}/{limit} agents).",
+};

@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { chatWithAgent, FALLBACK_AGENT_MODEL } from "@/lib/agents/chat-service";
 import { resolveRequestHost } from "@/lib/security/domains";
 import { createAdmin } from "@/lib/supabase/admin";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getMessages } from "@/lib/i18n/messages";
 
 const AGENT_MODEL = process.env.OPENAI_AGENT_MODEL ?? FALLBACK_AGENT_MODEL;
 const CORS_HEADERS = {
@@ -53,6 +55,8 @@ function extractMessage(body: Record<string, unknown>) {
 }
 
 export async function POST(req: Request) {
+  const locale = getRequestLocale(req);
+  const e = getMessages(locale).api;
   try {
     const url = new URL(req.url);
     const catalog = url.searchParams.get("catalog") ?? null;
@@ -65,7 +69,7 @@ export async function POST(req: Request) {
       body = await req.json();
     } catch {
       console.warn("[AI SaaS] /api/agent/chat invalid JSON body");
-      return jsonResponse({ error: "Invalid JSON body" }, { status: 400 });
+      return jsonResponse({ error: e.invalidJson }, { status: 400 });
     }
 
     const bodyRecord =
@@ -76,13 +80,13 @@ export async function POST(req: Request) {
 
     if (!apiKey) {
       console.warn("[AI SaaS] /api/agent/chat 400: missing agent key");
-      return jsonResponse({ error: "Missing agent key" }, { status: 400 });
+      return jsonResponse({ error: e.missingKey }, { status: 400 });
     }
 
     if (!message) {
       console.warn("[AI SaaS] /api/agent/chat 400: missing message");
       return jsonResponse(
-        { error: "Missing message (message or messages[] required)" },
+        { error: e.missingMessage },
         { status: 400 }
       );
     }
@@ -94,6 +98,7 @@ export async function POST(req: Request) {
         catalog: catalog ?? undefined,
         currency: currency ?? undefined,
         requestHost: resolveRequestHost(req),
+        locale,
       },
       {
         supabase: createAdmin(),
@@ -118,7 +123,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("[AI SaaS] Error en /api/agent/chat:", err);
     return jsonResponse(
-      { error: "Error interno del servidor." },
+      { error: e.internal },
       { status: 500 }
     );
   }
