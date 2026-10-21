@@ -131,6 +131,9 @@ const { chromium } = requireModule(
       };
       await load();
       assert.equal(await page.locator(".ai-store-card").count(), 2);
+      await page.getByLabel("Categoría", { exact: true }).selectOption("Café");
+      assert.equal(await page.locator(".ai-store-card").count(), 1);
+      await page.getByLabel("Categoría", { exact: true }).selectOption("");
       assert.equal(
         await page.locator(".ai-store-card img").count(),
         0,
@@ -140,9 +143,13 @@ const { chromium } = requireModule(
         .getByRole("searchbox", { name: "Buscar productos…" })
         .fill("cafe");
       assert.equal(await page.locator(".ai-store-card").count(), 1);
-      await page
-        .getByRole("button", { name: "Ver Café natural", exact: true })
-        .click();
+      // A click on the image area opens the detail, while Add only updates the cart.
+      await page.getByRole("button", { name: "Añadir", exact: true }).click();
+      assert.equal(await page.locator(".ai-store-detail").count(), 0);
+      await page.getByRole("button", { name: "Deshacer", exact: true }).click();
+      const media = await page.locator(".ai-store-image").boundingBox();
+      await page.mouse.click(media.x + media.width / 2, media.y + media.height / 2);
+      await page.getByText("Disponible · 3 unidades", { exact: true }).waitFor();
       await page.getByLabel("Cantidad", { exact: true }).fill("2");
       await page
         .getByRole("button", { name: "Añadir al carrito", exact: true })

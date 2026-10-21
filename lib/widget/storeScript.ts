@@ -17,6 +17,10 @@ export const STORE_SCRIPT = String.raw`
         status.setAttribute('aria-live', 'polite');
         const style = document.createElement('style');
         style.textContent = [
+          '#ai-saas-anchor .ai-store-grid .ai-store-card{position:relative}',
+          '#ai-saas-anchor .ai-store-open::after{content:"";position:absolute;inset:0;border-radius:14px;cursor:pointer}',
+          '#ai-saas-anchor .ai-store-grid .ai-store-primary{position:relative;z-index:1}',
+          '#ai-saas-anchor .ai-store-open:focus-visible::after{outline:2px solid var(--ai-bot-text);outline-offset:2px}',
           '#ai-saas-anchor .ai-store-nav,#ai-saas-anchor .ai-store-panel,#ai-saas-anchor .ai-store-status{width:100%;align-self:stretch}',
           '#ai-saas-anchor.ai-format-assistant[data-store-view=store] .ai-assistant-stage,#ai-saas-anchor.ai-format-assistant[data-store-view=cart] .ai-assistant-stage{gap:0;padding:0;align-items:stretch}',
           '#ai-saas-anchor [hidden]{display:none!important}',
@@ -113,8 +117,12 @@ export const STORE_SCRIPT = String.raw`
           switchView('store'); panel.replaceChildren();
           const section = el('div', undefined, 'ai-store-detail');
           section.append(button(tr('← Volver al catálogo', '← Back to catalog'), render), image(product), el('h2', product.name), el('strong', money(product.price_cents)), el('p', product.description));
+          section.appendChild(el('p', product.stock > 0
+            ? tr('Disponible · ', 'In stock · ') + product.stock + tr(' unidades', ' units')
+            : tr('Agotado', 'Sold out')));
           const label = el('label', tr('Cantidad', 'Quantity'));
           const quantity = document.createElement('input'); quantity.type = 'number'; quantity.min = '1'; quantity.max = String(Math.min(99, product.stock)); quantity.value = '1'; quantity.step = '1';
+          if (product.stock <= 0) { quantity.disabled = true; quantity.min = '0'; quantity.value = '0'; }
           label.appendChild(quantity); section.appendChild(label);
           const buy = button(product.stock > 0 ? tr('Añadir al carrito', 'Add to cart') : tr('Agotado', 'Sold out'), () => add(product, Number(quantity.value)), true);
           buy.disabled = product.stock <= 0; section.appendChild(buy);
@@ -139,6 +147,7 @@ export const STORE_SCRIPT = String.raw`
             matches.forEach(product => {
               const card = el('article', undefined, 'ai-store-card');
               const open = button(tr('Ver detalles', 'View details'), () => detail(product));
+              open.classList.add('ai-store-open');
               open.setAttribute('aria-label', tr('Ver ', 'View ') + product.name);
               const buy = button(product.stock > 0 ? tr('Añadir', 'Add') : tr('Agotado', 'Sold out'), () => add(product, 1), true); buy.disabled = product.stock <= 0;
               card.append(image(product), el('h3', product.name), el('strong', money(product.price_cents)), open, buy); grid.appendChild(card);
