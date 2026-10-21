@@ -17,6 +17,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { key: "copilot", href: "/dashboard" },
   { key: "agents", href: "/dashboard/agents" },
+  { key: "store", href: "/dashboard/store" },
   { key: "integrations", href: "/dashboard/integrations" },
   { key: "billing", href: "/dashboard/billing" },
   { key: "docs", href: "/dashboard/docs" },

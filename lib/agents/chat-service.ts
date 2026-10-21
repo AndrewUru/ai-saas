@@ -6,6 +6,7 @@ import {
 } from "@/lib/contracts/agent";
 import { wooSearchProductsByApiKey } from "@/lib/tools/woo";
 import { shopifySearchProductsByApiKey } from "@/lib/tools/shopify";
+import { searchNativeProducts } from "@/lib/commerce/search";
 import { embedTexts } from "@/lib/knowledge/embed";
 import { toPgVector } from "@/lib/woo/embeddings";
 import {
@@ -32,6 +33,7 @@ type AgentMessageRecord = {
 };
 
 type ProductSearchItem = {
+  native_product?: boolean;
   id: string | number;
   name: string;
   price: string | null;
@@ -142,6 +144,7 @@ function buildProductListReply(
     type: "product_list",
     title: buildProductListTitle(language, query),
     items: items.map((item) => ({
+      native_product: item.native_product === true,
       id: item.id,
       name: item.name,
       price: item.price,
@@ -170,6 +173,7 @@ function buildSystemPrompt(agent: AgentRecord) {
     : null;
 
   return [basePrompt, ...extras, languageInstruction]
+    .concat(agent.native_store_id ? ["This agent has a native catalog inside the widget. Use search_products to find real products. The customer can open a product card and add it to their cart. You cannot change their cart or process payments. Never claim to have added items, reserved stock, placed an order or collected payment."] : [])
     .filter(Boolean)
     .join("\n\n");
 }
@@ -252,9 +256,9 @@ export async function chatWithAgent(
 
   const { data: agent, error: agentError } = await deps.supabase
     .from("agents")
-    .select(
-      "id, user_id, is_active, allowed_domains, messages_limit, description, prompt_system, language, fallback_url"
-    )
+    // The optional native store column may not exist until the migration is applied.
+    // Validation below projects only fields used by the chat service.
+    .select("*")
     .eq("api_key", apiKey)
     .single();
 
@@ -434,7 +438,9 @@ export async function chatWithAgent(
           }
           let normalizedResults: ProductSearchItem[] = [];
 
-          if (useShopify) {
+          if (validAgent.native_store_id) {
+            normalizedResults = await searchNativeProducts(deps.supabase, validAgent.native_store_id, validAgent.user_id, args);
+          } else if (useShopify) {
             const products = await shopifySearchProductsByApiKey(apiKey, args, {
               openaiApiKey: deps.openaiApiKey,
             });

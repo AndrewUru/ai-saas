@@ -26,6 +26,7 @@ export const agentSummarySchema = z.object({
 export const agentListSchema = z.array(agentSummarySchema);
 
 export const agentRecordSchema = z.object({
+  native_store_id: z.string().uuid().nullable().optional(),
   id: z.string(),
   user_id: z.string(),
   is_active: z.boolean(),

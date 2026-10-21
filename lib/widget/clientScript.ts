@@ -1,5 +1,6 @@
 import { WidgetConfig } from "./types"; // We use types for type safety in the generator, but the client script is a string.
 import { STATIC_STYLES } from "./styles";
+import { STORE_SCRIPT } from "./storeScript";
 
 /**
  * Generates the pure JS code that runs in the browser.
@@ -572,6 +573,9 @@ export function renderWidgetScript(
     \`;
     const content = \`<div class="ai-pl-item">\${media}\${meta}\${action}</div>\`;
 
+    if (rawItem?.native_product === true && typeof rawItem.id === "string") {
+      return \`<button type="button" class="ai-pl-link" data-native-product="\${escapeHtml(rawItem.id)}" aria-label="\${escapeHtml(copy.viewProductAria)} \${name}">\${content}</button>\`;
+    }
     if (permalink) {
       return \`<a class="ai-pl-link" href="\${permalink}" target="_blank" rel="noopener noreferrer" aria-label="\${escapeHtml(copy.viewProductAria)} \${name}">\${content}</a>\`;
     }
@@ -885,6 +889,7 @@ export function renderWidgetScript(
       const submitBtn = form.querySelector("button");
       const chatBox = document.getElementById("ai-saas-chat-box");
       const suggestionLabels = copy.suggestions;
+      ${STORE_SCRIPT}
 
       const previewEditorSelectors = {
         launcher: "#ai-saas-toggle",
@@ -1438,7 +1443,7 @@ export function renderWidgetScript(
       
       let isOpen = false;
       const setPageScrollLock = (locked) => {
-        const shouldLock = locked && normalizeFormat(fullConfig.format) === "assistant";
+        const shouldLock = locked && (normalizeFormat(fullConfig.format) === "assistant" || (fullConfig.nativeStoreEnabled && window.matchMedia("(max-width: 600px)").matches));
         document.documentElement.classList.toggle("ai-saas-page-locked", shouldLock);
         document.body.classList.toggle("ai-saas-page-locked", shouldLock);
       };
@@ -1453,7 +1458,11 @@ export function renderWidgetScript(
           if (!IS_PREVIEW) refreshTheme();
           anchor.classList.add("open");
           widget.setAttribute("aria-hidden", "false");
-          window.setTimeout(() => input.focus(), 0);
+          window.setTimeout(() => {
+            const storeTab = anchor.dataset.storeView && anchor.dataset.storeView !== "chat"
+              ? anchor.querySelector('.ai-store-nav [aria-current="page"]') : null;
+            (storeTab || input).focus();
+          }, 0);
         } else {
           anchor.classList.remove("open");
           widget.setAttribute("aria-hidden", "true");

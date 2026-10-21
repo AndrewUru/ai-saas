@@ -7,6 +7,7 @@ export const shell: typeof en = {
   pro: "Pro",
   homePage: "Página de inicio",
   nav: {
+    store: "Mi tienda",
     copilot: "Copiloto",
     agents: "Agentes",
     integrations: "Integraciones",
