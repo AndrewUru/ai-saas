@@ -37,13 +37,18 @@ function cx(...cls: Array<string | false | undefined | null>) {
 
 export default function DashboardShell({
   children,
+  showAdminLink = false,
 }: {
   children: React.ReactNode;
+  showAdminLink?: boolean;
 }) {
   const pathname = usePathname();
   const { t } = useI18n();
   const s = t.shell;
-  const NAV = NAV_ITEMS.map((item) => ({ ...item, label: s.nav[item.key] }));
+  const NAV = [
+    ...NAV_ITEMS.map((item) => ({ href: item.href, label: s.nav[item.key] })),
+    ...(showAdminLink ? [{ href: "/dashboard/admin", label: "Super admin" }] : []),
+  ];
   const [open, setOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
