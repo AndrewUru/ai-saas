@@ -22,6 +22,7 @@ import {
   createWooIntegration,
   deleteWooIntegration,
   setWooIntegrationState,
+  startWooConnection,
   syncWooIntegration,
   testWooIntegration,
   updateWooIntegration,
@@ -85,6 +86,10 @@ function errorMessage(
     case "db":
     case "unexpected":
       return ip.errors[error];
+    case "not_woo":
+      return ip.woo.oneClick.notWoo;
+    case "unreachable":
+      return ip.woo.oneClick.unreachable;
     default:
       return null;
   }
@@ -234,8 +239,16 @@ export default async function WooIntegrationPage({
     throw new Error(error.message);
   }
 
-  const status = statusMessage(statusParam, ip);
-  const errorMsg = errorMessage(errorParam, statusCode, codeParam, ip);
+  // WooCommerce sends the merchant back with success=1 (approved) or success=0.
+  const wooReturn = typeof params.success === "string" ? params.success : null;
+  const status =
+    wooReturn === "1"
+      ? { intent: "success" as const, text: ip.woo.oneClick.connected }
+      : statusMessage(statusParam, ip);
+  const errorMsg =
+    wooReturn === "0"
+      ? ip.woo.oneClick.denied
+      : errorMessage(errorParam, statusCode, codeParam, ip);
   const stores = integrations ?? [];
   const activeStores = stores.filter((integration) => integration.is_active).length;
   const indexedProducts = stores.reduce(
@@ -245,7 +258,7 @@ export default async function WooIntegrationPage({
   const syncedStores = stores.filter(
     (integration) => integration.last_sync_status === "success",
   ).length;
-  const appUrl = getSiteUrl();
+  const appUrl = await getSiteUrl();
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
@@ -318,25 +331,15 @@ export default async function WooIntegrationPage({
                 </span>
                 <div>
                   <h2 className="text-lg font-semibold text-white">
-                    {ip.woo.connectTitle}
+                    {ip.woo.oneClick.title}
                   </h2>
                   <p className="mt-1 text-sm leading-6 text-slate-400">
-                    {ip.woo.connectIntro}
+                    {ip.woo.oneClick.intro}
                   </p>
                 </div>
               </div>
 
-              <form action={createWooIntegration} className="mt-5 space-y-4">
-                <FieldLabel label={ip.internalLabel}>
-                  <input
-                    name="label"
-                    required
-                    maxLength={80}
-                    placeholder={ip.woo.labelPlaceholder}
-                    className={inputClass}
-                  />
-                </FieldLabel>
-
+              <form action={startWooConnection} className="mt-5 space-y-4">
                 <FieldLabel label={ip.woo.storeUrl}>
                   <div className="relative">
                     <Link2
@@ -344,66 +347,123 @@ export default async function WooIntegrationPage({
                       aria-hidden="true"
                     />
                     <input
-                      name="site_url"
-                      type="url"
+                      name="store_url"
+                      type="text"
+                      inputMode="url"
                       required
+                      autoComplete="url"
                       placeholder="https://store.com"
                       className={`${inputClass} pl-10`}
                     />
                   </div>
                 </FieldLabel>
 
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
-                  <FieldLabel label={ip.woo.consumerKey}>
-                    <div className="relative">
-                      <KeyRound
-                        className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-                        aria-hidden="true"
-                      />
-                      <input
-                        name="consumer_key"
-                        required
-                        placeholder="ck_..."
-                        className={`${inputClass} pl-10`}
-                      />
-                    </div>
-                  </FieldLabel>
-
-                  <FieldLabel label={ip.woo.consumerSecret}>
-                    <div className="relative">
-                      <Lock
-                        className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-                        aria-hidden="true"
-                      />
-                      <input
-                        name="consumer_secret"
-                        required
-                        placeholder="cs_..."
-                        className={`${inputClass} pl-10`}
-                      />
-                    </div>
-                  </FieldLabel>
-                </div>
-
-                <label className="flex items-start gap-3 rounded-2xl border border-slate-800 bg-slate-950/35 p-3 text-xs text-slate-400">
+                <FieldLabel label={ip.woo.oneClick.labelOptional}>
                   <input
-                    name="is_active"
-                    type="checkbox"
-                    defaultChecked
-                    className="mt-0.5 h-4 w-4 rounded border border-slate-600 bg-transparent text-neutral-400 focus:ring-neutral-400"
+                    name="label"
+                    maxLength={80}
+                    placeholder={ip.woo.labelPlaceholder}
+                    className={inputClass}
                   />
-                  <span>
-                    <span className="block font-semibold text-slate-200">
-                      {ip.woo.activateTitle}
-                    </span>
-                    {ip.woo.activateBody}
-                  </span>
-                </label>
+                </FieldLabel>
+
+                <p className="text-xs leading-5 text-slate-400">
+                  {ip.woo.oneClick.permissions}
+                </p>
 
                 <button type="submit" className="ui-button ui-button--primary w-full">
-                  {ip.woo.save}
+                  <PlugZap className="h-4 w-4" aria-hidden="true" />
+                  {ip.woo.oneClick.connect}
                 </button>
               </form>
+
+              <details className="mt-5 rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
+                <summary className="cursor-pointer text-sm font-semibold text-slate-300 transition hover:text-white">
+                  {ip.woo.oneClick.manualToggle}
+                </summary>
+                <p className="mt-3 text-sm leading-6 text-slate-400">
+                  {ip.woo.connectIntro}
+                </p>
+
+                <form action={createWooIntegration} className="mt-5 space-y-4">
+                  <FieldLabel label={ip.internalLabel}>
+                    <input
+                      name="label"
+                      required
+                      maxLength={80}
+                      placeholder={ip.woo.labelPlaceholder}
+                      className={inputClass}
+                    />
+                  </FieldLabel>
+
+                  <FieldLabel label={ip.woo.storeUrl}>
+                    <div className="relative">
+                      <Link2
+                        className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+                        aria-hidden="true"
+                      />
+                      <input
+                        name="site_url"
+                        type="url"
+                        required
+                        placeholder="https://store.com"
+                        className={`${inputClass} pl-10`}
+                      />
+                    </div>
+                  </FieldLabel>
+
+                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+                    <FieldLabel label={ip.woo.consumerKey}>
+                      <div className="relative">
+                        <KeyRound
+                          className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+                          aria-hidden="true"
+                        />
+                        <input
+                          name="consumer_key"
+                          required
+                          placeholder="ck_..."
+                          className={`${inputClass} pl-10`}
+                        />
+                      </div>
+                    </FieldLabel>
+
+                    <FieldLabel label={ip.woo.consumerSecret}>
+                      <div className="relative">
+                        <Lock
+                          className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+                          aria-hidden="true"
+                        />
+                        <input
+                          name="consumer_secret"
+                          required
+                          placeholder="cs_..."
+                          className={`${inputClass} pl-10`}
+                        />
+                      </div>
+                    </FieldLabel>
+                  </div>
+
+                  <label className="flex items-start gap-3 rounded-2xl border border-slate-800 bg-slate-950/35 p-3 text-xs text-slate-400">
+                    <input
+                      name="is_active"
+                      type="checkbox"
+                      defaultChecked
+                      className="mt-0.5 h-4 w-4 rounded border border-slate-600 bg-transparent text-neutral-400 focus:ring-neutral-400"
+                    />
+                    <span>
+                      <span className="block font-semibold text-slate-200">
+                        {ip.woo.activateTitle}
+                      </span>
+                      {ip.woo.activateBody}
+                    </span>
+                  </label>
+
+                  <button type="submit" className="ui-button ui-button--primary w-full">
+                    {ip.woo.save}
+                  </button>
+                </form>
+              </details>
             </section>
 
             <section className="rounded-3xl border border-slate-800/80 bg-slate-900/35 p-5">

@@ -78,20 +78,36 @@ export const integrationPages: typeof en = {
     activateBody:
       "Los agentes pueden usar este catálogo en cuanto se prueben las credenciales y se sincronicen los productos.",
     save: "Guardar conexión",
+    oneClick: {
+      title: "Conecta en un clic",
+      intro:
+        "Escribe la dirección de tu tienda y aprueba el acceso en WordPress. Nosotros configuramos las claves, las actualizaciones de productos y la primera sincronización.",
+      labelOptional: "Nombre (opcional)",
+      connect: "Conectar con WooCommerce",
+      permissions:
+        "WooCommerce pedirá acceso de lectura y escritura. La escritura solo se usa para registrar avisos de cambios en productos: nunca modificamos tus productos ni pedidos.",
+      manualToggle: "Prefiero pegar las claves de la API a mano",
+      connected:
+        "Tienda conectada. Estamos importando tus productos, puede tardar unos minutos. Después asigna la tienda a un agente.",
+      denied: "No se aprobó el acceso en WooCommerce, así que no se ha conectado nada.",
+      notWoo: "No encontramos WooCommerce en esa dirección. Revisa la URL de tu tienda.",
+      unreachable: "No pudimos acceder a esa dirección. Revisa la URL e inténtalo de nuevo.",
+    },
     guideTitle: "Guía de configuración",
     steps: [
       {
-        title: "Crea una clave de lectura",
-        detail: "En WordPress, abre WooCommerce > Ajustes > Avanzado > API REST.",
+        title: "Escribe la URL de tu tienda",
+        detail: "La dirección pública de tu tienda WooCommerce, por ejemplo https://mitienda.com.",
       },
       {
-        title: "Pega la clave y el secreto",
-        detail: "Usa permisos de lectura. Los valores se cifran al guardar.",
-      },
-      {
-        title: "Prueba, sincroniza y asigna",
+        title: "Aprueba el acceso en WordPress",
         detail:
-          "Verifica la conexión, sincroniza los productos y asigna la tienda a un agente.",
+          "Inicia sesión si te lo pide y pulsa Aprobar. Las claves se crean y se cifran solas.",
+      },
+      {
+        title: "Asígnala a un agente",
+        detail:
+          "Los productos se sincronizan solos y se mantienen al día. Después elige la tienda en el espacio de trabajo de un agente.",
       },
     ],
     connectedEyebrow: "Tiendas conectadas",
@@ -107,7 +123,7 @@ export const integrationPages: typeof en = {
     keepSecret: "Déjalo vacío para mantener el secreto actual",
     emptyTitle: "Aún no hay ninguna tienda WooCommerce conectada.",
     emptyBody:
-      "Añade una API key REST de solo lectura desde el formulario. Tras la primera sincronización, los agentes podrán responder con contexto de productos y stock.",
+      "Conecta tu tienda desde el formulario. Tras la primera sincronización, los agentes podrán responder con contexto de productos y stock.",
   },
   shopify: {
     errors: {

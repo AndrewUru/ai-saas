@@ -52,6 +52,12 @@ export async function POST(req: Request) {
   }
 
   const rawBody = await req.text();
+
+  // WooCommerce pings a new webhook with "webhook_id=<id>" and no signature.
+  if (!req.headers.get("x-wc-webhook-topic") && /^webhook_id=\d+$/.test(rawBody)) {
+    return jsonOk({ ping: true });
+  }
+
   if (integration.webhook_secret) {
     const signature = req.headers.get("x-wc-webhook-signature");
     const ok = verifySignature(integration.webhook_secret, rawBody, signature);

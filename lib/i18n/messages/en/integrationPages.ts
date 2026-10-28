@@ -73,20 +73,35 @@ export const integrationPages = {
     activateBody:
       "Agents can use this catalog as soon as credentials are tested and products are synced.",
     save: "Save connection",
+    oneClick: {
+      title: "Connect in one click",
+      intro:
+        "Enter your store address and approve access in WordPress. We set up the keys, product updates and the first sync for you.",
+      labelOptional: "Name (optional)",
+      connect: "Connect with WooCommerce",
+      permissions:
+        "WooCommerce will ask for read/write access. Write access is only used to register product-change notifications: we never edit your products or orders.",
+      manualToggle: "I'd rather paste API keys manually",
+      connected:
+        "Store connected. We're importing your products, which can take a few minutes. Then assign the store to an agent.",
+      denied: "Access wasn't approved in WooCommerce, so nothing was connected.",
+      notWoo: "We couldn't find WooCommerce at that address. Check your store URL.",
+      unreachable: "We couldn't reach that address. Check the URL and try again.",
+    },
     guideTitle: "Setup guide",
     steps: [
       {
-        title: "Create a read key",
-        detail: "In WordPress, open WooCommerce, Settings, Advanced, REST API.",
+        title: "Enter your store URL",
+        detail: "The public address of your WooCommerce store, for example https://mystore.com.",
       },
       {
-        title: "Paste key and secret",
-        detail: "Use read permissions. The values are encrypted after save.",
+        title: "Approve access in WordPress",
+        detail: "Log in if asked and click Approve. Keys are created and encrypted automatically.",
       },
       {
-        title: "Test, sync, assign",
+        title: "Assign it to an agent",
         detail:
-          "Verify the connection, sync products, then assign the store to an agent.",
+          "Products sync on their own and stay updated. Then pick the store in an agent workspace.",
       },
     ],
     connectedEyebrow: "Connected stores",
@@ -102,7 +117,7 @@ export const integrationPages = {
     keepSecret: "Leave empty to keep current secret",
     emptyTitle: "No WooCommerce store connected yet.",
     emptyBody:
-      "Add a read-only REST API key from the form. After the first sync, agents can answer with product and stock context.",
+      "Connect your store from the form. After the first sync, agents can answer with product and stock context.",
   },
   shopify: {
     errors: {

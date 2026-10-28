@@ -6,6 +6,8 @@ import { z } from "zod";
 import { createServer } from "@/lib/supabase/server";
 import { decrypt, encrypt } from "@/lib/crypto";
 import { randomUUID } from "crypto";
+import { getSiteUrl } from "@/lib/site";
+import { signWooAuthState } from "@/lib/woo/auth-state";
 import { normalizeWooStoreUrl } from "@/lib/woo/client";
 import { syncWooProducts } from "@/lib/woo/sync";
 
@@ -64,6 +66,79 @@ function handleRedirectError(err: unknown) {
   if (err instanceof Error && err.message.includes("NEXT_REDIRECT")) {
     throw err;
   }
+}
+
+// =====================
+// ONE-CLICK CONNECT
+// =====================
+const ConnectSchema = z.object({
+  store_url: z.string().trim().min(3).max(255),
+  label: z.string().trim().max(80),
+});
+
+const IP_HOST_PATTERN = /^[\d.]+$|^\[|:/;
+
+/**
+ * Comprueba si en esa dirección hay un WooCommerce antes de enviar allí al
+ * comerciante. Solo descarta cuando estamos seguros: muchas tiendas limitan
+ * la API REST a usuarios con sesión, y en ese caso dejamos que decida Woo.
+ */
+async function detectWooCommerce(storeUrl: string) {
+  const { hostname } = new URL(storeUrl);
+  if (!hostname.includes(".") || IP_HOST_PATTERN.test(hostname)) return "unreachable";
+
+  try {
+    const res = await fetch(`${storeUrl}/wp-json/`, {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return "ok";
+    const body = (await res.json().catch(() => null)) as { namespaces?: unknown } | null;
+    if (Array.isArray(body?.namespaces) && !body.namespaces.includes("wc/v3")) {
+      return "not_woo";
+    }
+    return "ok";
+  } catch {
+    return "unreachable";
+  }
+}
+
+export async function startWooConnection(formData: FormData) {
+  const supabase = await createServer();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const parsed = ConnectSchema.safeParse({
+    store_url: formData.get("store_url"),
+    label: formData.get("label") ?? "",
+  });
+  if (!parsed.success) return redirectWithError("invalid");
+
+  const storeUrl = normalizeWooStoreUrl(parsed.data.store_url);
+  if (!storeUrl) return redirectWithError("invalid");
+
+  const detection = await detectWooCommerce(storeUrl);
+  if (detection !== "ok") return redirectWithError(detection);
+
+  const siteUrl = await getSiteUrl();
+  // Query-var form of /wc-auth/v1/authorize: it also works on stores whose
+  // rewrite rules don't cover that route (e.g. WordPress in a subdirectory).
+  const authUrl = new URL(`${storeUrl}/`);
+  authUrl.searchParams.set("wc-auth-version", "1");
+  authUrl.searchParams.set("wc-auth-route", "authorize");
+  authUrl.searchParams.set("app_name", "AI Commerce Agents");
+  authUrl.searchParams.set("scope", "read_write");
+  authUrl.searchParams.set(
+    "user_id",
+    signWooAuthState({ userId: user.id, storeUrl, label: parsed.data.label }),
+  );
+  authUrl.searchParams.set("return_url", `${siteUrl}/integrations/woo`);
+  authUrl.searchParams.set("callback_url", `${siteUrl}/api/integrations/woo/auth/callback`);
+
+  redirect(authUrl.toString());
 }
 
 // =====================
