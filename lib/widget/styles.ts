@@ -1943,6 +1943,30 @@ body.ai-saas-page-locked {
   background: rgba(255, 255, 255, 0.08);
 }
 
+#ai-saas-anchor.ai-format-assistant .ai-pl-title {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-pl-action {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-pl-action.muted,
+#ai-saas-anchor.ai-format-assistant .ai-pl-stock {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-pl-stock.instock {
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.14);
+}
+
+#ai-saas-anchor.ai-format-assistant .ai-pl-stock.out {
+  color: #fb7185;
+  background: rgba(244, 63, 94, 0.14);
+}
+
 /* Full-screen assistant experience */
 #ai-saas-anchor.ai-format-assistant.open #ai-saas-widget {
   grid-template-columns: 292px minmax(0, 1fr);
