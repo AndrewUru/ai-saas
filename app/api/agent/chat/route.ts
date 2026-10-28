@@ -95,8 +95,6 @@ export async function POST(req: Request) {
       {
         apiKey,
         message,
-        cartContext: bodyRecord.cart_context,
-        visitorMessages: bodyRecord.messages,
         catalog: catalog ?? undefined,
         currency: currency ?? undefined,
         requestHost: resolveRequestHost(req),
@@ -121,7 +119,7 @@ export async function POST(req: Request) {
       );
     }
 
-    return jsonResponse({ reply: result.reply, fallback_url: result.fallbackUrl, ...(result.cartAction ? { cart_action: result.cartAction } : {}) });
+    return jsonResponse({ reply: result.reply, fallback_url: result.fallbackUrl });
   } catch (err) {
     console.error("[AI SaaS] Error en /api/agent/chat:", err);
     return jsonResponse(

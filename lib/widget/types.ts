@@ -55,7 +55,6 @@ export interface WidgetAppearance {
 }
 
 export interface WidgetConfig {
-  nativeStoreEnabled?: boolean;
   key: string;
   chatEndpoint: string;
   language?: WidgetLanguage | string | null;

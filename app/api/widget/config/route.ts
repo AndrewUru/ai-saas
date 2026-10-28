@@ -313,7 +313,6 @@ export async function GET(req: Request) {
   };
 
   const config: WidgetConfig = {
-    nativeStoreEnabled: Boolean(agent.native_store_id),
     key: agent.api_key,
     chatEndpoint,
     language: resolvedLanguage,

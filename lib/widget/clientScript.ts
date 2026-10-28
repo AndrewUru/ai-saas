@@ -1,6 +1,5 @@
 import { WidgetConfig } from "./types"; // We use types for type safety in the generator, but the client script is a string.
 import { STATIC_STYLES } from "./styles";
-import { STORE_SCRIPT } from "./storeScript";
 
 /**
  * Generates the pure JS code that runs in the browser.
@@ -573,9 +572,6 @@ export function renderWidgetScript(
     \`;
     const content = \`<div class="ai-pl-item">\${media}\${meta}\${action}</div>\`;
 
-    if (rawItem?.native_product === true && typeof rawItem.id === "string") {
-      return \`<button type="button" class="ai-pl-link" data-native-product="\${escapeHtml(rawItem.id)}" aria-label="\${escapeHtml(copy.viewProductAria)} \${name}">\${content}</button>\`;
-    }
     if (permalink) {
       return \`<a class="ai-pl-link" href="\${permalink}" target="_blank" rel="noopener noreferrer" aria-label="\${escapeHtml(copy.viewProductAria)} \${name}">\${content}</a>\`;
     }
@@ -889,8 +885,6 @@ export function renderWidgetScript(
       const submitBtn = form.querySelector("button");
       const chatBox = document.getElementById("ai-saas-chat-box");
       const suggestionLabels = copy.suggestions;
-      let nativeCommerce = null;
-      ${STORE_SCRIPT}
 
       const previewEditorSelectors = {
         launcher: "#ai-saas-toggle",
@@ -1444,7 +1438,7 @@ export function renderWidgetScript(
       
       let isOpen = false;
       const setPageScrollLock = (locked) => {
-        const shouldLock = locked && (normalizeFormat(fullConfig.format) === "assistant" || (fullConfig.nativeStoreEnabled && window.matchMedia("(max-width: 600px)").matches));
+        const shouldLock = locked && normalizeFormat(fullConfig.format) === "assistant";
         document.documentElement.classList.toggle("ai-saas-page-locked", shouldLock);
         document.body.classList.toggle("ai-saas-page-locked", shouldLock);
       };
@@ -1459,11 +1453,7 @@ export function renderWidgetScript(
           if (!IS_PREVIEW) refreshTheme();
           anchor.classList.add("open");
           widget.setAttribute("aria-hidden", "false");
-          window.setTimeout(() => {
-            const storeTab = anchor.dataset.storeView && anchor.dataset.storeView !== "chat"
-              ? anchor.querySelector('.ai-store-nav [aria-current="page"]') : null;
-            (storeTab || input).focus();
-          }, 0);
+          window.setTimeout(() => input.focus(), 0);
         } else {
           anchor.classList.remove("open");
           widget.setAttribute("aria-hidden", "true");
@@ -1590,7 +1580,6 @@ export function renderWidgetScript(
           const payload = {
             message: text,
             messages: activeMessages.slice(-20),
-            ...(nativeCommerce?.getContext() ? { cart_context: nativeCommerce.getContext() } : {}),
           };
           if (agentKey) payload.api_key = agentKey;
 
@@ -1618,10 +1607,8 @@ export function renderWidgetScript(
 
           // Bot Message
           const botDiv = document.createElement("div");
-          const cartResult = data.cart_action && nativeCommerce ? nativeCommerce.applyAction(data.cart_action) : null;
-          const replyRaw = cartResult?.text || data.reply || copy.fallbackReply;
+          const replyRaw = data.reply || copy.fallbackReply;
           const parsed = safeJsonParse(replyRaw);
-          nativeCommerce?.observeReply(parsed);
           if (isProductList(parsed)) {
             botDiv.className = "ai-saas-bubble bot product-list ai-saas-enter";
             botDiv.innerHTML = renderProductListHtml(parsed, copy);
@@ -1633,19 +1620,6 @@ export function renderWidgetScript(
             }
           }
           chatBox.appendChild(botDiv);
-          if (cartResult?.undo) {
-            const undo = document.createElement("button");
-            undo.type = "button";
-            undo.className = "ai-store-button";
-            undo.textContent = cartResult.undoLabel;
-            undo.addEventListener("click", () => {
-              const notice = document.createElement("p");
-              notice.textContent = cartResult.undo();
-              botDiv.appendChild(notice);
-              undo.disabled = true;
-            });
-            botDiv.appendChild(undo);
-          }
           activeMessages.push({ role: "assistant", content: replyRaw });
           persistActiveSession();
           scrollChatToBottom();

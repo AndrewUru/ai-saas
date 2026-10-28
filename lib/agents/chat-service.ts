@@ -6,9 +6,6 @@ import {
 } from "@/lib/contracts/agent";
 import { wooSearchProductsByApiKey } from "@/lib/tools/woo";
 import { shopifySearchProductsByApiKey } from "@/lib/tools/shopify";
-import { searchNativeProducts } from "@/lib/commerce/search";
-import { nativeSalesReply } from "@/lib/commerce/sales-agent";
-import type { CartAction } from "@/lib/commerce/cart";
 import { embedTexts } from "@/lib/knowledge/embed";
 import { toPgVector } from "@/lib/woo/embeddings";
 import {
@@ -35,7 +32,6 @@ type AgentMessageRecord = {
 };
 
 type ProductSearchItem = {
-  native_product?: boolean;
   id: string | number;
   name: string;
   price: string | null;
@@ -78,7 +74,7 @@ export type AgentChatDeps = {
 };
 
 export type AgentChatResult =
-  | { ok: true; reply: string; fallbackUrl: string | null; cartAction?: CartAction }
+  | { ok: true; reply: string; fallbackUrl: string | null }
   | { ok: false; status: number; error: string; fallbackUrl?: string | null };
 
 const TOOLS = [
@@ -146,7 +142,6 @@ function buildProductListReply(
     type: "product_list",
     title: buildProductListTitle(language, query),
     items: items.map((item) => ({
-      native_product: item.native_product === true,
       id: item.id,
       name: item.name,
       price: item.price,
@@ -216,8 +211,6 @@ export async function chatWithAgent(
   params: {
     apiKey: string;
     message: string;
-    cartContext?: unknown;
-    visitorMessages?: unknown;
     catalog?: string;
     currency?: string;
     requestHost?: RequestHostContext;
@@ -235,8 +228,6 @@ export async function chatWithAgent(
   const parsedRequest = chatRequestSchema.safeParse({
     api_key: params.apiKey,
     message: params.message,
-    cart_context: params.cartContext,
-    messages: params.visitorMessages,
   });
 
   if (!parsedRequest.success) {
@@ -261,9 +252,9 @@ export async function chatWithAgent(
 
   const { data: agent, error: agentError } = await deps.supabase
     .from("agents")
-    // The optional native store column may not exist until the migration is applied.
-    // Validation below projects only fields used by the chat service.
-    .select("*")
+    .select(
+      "id, user_id, is_active, allowed_domains, messages_limit, description, prompt_system, language, fallback_url"
+    )
     .eq("api_key", apiKey)
     .single();
 
@@ -342,7 +333,7 @@ export async function chatWithAgent(
     }
   }
 
-  const { data: recentMessages } = validAgent.native_store_id ? { data: [] } : await deps.supabase
+  const { data: recentMessages } = await deps.supabase
     .from("agent_messages")
     .select("message, reply")
     .eq("agent_id", validAgent.id)
@@ -368,26 +359,6 @@ export async function chatWithAgent(
     );
   } catch (err) {
     logger.error("[AI SaaS] Knowledge lookup error:", err);
-  }
-
-  if (validAgent.native_store_id) {
-    try {
-      const result = await nativeSalesReply({
-        db: deps.supabase, storeId: validAgent.native_store_id, userId: validAgent.user_id,
-        message, history: parsedRequest.data.messages ?? [], context: parsedRequest.data.cart_context,
-        systemPrompt: buildSystemPrompt(validAgent), knowledge: knowledgeContext,
-        language: validAgent.language === "auto" ? (params.locale ?? "en") : (validAgent.language ?? params.locale ?? "en"),
-        apiKey: deps.openaiApiKey, model: deps.model ?? FALLBACK_AGENT_MODEL, fetcher: deps.fetcher,
-      });
-      if (params.persistConversation !== false) {
-        const { error } = await deps.supabase.from("agent_messages").insert({ agent_id: validAgent.id, message, reply: result.reply, created_at: deps.now ? deps.now() : new Date().toISOString() });
-        if (error) logger.error("[AI SaaS] Native conversation persistence failed", { agentId: validAgent.id, code: error.code });
-      }
-      return { ok: true, ...result, fallbackUrl: validAgent.fallback_url ?? null };
-    } catch (error) {
-      logger.error("[AI SaaS] Native seller failed", error);
-      return { ok: false, status: 502, error: m.toolFailed, fallbackUrl: validAgent.fallback_url ?? null };
-    }
   }
 
   // Initial messages payload
@@ -463,9 +434,7 @@ export async function chatWithAgent(
           }
           let normalizedResults: ProductSearchItem[] = [];
 
-          if (validAgent.native_store_id) {
-            normalizedResults = await searchNativeProducts(deps.supabase, validAgent.native_store_id, validAgent.user_id, args);
-          } else if (useShopify) {
+          if (useShopify) {
             const products = await shopifySearchProductsByApiKey(apiKey, args, {
               openaiApiKey: deps.openaiApiKey,
             });

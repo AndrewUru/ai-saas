@@ -5,7 +5,6 @@ export const shell = {
   pro: "Pro",
   homePage: "Home page",
   nav: {
-    store: "My store",
     copilot: "Copilot",
     agents: "Agents",
     integrations: "Integrations",
