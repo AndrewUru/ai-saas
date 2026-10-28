@@ -1,6 +1,10 @@
 import { z } from "zod";
+import { cartContextSchema, visitorMessagesSchema } from "@/lib/commerce/cart";
 
 export const chatRequestSchema = z.object({
+  // Optional widget context must never reject a valid chat message (other clients send their own history).
+  cart_context: cartContextSchema.optional().catch(undefined),
+  messages: visitorMessagesSchema,
   api_key: z.string().trim().min(1, "api_key requerido"),
   message: z.string().trim().min(1, "message requerido").max(2000, "message demasiado largo"),
 });

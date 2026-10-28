@@ -24,7 +24,7 @@ export async function searchNativeProducts(
   if (!store) return [];
   let query = db
     .from("native_products")
-    .select("id, name, price_cents, stock, image_url, category")
+    .select("id, name, description, price_cents, stock, image_url, category")
     .eq("store_id", store.id)
     .eq("active", true);
   if (args.query)
@@ -40,6 +40,8 @@ export async function searchNativeProducts(
   return (products ?? []).map((product) => ({
     id: product.id as string,
     name: product.name as string,
+    description: product.description as string,
+    stock_quantity: product.stock as number,
     price: (product.price_cents / 100).toFixed(2),
     currency: store.currency as string,
     stock_status: product.stock > 0 ? "instock" : "outofstock",

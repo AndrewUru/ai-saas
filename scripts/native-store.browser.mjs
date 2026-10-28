@@ -42,6 +42,7 @@ const { chromium } = requireModule(
       page.on("pageerror", (error) => errors.push(error.message));
       let stock = 3;
       let fail = false;
+      const chatRequests = [];
       const fixture = () => ({
         store: { id: "store-test", name: "Tienda de prueba", currency: "EUR" },
         products: [
@@ -92,7 +93,27 @@ const { chromium } = requireModule(
               ? { status: 503, json: { error: "Unavailable" } }
               : { json: fixture() },
           );
-        if (url.pathname === "/api/agent/chat")
+        if (url.pathname === "/api/agent/chat") {
+          const body = route.request().postDataJSON();
+          chatRequests.push(body);
+          const context = body.cart_context;
+          if (body.message === "añade dos" || body.message === "añade otras dos")
+            return route.fulfill({
+              json: {
+                reply: "Cambio de carrito preparado.",
+                cart_action: {
+                  id: "action-" + chatRequests.length,
+                  store_id: context.store_id,
+                  currency: context.currency,
+                  // A change prepared for an older cart revision must be rejected.
+                  expected_revision:
+                    context.revision - (body.message === "añade otras dos" ? 1 : 0),
+                  product: { ...fixture().products[0], active: true },
+                  before_quantity: context.items[0].quantity,
+                  after_quantity: context.items[0].quantity + 2,
+                },
+              },
+            });
           return route.fulfill({
             json: {
               reply: JSON.stringify({
@@ -108,6 +129,7 @@ const { chromium } = requireModule(
               }),
             },
           });
+        }
         return route.fulfill({ json: {} });
       });
       const load = async () => {
@@ -213,10 +235,36 @@ const { chromium } = requireModule(
           "native-store-" + format + ".png",
         ),
       });
+      const chatBox = page.locator("#ai-saas-chat-box");
+      const send = async (text) => {
+        await page.getByRole("button", { name: "Chat", exact: true }).click();
+        await page.locator("#ai-saas-form input").fill(text);
+        await page
+          .locator("#ai-saas-form")
+          .evaluate((form) => form.requestSubmit());
+      };
+      stock = 3;
+      await send("añade dos");
+      await chatBox
+        .getByText("Café natural: ahora tienes 3 unidades en el carrito.")
+        .waitFor();
+      const sent = chatRequests.at(-1).cart_context;
+      assert.deepEqual(sent.items, [{ id: "product-1", quantity: 1 }]);
+      assert.equal(sent.focused_product_id, null, "Leaving a detail clears its focus");
+      assert.deepEqual(sent.suggested_product_ids, ["product-1"]);
+      await page.getByRole("button", { name: "Carrito (3)", exact: true }).waitFor();
+      await chatBox.getByRole("button", { name: "Deshacer", exact: true }).click();
+      await chatBox.getByText("Cambio deshecho.", { exact: true }).waitFor();
+      await page.getByRole("button", { name: "Carrito (1)", exact: true }).waitFor();
+      await send("añade otras dos");
+      await chatBox
+        .getByText("El carrito ha cambiado mientras respondía", { exact: false })
+        .waitFor();
+      await page.getByRole("button", { name: "Carrito (1)", exact: true }).waitFor();
       assert.deepEqual(errors, []);
       console.log(
         format +
-          ": catalog, safe text, search, detail, cart, persistence, stock reconciliation, retry, chat cards and mobile passed",
+          ": catalog, safe text, search, detail, cart, persistence, stock reconciliation, retry, chat cards, chat cart changes, undo and mobile passed",
       );
       await context.close();
     }

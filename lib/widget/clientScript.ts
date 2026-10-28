@@ -889,6 +889,7 @@ export function renderWidgetScript(
       const submitBtn = form.querySelector("button");
       const chatBox = document.getElementById("ai-saas-chat-box");
       const suggestionLabels = copy.suggestions;
+      let nativeCommerce = null;
       ${STORE_SCRIPT}
 
       const previewEditorSelectors = {
@@ -1589,6 +1590,7 @@ export function renderWidgetScript(
           const payload = {
             message: text,
             messages: activeMessages.slice(-20),
+            ...(nativeCommerce?.getContext() ? { cart_context: nativeCommerce.getContext() } : {}),
           };
           if (agentKey) payload.api_key = agentKey;
 
@@ -1616,8 +1618,10 @@ export function renderWidgetScript(
 
           // Bot Message
           const botDiv = document.createElement("div");
-          const replyRaw = data.reply || copy.fallbackReply;
+          const cartResult = data.cart_action && nativeCommerce ? nativeCommerce.applyAction(data.cart_action) : null;
+          const replyRaw = cartResult?.text || data.reply || copy.fallbackReply;
           const parsed = safeJsonParse(replyRaw);
+          nativeCommerce?.observeReply(parsed);
           if (isProductList(parsed)) {
             botDiv.className = "ai-saas-bubble bot product-list ai-saas-enter";
             botDiv.innerHTML = renderProductListHtml(parsed, copy);
@@ -1629,6 +1633,19 @@ export function renderWidgetScript(
             }
           }
           chatBox.appendChild(botDiv);
+          if (cartResult?.undo) {
+            const undo = document.createElement("button");
+            undo.type = "button";
+            undo.className = "ai-store-button";
+            undo.textContent = cartResult.undoLabel;
+            undo.addEventListener("click", () => {
+              const notice = document.createElement("p");
+              notice.textContent = cartResult.undo();
+              botDiv.appendChild(notice);
+              undo.disabled = true;
+            });
+            botDiv.appendChild(undo);
+          }
           activeMessages.push({ role: "assistant", content: replyRaw });
           persistActiveSession();
           scrollChatToBottom();

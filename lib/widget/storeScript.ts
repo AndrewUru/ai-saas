@@ -63,6 +63,10 @@ export const STORE_SCRIPT = String.raw`
         let currency = null;
         let search = '';
         let category = '';
+        let revision = 0;
+        let focusedProductId = null;
+        let suggestedProductIds = [];
+        const appliedActions = new Set();
         const tabs = {};
         const el = (tag, text, cls) => {
           const node = document.createElement(tag);
@@ -77,6 +81,7 @@ export const STORE_SCRIPT = String.raw`
         const money = cents => new Intl.NumberFormat(es ? 'es-ES' : 'en-US', { style: 'currency', currency: store.currency }).format(cents / 100);
         const cartKey = () => 'ai-store-cart:v1:' + store.id;
         const save = () => {
+          revision++;
           try { localStorage.setItem(cartKey(), JSON.stringify({ v: 1, currency: store.currency, items: cart })); } catch {}
           tabs.cart.textContent = tr('Carrito', 'Cart') + ' (' + cart.reduce((sum, line) => sum + line.quantity, 0) + ')';
         };
@@ -115,6 +120,7 @@ export const STORE_SCRIPT = String.raw`
         };
         const detail = product => {
           switchView('store'); panel.replaceChildren();
+          focusedProductId = product.id;
           const section = el('div', undefined, 'ai-store-detail');
           section.append(button(tr('← Volver al catálogo', '← Back to catalog'), render), image(product), el('h2', product.name), el('strong', money(product.price_cents)), el('p', product.description));
           section.appendChild(el('p', product.stock > 0
@@ -183,6 +189,8 @@ export const STORE_SCRIPT = String.raw`
           if (loading) { panel.appendChild(el('p', tr('Cargando tienda…', 'Loading store…'))); return; }
           if (failed) { panel.append(el('p', tr('No se pudo cargar la tienda.', 'Could not load the store.')), button(tr('Reintentar', 'Retry'), () => load())); return; }
           if (!store) { panel.appendChild(el('p', tr('La tienda no está publicada.', 'The store is not published.'))); return; }
+          // "That one" in chat refers to an open product detail only; detail() sets it after rendering.
+          focusedProductId = null;
           if (view === 'store') renderCatalog(); else renderCart();
         };
         const switchView = next => {
@@ -226,6 +234,56 @@ export const STORE_SCRIPT = String.raw`
           const product = products.find(item => item.id === target.getAttribute('data-native-product'));
           if (product && !failed) detail(product);
           else { switchView('store'); void load(); }
+        });
+        nativeCommerce = {
+          getContext: () => store && !loading && !failed ? {
+            store_id: store.id, currency: store.currency, revision,
+            items: cart.map(line => ({ id: line.id, quantity: line.quantity })),
+            focused_product_id: focusedProductId, suggested_product_ids: suggestedProductIds,
+          } : undefined,
+          observeReply: reply => {
+            if (reply?.type === 'product_list') {
+              focusedProductId = null;
+              suggestedProductIds = reply.items.filter(item => item?.native_product === true && typeof item.id === 'string').slice(0, 8).map(item => item.id);
+            }
+          },
+          applyAction: action => {
+            const stale = () => ({ text: tr('El carrito ha cambiado mientras respondía. No he aplicado el cambio; vuelve a pedírmelo.', 'Your cart changed while I was replying. I have not applied the change; please ask again.') });
+            if (!store || failed || loading || !action || action.store_id !== store.id || action.currency !== store.currency || action.expected_revision !== revision || appliedActions.has(action.id)) return stale();
+            const product = action.product;
+            const before = cart.find(line => line.id === product?.id)?.quantity || 0;
+            if (!product || typeof product.id !== 'string' || typeof product.name !== 'string' || !Number.isSafeInteger(product.price_cents) || product.price_cents < 1 || !Number.isInteger(product.stock) || product.stock < 0 || before !== action.before_quantity || !Number.isInteger(action.after_quantity) || action.after_quantity < 0 || action.after_quantity > Math.min(99, product.stock) || (action.after_quantity > 0 && product.active !== true)) return stale();
+            const snapshot = cart.map(line => ({ ...line }));
+            const index = products.findIndex(item => item.id === product.id);
+            if (index >= 0) products[index] = { ...products[index], ...product };
+            else if (action.after_quantity > 0) products.push(product);
+            cart = cart.filter(line => line.id !== product.id);
+            if (action.after_quantity > 0) cart.push({ id: product.id, quantity: action.after_quantity });
+            appliedActions.add(action.id); save();
+            const appliedRevision = revision;
+            if (view !== 'chat') render();
+            const text = action.after_quantity === 0
+              ? tr('He quitado ', 'Removed ') + product.name + tr(' del carrito.', ' from your cart.')
+              : product.name + tr(': ahora tienes ', ': you now have ') + action.after_quantity + tr(' unidades en el carrito.', ' units in your cart.');
+            status.textContent = text;
+            return { text, undoLabel: tr('Deshacer', 'Undo'), undo: () => {
+              if (revision !== appliedRevision || (before > 0 && (product.active !== true || before > product.stock))) return tr('El carrito o la disponibilidad han cambiado. Pídeme un nuevo cambio.', 'Your cart or availability has changed. Ask me for a new change.');
+              cart = snapshot; save(); if (view !== 'chat') render();
+              const notice = tr('Cambio deshecho.', 'Change undone.'); status.textContent = notice; return notice;
+            } };
+          },
+        };
+        window.addEventListener('storage', event => {
+          if (!store || event.key !== cartKey()) return;
+          try {
+            const saved = JSON.parse(event.newValue || 'null');
+            if (!saved) cart = [];
+            else if (saved.v === 1 && saved.currency === store.currency && Array.isArray(saved.items)) {
+              const seen = new Set();
+              cart = saved.items.slice(0, 500).filter(line => line && typeof line.id === 'string' && !seen.has(line.id) && seen.add(line.id));
+            } else return;
+            reconcile(); if (view !== 'chat') render();
+          } catch { /* Malformed storage cannot modify a valid cart. */ }
         });
         switchView('chat'); void load();
       }
