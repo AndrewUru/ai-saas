@@ -6,6 +6,8 @@ import {
 } from "@/lib/contracts/agent";
 import { wooSearchProductsByApiKey } from "@/lib/tools/woo";
 import { shopifySearchProductsByApiKey } from "@/lib/tools/shopify";
+import { DEMO_CATALOG_PROMPT, demoSearchProducts } from "@/lib/tools/demo";
+import { SHOWCASE_AGENT_KEY } from "@/lib/agents/showcase";
 import { embedTexts } from "@/lib/knowledge/embed";
 import { toPgVector } from "@/lib/woo/embeddings";
 import {
@@ -342,6 +344,7 @@ export async function chatWithAgent(
 
   const history = buildHistory(recentMessages).reverse();
   const useShopify = params.catalog === "shopify";
+  const useDemoCatalog = !useShopify && apiKey === SHOWCASE_AGENT_KEY;
   const preferredCurrency = params.currency ?? null;
   let knowledgeContext: string | null = null;
 
@@ -367,6 +370,7 @@ export async function chatWithAgent(
     : null;
   const messages: ChatHistoryItem[] = [
     { role: "system", content: buildSystemPrompt(validAgent) },
+    ...(useDemoCatalog ? ([{ role: "system", content: DEMO_CATALOG_PROMPT }] as ChatHistoryItem[]) : []),
     ...(contextMessage ? ([{ role: "system", content: contextMessage }] as ChatHistoryItem[]) : []),
     ...history,
     { role: "user", content: message },
@@ -449,6 +453,18 @@ export async function chatWithAgent(
               image: item.image ?? null,
               categories: item.categories ?? null,
               score: item.score ?? null,
+            }));
+          } else if (useDemoCatalog) {
+            normalizedResults = demoSearchProducts(args).map((item) => ({
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              currency: item.currency,
+              stock_status: item.stock_status,
+              permalink: null,
+              image: null,
+              categories: item.categories,
+              score: item.score,
             }));
           } else {
             const products = await wooSearchProductsByApiKey(apiKey, args, {

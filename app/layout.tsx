@@ -2,11 +2,12 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 import AppChrome from "@/components/AppChrome";
+import { SHOWCASE_AGENT_KEY } from "@/lib/agents/showcase";
 import { I18nProvider } from "@/lib/i18n/client";
 import { getI18n } from "@/lib/i18n/server";
 import QueryProvider from "./query-provider";
 
-const widgetKey = "agt_419oweh9oi6mjswq07p";
+const widgetKey = SHOWCASE_AGENT_KEY;
 const widgetSrc =
   process.env.NODE_ENV === "development"
     ? `/api/widget?key=${widgetKey}&preview=1`
