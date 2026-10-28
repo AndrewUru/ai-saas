@@ -36,6 +36,8 @@ import { integrationPages as enIntegrationPages } from "./en/integrationPages";
 import { integrationPages as esIntegrationPages } from "./es/integrationPages";
 import { api as enApi } from "./en/api";
 import { api as esApi } from "./es/api";
+import { channels as enChannels } from "./en/channels";
+import { channels as esChannels } from "./es/channels";
 import {
   widgetEditor as enWidgetEditor,
   widgetTemplatesCopy as enWidgetTemplatesCopy,
@@ -66,6 +68,7 @@ const en = {
   analytics: enAnalytics,
   integrationPages: enIntegrationPages,
   api: enApi,
+  channels: enChannels,
   widgetEditor: enWidgetEditor,
   widgetTemplates: enWidgetTemplatesCopy,
 };
@@ -93,6 +96,7 @@ const es: Messages = {
   analytics: esAnalytics,
   integrationPages: esIntegrationPages,
   api: esApi,
+  channels: esChannels,
   widgetEditor: esWidgetEditor,
   widgetTemplates: esWidgetTemplatesCopy,
 };

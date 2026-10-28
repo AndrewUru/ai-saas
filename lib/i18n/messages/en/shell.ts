@@ -19,6 +19,7 @@ export const shell = {
     knowledge: "Knowledge",
     simulator: "Simulator",
     install: "Install",
+    channels: "Channels",
   },
   contactSupport: "Contact support",
   openMenu: "Open menu",

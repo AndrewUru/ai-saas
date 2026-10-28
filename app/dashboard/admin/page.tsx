@@ -44,6 +44,7 @@ type MessageStatRow = {
 type MessageRow = {
   id: string;
   agent_id: string;
+  channel: string | null;
   message: string | null;
   reply: string | null;
   created_at: string | null;
@@ -299,7 +300,7 @@ export default async function SuperAdminPage({
   // instead of filtering the global "latest 25".
   let messagesQuery = admin
     .from("agent_messages")
-    .select("id, agent_id, message, reply, created_at")
+    .select("id, agent_id, channel, message, reply, created_at")
     .order("created_at", { ascending: false })
     .limit(RECENT_LIMIT);
   let subscriptionsQuery = admin
@@ -514,7 +515,10 @@ export default async function SuperAdminPage({
                       {" · "}
                       {ownerEmail(agent?.user_id)}
                     </span>
-                    <span className="shrink-0">{formatDate(row.created_at)}</span>
+                    <span className="flex shrink-0 items-center gap-2">
+                      <Badge tone="neutral">{row.channel ?? "widget"}</Badge>
+                      {formatDate(row.created_at)}
+                    </span>
                   </div>
                   <p className="mt-3 whitespace-pre-wrap break-words text-sm text-foreground">
                     {row.message || "—"}

@@ -28,6 +28,7 @@ const AGENT_SCREENS: { key: keyof Messages["shell"]["screens"]; suffix: string }
   { key: "analytics", suffix: "/analytics" },
   { key: "knowledge", suffix: "/knowledge" },
   { key: "simulator", suffix: "/simulator" },
+  { key: "channels", suffix: "/channels" },
   { key: "install", suffix: "/install" },
 ];
 

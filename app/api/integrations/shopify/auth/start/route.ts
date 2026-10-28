@@ -65,7 +65,7 @@ export async function GET(req: Request) {
 
   const signedState = signShopifyState(payload, apiSecret);
 
-  const redirectUri = `${getSiteUrl()}/api/integrations/shopify/auth/callback`;
+  const redirectUri = `${await getSiteUrl()}/api/integrations/shopify/auth/callback`;
   const authUrl = new URL(`https://${shopDomain}/admin/oauth/authorize`);
   authUrl.searchParams.set("client_id", apiKey);
   authUrl.searchParams.set("scope", scopes);

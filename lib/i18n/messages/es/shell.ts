@@ -21,6 +21,7 @@ export const shell: typeof en = {
     knowledge: "Conocimiento",
     simulator: "Simulador",
     install: "Instalación",
+    channels: "Canales",
   },
   contactSupport: "Contactar con soporte",
   openMenu: "Abrir menú",

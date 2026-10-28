@@ -117,7 +117,7 @@ export default function AgentSimulator({ agentId }: AgentSimulatorProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, history: messages.slice(-12) }),
       });
       const data = (await res.json().catch(() => null)) as {
         reply?: string;

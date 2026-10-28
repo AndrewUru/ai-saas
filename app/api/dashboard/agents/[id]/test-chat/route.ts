@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { resolveAgentCatalog } from "@/lib/agents/catalog";
 import { chatWithAgent, FALLBACK_AGENT_MODEL } from "@/lib/agents/chat-service";
 import { createAdmin } from "@/lib/supabase/admin";
 import { createServer } from "@/lib/supabase/server";
@@ -10,6 +11,15 @@ const AGENT_MODEL = process.env.OPENAI_AGENT_MODEL ?? FALLBACK_AGENT_MODEL;
 function bodySchema(messageRequired: string) {
   return z.object({
     message: z.string().trim().min(1, messageRequired).max(2000),
+    history: z
+      .array(
+        z.object({
+          role: z.enum(["user", "assistant"]),
+          content: z.string().max(8000),
+        }),
+      )
+      .max(12)
+      .optional(),
   });
 }
 
@@ -65,21 +75,10 @@ export async function POST(req: Request, context: TestChatRouteContext) {
   }
 
   const admin = createAdmin();
-  let catalog: string | undefined;
-  let currency: string | undefined;
-
-  if (agent.shopify_integration_id) {
-    const { data: shopify } = await admin
-      .from("integrations_shopify")
-      .select("id, is_active, currency")
-      .eq("id", agent.shopify_integration_id)
-      .maybeSingle();
-
-    if (shopify?.is_active) {
-      catalog = "shopify";
-      currency = shopify.currency ?? undefined;
-    }
-  }
+  const { catalog, currency } = await resolveAgentCatalog(
+    admin,
+    agent.shopify_integration_id,
+  );
 
   const result = await chatWithAgent(
     {
@@ -90,6 +89,7 @@ export async function POST(req: Request, context: TestChatRouteContext) {
       skipQuota: true,
       persistConversation: false,
       locale,
+      history: parsed.data.history ?? [],
     },
     {
       supabase: admin,

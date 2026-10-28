@@ -220,6 +220,12 @@ export async function chatWithAgent(
     persistConversation?: boolean;
     /** Idioma de los mensajes de error y de la respuesta de respaldo. */
     locale?: Locale;
+    /** Hilo del cliente; sin él no se carga historial de otros visitantes. */
+    conversationId?: string;
+    /** Origen del mensaje: widget, telegram, whatsapp... */
+    channel?: string;
+    /** Historial explícito (simulador), en lugar del guardado en la base de datos. */
+    history?: Array<{ role: "user" | "assistant"; content: string }>;
   },
   deps: AgentChatDeps
 ): Promise<AgentChatResult> {
@@ -335,14 +341,20 @@ export async function chatWithAgent(
     }
   }
 
-  const { data: recentMessages } = await deps.supabase
-    .from("agent_messages")
-    .select("message, reply")
-    .eq("agent_id", validAgent.id)
-    .order("created_at", { ascending: false })
-    .limit(6);
+  let history: ChatHistoryItem[] = [];
+  if (params.history) {
+    history = params.history.slice(-12);
+  } else if (params.conversationId) {
+    const { data: recentMessages } = await deps.supabase
+      .from("agent_messages")
+      .select("message, reply")
+      .eq("agent_id", validAgent.id)
+      .eq("conversation_id", params.conversationId)
+      .order("created_at", { ascending: false })
+      .limit(6);
 
-  const history = buildHistory(recentMessages).reverse();
+    history = buildHistory((recentMessages ?? []).reverse());
+  }
   const useShopify = params.catalog === "shopify";
   const useDemoCatalog = !useShopify && apiKey === SHOWCASE_AGENT_KEY;
   const preferredCurrency = params.currency ?? null;
@@ -537,6 +549,8 @@ export async function chatWithAgent(
         agent_id: validAgent.id,
         message,
         reply,
+        channel: params.channel ?? "widget",
+        conversation_id: params.conversationId ?? null,
         created_at: deps.now ? deps.now() : new Date().toISOString(),
       });
     if (persistenceError) {

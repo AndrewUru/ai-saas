@@ -54,6 +54,14 @@ function extractMessage(body: Record<string, unknown>) {
   return null;
 }
 
+const CONVERSATION_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
+
+function extractConversationId(body: Record<string, unknown>) {
+  const value = body.conversation_id;
+  if (typeof value !== "string" || !CONVERSATION_ID_PATTERN.test(value)) return undefined;
+  return `widget:${value}`;
+}
+
 export async function POST(req: Request) {
   const locale = getRequestLocale(req);
   const e = getMessages(locale).api;
@@ -99,6 +107,8 @@ export async function POST(req: Request) {
         currency: currency ?? undefined,
         requestHost: resolveRequestHost(req),
         locale,
+        conversationId: extractConversationId(bodyRecord),
+        channel: "widget",
       },
       {
         supabase: createAdmin(),

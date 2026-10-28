@@ -1312,8 +1312,10 @@ export function renderWidgetScript(
       };
 
       const historyStorageKey = \`ai-saas-widget-history:\${CONFIG_KEY || brandName}\`;
+      // Also sent as conversation_id, so it must be hard to guess.
       const createSessionId = () =>
-        Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+        window.crypto?.randomUUID?.() ||
+        Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 12);
       const readChatHistory = () => {
         if (IS_PREVIEW) return [];
         try {
@@ -1580,6 +1582,7 @@ export function renderWidgetScript(
           const payload = {
             message: text,
             messages: activeMessages.slice(-20),
+            conversation_id: requestSessionId,
           };
           if (agentKey) payload.api_key = agentKey;
 
