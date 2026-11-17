@@ -1,0 +1,36 @@
+name: Weekly UI/UX Automation Checks
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/weekly-ui-improvements.yml"
+      - ".github/workflows/weekly-ui-validation.yml"
+      - ".maintenance/scripts/weekly-ui-*.mjs"
+      - ".maintenance/config/weekly-ui-improvements.json"
+      - ".maintenance/schemas/weekly-ui-improvement.schema.json"
+      - ".maintenance/improvements/queue/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  weekly-ui-engine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Run weekly UI/UX unit tests
+        run: npm run improve:weekly:test
+
+      - name: Check queue without modifying any files
+        run: npm run improve:weekly:dry
