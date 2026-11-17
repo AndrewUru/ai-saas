@@ -65,7 +65,7 @@ jobs:
             {
               echo "### Codex cannot generate an improvement"
               echo ""
-              echo "The required repository Actions secret `OPENAI_API_KEY` is empty or unavailable."
+              echo 'The required repository Actions secret `OPENAI_API_KEY` is empty or unavailable.'
               echo "Create the secret and re-run this workflow. A ChatGPT subscription is not an API credential."
             } >> "$GITHUB_STEP_SUMMARY"
             exit 1
