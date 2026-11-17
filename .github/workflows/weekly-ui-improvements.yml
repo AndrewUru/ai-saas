@@ -6,8 +6,7 @@ on:
     - cron: "0 8 * * 1"
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 concurrency:
   group: weekly-ui-ux-improvements
@@ -16,6 +15,7 @@ concurrency:
 jobs:
   generate-candidate:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     permissions:
       contents: read
       pull-requests: read
@@ -25,15 +25,18 @@ jobs:
       generated: ${{ steps.validate.outputs.generated }}
     steps:
       - name: Checkout default branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
+
+      - name: Test weekly UI/UX automation
+        run: npm run improve:weekly:test
 
       - name: Stop if a weekly UI/UX PR is already open
         id: open-pr
@@ -50,6 +53,23 @@ jobs:
         if: steps.open-pr.outputs.count == '0'
         id: queue
         run: node .maintenance/scripts/weekly-ui-proposal.mjs --queue-status
+
+      - name: Verify Codex API credential
+        if: steps.queue.outputs.ready == 'false'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        shell: bash
+        run: |
+          if [[ -z "$OPENAI_API_KEY" ]]; then
+            echo "::error title=Missing OPENAI_API_KEY::Configure the OPENAI_API_KEY repository Actions secret under Settings > Secrets and variables > Actions."
+            {
+              echo "### Codex cannot generate an improvement"
+              echo ""
+              echo 'The required repository Actions secret `OPENAI_API_KEY` is empty or unavailable.'
+              echo "Create the secret and re-run this workflow. A ChatGPT subscription is not an API credential."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
 
       - name: Ask Codex for one small improvement
         if: steps.queue.outputs.ready == 'false'
@@ -86,14 +106,18 @@ jobs:
     needs: generate-candidate
     if: needs['generate-candidate'].outputs.open_pr_count == '0'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
 
     env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || vars.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
     steps:
       - name: Checkout default branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
@@ -105,10 +129,13 @@ jobs:
           git log -1 --oneline
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
+
+      - name: Test weekly UI/UX automation
+        run: npm run improve:weekly:test
 
       - name: Stop if a weekly UI/UX PR is already open
         id: open-pr
@@ -150,16 +177,21 @@ jobs:
         run: npm ci
 
       - name: Run lint
-        if: always() && steps.improvement.outputs.applied == 'true'
+        if: always() && steps.improvement.outputs.applied == 'true' && steps.install.outcome == 'success'
         id: lint
         continue-on-error: true
         run: npm run lint
 
       - name: Run production build
-        if: always() && steps.improvement.outputs.applied == 'true'
+        if: always() && steps.improvement.outputs.applied == 'true' && steps.install.outcome == 'success'
         id: build
         continue-on-error: true
-        run: npm run build
+        run: |
+          if [[ -z "$NEXT_PUBLIC_SUPABASE_URL" || -z "$NEXT_PUBLIC_SUPABASE_ANON_KEY" ]]; then
+            echo "::error title=Missing Supabase build settings::Configure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY as repository Actions secrets or variables."
+            exit 1
+          fi
+          npm run build
 
       - name: Record validation results
         if: always() && steps.improvement.outputs.applied == 'true'
